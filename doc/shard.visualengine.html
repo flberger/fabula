@@ -1,0 +1,241 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module shard.visualengine</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="shard.html"><font color="#ffffff">shard</font></a>.visualengine</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/visualengine.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/visualengine.py</a></font></td></tr></table>
+    <p><tt>Shard&nbsp;Visual&nbsp;Engine<br>
+&nbsp;<br>
+Extracted&nbsp;from&nbsp;shard.py&nbsp;on&nbsp;22.&nbsp;Sep&nbsp;2009</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="shard.visualengine.html#VisualEngine">VisualEngine</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="VisualEngine">class <strong>VisualEngine</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;for&nbsp;the<br>
+Shard&nbsp;Client.&nbsp;Subclasses&nbsp;should&nbsp;override&nbsp;the<br>
+appropriate&nbsp;methods&nbsp;of&nbsp;this&nbsp;class&nbsp;and&nbsp;implement&nbsp;a&nbsp;<br>
+graphical&nbsp;representation&nbsp;of&nbsp;the&nbsp;game&nbsp;and&nbsp;the&nbsp;<br>
+action.&nbsp;Shard&nbsp;is&nbsp;based&nbsp;on&nbsp;a&nbsp;two-dimensional&nbsp;map,&nbsp;<br>
+but&nbsp;apart&nbsp;from&nbsp;that&nbsp;it&nbsp;makes&nbsp;very&nbsp;few&nbsp;assumptions&nbsp;<br>
+about&nbsp;the&nbsp;graphical&nbsp;rendering.&nbsp;Thus&nbsp;it&nbsp;is&nbsp;<br>
+possible&nbsp;to&nbsp;write&nbsp;2D&nbsp;and&nbsp;3D&nbsp;VisualEngines&nbsp;and&nbsp;<br>
+even&nbsp;a&nbsp;text&nbsp;interface.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="VisualEngine-__init__"><strong>__init__</strong></a>(self, asset_engine, framerate)</dt><dd><tt>This&nbsp;method&nbsp;initializes&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a>.<br>
+asset_engine&nbsp;must&nbsp;be&nbsp;an&nbsp;instance&nbsp;of<br>
+shard.AssetEngine&nbsp;or&nbsp;a&nbsp;subclass.<br>
+framerate&nbsp;must&nbsp;be&nbsp;an&nbsp;integer&nbsp;and&nbsp;sets<br>
+the&nbsp;maximum&nbsp;(not&nbsp;minimum&nbsp;;-))&nbsp;frames&nbsp;per<br>
+second&nbsp;the&nbsp;client&nbsp;will&nbsp;run&nbsp;in.<br>
+If&nbsp;you&nbsp;override&nbsp;this&nbsp;method,&nbsp;make&nbsp;sure&nbsp;<br>
+you&nbsp;do&nbsp;all&nbsp;these&nbsp;initiaizations,&nbsp;too.<br>
+For&nbsp;your&nbsp;convenience&nbsp;there&nbsp;is&nbsp;a&nbsp;method<br>
+<a href="#VisualEngine-custom_init">custom_init</a>()&nbsp;which&nbsp;you&nbsp;can&nbsp;savely<br>
+override.&nbsp;<br>
+This&nbsp;method&nbsp;must&nbsp;not&nbsp;block,&nbsp;it&nbsp;has&nbsp;to&nbsp;<br>
+return&nbsp;once&nbsp;everything&nbsp;is&nbsp;set&nbsp;up.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-collect_player_input"><strong>collect_player_input</strong></a>(self)</dt><dd><tt>The&nbsp;module&nbsp;you&nbsp;use&nbsp;for&nbsp;actual&nbsp;graphics<br>
+rendering&nbsp;most&nbsp;probably&nbsp;has&nbsp;a&nbsp;way&nbsp;to<br>
+capture&nbsp;user&nbsp;input.&nbsp;This&nbsp;method&nbsp;is&nbsp;called<br>
+when&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;has&nbsp;displayed&nbsp;a<br>
+series&nbsp;of&nbsp;events&nbsp;and&nbsp;wants&nbsp;to&nbsp;capture<br>
+the&nbsp;user's&nbsp;reaction.&nbsp;When&nbsp;overriding&nbsp;this<br>
+method,&nbsp;you&nbsp;have&nbsp;to&nbsp;convert&nbsp;the&nbsp;data<br>
+provided&nbsp;by&nbsp;your&nbsp;module&nbsp;into&nbsp;Shard&nbsp;<br>
+events,&nbsp;most&nbsp;probably&nbsp;instances&nbsp;of&nbsp;<br>
+shard.AttemptEvent.&nbsp;You&nbsp;must&nbsp;append&nbsp;them<br>
+to&nbsp;self.<strong>player_event_list</strong>&nbsp;which&nbsp;is<br>
+evaluated&nbsp;by&nbsp;the&nbsp;ControlEngine.<br>
+Note&nbsp;that&nbsp;your&nbsp;module&nbsp;might&nbsp;provide&nbsp;you<br>
+with&nbsp;numerous&nbsp;user&nbsp;actions&nbsp;if&nbsp;the&nbsp;user<br>
+clicked&nbsp;and&nbsp;typed&nbsp;a&nbsp;lot&nbsp;during&nbsp;the<br>
+rendering.&nbsp;You&nbsp;should&nbsp;create&nbsp;a&nbsp;<br>
+reasonable&nbsp;subset&nbsp;of&nbsp;those&nbsp;actions,&nbsp;<br>
+e.g.&nbsp;select&nbsp;only&nbsp;the&nbsp;very&nbsp;last&nbsp;user<br>
+input&nbsp;action.<br>
+The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-custom_init"><strong>custom_init</strong></a>(self)</dt><dd><tt>When&nbsp;creating&nbsp;a&nbsp;subclass,&nbsp;you&nbsp;should&nbsp;not<br>
+override&nbsp;the&nbsp;standard&nbsp;<a href="#VisualEngine-__init__">__init__</a>()&nbsp;method<br>
+of&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;class.&nbsp;Instead&nbsp;place<br>
+all&nbsp;your&nbsp;custom&nbsp;setup&nbsp;code&nbsp;here.&nbsp;You&nbsp;can&nbsp;<br>
+initialize&nbsp;your&nbsp;graphics&nbsp;module&nbsp;here&nbsp;and<br>
+display&nbsp;a&nbsp;splash&nbsp;screen.&nbsp;Everything<br>
+is&nbsp;fine,&nbsp;as&nbsp;long&nbsp;as&nbsp;you&nbsp;return.&nbsp;:-)</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_CanSpeakEvent"><strong>display_CanSpeakEvent</strong></a>(self, CanSpeakEvent_instance)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a><br>
+needs&nbsp;to&nbsp;render&nbsp;a&nbsp;CanSpeakEvent.&nbsp;This&nbsp;is&nbsp;the<br>
+last&nbsp;event&nbsp;rendered&nbsp;before&nbsp;returning&nbsp;to<br>
+the&nbsp;ControlEngine.&nbsp;You&nbsp;have&nbsp;to&nbsp;prompt&nbsp;for<br>
+appropriate&nbsp;user&nbsp;input&nbsp;here&nbsp;and&nbsp;add&nbsp;a<br>
+corresponding&nbsp;SaysEvent&nbsp;to&nbsp;self.<strong>player_event_list</strong>,&nbsp;<br>
+which&nbsp;is&nbsp;evaluated&nbsp;by&nbsp;the&nbsp;ControlEngine.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_ChangeMapElementEvents"><strong>display_ChangeMapElementEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of<br>
+instances&nbsp;of&nbsp;ChangeMapElementEvent.<br>
+There&nbsp;are&nbsp;only&nbsp;visible&nbsp;Map&nbsp;elements<br>
+in&nbsp;the&nbsp;list&nbsp;if&nbsp;you&nbsp;hav&nbsp;implemented<br>
+an&nbsp;according&nbsp;filter&nbsp;in&nbsp;<a href="#VisualEngine-filter_events">filter_events</a>().<br>
+In&nbsp;this&nbsp;method&nbsp;you&nbsp;must&nbsp;implement&nbsp;a<br>
+major&nbsp;redraw&nbsp;of&nbsp;the&nbsp;display,&nbsp;updating&nbsp;all<br>
+Map&nbsp;elements&nbsp;and&nbsp;after&nbsp;that&nbsp;all&nbsp;Entities.<br>
+This&nbsp;is&nbsp;only&nbsp;a&nbsp;single&nbsp;frame&nbsp;though.<br>
+Note&nbsp;that&nbsp;event_list&nbsp;may&nbsp;be&nbsp;empty.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_DeleteEvents"><strong>display_DeleteEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of&nbsp;<br>
+instances&nbsp;of&nbsp;DeleteEvent.&nbsp;You&nbsp;need<br>
+to&nbsp;remove&nbsp;the&nbsp;Entites&nbsp;affected&nbsp;from<br>
+your&nbsp;data&nbsp;structures&nbsp;and&nbsp;draw&nbsp;a<br>
+frame&nbsp;without&nbsp;the&nbsp;deleted&nbsp;Entities.<br>
+event_list&nbsp;may&nbsp;be&nbsp;empty.&nbsp;Note&nbsp;that<br>
+the&nbsp;Entities&nbsp;to&nbsp;be&nbsp;removed&nbsp;are<br>
+already&nbsp;gone&nbsp;in&nbsp;self.<strong>event_dict</strong>,&nbsp;<br>
+so&nbsp;use&nbsp;self.<strong>deleted_entities_dict</strong><br>
+instead.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_EnterRoomEvent"><strong>display_EnterRoomEvent</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a><br>
+has&nbsp;encoutered&nbsp;an&nbsp;EnterRoomEvent.&nbsp;You&nbsp;should<br>
+override&nbsp;it,&nbsp;blank&nbsp;the&nbsp;screen&nbsp;here&nbsp;and&nbsp;display<br>
+a&nbsp;waiting&nbsp;message&nbsp;since&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;is<br>
+going&nbsp;to&nbsp;twiddle&nbsp;thumbs&nbsp;until&nbsp;it&nbsp;receives&nbsp;a&nbsp;<br>
+RoomCompleteEvent.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_PerceptionEvents"><strong>display_PerceptionEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of<br>
+instances&nbsp;of&nbsp;PerceptionEvent.&nbsp;You<br>
+have&nbsp;to&nbsp;provide&nbsp;an&nbsp;implementation<br>
+whicht&nbsp;displays&nbsp;them&nbsp;one&nbsp;by&nbsp;one,&nbsp;<br>
+possibly&nbsp;awaiting&nbsp;user&nbsp;confirmation.<br>
+event_list&nbsp;may&nbsp;be&nbsp;empty.&nbsp;Please&nbsp;do<br>
+not&nbsp;continue&nbsp;animation&nbsp;of&nbsp;other<br>
+Entities&nbsp;during&nbsp;the&nbsp;perception&nbsp;so<br>
+there&nbsp;are&nbsp;no&nbsp;background&nbsp;actions&nbsp;<br>
+which&nbsp;may&nbsp;pass&nbsp;unnoticed.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_RoomCompleteEvent"><strong>display_RoomCompleteEvent</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;everything<br>
+is&nbsp;fetched&nbsp;and&nbsp;ready&nbsp;after&nbsp;a<br>
+RoomCompleteEvent.&nbsp;Here&nbsp;you&nbsp;should&nbsp;<br>
+set&nbsp;up&nbsp;the&nbsp;main&nbsp;screen&nbsp;and&nbsp;display&nbsp;<br>
+some&nbsp;Map&nbsp;elements&nbsp;and&nbsp;Entities.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_SaysEvents"><strong>display_SaysEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list<br>
+of&nbsp;instances&nbsp;of&nbsp;SaysEvent&nbsp;when&nbsp;the<br>
+<a href="#VisualEngine">VisualEngine</a>&nbsp;is&nbsp;ready&nbsp;to&nbsp;display<br>
+what&nbsp;Entities&nbsp;say.&nbsp;In&nbsp;this&nbsp;method<br>
+you&nbsp;have&nbsp;to&nbsp;compute&nbsp;a&nbsp;number&nbsp;of<br>
+frames&nbsp;for&nbsp;displaying&nbsp;text&nbsp;and<br>
+animation&nbsp;for&nbsp;each&nbsp;SaysEvent&nbsp;<br>
+depending&nbsp;on&nbsp;how&nbsp;long&nbsp;the&nbsp;text&nbsp;is.&nbsp;<br>
+Once&nbsp;you&nbsp;start&nbsp;displaying&nbsp;the&nbsp;text,&nbsp;<br>
+you&nbsp;have&nbsp;to&nbsp;notify&nbsp;the&nbsp;affected&nbsp;<br>
+Entity&nbsp;by&nbsp;calling<br>
+Entity.starts_speaking(self,&nbsp;frames,&nbsp;framerate).<br>
+You&nbsp;should&nbsp;catch&nbsp;some&nbsp;user&nbsp;<br>
+confirmation.&nbsp;Please&nbsp;do&nbsp;not&nbsp;continue&nbsp;<br>
+animation&nbsp;of&nbsp;other&nbsp;Entities&nbsp;so&nbsp;there&nbsp;<br>
+are&nbsp;no&nbsp;background&nbsp;actions&nbsp;which&nbsp;may&nbsp;<br>
+pass&nbsp;unnoticed.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_SpawnEvents"><strong>display_SpawnEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of<br>
+instances&nbsp;of&nbsp;SpawnEvent&nbsp;to&nbsp;be&nbsp;displayed.&nbsp;<br>
+All&nbsp;you&nbsp;need&nbsp;to&nbsp;do&nbsp;here&nbsp;is&nbsp;adding&nbsp;the&nbsp;<br>
+new&nbsp;Enties&nbsp;to&nbsp;a&nbsp;list&nbsp;of&nbsp;visible&nbsp;Entities&nbsp;<br>
+you&nbsp;might&nbsp;have&nbsp;set&nbsp;up&nbsp;and&nbsp;render&nbsp;a&nbsp;static<br>
+frame.&nbsp;Note&nbsp;that&nbsp;event_list&nbsp;may&nbsp;be&nbsp;empty.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_asset_exception"><strong>display_asset_exception</strong></a>(self, asset)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;asset_engine<br>
+is&nbsp;unable&nbsp;to&nbsp;retrieve&nbsp;the&nbsp;asset.&nbsp;This&nbsp;is&nbsp;a&nbsp;<br>
+serious&nbsp;error&nbsp;which&nbsp;prohibits&nbsp;continuation.<br>
+The&nbsp;user&nbsp;should&nbsp;be&nbsp;asked&nbsp;to&nbsp;check&nbsp;his<br>
+installation,&nbsp;file&nbsp;system&nbsp;or&nbsp;network<br>
+connection.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_multiple_frame_action"><strong>display_multiple_frame_action</strong></a>(self, MovesToEvent_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a><br>
+is&nbsp;ready&nbsp;to&nbsp;render&nbsp;Move,&nbsp;Drop&nbsp;or&nbsp;PickUp<br>
+actions.&nbsp;All&nbsp;visible&nbsp;Entities&nbsp;are&nbsp;already<br>
+notified&nbsp;about&nbsp;their&nbsp;state&nbsp;at&nbsp;this&nbsp;point.<br>
+This&nbsp;method&nbsp;must&nbsp;render&nbsp;exactly<br>
+self.<strong>action_frames</strong>&nbsp;frames.&nbsp;You&nbsp;have&nbsp;to&nbsp;<br>
+compute&nbsp;a&nbsp;movement&nbsp;for&nbsp;each&nbsp;Entity&nbsp;in&nbsp;the&nbsp;<br>
+list&nbsp;of&nbsp;MovesToEvent&nbsp;instances&nbsp;provided.&nbsp;<br>
+Note&nbsp;that&nbsp;this&nbsp;list&nbsp;may&nbsp;be&nbsp;empty,&nbsp;but&nbsp;even&nbsp;<br>
+then&nbsp;you&nbsp;have&nbsp;to&nbsp;render&nbsp;the&nbsp;full&nbsp;number&nbsp;of&nbsp;<br>
+frames&nbsp;to&nbsp;display&nbsp;PickUp&nbsp;and&nbsp;Drop&nbsp;animations.&nbsp;<br>
+You&nbsp;might&nbsp;get&nbsp;away&nbsp;with&nbsp;just&nbsp;changing&nbsp;the&nbsp;<br>
+screen&nbsp;coordinates&nbsp;and&nbsp;calling&nbsp;<br>
+<a href="#VisualEngine-display_static_frame">display_static_frame</a>().</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-display_static_frame"><strong>display_static_frame</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a><br>
+decides&nbsp;that&nbsp;is&nbsp;need&nbsp;to&nbsp;enter&nbsp;a&nbsp;single&nbsp;frame<br>
+of&nbsp;the&nbsp;current&nbsp;game&nbsp;state.&nbsp;There&nbsp;is&nbsp;nothing<br>
+special&nbsp;going&nbsp;on&nbsp;here,&nbsp;so&nbsp;you&nbsp;should&nbsp;notify<br>
+the&nbsp;Entities&nbsp;that&nbsp;there&nbsp;is&nbsp;a&nbsp;next&nbsp;frame&nbsp;to<br>
+be&nbsp;displayed&nbsp;(however&nbsp;that&nbsp;is&nbsp;done&nbsp;in&nbsp;your&nbsp;<br>
+implementation)&nbsp;and&nbsp;update&nbsp;their&nbsp;graphics.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-filter_events"><strong>filter_events</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;is&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of<br>
+parallel&nbsp;events&nbsp;before&nbsp;they&nbsp;are&nbsp;rendered.<br>
+You&nbsp;can&nbsp;filter&nbsp;events&nbsp;here,&nbsp;for&nbsp;example<br>
+if&nbsp;they&nbsp;are&nbsp;off-screen.&nbsp;This&nbsp;method<br>
+must&nbsp;change&nbsp;the&nbsp;event_list&nbsp;in&nbsp;place.<br>
+The&nbsp;default&nbsp;is&nbsp;no&nbsp;filtering.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-render_message"><strong>render_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;the&nbsp;<a href="#VisualEngine">VisualEngine</a>.<br>
+It&nbsp;is&nbsp;called&nbsp;regularly&nbsp;by&nbsp;the&nbsp;ClientControlEngine<br>
+with&nbsp;a&nbsp;list&nbsp;of&nbsp;events&nbsp;to&nbsp;display&nbsp;(note:&nbsp;the<br>
+list&nbsp;may&nbsp;be&nbsp;empty).&nbsp;It&nbsp;may&nbsp;take&nbsp;all&nbsp;the&nbsp;time&nbsp;<br>
+it&nbsp;needs&nbsp;to&nbsp;render&nbsp;the&nbsp;action,&nbsp;just&nbsp;a&nbsp;couple&nbsp;<br>
+or&nbsp;even&nbsp;hundreds&nbsp;of&nbsp;frames,&nbsp;but&nbsp;it&nbsp;must&nbsp;<br>
+return&nbsp;once&nbsp;the&nbsp;events&nbsp;have&nbsp;been&nbsp;displayed.&nbsp;<br>
+It&nbsp;must&nbsp;neither&nbsp;block&nbsp;completely&nbsp;nor&nbsp;run&nbsp;in&nbsp;<br>
+a&nbsp;thread&nbsp;since&nbsp;the&nbsp;ClientControlEngine&nbsp;has&nbsp;to&nbsp;<br>
+grab&nbsp;new&nbsp;events&nbsp;and&nbsp;change&nbsp;state&nbsp;between&nbsp;<br>
+calls&nbsp;to&nbsp;<a href="#VisualEngine-render_message">render_message</a>().&nbsp;Put&nbsp;that&nbsp;way,&nbsp;<br>
+<a href="#VisualEngine-render_message">render_message</a>()&nbsp;is&nbsp;simply&nbsp;a&nbsp;part&nbsp;of&nbsp;<br>
+ClientControlEngine.run().<br>
+You&nbsp;should&nbsp;normally&nbsp;not&nbsp;override&nbsp;this&nbsp;method<br>
+unless&nbsp;you&nbsp;have&nbsp;to&nbsp;do&nbsp;some&nbsp;really&nbsp;advanced<br>
+stuff.&nbsp;Overriding&nbsp;the&nbsp;other&nbsp;methods&nbsp;of&nbsp;this<br>
+class&nbsp;(which&nbsp;in&nbsp;turn&nbsp;are&nbsp;called&nbsp;from&nbsp;<br>
+<a href="#VisualEngine-render_message">render_message</a>())&nbsp;should&nbsp;be&nbsp;just&nbsp;fine.&nbsp;See&nbsp;<br>
+the&nbsp;other&nbsp;methods&nbsp;and&nbsp;the&nbsp;source&nbsp;code&nbsp;for&nbsp;<br>
+details.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-update_frame_timer"><strong>update_frame_timer</strong></a>(self)</dt><dd><tt>Your&nbsp;graphics&nbsp;module&nbsp;might&nbsp;provide&nbsp;a<br>
+timer&nbsp;which&nbsp;must&nbsp;be&nbsp;notified&nbsp;once&nbsp;per<br>
+frame.&nbsp;Do&nbsp;this&nbsp;here&nbsp;and&nbsp;use&nbsp;this&nbsp;method<br>
+wherever&nbsp;you&nbsp;need&nbsp;it.&nbsp;It&nbsp;is&nbsp;also&nbsp;called<br>
+from&nbsp;<a href="#VisualEngine-render_message">render_message</a>()&nbsp;when&nbsp;appropriate.<br>
+This&nbsp;method&nbsp;may&nbsp;block&nbsp;execution&nbsp;to&nbsp;slow<br>
+the&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;down&nbsp;to&nbsp;a&nbsp;certain<br>
+frame&nbsp;rate.</tt></dd></dl>
+
+<dl><dt><a name="VisualEngine-update_inventory"><strong>update_inventory</strong></a>(self)</dt><dd><tt>We&nbsp;do&nbsp;not&nbsp;have&nbsp;to&nbsp;care&nbsp;about&nbsp;the&nbsp;object&nbsp;of<br>
+a&nbsp;DropsEvent&nbsp;and&nbsp;PicksUpEvent&nbsp;since&nbsp;the&nbsp;<br>
+ControlEngine&nbsp;has&nbsp;generated&nbsp;an&nbsp;respective&nbsp;<br>
+SpawnEvent&nbsp;and&nbsp;DeleteEvent,&nbsp;which&nbsp;is&nbsp;already&nbsp;<br>
+rendered.&nbsp;All&nbsp;that&nbsp;is&nbsp;left&nbsp;is&nbsp;to&nbsp;update&nbsp;the&nbsp;<br>
+inventory&nbsp;visualisation.&nbsp;You&nbsp;can&nbsp;use&nbsp;that<br>
+to&nbsp;enter&nbsp;a&nbsp;frame&nbsp;for&nbsp;the&nbsp;Entities&nbsp;as&nbsp;well.</tt></dd></dl>
+
+</td></tr></table></td></tr></table>
+</body></html>
