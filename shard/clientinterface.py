@@ -3,6 +3,8 @@
    Extracted from shard.py on 22. Sep 2009
 """
 
+import shard
+
 class ClientInterface:
     '''This is the base class for a Shard Client Interface.
        Implementations should subclass this one an override
@@ -13,8 +15,8 @@ class ClientInterface:
         # EXAMPLE
         # First one cache for a client message and one
         # for a server message.
-        self.client_message = Message([])
-        self.server_message = Message([])
+        self.client_message = shard.Message([])
+        self.server_message = shard.Message([])
 
         # Please note that handle_messages() will run in
         # a background thread. NEVER attempt to change
@@ -59,8 +61,8 @@ class ClientInterface:
            the thread.'''
         # EXAMPLE
         # Set up space for some local copies
-        local_client_message = Message([])
-        local_server_message = Message([])
+        local_client_message = shard.Message([])
+        local_server_message = shard.Message([])
 
         # Just as in the main thread, a queue
         # for server messages comes in handy in case 
@@ -89,7 +91,7 @@ class ClientInterface:
                 # init message and silently discard everything
                 # else.
                 for current_event in local_client_message.event_list:
-                    if isinstance(current_event, InitEvent):
+                    if isinstance(current_event, shard.InitEvent):
                         client_sent_init = True
 
             # When done with the client message, it is time
@@ -99,17 +101,17 @@ class ClientInterface:
             # requested init.
             if client_sent_init:
                 # Build a message
-                event_list = [ EnterRoomEvent() ]
-                event_list.append(SpawnEvent(Entity("PLAYER",
-                                                    "player",
-                                                    (0, 0),
-                                                    "")))
-                event_list.append(RoomCompleteEvent())
-                event_list.append(PerceptionEvent("player",
-                                                  "dummy server message"))
+                event_list = [shard.EnterRoomEvent()]
+                event_list.append(shard.SpawnEvent(shard.Entity("PLAYER",
+                                                                "player",
+                                                                (0, 0),
+                                                                "")))
+                event_list.append(shard.RoomCompleteEvent())
+                event_list.append(shard.PerceptionEvent("player",
+                                                        "dummy server message"))
 
                 # Append a message to the queue
-                server_message_queue.append(Message(event_list))
+                server_message_queue.append(shard.Message(event_list))
 
                 # Set client_sent_init to false again, so the
                 # events are only set once
@@ -190,7 +192,7 @@ class ClientInterface:
            message.'''
         # EXAMPLE
         # Set up a local copy
-        local_server_message = Message([])
+        local_server_message = shard.Message([])
 
         # self.server_message_available is used as a 
         # thread-safe flag. It may only be set to True 
@@ -225,7 +227,7 @@ class ClientInterface:
 
             # A Message must be returned, so create
             # an empty one
-            return Message([])
+            return shard.Message([])
 
     def shutdown(self):
         '''This method is called when the client is

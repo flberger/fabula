@@ -3,6 +3,8 @@
     Extracted from shard.py on 22. Sep 2009
 """
 
+import shard
+
 class ClientControlEngine:
     '''An instance of this class is the main engine in every
        Shard client. It connects to the Client Interface and
@@ -31,19 +33,19 @@ class ClientControlEngine:
         # to be called for the respective event.
         # I just love to use dicts to avoid endless
         # if... elif... clauses. :-)
-        self.event_dict = {AttemptFailedEvent : self.process_AttemptFailedEvent , 
-                          CanSpeakEvent : self.process_CanSpeakEvent , 
-                          DropsEvent : self.process_DropsEvent , 
-                          MovesToEvent : self.process_MovesToEvent , 
-                          PicksUpEvent : self.process_PicksUpEvent , 
-                          CustomEntityEvent : self.process_CustomEntityEvent , 
-                          PerceptionEvent : self.process_PerceptionEvent , 
-                          SaysEvent : self.process_SaysEvent , 
-                          ChangeMapElementEvent : self.process_ChangeMapElementEvent , 
-                          DeleteEvent : self.process_DeleteEvent , 
-                          EnterRoomEvent : self.process_EnterRoomEvent , 
-                          RoomCompleteEvent : self.process_RoomCompleteEvent , 
-                          SpawnEvent : self.process_SpawnEvent }
+        self.event_dict = {shard.AttemptFailedEvent : self.process_AttemptFailedEvent, 
+                           shard.CanSpeakEvent : self.process_CanSpeakEvent, 
+                           shard.DropsEvent : self.process_DropsEvent, 
+                           shard.MovesToEvent : self.process_MovesToEvent, 
+                           shard.PicksUpEvent : self.process_PicksUpEvent, 
+                           shard.CustomEntityEvent : self.process_CustomEntityEvent, 
+                           shard.PerceptionEvent : self.process_PerceptionEvent, 
+                           shard.SaysEvent : self.process_SaysEvent, 
+                           shard.ChangeMapElementEvent : self.process_ChangeMapElementEvent, 
+                           shard.DeleteEvent : self.process_DeleteEvent, 
+                           shard.EnterRoomEvent : self.process_EnterRoomEvent, 
+                           shard.RoomCompleteEvent : self.process_RoomCompleteEvent, 
+                           shard.SpawnEvent : self.process_SpawnEvent}
 
         # self.entity_dict keeps track of all active Entites.
         # It uses the identifier as a key, assuming that is
@@ -75,7 +77,7 @@ class ClientControlEngine:
         # in a Message for the VisualEngine.
         # The ClientControlEngine has to empty the Message once 
         # the VisualEngine has rendered all Events.
-        self.visual_engine_message = Message([])
+        self.visual_engine_message = shard.Message([])
 
         # We attach custom flags to the Message to notify
         # the VisualEngine whether an EnterRoomEvent or
@@ -86,7 +88,7 @@ class ClientControlEngine:
 
         # In self.client_message we collect Client events to be
         # sent to the server in each loop.
-        self.client_message = Message([])
+        self.client_message = shard.Message([])
         
         # DELETE
         self.got_empty_message = False
@@ -117,7 +119,7 @@ class ClientControlEngine:
 
         # Send InitEvent to trigger a complete update
         # from the server
-        self.client_interface.send_message(Message([InitEvent()]))
+        self.client_interface.send_message(shard.Message([shard.InitEvent()]))
 
         while not self.visual_engine.exit_requested:
             # grab_message must and will return a Message, but
@@ -164,7 +166,7 @@ class ClientControlEngine:
 
             # The VisualEngine returned, the Server Message has
             # been applied and rendered. Clean up.
-            self.visual_engine_message = Message([])
+            self.visual_engine_message = shard.Message([])
             self.deleted_entities_dict = {}
             self.visual_engine_message.has_EnterRoomEvent = False
             self.visual_engine_message.has_RoomCompleteEvent = False
@@ -173,7 +175,7 @@ class ClientControlEngine:
             # had any events at all. But we only send a 
             # MessageAppliedEvent if it had.
             if len(server_message.event_list)>0:
-                self.client_message.event_list.append(MessageAppliedEvent())
+                self.client_message.event_list.append(shard.MessageAppliedEvent())
 
             # TODO:
             # If there has been a Confirmation for a LookAt or
@@ -199,7 +201,7 @@ class ClientControlEngine:
                 self.client_interface.send_message(self.client_message)
 
                 # Clean up
-                self.client_message = Message([])
+                self.client_message = shard.Message([])
 
             # OK, iteration done. If no exit requested, 
             # grab the next server event!

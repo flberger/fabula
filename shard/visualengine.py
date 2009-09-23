@@ -3,6 +3,8 @@
    Extracted from shard.py on 22. Sep 2009
 """
 
+import shard
+
 class VisualEngine:
     '''This is the base class for a VisualEngine for the
        Shard Client. Subclasses should override the
@@ -109,7 +111,7 @@ class VisualEngine:
         
         # Compute the number of frames per action.
         # See __init__() for details.
-        action_frames = int(self.action_time * self.framerate)
+        self.action_frames = int(self.action_time * self.framerate)
 
         ####################
         # Check EnterRoomEvent
@@ -189,7 +191,7 @@ class VisualEngine:
 
                 # Delete everything in the event_list up to and
                 # including the RoomCompleteEvent
-                while not isinstance(message.event_list[0], RoomCompleteEvent):
+                while not isinstance(message.event_list[0], shard.RoomCompleteEvent):
                     del message.event_list[0]
                 
                 # Arrived at RoomCompleteEvent. 
@@ -241,13 +243,13 @@ class VisualEngine:
         grouped_events = [[]]
 
         # make a buffer for the CanSpeakEvent
-        buffered_CanSpeakEvent = Event("dummy_identifier")
+        buffered_CanSpeakEvent = shard.Event("dummy_identifier")
         
         # buffer for an identifier
         identifier = ''
         
         for current_event in message.event_list:
-            if isinstance(current_event, CanSpeakEvent):
+            if isinstance(current_event, shard.CanSpeakEvent):
                 # CanSpeakEvent is taken out of the list
                 # to be appended at the very end.
                 # Note that this keeps only the very
@@ -255,7 +257,7 @@ class VisualEngine:
                 # more than one in a message.
                 buffered_CanSpeakEvent = current_event
             
-            elif isinstance(current_event, ChangeMapElementEvent):
+            elif isinstance(current_event, shard.ChangeMapElementEvent):
                 # All these happen in parallel, no identifier
                 # is recorded
                 grouped_events[-1].append(current_event)
@@ -263,7 +265,7 @@ class VisualEngine:
             else:
                 # Now follow the events where we can
                 # detect an identifier
-                if isinstance(current_event, SpawnEvent):
+                if isinstance(current_event, shard.SpawnEvent):
                     identifier = current_event.entity.identifier
                 else:
                     identifier = current_event.identifier
@@ -288,7 +290,7 @@ class VisualEngine:
 
         # All parallel events are grouped now.            
         # Append the CanSpeakEvent if it is there.
-        if isinstance(buffered_CanSpeakEvent, CanSpeakEvent):
+        if isinstance(buffered_CanSpeakEvent, shard.CanSpeakEvent):
             grouped_events.append([buffered_CanSpeakEvent])
 
         ####################
@@ -317,7 +319,7 @@ class VisualEngine:
 
             # We have at least one event.
 
-            if isinstance(event_list[0], CanSpeakEvent):
+            if isinstance(event_list[0], shard.CanSpeakEvent):
                 # See the method for explaination.
                 self.display_CanSpeakEvent(event_list[0])
                 
@@ -342,18 +344,18 @@ class VisualEngine:
             has_inventory_action = False
 
             for current_event in event_list:
-                if isinstance(current_event, PerceptionEvent):
+                if isinstance(current_event, shard.PerceptionEvent):
                     # Queue for later use.
                     PerceptionEvent_list.append(current_event)
 
-                elif isinstance(current_event, SaysEvent):
+                elif isinstance(current_event, shard.SaysEvent):
                     # The Entity is notified in
                     # self.display_SaysEvents() because we
                     # do not compute the number of frames here.
                     # Queue for later use.
                     SaysEvent_list.append(current_event)
 
-                elif isinstance(current_event, DropsEvent):
+                elif isinstance(current_event, shard.DropsEvent):
                     # This is a multiple frame action.
                     has_multiple_frame_action = True
 
@@ -362,10 +364,10 @@ class VisualEngine:
 
                     # Notify the Entity that the animation is
                     # about to start. No need to queue the event.
-                    self.entity_dict[current_event.identifier].starts_dropping(action_frames,
+                    self.entity_dict[current_event.identifier].starts_dropping(self.action_frames,
                                                                                self.framerate)
 
-                elif isinstance(current_event, PicksUpEvent):
+                elif isinstance(current_event, shard.PicksUpEvent):
                     # This is a multiple frame action.
                     has_multiple_frame_action = True
 
@@ -374,30 +376,30 @@ class VisualEngine:
 
                     # Notify the Entity that the animation is
                     # about to start. No need to queue the event.
-                    self.entity_dict[current_event.identifier].starts_picking_up(action_frames,
+                    self.entity_dict[current_event.identifier].starts_picking_up(self.action_frames,
                                                                                  self.framerate)
 
-                elif isinstance(current_event, MovesToEvent):
+                elif isinstance(current_event, shard.MovesToEvent):
                     # This is a multiple frame action.
                     has_multiple_frame_action = True
 
                     # Notify the Entity that the animation
                     # is about to start.
-                    self.entity_dict[current_event.identifier].starts_moving(action_frames,
+                    self.entity_dict[current_event.identifier].starts_moving(self.action_frames,
                                                                              self.framerate)
 
                     # Queue for later use.
                     MovesToEvent_list.append(current_event)
 
-                elif isinstance(current_event, ChangeMapElementEvent):
+                elif isinstance(current_event, shard.ChangeMapElementEvent):
                     # Queue for later use.
                     ChangeMapElementEvent_list.append(current_event)
 
-                elif isinstance(current_event, SpawnEvent):
+                elif isinstance(current_event, shard.SpawnEvent):
                     # Queue for later use.
                     SpawnEvent_list.append(current_event)
 
-                elif isinstance(current_event, DeleteEvent):
+                elif isinstance(current_event, shard.DeleteEvent):
                     # Queue for later use.
                     DeleteEvent_list.append(current_event)
 
@@ -527,8 +529,8 @@ class VisualEngine:
         # Find a player in entity_dict
         for current_entity in self.entity_dict.values():
             if current_entity.entity_type == "PLAYER":
-                self.player_event_list.append(SaysEvent(current_entity.identifier,
-                                                        "display_CanSpeakEvent: dummy"))
+                self.player_event_list.append(shard.SaysEvent(current_entity.identifier,
+                                                              "display_CanSpeakEvent: dummy"))
         # Don't forget the frame counter in
         # your implementation.
         self.update_frame_timer()
