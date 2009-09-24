@@ -481,9 +481,8 @@ class VisualEngine:
            installation, file system or network
            connection.'''
 
-        self.logger.critical("VisualEngine.display_asset_exception: A required asset "
-              + "(image, animation, sound) could not be fetched. "
-              + "The problematic asset was '"
+        self.logger.critical("A required asset (image, animation,"
+              + " sound) could not be fetched. The problematic asset was '"
               + str(asset)
               + "'. Sorry, but I can't go on.")
 

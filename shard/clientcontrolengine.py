@@ -94,7 +94,7 @@ class ClientControlEngine:
         self.client_message = shard.Message([])
         
         self.got_empty_message = False
-        self.logger.info("ClientControlEngine: __init__ complete.")
+        self.logger.info("__init__ complete.")
 
         # TODO: set up the inventory
 
@@ -115,7 +115,7 @@ class ClientControlEngine:
         # approach to the whole thing instead of putting
         # neat "if" clauses here and there.
 
-        self.logger.info("ClientControlEngine: starting main loop in run().")
+        self.logger.info("starting main loop in run().")
 
         # Send InitEvent to trigger a complete update
         # from the server
@@ -127,11 +127,11 @@ class ClientControlEngine:
             server_message = self.client_interface.grab_message()
 
             if len(server_message.event_list):
-                self.logger.info("ClientControlEngine: got server_message: \n"
+                self.logger.info("got server_message: \n"
                       + str(server_message.event_list))
                 self.got_empty_message = False
             elif not self.got_empty_message:
-                self.logger.info("ClientControlEngine: got an empty server_message.")
+                self.logger.info("got an empty server_message.")
                 self.got_empty_message = True
 
             # First handle the events in the ClientControlEngine, 
@@ -206,13 +206,13 @@ class ClientControlEngine:
 
         # exit has been requested
         
-        self.logger.info("ClientControlEngine.run: exit requested from "
+        self.logger.info("exit requested from "
               + "VisualEngine, shutting down interface...")
 
         # stop the Client Interface thread
         self.client_interface.shutdown()
 
-        self.logger.info("ClientControlEngine.run: shutdown confirmed.")
+        self.logger.info("shutdown confirmed.")
 
         # TODO:
         # possibly exit cleanly from the VisualEngine here
@@ -356,7 +356,7 @@ class ClientControlEngine:
             self.visual_engine_message.event_list.append(event)
 
         else:
-            self.logger.info("process_DeleteEvent: Entity to delete does not exist.")
+            self.logger.info("Entity to delete does not exist.")
 
     def process_EnterRoomEvent(self, event):
         '''An EnterRoomEvent means the server is

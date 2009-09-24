@@ -34,5 +34,10 @@ class AssetEngine:
            fetch_asset() should do some asset caching
            to prevent unnecessary file or network
            access.'''
-        raise ShardException("This is just a dummy fetch_asset() method. "
+
+        errormessage = ("This is just a dummy fetch_asset() method. "
                         + "Please use a real implementation of AssetEngine.")
+
+        self.logger.critical(errormessage)
+
+        raise ShardException(errormessage)

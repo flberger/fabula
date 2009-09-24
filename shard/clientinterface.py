@@ -206,20 +206,20 @@ class ClientInterface:
             # overwrite it
             local_server_message = self.server_message
 
-            self.logger.info("grabserver_message: Message available, got :"
+            self.logger.info("Message available, got :"
                   + str(local_server_message))
 
             # Now set the flag
             self.server_message_available = False
 
-            self.logger.info("grabserver_message: server_message_available is now '"
+            self.logger.info("server_message_available is now '"
                   + str(self.server_message_available) + "'.")
             self.sent_no_message_available = False
 
             return local_server_message
         else:
             if not self.sent_no_message_available:
-                self.logger.info("grabserver_message: no Message available "
+                self.logger.info("no Message available "
                       + "(server_message_available False)")
                 self.sent_no_message_available = True
 
