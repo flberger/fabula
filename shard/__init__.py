@@ -17,8 +17,6 @@
 #
 # - Some more blank lines to make the code more
 #   readable without coloring.
-#
-# - proper logging -.-
 
 ############################################################
 # Events
@@ -669,7 +667,7 @@ DIRECTION_VECTOR = {'N' : (0, 1) ,
 ############################################################
 # Exceptions
 
-class ShardException:
+class ShardException():
     '''This is the base class of Shard-related
        exceptions. Shard Implementations should
        raise an instance of this class when 

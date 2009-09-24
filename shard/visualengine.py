@@ -19,7 +19,7 @@ class VisualEngine:
     ####################
     # Initialization
 
-    def __init__(self, asset_engine, framerate):
+    def __init__(self, asset_engine, framerate, logger):
         '''This method initializes the VisualEngine.
            asset_engine must be an instance of
            shard.AssetEngine or a subclass.
@@ -33,6 +33,10 @@ class VisualEngine:
            override. 
            This method must not block, it has to 
            return once everything is set up.'''
+
+        # Attach logger
+        self.logger = logger
+
         # Get framerate and asset_engine from parameters
         self.framerate = framerate
         self.asset_engine = asset_engine
@@ -477,7 +481,7 @@ class VisualEngine:
            installation, file system or network
            connection.'''
 
-        print("VisualEngine.display_asset_exception: A required asset "
+        self.logger.critical("VisualEngine.display_asset_exception: A required asset "
               + "(image, animation, sound) could not be fetched. "
               + "The problematic asset was '"
               + str(asset)

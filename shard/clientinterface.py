@@ -10,8 +10,12 @@ class ClientInterface:
        Implementations should subclass this one an override
        the default methods, which showcase a simple example.'''
 
-    def __init__(self):
+    def __init__(self, logger):
         '''Interface initialization.'''
+
+        # Attach logger
+        self.logger = logger
+
         # EXAMPLE
         # First one cache for a client message and one
         # for a server message.
@@ -41,7 +45,6 @@ class ClientInterface:
         # And this is the one for the confirmation.
         self.shutdown_confirmed = False
 
-        # DELETE
         self.sent_no_message_available = False
 
     def handle_messages(self):
@@ -203,27 +206,22 @@ class ClientInterface:
             # overwrite it
             local_server_message = self.server_message
 
-            # DELETE
-            print("grabserver_message: Message available, got :"
+            self.logger.info("grabserver_message: Message available, got :"
                   + str(local_server_message))
 
             # Now set the flag
             self.server_message_available = False
 
-            # DELETE
-            print("grabserver_message: server_message_available is now '"
+            self.logger.info("grabserver_message: server_message_available is now '"
                   + str(self.server_message_available) + "'.")
             self.sent_no_message_available = False
-            # DELETE
 
             return local_server_message
         else:
-            # DELETE
             if not self.sent_no_message_available:
-                print("grabserver_message: no Message available "
+                self.logger.info("grabserver_message: no Message available "
                       + "(server_message_available False)")
                 self.sent_no_message_available = True
-            # DELETE
 
             # A Message must be returned, so create
             # an empty one

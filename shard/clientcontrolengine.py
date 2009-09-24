@@ -15,13 +15,16 @@ class ClientControlEngine:
     ####################
     # Init
 
-    def __init__(self, client_interface_instance, visual_engine_instance):
+    def __init__(self, client_interface_instance, visual_engine_instance, logger):
         '''The ClientControlEngine must be instantiated with an
            instance of shard.ClientInterface which handles
            the connection to the server or supplies events
            in some other way, and an instance of 
            shard.VisualEngine which graphically renders the
            game action.'''
+
+        # Attach logger
+        self.logger = logger
 
         self.client_interface = client_interface_instance
         self.visual_engine = visual_engine_instance
@@ -90,10 +93,8 @@ class ClientControlEngine:
         # sent to the server in each loop.
         self.client_message = shard.Message([])
         
-        # DELETE
         self.got_empty_message = False
-        print("ClientControlEngine: __init__ complete.")
-        # DELETE
+        self.logger.info("ClientControlEngine: __init__ complete.")
 
         # TODO: set up the inventory
 
@@ -114,8 +115,7 @@ class ClientControlEngine:
         # approach to the whole thing instead of putting
         # neat "if" clauses here and there.
 
-        # DELETE
-        print("ClientControlEngine: starting main loop in run().")
+        self.logger.info("ClientControlEngine: starting main loop in run().")
 
         # Send InitEvent to trigger a complete update
         # from the server
@@ -126,15 +126,13 @@ class ClientControlEngine:
             # it possibly has an empty event_list.
             server_message = self.client_interface.grab_message()
 
-            # DELETE
             if len(server_message.event_list):
-                print("ClientControlEngine: got server_message: \n"
+                self.logger.info("ClientControlEngine: got server_message: \n"
                       + str(server_message.event_list))
                 self.got_empty_message = False
             elif not self.got_empty_message:
-                print("ClientControlEngine: got an empty server_message.")
+                self.logger.info("ClientControlEngine: got an empty server_message.")
                 self.got_empty_message = True
-            # DELETE
 
             # First handle the events in the ClientControlEngine, 
             # gathering Entities and Map Elements and preparing
@@ -208,15 +206,13 @@ class ClientControlEngine:
 
         # exit has been requested
         
-        # DELETE
-        print("ClientControlEngine.run: exit requested from "
+        self.logger.info("ClientControlEngine.run: exit requested from "
               + "VisualEngine, shutting down interface...")
 
         # stop the Client Interface thread
         self.client_interface.shutdown()
 
-        # DELETE
-        print("ClientControlEngine.run: shutdown confirmed.")
+        self.logger.info("ClientControlEngine.run: shutdown confirmed.")
 
         # TODO:
         # possibly exit cleanly from the VisualEngine here
@@ -344,10 +340,8 @@ class ClientControlEngine:
            VisualEngine, then remove it from the
            entity_dict.'''
 
-        # DELETE
-        # This is just a hack, see TODO for run() for details
+        # TODO: This is just a hack, see TODO for run() for details
         if event.identifier in self.entity_dict.keys():
-        # DELETE
 
             # Save the Entity in the deleted_entities_dict
             # to notify the VisualEngine
@@ -361,10 +355,8 @@ class ClientControlEngine:
             # when exactly to remove the Entity.
             self.visual_engine_message.event_list.append(event)
 
-        # DELETE
         else:
-            print("process_DeleteEvent: Entity to delete does not exist.")
-        # DELETE
+            self.logger.info("process_DeleteEvent: Entity to delete does not exist.")
 
     def process_EnterRoomEvent(self, event):
         '''An EnterRoomEvent means the server is

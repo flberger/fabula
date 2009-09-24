@@ -13,6 +13,9 @@ class AssetEngine:
        data - the default implementation raises
        a shard.ShardException.'''
 
+    def __init__(self, logger):
+        self.logger = logger
+
     def fetch_asset(self, asset_identifier):
         '''This is the main method of the AssetEngine.
            It retrieves the file specified in
@@ -33,4 +36,3 @@ class AssetEngine:
            access.'''
         raise ShardException("This is just a dummy fetch_asset() method. "
                         + "Please use a real implementation of AssetEngine.")
-
