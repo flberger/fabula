@@ -20,7 +20,8 @@ Extracted&nbsp;from&nbsp;shard.py&nbsp;on&nbsp;22.&nbsp;Sep&nbsp;2009</tt></p>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="shard.html">shard</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -81,7 +82,8 @@ rendering.&nbsp;You&nbsp;should&nbsp;create&nbsp;a&nbsp;<br>
 reasonable&nbsp;subset&nbsp;of&nbsp;those&nbsp;actions,&nbsp;<br>
 e.g.&nbsp;select&nbsp;only&nbsp;the&nbsp;very&nbsp;last&nbsp;user<br>
 input&nbsp;action.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
+The&nbsp;default&nbsp;implementation&nbsp;reads<br>
+user&nbsp;input&nbsp;from&nbsp;the&nbsp;console.</tt></dd></dl>
 
 <dl><dt><a name="VisualEngine-custom_init"><strong>custom_init</strong></a>(self)</dt><dd><tt>When&nbsp;creating&nbsp;a&nbsp;subclass,&nbsp;you&nbsp;should&nbsp;not<br>
 override&nbsp;the&nbsp;standard&nbsp;<a href="#VisualEngine-__init__">__init__</a>()&nbsp;method<br>
@@ -235,7 +237,9 @@ wherever&nbsp;you&nbsp;need&nbsp;it.&nbsp;It&nbsp;is&nbsp;also&nbsp;called<br>
 from&nbsp;<a href="#VisualEngine-render_message">render_message</a>()&nbsp;when&nbsp;appropriate.<br>
 This&nbsp;method&nbsp;may&nbsp;block&nbsp;execution&nbsp;to&nbsp;slow<br>
 the&nbsp;<a href="#VisualEngine">VisualEngine</a>&nbsp;down&nbsp;to&nbsp;a&nbsp;certain<br>
-frame&nbsp;rate.</tt></dd></dl>
+frame&nbsp;rate.<br>
+The&nbsp;default&nbsp;implementation&nbsp;waits<br>
+1.0/self.<strong>framerate</strong>&nbsp;seconds.</tt></dd></dl>
 
 <dl><dt><a name="VisualEngine-update_inventory"><strong>update_inventory</strong></a>(self)</dt><dd><tt>We&nbsp;do&nbsp;not&nbsp;have&nbsp;to&nbsp;care&nbsp;about&nbsp;the&nbsp;object&nbsp;of<br>
 a&nbsp;DropsEvent&nbsp;and&nbsp;PicksUpEvent&nbsp;since&nbsp;the&nbsp;<br>
