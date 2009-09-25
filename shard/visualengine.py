@@ -4,6 +4,7 @@
 """
 
 import shard
+import time
 
 class VisualEngine:
     '''This is the base class for a VisualEngine for the
@@ -71,6 +72,9 @@ class VisualEngine:
         # See the method for explaination.
         self.custom_init()
 
+        self.logger.info("complete")
+        self.logger.info("now waiting for RoomCompleteEvent")
+
         return
 
     ####################
@@ -97,6 +101,7 @@ class VisualEngine:
            render_message()) should be just fine. See 
            the other methods and the source code for 
            details.'''
+
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
         # checks, like for duplicate RoomCompleteEvents, 
@@ -125,7 +130,9 @@ class VisualEngine:
         # the ControlEngine has set up a flag in the
         # message, so we simply check that instead
         # of scanning the whole list.
+        #
         if message.has_EnterRoomEvent:
+
             # When this arrives here all data scructures
             # have already been cleared and possibly
             # populated with new Entites and a new Map.
@@ -133,10 +140,14 @@ class VisualEngine:
             # an EnterRoomEvent.
 
             # See the method for explaination
+            #
             self.display_EnterRoomEvent()
             
             # Set a flag that we are waiting
             # for RoomCompleteEvent
+            #
+            self.logger.info("now waiting for RoomCompleteEvent")
+
             self.waiting_for_RoomCompleteEvent = True
 
         ####################
@@ -145,10 +156,14 @@ class VisualEngine:
         # Next, as long as we are waiting for a
         # RoomCompleteEvent, nothig will be rendered
         # and no player input is accepted.
+        #
         if self.waiting_for_RoomCompleteEvent:
+
             # The ControlEngine has set a flag for
             # our convenience.
+            #
             if message.has_RoomCompleteEvent:
+
                 # By the time the event arrives the 
                 # ControlEngine has gathered all important
                 # data and handed them over to us, so wen can
@@ -471,6 +486,9 @@ class VisualEngine:
            a waiting message since the VisualEngine is
            going to twiddle thumbs until it receives a 
            RoomCompleteEvent.'''
+
+        self.logger.info("called")
+
         return
 
     def display_asset_exception(self, asset):
@@ -494,11 +512,15 @@ class VisualEngine:
            RoomCompleteEvent. Here you should 
            set up the main screen and display 
            some Map elements and Entities.'''
+
+        self.logger.info("called")
+
         # You'll possibly want to save the real 
         # screen coordinates of Entities in a 
         # special data structure since they do 
         # not necessarily correspond to the Map 
         # coordinates.
+        #
         return
 
     def update_frame_timer(self):
@@ -509,7 +531,13 @@ class VisualEngine:
            from render_message() when appropriate.
            This method may block execution to slow
            the VisualEngine down to a certain
-           frame rate.'''
+           frame rate.
+           The default implementation waits
+           1.0/self.framerate seconds.
+        '''
+
+        time.sleep(1.0/self.framerate)
+
         return
 
     def filter_events(self, event_list):
@@ -529,14 +557,20 @@ class VisualEngine:
            appropriate user input here and add a
            corresponding SaysEvent to self.player_event_list, 
            which is evaluated by the ControlEngine.'''
+
+        self.logger.info("called")
+
         # Find a player in entity_dict
+        #
         for current_entity in self.entity_dict.values():
             if current_entity.entity_type == "PLAYER":
                 self.player_event_list.append(shard.SaysEvent(current_entity.identifier,
                                                               "display_CanSpeakEvent: dummy"))
         # Don't forget the frame counter in
         # your implementation.
+        #
         self.update_frame_timer()
+
         return
 
     def display_static_frame(self):
@@ -547,11 +581,14 @@ class VisualEngine:
            the Entities that there is a next frame to
            be displayed (however that is done in your 
            implementation) and update their graphics.'''
+
         # You might want to restrict your updates to
         # visible Entities
+        #
         pass
 
         self.update_frame_timer()
+
         return
 
     def collect_player_input(self):
@@ -574,7 +611,15 @@ class VisualEngine:
            reasonable subset of those actions, 
            e.g. select only the very last user
            input action.
-           The default implementation does nothing.'''
+           The default implementation reads
+           user input from the console.
+        '''
+
+        user_input = raw_input("Quit? (y/n):")
+
+        if user_input == "y":
+            self.exit_requested = True
+
         return
 
     def display_multiple_frame_action(self, MovesToEvent_list):
@@ -616,6 +661,9 @@ class VisualEngine:
            new Enties to a list of visible Entities 
            you might have set up and render a static
            frame. Note that event_list may be empty.'''
+
+        self.logger.info("called")
+
         return           
 
     def display_DeleteEvents(self, event_list):
@@ -629,6 +677,9 @@ class VisualEngine:
            already gone in self.event_dict, 
            so use self.deleted_entities_dict
            instead.'''
+
+        self.logger.info("called")
+
         return
 
     def display_ChangeMapElementEvents(self, event_list):
@@ -642,6 +693,9 @@ class VisualEngine:
            Map elements and after that all Entities.
            This is only a single frame though.
            Note that event_list may be empty.'''
+
+        self.logger.info("called")
+
         return
 
     def update_inventory(self):
@@ -666,8 +720,13 @@ class VisualEngine:
            Entities during the perception so
            there are no background actions 
            which may pass unnoticed.'''
+
+        self.logger.info("called")
+
         # Update the frame counter though.
+        #
         self.update_frame_timer()
+
         return           
 
     def display_SaysEvents(self, event_list):
@@ -688,7 +747,12 @@ class VisualEngine:
            animation of other Entities so there 
            are no background actions which may 
            pass unnoticed.'''
+
+        self.logger.info("called")
+
         # Don't forget the frame counter in each frame.
+        #
         self.update_frame_timer()
+
         return
 

@@ -1,20 +1,19 @@
 #! /usr/bin/python
 
-'''run_shardclient.py - Initialize and run a Shard client
+'''run_shardserver.py - Initialize and run a Shard server
    
    (c) Florian Berger <fberger@fbmd.de>
    
-   Work started on 27. May 2008'''
+   Adapted from run_shardclient.py on 25. Sep 2009
+'''
 
 ##############################
 # Imports
 
 from optparse import OptionParser
 import logging
-import shard.clientinterface
-import shard.assetengine
-import shard.visualengine
-import shard.clientcontrolengine
+import shard.serverinterface
+import shard.servercoreengine
 import thread
 
 ##############################
@@ -25,11 +24,6 @@ option_parser = OptionParser()
 option_parser.add_option("-l",  "--loglevel",
                          default="d",
                          help="d(ebug) | i(nfo) | w(arning) | e(rro)r | c(ritical)")
-
-option_parser.add_option("-f",  "--framerate",
-                         type="int",
-                         default=50,
-                         help="default 50")
 
 option_parser.add_option("-p",  "--port",
                          type="int",
@@ -65,31 +59,19 @@ logger.addHandler(stderr_handler)
 ##############################
 # Main
 
-FRAMERATE = options.framerate
-
 def main():
 
     logger.info("Using loglevel "
                 + str(options.loglevel)
-                + " and framerate "
-                + str(FRAMERATE)
                 + ".")
 
-    interface = shard.clientinterface.ClientInterface(("localhost", options.port), logger)
+    interface = shard.serverinterface.ServerInterface(("localhost", options.port), logger)
 
-    asset_engine = shard.assetengine.AssetEngine(logger)
-
-    visual_engine = shard.visualengine.VisualEngine(asset_engine, FRAMERATE, logger)
-
-    cce = shard.clientcontrolengine.ClientControlEngine(interface, visual_engine, logger)
+    sce = shard.servercoreengine.ServerCoreEngine(interface, logger)
 
     thread.start_new_thread(interface.handle_messages, ())
 
-    # This method will return when the visual
-    # engine sets visual_engine.exit_requested
-    # to True
-    #
-    cce.run()
+    sce.run()
 
 if __name__ == "__main__":
     main()
