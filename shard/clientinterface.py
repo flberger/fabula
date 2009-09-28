@@ -5,10 +5,10 @@
 
 import shard
 import socket
-from collections import deque
 import cPickle
+import shard.messagebuffer
 
-class ClientInterface:
+class ClientInterface(shard.messagebuffer.MessageBuffer):
     '''This is the base class for a Shard Client Interface.
        Implementations should subclass this one an override
        the default methods, which showcase a simple example.'''
@@ -31,13 +31,11 @@ class ClientInterface:
         #
         self.shutdown_confirmed = False
 
-        # A hint from the Python documentation:
-        # deques are a fast, thread-safe replacement
-        # for queues.
-        # Use deque.append(x) and deque.popleft()
+        # This is a subclass of MessageBuffer, but
+        # since we override __init__(), we have to
+        # call setup.
         #
-        self.client_messages = deque()
-        self.server_messages = deque()
+        self.setup()
 
         # Set up UDP socket
         # It wouldn't be unreasonable to also use
@@ -78,11 +76,11 @@ class ClientInterface:
         #
         while not self.shutdown_flag:
 
-            if self.client_messages:
+            if self.messages_for_remote:
 
-                self.logger.debug("sending 1 message of " + str(len(self.client_messages)))
+                self.logger.debug("sending 1 message of " + str(len(self.messages_for_remote)))
 
-                self.sock.sendto(cPickle.dumps(self.client_messages.popleft()), 
+                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft()), 
                                  self.address_port_tuple)
 
             # Now listen for incoming server
@@ -110,7 +108,7 @@ class ClientInterface:
 
                 self.logger.debug("received server message")
 
-                self.server_messages.append(cPickle.loads(data_received))
+                self.messages_for_local.append(cPickle.loads(data_received))
 
         # Caught shutdown notification, stopping thread
         #
@@ -119,40 +117,6 @@ class ClientInterface:
         self.shutdown_confirmed = True
 
         raise SystemExit
-
-    def send_message(self, message):
-        '''This method is called by the client 
-           ClientControlEngine with a message ready to be sent to
-           the server. The Message object given is an
-           an instance of shard.Message. This method
-           must return immediately to avoid blocking
-           the client.'''
-
-        self.logger.debug("appending message")
-
-        self.client_messages.append(message)
-
-        return
-
-    def grab_message(self):
-        '''This method is called by the client 
-           ClientControlEngine to obtain a new server message.
-           It must return an instance of shard.Message, 
-           and it must do so immediately to avoid
-           blocking the client. If there is no new
-           server message, it must return an empty
-           message.'''
-
-        if self.server_messages:
-
-            return self.server_messages.popleft()
-
-        else:
-
-            # A Message must be returned, so create
-            # an empty one
-            #
-            return shard.Message([])
 
     def shutdown(self):
         '''This method is called when the client is

@@ -54,7 +54,7 @@ class ClientControlEngine:
                            shard.SpawnEvent : self.process_SpawnEvent}
 
         # self.entity_dict keeps track of all active Entites.
-        # It uses the identifier as a key, assuming that is
+        # It uses the identifier as a key, assuming that it
         # is unique.
         #
         self.entity_dict = {}
@@ -233,7 +233,7 @@ class ClientControlEngine:
                 self.client_message = shard.Message([])
 
             # OK, iteration done. If no exit requested, 
-            # grab the next server event!
+            # grab the next server message!
 
         # exit has been requested
         
@@ -321,7 +321,7 @@ class ClientControlEngine:
         pass
 
     def process_CustomEntityEvent(self, event):
-        '''The key-vlaue dict of a CustomEntiyEvent 
+        '''The key-value dict of a CustomEntiyEvent 
            is just passed on to the Entity.'''
 
         self.entity_dict[event.identifier].process_CustomEntityEvent(event.key_value_dict)
@@ -410,7 +410,7 @@ class ClientControlEngine:
         '''An EnterRoomEvent means the server is
            about to send a new map, respawn the
            player and send items and NPCs. So
-           this method  empties all data 
+           this method empties all data 
            structures and passes the event on to 
            the VisualEngine.'''
 

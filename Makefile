@@ -1,4 +1,4 @@
-docs: doc/shard.html doc/shard.assetengine.html doc/shard.clientcontrolengine.html doc/shard.clientinterface.html doc/shard.visualengine.html doc/shard.servercoreengine.html doc/shard.serverinterface.html
+docs: doc/shard.html doc/shard.assetengine.html doc/shard.clientcontrolengine.html doc/shard.clientinterface.html doc/shard.visualengine.html doc/shard.servercoreengine.html doc/shard.serverinterface.html doc/shard.messagebuffer.html
 
 doc/shard.html: shard/__init__.py
 	pydoc -w shard
@@ -27,3 +27,7 @@ doc/shard.servercoreengine.html: shard/servercoreengine.py
 doc/shard.serverinterface.html: shard/serverinterface.py
 	pydoc -w shard.serverinterface
 	mv shard.serverinterface.html doc/
+
+doc/shard.messagebuffer.html: shard/messagebuffer.py
+	pydoc -w shard.messagebuffer
+	mv shard.messagebuffer.html doc/

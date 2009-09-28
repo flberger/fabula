@@ -4,10 +4,10 @@
 """
 
 import shard
+import shard.messagebuffer
 import cPickle
 import SocketServer
 import socket
-from collections import deque
 
 class ServerInterface:
     '''This is the base class for a Shard Server Interface.
@@ -24,8 +24,8 @@ class ServerInterface:
         self.logger = logger
 
         # client_connections is a dict of
-        # ClientConnection instances, indexed by
-        # (address, port) tuples.
+        # shard.messagebuffer.MessageBuffer
+        # instances, indexed by (address, port) tuples.
         #
         self.client_connections = {}
 
@@ -76,21 +76,23 @@ class ServerInterface:
                 #
                 if not self.client_address in client_connections_proxy:
 
-                    # New client. Create a new ClientConnection
+                    # New client. Create a new
+                    # shard.messagebuffer.MessageBuffer
                     # and add it to the dict
                     #
-                    client_connections_proxy[self.client_address] = ClientConnection()
+                    client_connections_proxy[self.client_address] = shard.messagebuffer.MessageBuffer()
 
-                    logger_proxy.info("adding new client: " + str(self.client_address))
+                    logger_proxy.info("adding new client: "
+                                      + str(self.client_address))
 
                 # Append the message.
                 # (inbetween steps to avoid a loong line ;-) )
                 #
                 message = cPickle.loads(self.request[0])
 
-                connection = client_connections_proxy[self.client_address]
+                messagebuffer = client_connections_proxy[self.client_address]
 
-                connection.client_messages.append(message)
+                messagebuffer.messages_for_local.append(message)
 
                 # End of handle() method.
 
@@ -120,16 +122,16 @@ class ServerInterface:
             #
             for address_port_tuple in self.client_connections:
 
-                connection = self.client_connections[address_port_tuple]
+                messagebuffer = self.client_connections[address_port_tuple]
 
-                if connection.server_messages:
+                if messagebuffer.messages_for_remote:
 
                     self.logger.debug("sending 1 message of "
-                                      + str(len(connection.server_messages))
+                                      + str(len(messagebuffer.messages_for_remote))
                                       + " to client "
                                       + str(address_port_tuple))
 
-                    server.socket.sendto(cPickle.dumps(connection.server_messages.popleft()), 
+                    server.socket.sendto(cPickle.dumps(messagebuffer.messages_for_remote.popleft()), 
                                          address_port_tuple)
 
         # Caught shutdown notification, stopping thread
@@ -160,49 +162,3 @@ class ServerInterface:
             pass
 
         return True
-
-class ClientConnection:
-    '''For each client connection an instance of
-       this class is created. 
-    '''
-
-    def __init__(self):
-
-        # A hint from the Python documentation:
-        # deques are a fast, thread-safe replacement
-        # for queues.
-        # Use deque.append(x) and deque.popleft()
-        #
-        self.client_messages = deque()
-        self.server_messages = deque()
-
-    def send_message(self, message):
-        '''This method is called by the client 
-           ClientControlEngine with a message ready to be sent to
-           the server. The Message object given is an
-           an instance of shard.Message. This method
-           must return immediately to avoid blocking
-           the client.'''
-
-        self.server_messages.append(message)
-
-        return
-
-    def grab_message(self):
-        '''This method is called by the client 
-           ClientControlEngine to obtain a new server message.
-           It must return an instance of shard.Message, 
-           and it must do so immediately to avoid
-           blocking the client. If there is no new
-           server message, it must return an empty
-           message.'''
-
-        if self.client_messages:
-
-            return self.client_messages.popleft()
-
-        else:
-            # A Message must be returned, so create
-            # an empty one
-            #
-            return shard.Message([])
