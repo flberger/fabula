@@ -11,7 +11,7 @@
 
 from optparse import OptionParser
 import logging
-import shard.clientinterface
+import shard.interfaces
 import shard.assetengine
 import shard.visualengine
 import shard.clientcontrolengine
@@ -55,7 +55,7 @@ logger.setLevel(leveldict[options.loglevel])
 stderr_handler = logging.StreamHandler()
 stderr_handler.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s:%(funcName)s(): %(message)s",
+formatter = logging.Formatter("%(asctime)s %(levelname)s module %(module)s: %(funcName)s(): %(message)s",
                               "%Y-%m-%d %H:%M:%S")
 
 stderr_handler.setFormatter(formatter)
@@ -75,7 +75,7 @@ def main():
                 + str(FRAMERATE)
                 + ".")
 
-    interface = shard.clientinterface.ClientInterface(("localhost", options.port), logger)
+    interface = shard.interfaces.ClientInterface(("localhost", options.port), logger)
 
     asset_engine = shard.assetengine.AssetEngine(logger)
 
