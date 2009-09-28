@@ -19,14 +19,14 @@ class MessageBuffer:
         """This is meant to be a base class
            to be inherited from. This default
            __init__() method simply calls
-           self.setup(). You should do so,
-           too, when subclassing this with a
-           custom implementation.
+           self.message_buffer_setup(). You
+           should do so, too, when subclassing
+           this with a custom implementation.
         """
 
-        self.setup()
+        self.message_buffer_setup()
 
-    def setup(self):
+    def message_buffer_setup(self):
         """This method sets up the internal
            queues (in this case instances
            of collections.deque)

@@ -3,12 +3,12 @@
    Extracted from shard.py on 22. Sep 2009
 """
 
-import shard
 import socket
 import cPickle
 import shard.messagebuffer
+import shard.interface
 
-class ClientInterface(shard.messagebuffer.MessageBuffer):
+class ClientInterface(shard.messagebuffer.MessageBuffer, shard.interface.Interface):
     '''This is the base class for a Shard Client Interface.
        Implementations should subclass this one an override
        the default methods, which showcase a simple example.'''
@@ -16,26 +16,16 @@ class ClientInterface(shard.messagebuffer.MessageBuffer):
     def __init__(self, address_port_tuple, logger):
         '''Interface initialization.'''
 
-        self.address_port_tuple = address_port_tuple
-
-        # Attach logger
+        # First call setup_interface() from the
+        # base class
         #
-        self.logger = logger
-
-        # This is the flag which is set when shutdown()
-        # is called.
-        #
-        self.shutdown_flag = False
-
-        # And this is the one for the confirmation.
-        #
-        self.shutdown_confirmed = False
+        self.setup_interface(address_port_tuple, logger)
 
         # This is a subclass of MessageBuffer, but
         # since we override __init__(), we have to
-        # call setup.
+        # call message_buffer_setup().
         #
-        self.setup()
+        self.message_buffer_setup()
 
         # Set up UDP socket
         # It wouldn't be unreasonable to also use
@@ -117,24 +107,3 @@ class ClientInterface(shard.messagebuffer.MessageBuffer):
         self.shutdown_confirmed = True
 
         raise SystemExit
-
-    def shutdown(self):
-        '''This method is called when the client is
-           about to exit. It should notify 
-           handle_messages() to raise SystemExit to stop 
-           the thread properly. shutdown() must return 
-           True when handle_messages() received the 
-           notification and is about to exit.'''
-
-        self.logger.info("called")
-
-        # Set the flag to be caught by handle_messages()
-        #
-        self.shutdown_flag = True
-
-        # Wait for confirmation (blocks interface and client!)
-        #
-        while not self.shutdown_confirmed:
-            pass
-
-        return True

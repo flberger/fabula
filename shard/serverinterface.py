@@ -3,13 +3,12 @@
    Work started on 24. Sep 2009
 """
 
-import shard
 import shard.messagebuffer
+import shard.interface
 import cPickle
 import SocketServer
-import socket
 
-class ServerInterface:
+class ServerInterface(shard.interface.Interface):
     '''This is the base class for a Shard Server Interface.
        Implementations should subclass this one an override
        the default methods, which do nothing.'''
@@ -17,26 +16,16 @@ class ServerInterface:
     def __init__(self, address_port_tuple, logger):
         '''Interface initialization.'''
 
-        self.address_port_tuple = address_port_tuple
-
-        # Attach logger
+        # First call setup_interface() from the
+        # base class
         #
-        self.logger = logger
+        self.setup_interface(address_port_tuple, logger)
 
         # client_connections is a dict of
         # shard.messagebuffer.MessageBuffer
         # instances, indexed by (address, port) tuples.
         #
         self.client_connections = {}
-
-        # This is the flag which is set when shutdown()
-        # is called.
-        #
-        self.shutdown_flag = False
-
-        # And this is the one for the confirmation.
-        #
-        self.shutdown_confirmed = False
 
         self.logger.debug("complete")
 
@@ -141,24 +130,3 @@ class ServerInterface:
         self.shutdown_confirmed = True
 
         raise SystemExit
-
-    def shutdown(self):
-        '''This method is called when the server is
-           about to exit. It should notify 
-           handle_messages() to raise SystemExit to stop 
-           the thread properly. shutdown() must return 
-           True when handle_messages() received the 
-           notification and is about to exit.'''
-
-        self.logger.info("called")
-
-        # Set the flag to be caught by handle_messages()
-        #
-        self.shutdown_flag = True
-
-        # Wait for confirmation (blocks interface and client!)
-        #
-        while not self.shutdown_confirmed:
-            pass
-
-        return True
