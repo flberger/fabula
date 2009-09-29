@@ -157,7 +157,7 @@ class CanSpeakEvent(ConfirmEvent):
        an NPC to speak. Since this event requires
        immediate user input, it is always executed
        as the last event of a Message by the 
-       VisualEngine.'''
+       PresentationEngine.'''
 
     def __init__(self, identifier, sentences):
         '''sentences is a list of strings for the
@@ -213,7 +213,7 @@ class CustomEntityEvent(Event):
        A CustomEntityEvent should feed an internal
        queue of an Entity. All CustonEntityEvents of a
        Message are passed to the Entity before the
-       Message is rendered by the VisualEngine. They
+       Message is rendered by the PresentationEngine. They
        are not supplied in real time during the rendering.'''
 
     def __init__(self, identifier, key_value_dict):
@@ -308,7 +308,7 @@ class ChangeMapElementEvent(ServerEvent):
        two-dimensional map. When sent in a Message, 
        these events are executed immediately and
        in parallel upon the rendering of the
-       Message by the VisualEngine.'''
+       Message by the PresentationEngine.'''
     
     def __init__(self, tile, location):
         '''tile is a shard map object having a type 
@@ -361,7 +361,7 @@ class MessageAppliedEvent(ClientEvent):
 class Message:
     '''A Message manages an ordered list of shard events.
        Messages sent by the server describe the action
-       of a certain time frame. The VisualEngine has to
+       of a certain time frame. The PresentationEngine has to
        decide which events happen in parallel and which 
        ones happen sequential. Instances of Message 
        expose a single Python list object as Message.event_list.'''
@@ -394,10 +394,10 @@ class Entity:
        sprites, 3D models). Usually the ClientControlEngine
        manages a list of Entity instances. Everything
        concernig the actual graphical representation is
-       done by the VisualEngine. Since this is very
+       done by the PresentationEngine. Since this is very
        application dependent it is not covered in the
        base class. Check the documentation and source of 
-       the VisualEngine for further insight on how it 
+       the PresentationEngine for further insight on how it 
        handles game objects.'''
 
     def __init__(self, entity_type, identifier, location, asset):
@@ -424,7 +424,7 @@ class Entity:
            the Entity. Do not put large objects here
            since Entities are pushed around quite a
            bit and transfered across the network.
-           The VisualEngine may fetch the asset and
+           The PresentationEngine may fetch the asset and
            attach it to the instance of the Entity.'''
         self.entity_type = entity_type
         self.identifier = identifier
@@ -473,7 +473,7 @@ class Entity:
            agnostic about the type of world
            and location (text, 2D, 3D).
            A call to this method does not mean
-           that the VisualEngine has started
+           that the PresentationEngine has started
            the movement. This is rather called
            by the ClientControlEngine to signal
            where the Entity is about to move.
@@ -523,7 +523,7 @@ class Entity:
         pass
 
     def starts_moving(self, frames, framerate):
-        '''The VisualEngine is responsible for the
+        '''The PresentationEngine is responsible for the
            gradual movement of the Entity to the
            target, but not for the animation. It
            calls this method once to signal that
@@ -534,7 +534,7 @@ class Entity:
            an animation. starts_moving() is always
            called after process_MovesToEvent(), so
            the Entity knows about the direction.
-           The VisualEngine provides the number of
+           The PresentationEngine provides the number of
            frames for the movement and the framerate.
            Thus the entity can adapt to different
            frame rates by adjusting how many frames
@@ -547,7 +547,7 @@ class Entity:
         self.moves = True
 
 #    def stopsMoving(self):
-#        '''Called when the VisualEngine has
+#        '''Called when the PresentationEngine has
 #           completed the movement. This should
 #           trigger a stop of the movement 
 #           animation. The default implementation
@@ -555,7 +555,7 @@ class Entity:
 #        self.moves = False
 
     def starts_speaking(self, frames, framerate):
-        '''The VisualEngine displays text spoken 
+        '''The PresentationEngine displays text spoken 
            by the Entity, but does not enforce any
            animation. It calls this method to 
            signal that the Entity starts speaking
@@ -563,7 +563,7 @@ class Entity:
            some logic which changes their graphical 
            representation on every frame, yielding
            an animation.
-           The VisualEngine provides the number of
+           The PresentationEngine provides the number of
            frames for the speaking action and the 
            framerate. Thus the entity can adapt to 
            different frame rates by adjusting how 
@@ -577,7 +577,7 @@ class Entity:
         self.speaks = True
 
 #    def stopsSpeaking(self):
-#        '''Called when the VisualEngine is about
+#        '''Called when the PresentationEngine is about
 #           to erase the spoken text from the 
 #           screen. This should trigger a stop of 
 #           the speaking animation. The default 
@@ -586,7 +586,7 @@ class Entity:
 #        self.speaks = False
 
     def starts_picking_up(self, frames, framerate):
-        '''The VisualEngine makes picked up objects
+        '''The PresentationEngine makes picked up objects
            disappear and appear in the inventory, 
            but does not enforce any animation. It 
            calls this method to signal that the 
@@ -595,7 +595,7 @@ class Entity:
            logic which changes their graphical 
            representation on every frame, yielding 
            an animation.
-           The VisualEngine provides the number of
+           The PresentationEngine provides the number of
            frames for the action and the framerate.
            Thus the entity can adapt to different
            frame rates by adjusting how many frames
@@ -608,7 +608,7 @@ class Entity:
         self.picks_up = True
 
     def starts_dropping(self, frames, framerate):
-        '''The VisualEngine makes dropped objects
+        '''The PresentationEngine makes dropped objects
            disappear in the inventory and appear
            on the map, but does not enforce any 
            animation. It calls this method to 
@@ -617,7 +617,7 @@ class Entity:
            implement a flag or some logic which 
            changes their graphical representation 
            on every frame, yielding an animation.
-           The VisualEngine provides the number of
+           The PresentationEngine provides the number of
            frames for the action and the framerate.
            Thus the entity can adapt to different
            frame rates by adjusting how many frames

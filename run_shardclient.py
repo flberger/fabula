@@ -13,7 +13,7 @@ from optparse import OptionParser
 import logging
 import shard.interfaces
 import shard.assetengine
-import shard.visualengine
+import shard.presentationengine
 import shard.clientcontrolengine
 import thread
 
@@ -79,14 +79,14 @@ def main():
 
     asset_engine = shard.assetengine.AssetEngine(logger)
 
-    visual_engine = shard.visualengine.VisualEngine(asset_engine, FRAMERATE, logger)
+    presentation_engine = shard.presentationengine.PresentationEngine(asset_engine, FRAMERATE, logger)
 
-    cce = shard.clientcontrolengine.ClientControlEngine(interface, visual_engine, logger)
+    cce = shard.clientcontrolengine.ClientControlEngine(interface, presentation_engine, logger)
 
     thread.start_new_thread(interface.handle_messages, ())
 
-    # This method will return when the visual
-    # engine sets visual_engine.exit_requested
+    # This method will return when the presentation
+    # engine sets presentation_engine.exit_requested
     # to True
     #
     cce.run()

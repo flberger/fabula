@@ -22,7 +22,7 @@ class AssetEngine:
            asset_identifier and returns the content.
            The type of object returned is determined
            by the actual implementation of AssetEngine, 
-           VisualEngine and Entity. This method is
+           PresentationEngine and Entity. This method is
            encouraged to do advanced operations like
            fetching and decompressing zip files, 
            format conversion and the like.

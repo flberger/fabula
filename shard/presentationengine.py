@@ -1,27 +1,29 @@
-"""Shard Visual Engine
+"""Shard Presentation Engine
 
    Extracted from shard.py on 22. Sep 2009
+
+   Renamed from VisualEngine to PresentationEngine on 29. Sep 2009
 """
 
 import shard
 import time
 
-class VisualEngine:
-    '''This is the base class for a VisualEngine for the
+class PresentationEngine:
+    '''This is the base class for a PresentationEngine for the
        Shard Client. Subclasses should override the
        appropriate methods of this class and implement a 
        graphical representation of the game and the 
        action. Shard is based on a two-dimensional map, 
        but apart from that it makes very few assumptions 
        about the graphical rendering. Thus it is 
-       possible to write 2D and 3D VisualEngines and 
+       possible to write 2D and 3D PresentationEngines and 
        even a text interface.'''
 
     ####################
     # Initialization
 
     def __init__(self, asset_engine, framerate, logger):
-        '''This method initializes the VisualEngine.
+        '''This method initializes the PresentationEngine.
            asset_engine must be an instance of
            shard.AssetEngine or a subclass.
            framerate must be an integer and sets
@@ -50,7 +52,7 @@ class VisualEngine:
         # cleared and updated on each rendering
         self.player_event_list = []
 
-        # Since it represents the GUI, the VisualEngine
+        # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
         # exit request by the user. This value is
         # checked in the ClientControlEngine main loop.
@@ -78,10 +80,10 @@ class VisualEngine:
         return
 
     ####################
-    # VisualEngine Main Loop
+    # PresentationEngine Main Loop
 
     def render_message(self, message):
-        '''This is the main method of the VisualEngine.
+        '''This is the main method of the PresentationEngine.
            It is called regularly by the ClientControlEngine
            with a list of events to display (note: the
            list may be empty). It may take all the time 
@@ -472,7 +474,7 @@ class VisualEngine:
     def custom_init(self):
         '''When creating a subclass, you should not
            override the standard __init__() method
-           of the VisualEngine class. Instead place
+           of the PresentationEngine class. Instead place
            all your custom setup code here. You can 
            initialize your graphics module here and
            display a splash screen. Everything
@@ -480,10 +482,10 @@ class VisualEngine:
         return
 
     def display_EnterRoomEvent(self):
-        '''This method is called when the VisualEngine
+        '''This method is called when the PresentationEngine
            has encoutered an EnterRoomEvent. You should
            override it, blank the screen here and display
-           a waiting message since the VisualEngine is
+           a waiting message since the PresentationEngine is
            going to twiddle thumbs until it receives a 
            RoomCompleteEvent.'''
 
@@ -530,7 +532,7 @@ class VisualEngine:
            wherever you need it. It is also called
            from render_message() when appropriate.
            This method may block execution to slow
-           the VisualEngine down to a certain
+           the PresentationEngine down to a certain
            frame rate.
            The default implementation waits
            1.0/self.framerate seconds.
@@ -550,7 +552,7 @@ class VisualEngine:
         return
 
     def display_CanSpeakEvent(self, CanSpeakEvent_instance):
-        '''This method is called when the VisualEngine
+        '''This method is called when the PresentationEngine
            needs to render a CanSpeakEvent. This is the
            last event rendered before returning to
            the ControlEngine. You have to prompt for
@@ -574,7 +576,7 @@ class VisualEngine:
         return
 
     def display_static_frame(self):
-        '''This method is called when the VisualEngine
+        '''This method is called when the PresentationEngine
            decides that is need to enter a single frame
            of the current game state. There is nothing
            special going on here, so you should notify
@@ -595,7 +597,7 @@ class VisualEngine:
         '''The module you use for actual graphics
            rendering most probably has a way to
            capture user input. This method is called
-           when the VisualEngine has displayed a
+           when the PresentationEngine has displayed a
            series of events and wants to capture
            the user's reaction. When overriding this
            method, you have to convert the data
@@ -623,7 +625,7 @@ class VisualEngine:
         return
 
     def display_multiple_frame_action(self, MovesToEvent_list):
-        '''This method is called when the VisualEngine
+        '''This method is called when the PresentationEngine
            is ready to render Move, Drop or PickUp
            actions. All visible Entities are already
            notified about their state at this point.
@@ -732,7 +734,7 @@ class VisualEngine:
     def display_SaysEvents(self, event_list):
         '''This method is called with a list
            of instances of SaysEvent when the
-           VisualEngine is ready to display
+           PresentationEngine is ready to display
            what Entities say. In this method
            you have to compute a number of
            frames for displaying text and

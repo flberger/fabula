@@ -8,27 +8,26 @@ import shard
 class ClientControlEngine:
     '''An instance of this class is the main engine in every
        Shard client. It connects to the Client Interface and
-       to the VisualEngine, passes events and keeps track
+       to the PresentationEngine, passes events and keeps track
        of Entities. It is normally instantiated in a small
        setup script "run_shardclient.py".'''
 
     ####################
     # Init
 
-    def __init__(self, client_interface_instance, visual_engine_instance, logger):
+    def __init__(self, interface_instance, presentation_engine_instance, logger):
         '''The ClientControlEngine must be instantiated with an
-           instance of shard.ClientInterface which handles
-           the connection to the server or supplies events
-           in some other way, and an instance of 
-           shard.VisualEngine which graphically renders the
-           game action.'''
+           instance of a subclass of shard.interfaces.Interface
+           which handles the connection to the server or supplies
+           events in some other way, and an instance of PresentationEngine
+           which presents the game action.'''
 
         # Attach logger
         #
         self.logger = logger
 
-        self.client_interface = client_interface_instance
-        self.visual_engine = visual_engine_instance
+        self.interface = interface_instance
+        self.presentation_engine = presentation_engine_instance
 
         # Set up flags used by self.run()
         #
@@ -60,13 +59,13 @@ class ClientControlEngine:
         self.entity_dict = {}
 
         # A dict for Entites which have been deleted, for
-        # the convenience of the VisualEngine. Usually it
+        # the convenience of the PresentationEngine. Usually it
         # should be cleared after each rendering.
         #
         self.deleted_entities_dict = {}
 
         # A list of tiles for the current room, for
-        # the convenience of the VisualEngine.
+        # the convenience of the PresentationEngine.
         #
         self.tile_list = []
 
@@ -83,20 +82,20 @@ class ClientControlEngine:
 
         # The ClientControlEngine examines the events of a Server
         # Message and applies them. events for special
-        # consideration for the VisualEngine are collected
-        # in a Message for the VisualEngine.
+        # consideration for the PresentationEngine are collected
+        # in a Message for the PresentationEngine.
         # The ClientControlEngine has to empty the Message once 
-        # the VisualEngine has rendered all Events.
+        # the PresentationEngine has rendered all Events.
         #
-        self.visual_engine_message = shard.Message([])
+        self.presentation_engine_message = shard.Message([])
 
         # We attach custom flags to the Message to notify
-        # the VisualEngine whether an EnterRoomEvent or
+        # the PresentationEngine whether an EnterRoomEvent or
         # RoomCompleteEvent occured, so it does not have
         # to scan the events.
         #
-        self.visual_engine_message.has_EnterRoomEvent = False
-        self.visual_engine_message.has_RoomCompleteEvent = False
+        self.presentation_engine_message.has_EnterRoomEvent = False
+        self.presentation_engine_message.has_RoomCompleteEvent = False
 
         # In self.client_message we collect Client events to be
         # sent to the server in each loop.
@@ -130,14 +129,14 @@ class ClientControlEngine:
         # Send InitEvent to trigger a complete update
         # from the server
         #
-        self.client_interface.send_message(shard.Message([shard.InitEvent()]))
+        self.interface.send_message(shard.Message([shard.InitEvent()]))
 
-        while not self.visual_engine.exit_requested:
+        while not self.presentation_engine.exit_requested:
 
             # grab_message must and will return a Message, but
             # it possibly has an empty event_list.
             #
-            server_message = self.client_interface.grab_message()
+            server_message = self.interface.grab_message()
 
             if server_message.event_list:
 
@@ -154,7 +153,7 @@ class ClientControlEngine:
 
             # First handle the events in the ClientControlEngine, 
             # gathering Entities and Map Elements and preparing
-            # a Message for the VisualEngine
+            # a Message for the PresentationEngine
             #
             for current_event in server_message.event_list:
 
@@ -167,31 +166,31 @@ class ClientControlEngine:
                 self.event_dict[current_event.__class__](current_event)
 
             # Now that everything is set and stored, call
-            # the VisualEngine to render the messages.
+            # the PresentationEngine to render the messages.
 
             # First hand over / update the necessary data.
             #
-            self.visual_engine.entity_dict = self.entity_dict
-            self.visual_engine.deleted_entities_dict = self.deleted_entities_dict
-            self.visual_engine.tile_list = self.tile_list
-            self.visual_engine.Map = self.map
+            self.presentation_engine.entity_dict = self.entity_dict
+            self.presentation_engine.deleted_entities_dict = self.deleted_entities_dict
+            self.presentation_engine.tile_list = self.tile_list
+            self.presentation_engine.Map = self.map
 
             # This call may take an almost arbitrary amount
             # of time, since there may be long actions to
-            # be shown by the VisualEngine.
+            # be shown by the PresentationEngine.
             # Notice: render_message() must be called regularly
             # even if the server Message and thus the
-            # Visualengine_message are empty!
+            # PresentationEngine_message are empty!
             #
-            self.visual_engine.render_message(self.visual_engine_message)
+            self.presentation_engine.render_message(self.presentation_engine_message)
 
-            # The VisualEngine returned, the Server Message has
+            # The PresentationEngine returned, the Server Message has
             # been applied and rendered. Clean up.
             #
-            self.visual_engine_message = shard.Message([])
+            self.presentation_engine_message = shard.Message([])
             self.deleted_entities_dict = {}
-            self.visual_engine_message.has_EnterRoomEvent = False
-            self.visual_engine_message.has_RoomCompleteEvent = False
+            self.presentation_engine_message.has_EnterRoomEvent = False
+            self.presentation_engine_message.has_RoomCompleteEvent = False
 
             # Up to now, we did not care whether the server Message
             # had any events at all. But we only send a 
@@ -206,17 +205,17 @@ class ClientControlEngine:
 
             # If we do not await a Confirmation anymore, 
             # we evaluate the player input if any.
-            # The VisualEngine might have collected some
+            # The PresentationEngine might have collected some
             # player input and converted it to events.
             #
-            if (self.visual_engine.player_event_list
+            if (self.presentation_engine.player_event_list
                 and not self.await_confirmation):
 
                 # We queue player triggered events before 
                 # MessageAppliedEvent so the server processes
                 # all events before sending anything new.
                 #
-                self.client_message.event_list = (self.visual_engine.player_event_list
+                self.client_message.event_list = (self.presentation_engine.player_event_list
                                                   + self.client_message.event_list)
 
                 # Since we had player input, we now await confirmation
@@ -226,7 +225,7 @@ class ClientControlEngine:
             # If this iteration yielded any events, send them.
             #
             if self.client_message.event_list:
-                self.client_interface.send_message(self.client_message)
+                self.interface.send_message(self.client_message)
 
                 # Clean up
                 #
@@ -238,15 +237,15 @@ class ClientControlEngine:
         # exit has been requested
         
         self.logger.info("exit requested from "
-              + "VisualEngine, shutting down interface...")
+              + "PresentationEngine, shutting down interface...")
 
         # stop the Client Interface thread
         #
-        self.client_interface.shutdown()
+        self.interface.shutdown()
 
         self.logger.info("shutdown confirmed.")
 
-        # TODO: possibly exit cleanly from the VisualEngine here
+        # TODO: possibly exit cleanly from the PresentationEngine here
 
         return
 
@@ -271,7 +270,7 @@ class ClientControlEngine:
 
         # Pass on the event.
         #
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_DropsEvent(self, event):
         '''Currently not implemented.'''
@@ -282,7 +281,7 @@ class ClientControlEngine:
         # coordinates from direction
         #
         # Queue the DropsEvent (for Animation) and
-        # a SpawnEvent for the VisualEngine
+        # a SpawnEvent for the PresentationEngine
         #
         #    ControlEngine: if there was a Confirmation and
         #    it has been applied or if there was an
@@ -298,7 +297,7 @@ class ClientControlEngine:
         #
         # ControlEngine: pass events to Entities
         #     Entity: change location, set graphics, custom actions
-        # ControlEngine: pass Message/Events to VisualEngine
+        # ControlEngine: pass Message/Events to PresentationEngine
         #
         pass
 
@@ -312,7 +311,7 @@ class ClientControlEngine:
         # Move the Entity to the Inventory
         #
         # Queue the PicksUpEvent (for Animation) and
-        # a DeleteEvent for the VisualEngine
+        # a DeleteEvent for the PresentationEngine
         #
         #    ControlEngine: if there was a Confirmation and
         #    it has been applied or if there was an
@@ -328,7 +327,7 @@ class ClientControlEngine:
 
     def process_PerceptionEvent(self, event):
         '''A perception must be displayed by the 
-           VisualEngine, so it is queued in a Message passed
+           PresentationEngine, so it is queued in a Message passed
            from the ClientControlEngine.'''
 
         #    ControlEngine: if there was a Confirmation
@@ -337,23 +336,23 @@ class ClientControlEngine:
         #    or if there was an AttemptFailedEvent: unset
         #    "AwaitConfirmation" flag
         #
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_SaysEvent(self, event):
-        '''The VisualEngine usually must display the 
+        '''The PresentationEngine usually must display the 
            spoken text. Thus the event is put in the
-           event queue for the VisualEngine.
-           The VisualEngine is going to notify
+           event queue for the PresentationEngine.
+           The PresentationEngine is going to notify
            the Entity once it starts speaking so it
            can provide an animation.'''
 
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event):
         '''Store the tile given in self.map, 
            a dict of dicts with x- and
            y-coordinates as keys. Also save
-           it for the VisualEngine.'''
+           it for the PresentationEngine.'''
 
         try:
             # see if a dict for the column (x coordinate)
@@ -374,14 +373,14 @@ class ClientControlEngine:
         #
         self.tile_list.append(event.tile)
 
-        # Append the event to the queue for the VisualEngine.
+        # Append the event to the queue for the PresentationEngine.
         #
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_DeleteEvent(self, event):
         '''Save the Entity to be deleted in the
            deleted_entities_dict for the 
-           VisualEngine, then remove it from the
+           PresentationEngine, then remove it from the
            entity_dict.'''
 
         # TODO: This is just a hack, see TODO for run() for details
@@ -389,7 +388,7 @@ class ClientControlEngine:
         if event.identifier in self.entity_dict.keys():
 
             # Save the Entity in the deleted_entities_dict
-            # to notify the VisualEngine
+            # to notify the PresentationEngine
             #
             self.deleted_entities_dict[event.identifier] = self.entity_dict[event.identifier]
 
@@ -397,11 +396,11 @@ class ClientControlEngine:
             #
             del self.entity_dict[event.identifier]
 
-            # Append the event to the queue for the VisualEngine.
-            # The VisualEngine needs the event for knowing
+            # Append the event to the queue for the PresentationEngine.
+            # The PresentationEngine needs the event for knowing
             # when exactly to remove the Entity.
             #
-            self.visual_engine_message.event_list.append(event)
+            self.presentation_engine_message.event_list.append(event)
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -412,7 +411,7 @@ class ClientControlEngine:
            player and send items and NPCs. So
            this method empties all data 
            structures and passes the event on to 
-           the VisualEngine.'''
+           the PresentationEngine.'''
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them
@@ -438,13 +437,13 @@ class ClientControlEngine:
         self.map = {}
 
         # Finally set the flag in the Message
-        # for the VisualEngine and queue the event
-        # so the VisualEngine knows what happend after
+        # for the PresentationEngine and queue the event
+        # so the PresentationEngine knows what happend after
         # that.
         #
-        self.visual_engine_message.has_EnterRoomEvent = True
+        self.presentation_engine_message.has_EnterRoomEvent = True
 
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_RoomCompleteEvent(self, event):
         '''RoomCompleteEvent notifies the client that
@@ -453,22 +452,22 @@ class ClientControlEngine:
            event arrives the ClientControlEngine should
            have saved all important data in data
            structures. So the event is queued for
-           the VisualEngine here.'''
+           the PresentationEngine here.'''
 
-        # This is a convenience flag so the VisualEngine
+        # This is a convenience flag so the PresentationEngine
         # does not have to scan the event_list.
         #
-        self.visual_engine_message.has_RoomCompleteEvent = True
+        self.presentation_engine_message.has_RoomCompleteEvent = True
 
         # Queue the event. All events after this are
         # rendered.
         #
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
 
     def process_SpawnEvent(self, event):
         '''Add the Entity given to the entity_dict
-           and pass the SpawnEvent on to the VisualEngine.'''
+           and pass the SpawnEvent on to the PresentationEngine.'''
 
         self.entity_dict[event.entity.identifier] = event.entity
 
-        self.visual_engine_message.event_list.append(event)
+        self.presentation_engine_message.event_list.append(event)
