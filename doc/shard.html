@@ -28,10 +28,11 @@ Transformed&nbsp;into&nbsp;a&nbsp;package&nbsp;on&nbsp;22.&nbsp;September&nbsp;2
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="shard.assetengine.html">assetengine</a><br>
-<a href="shard.clientcontrolengine.html">clientcontrolengine</a><br>
-</td><td width="25%" valign=top><a href="shard.interfaces.html">interfaces</a><br>
-<a href="shard.presentationengine.html">presentationengine</a><br>
-</td><td width="25%" valign=top><a href="shard.servercoreengine.html">servercoreengine</a><br>
+<a href="shard.clientcoreengine.html">clientcoreengine</a><br>
+</td><td width="25%" valign=top><a href="shard.coreengine.html">coreengine</a><br>
+<a href="shard.interfaces.html">interfaces</a><br>
+</td><td width="25%" valign=top><a href="shard.presentationengine.html">presentationengine</a><br>
+<a href="shard.servercoreengine.html">servercoreengine</a><br>
 </td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -364,7 +365,7 @@ A&nbsp;Shard&nbsp;Client&nbsp;should&nbsp;use&nbsp;subclasses&nbsp;(possibly<br>
 with&nbsp;multiple&nbsp;inheritance)&nbsp;or&nbsp;custom&nbsp;attachements<br>
 to&nbsp;instances&nbsp;of&nbsp;this&nbsp;class&nbsp;to&nbsp;implement&nbsp;the<br>
 game&nbsp;objects&nbsp;used&nbsp;by&nbsp;the&nbsp;rendering&nbsp;engine&nbsp;(2D<br>
-sprites,&nbsp;3D&nbsp;models).&nbsp;Usually&nbsp;the&nbsp;ClientControlEngine<br>
+sprites,&nbsp;3D&nbsp;models).&nbsp;Usually&nbsp;the&nbsp;ClientCoreEngine<br>
 manages&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#Entity">Entity</a>&nbsp;instances.&nbsp;Everything<br>
 concernig&nbsp;the&nbsp;actual&nbsp;graphical&nbsp;representation&nbsp;is<br>
 done&nbsp;by&nbsp;the&nbsp;PresentationEngine.&nbsp;Since&nbsp;this&nbsp;is&nbsp;very<br>
@@ -427,13 +428,13 @@ should&nbsp;override&nbsp;it.</tt></dd></dl>
 <dl><dt><a name="Entity-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>The&nbsp;<a href="#MovesToEvent">MovesToEvent</a>&nbsp;is&nbsp;supplied&nbsp;to&nbsp;the<br>
 <a href="#Entity">Entity</a>&nbsp;so&nbsp;it&nbsp;can&nbsp;update&nbsp;its&nbsp;location.<br>
 The&nbsp;rationale&nbsp;behind&nbsp;this&nbsp;is&nbsp;that<br>
-the&nbsp;ClientControlEngine&nbsp;can&nbsp;be&nbsp;entirely<br>
+the&nbsp;ClientCoreEngine&nbsp;can&nbsp;be&nbsp;entirely<br>
 agnostic&nbsp;about&nbsp;the&nbsp;type&nbsp;of&nbsp;world<br>
 and&nbsp;location&nbsp;(text,&nbsp;2D,&nbsp;3D).<br>
 A&nbsp;call&nbsp;to&nbsp;this&nbsp;method&nbsp;does&nbsp;not&nbsp;mean<br>
 that&nbsp;the&nbsp;PresentationEngine&nbsp;has&nbsp;started<br>
 the&nbsp;movement.&nbsp;This&nbsp;is&nbsp;rather&nbsp;called<br>
-by&nbsp;the&nbsp;ClientControlEngine&nbsp;to&nbsp;signal<br>
+by&nbsp;the&nbsp;ClientCoreEngine&nbsp;to&nbsp;signal<br>
 where&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;about&nbsp;to&nbsp;move.<br>
 See&nbsp;the&nbsp;other&nbsp;methods&nbsp;of&nbsp;this&nbsp;class.</tt></dd></dl>
 

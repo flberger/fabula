@@ -1,56 +1,45 @@
-""" Shard Client Control Engine
+""" Shard Client Core Engine
 
     Extracted from shard.py on 22. Sep 2009
 """
 
 import shard
+import shard.coreengine
 
-class ClientControlEngine:
+class ClientCoreEngine(shard.coreengine.CoreEngine):
     '''An instance of this class is the main engine in every
        Shard client. It connects to the Client Interface and
        to the PresentationEngine, passes events and keeps track
        of Entities. It is normally instantiated in a small
-       setup script "run_shardclient.py".'''
+       setup script "run_shard.py".'''
 
     ####################
     # Init
 
     def __init__(self, interface_instance, presentation_engine_instance, logger):
-        '''The ClientControlEngine must be instantiated with an
+        '''The ClientCoreEngine must be instantiated with an
            instance of a subclass of shard.interfaces.Interface
            which handles the connection to the server or supplies
            events in some other way, and an instance of PresentationEngine
            which presents the game action.'''
 
-        # Attach logger
+        # First setup CoreEngine internals
         #
-        self.logger = logger
+        self.setup(interface_instance,
+                   presentation_engine_instance,
+                   logger)
 
-        self.interface = interface_instance
-        self.presentation_engine = presentation_engine_instance
+        # We attach custom flags to the Message created in
+        # setup() to notify the PresentationEngine whether
+        # an EnterRoomEvent or RoomCompleteEvent occured,
+        # so it does not have to scan the events.
+        #
+        self.plugin_engine_message.has_EnterRoomEvent = False
+        self.plugin_engine_message.has_RoomCompleteEvent = False
 
         # Set up flags used by self.run()
         #
         self.await_confirmation = False
-
-        # A dictionary that maps event classes to functions 
-        # to be called for the respective event.
-        # I just love to use dicts to avoid endless
-        # if... elif... clauses. :-)
-        #
-        self.event_dict = {shard.AttemptFailedEvent : self.process_AttemptFailedEvent, 
-                           shard.CanSpeakEvent : self.process_CanSpeakEvent, 
-                           shard.DropsEvent : self.process_DropsEvent, 
-                           shard.MovesToEvent : self.process_MovesToEvent, 
-                           shard.PicksUpEvent : self.process_PicksUpEvent, 
-                           shard.CustomEntityEvent : self.process_CustomEntityEvent, 
-                           shard.PerceptionEvent : self.process_PerceptionEvent, 
-                           shard.SaysEvent : self.process_SaysEvent, 
-                           shard.ChangeMapElementEvent : self.process_ChangeMapElementEvent, 
-                           shard.DeleteEvent : self.process_DeleteEvent, 
-                           shard.EnterRoomEvent : self.process_EnterRoomEvent, 
-                           shard.RoomCompleteEvent : self.process_RoomCompleteEvent, 
-                           shard.SpawnEvent : self.process_SpawnEvent}
 
         # self.entity_dict keeps track of all active Entites.
         # It uses the identifier as a key, assuming that it
@@ -80,28 +69,6 @@ class ClientControlEngine:
         #
         self.map = {}
 
-        # The ClientControlEngine examines the events of a Server
-        # Message and applies them. events for special
-        # consideration for the PresentationEngine are collected
-        # in a Message for the PresentationEngine.
-        # The ClientControlEngine has to empty the Message once 
-        # the PresentationEngine has rendered all Events.
-        #
-        self.presentation_engine_message = shard.Message([])
-
-        # We attach custom flags to the Message to notify
-        # the PresentationEngine whether an EnterRoomEvent or
-        # RoomCompleteEvent occured, so it does not have
-        # to scan the events.
-        #
-        self.presentation_engine_message.has_EnterRoomEvent = False
-        self.presentation_engine_message.has_RoomCompleteEvent = False
-
-        # In self.client_message we collect Client events to be
-        # sent to the server in each loop.
-        #
-        self.client_message = shard.Message([])
-        
         self.got_empty_message = False
 
         self.logger.info("complete")
@@ -112,7 +79,7 @@ class ClientControlEngine:
     # Main Loop
 
     def run(self):
-        '''Main loop of the ClientControlEngine. This is
+        '''Main loop of the ClientCoreEngine. This is
            a blocking method. It calls all the process methods
            to process events.'''
 
@@ -131,7 +98,7 @@ class ClientControlEngine:
         #
         self.interface.send_message(shard.Message([shard.InitEvent()]))
 
-        while not self.presentation_engine.exit_requested:
+        while not self.plugin_engine.exit_requested:
 
             # grab_message must and will return a Message, but
             # it possibly has an empty event_list.
@@ -151,7 +118,7 @@ class ClientControlEngine:
 
                 self.got_empty_message = True
 
-            # First handle the events in the ClientControlEngine, 
+            # First handle the events in the ClientCoreEngine, 
             # gathering Entities and Map Elements and preparing
             # a Message for the PresentationEngine
             #
@@ -170,10 +137,10 @@ class ClientControlEngine:
 
             # First hand over / update the necessary data.
             #
-            self.presentation_engine.entity_dict = self.entity_dict
-            self.presentation_engine.deleted_entities_dict = self.deleted_entities_dict
-            self.presentation_engine.tile_list = self.tile_list
-            self.presentation_engine.Map = self.map
+            self.plugin_engine.entity_dict = self.entity_dict
+            self.plugin_engine.deleted_entities_dict = self.deleted_entities_dict
+            self.plugin_engine.tile_list = self.tile_list
+            self.plugin_engine.Map = self.map
 
             # This call may take an almost arbitrary amount
             # of time, since there may be long actions to
@@ -182,22 +149,22 @@ class ClientControlEngine:
             # even if the server Message and thus the
             # PresentationEngine_message are empty!
             #
-            self.presentation_engine.render_message(self.presentation_engine_message)
+            self.plugin_engine.render_message(self.plugin_engine_message)
 
             # The PresentationEngine returned, the Server Message has
             # been applied and rendered. Clean up.
             #
-            self.presentation_engine_message = shard.Message([])
+            self.plugin_engine_message = shard.Message([])
             self.deleted_entities_dict = {}
-            self.presentation_engine_message.has_EnterRoomEvent = False
-            self.presentation_engine_message.has_RoomCompleteEvent = False
+            self.plugin_engine_message.has_EnterRoomEvent = False
+            self.plugin_engine_message.has_RoomCompleteEvent = False
 
             # Up to now, we did not care whether the server Message
             # had any events at all. But we only send a 
             # MessageAppliedEvent if it had.
             #
             if server_message.event_list:
-                self.client_message.event_list.append(shard.MessageAppliedEvent())
+                self.message_for_remote.event_list.append(shard.MessageAppliedEvent())
 
             # TODO: possibly unset "AwaitConfirmation" flag
             # If there has been a Confirmation for a LookAt or
@@ -208,15 +175,15 @@ class ClientControlEngine:
             # The PresentationEngine might have collected some
             # player input and converted it to events.
             #
-            if (self.presentation_engine.player_event_list
+            if (self.plugin_engine.player_event_list
                 and not self.await_confirmation):
 
                 # We queue player triggered events before 
                 # MessageAppliedEvent so the server processes
                 # all events before sending anything new.
                 #
-                self.client_message.event_list = (self.presentation_engine.player_event_list
-                                                  + self.client_message.event_list)
+                self.message_for_remote.event_list = (self.plugin_engine.player_event_list
+                                                  + self.message_for_remote.event_list)
 
                 # Since we had player input, we now await confirmation
                 #
@@ -224,12 +191,12 @@ class ClientControlEngine:
 
             # If this iteration yielded any events, send them.
             #
-            if self.client_message.event_list:
-                self.interface.send_message(self.client_message)
+            if self.message_for_remote.event_list:
+                self.interface.send_message(self.message_for_remote)
 
                 # Clean up
                 #
-                self.client_message = shard.Message([])
+                self.message_for_remote = shard.Message([])
 
             # OK, iteration done. If no exit requested, 
             # grab the next server message!
@@ -252,72 +219,65 @@ class ClientControlEngine:
     ####################
     # Auxiliary Methods
 
-    def process_AttemptFailedEvent(self, event):
-        '''Currently not implemented.'''
+    #def process_AttemptFailedEvent(self, event):
+    #    #    CoreEngine: if there was a Confirmation and
+    #    #    it has been applied or if there was an
+    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #    #
+    #    pass
 
-        #    ControlEngine: if there was a Confirmation and
-        #    it has been applied or if there was an
-        #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-        #
-        pass
+    #def process_CanSpeakEvent(self, event):
+    #    '''Currently not implemented.'''
+    #    #    CoreEngine: if there was a Confirmation and
+    #    #    it has been applied or if there was an
+    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #    # Pass on the event.
+    #    #
+    #    self.plugin_engine_message.event_list.append(event)
 
-    def process_CanSpeakEvent(self, event):
-        '''Currently not implemented.'''
+    #def process_DropsEvent(self, event):
+    #    '''Currently not implemented.'''
+    #    # Remove the Entity from the Inventory
+    #    #
+    #    # Add it to the entity_dict, setting the
+    #    # coordinates from direction
+    #    #
+    #    # Queue the DropsEvent (for Animation) and
+    #    # a SpawnEvent for the PresentationEngine
+    #    #
+    #    #    CoreEngine: if there was a Confirmation and
+    #    #    it has been applied or if there was an
+    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #    #
+    #    pass
 
-        #    ControlEngine: if there was a Confirmation and
-        #    it has been applied or if there was an
-        #    AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #def process_MovesToEvent(self, event):
+    #    '''Currently not implemented.'''
+    #    # CoreEngine: if there was a Confirmation and it has been applied
+    #    # or if there was an AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #    #
+    #    # CoreEngine: pass events to Entities
+    #    #     Entity: change location, set graphics, custom actions
+    #    # CoreEngine: pass Message/Events to PresentationEngine
+    #    #
+    #    pass
 
-        # Pass on the event.
-        #
-        self.presentation_engine_message.event_list.append(event)
-
-    def process_DropsEvent(self, event):
-        '''Currently not implemented.'''
-
-        # Remove the Entity from the Inventory
-        #
-        # Add it to the entity_dict, setting the
-        # coordinates from direction
-        #
-        # Queue the DropsEvent (for Animation) and
-        # a SpawnEvent for the PresentationEngine
-        #
-        #    ControlEngine: if there was a Confirmation and
-        #    it has been applied or if there was an
-        #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-        #
-        pass
-
-    def process_MovesToEvent(self, event):
-        '''Currently not implemented.'''
-
-        # ControlEngine: if there was a Confirmation and it has been applied
-        # or if there was an AttemptFailedEvent: unset "AwaitConfirmation" flag
-        #
-        # ControlEngine: pass events to Entities
-        #     Entity: change location, set graphics, custom actions
-        # ControlEngine: pass Message/Events to PresentationEngine
-        #
-        pass
-
-    def process_PicksUpEvent(self, event):
-        '''Currently not implemented.'''
-
-        # Remove from the entity_dict
-        #
-        # Save in deleted_entities_dict
-        #
-        # Move the Entity to the Inventory
-        #
-        # Queue the PicksUpEvent (for Animation) and
-        # a DeleteEvent for the PresentationEngine
-        #
-        #    ControlEngine: if there was a Confirmation and
-        #    it has been applied or if there was an
-        #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-        #
-        pass
+    #def process_PicksUpEvent(self, event):
+    #    '''Currently not implemented.'''
+    #    # Remove from the entity_dict
+    #    #
+    #    # Save in deleted_entities_dict
+    #    #
+    #    # Move the Entity to the Inventory
+    #    #
+    #    # Queue the PicksUpEvent (for Animation) and
+    #    # a DeleteEvent for the PresentationEngine
+    #    #
+    #    #    CoreEngine: if there was a Confirmation and
+    #    #    it has been applied or if there was an
+    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
+    #    #
+    #    pass
 
     def process_CustomEntityEvent(self, event):
         '''The key-value dict of a CustomEntiyEvent 
@@ -325,28 +285,27 @@ class ClientControlEngine:
 
         self.entity_dict[event.identifier].process_CustomEntityEvent(event.key_value_dict)
 
-    def process_PerceptionEvent(self, event):
-        '''A perception must be displayed by the 
-           PresentationEngine, so it is queued in a Message passed
-           from the ClientControlEngine.'''
+    #def process_PerceptionEvent(self, event):
+    #    '''A perception must be displayed by the 
+    #       PresentationEngine, so it is queued in a Message passed
+    #       from the ClientCoreEngine.'''
+    #    #    CoreEngine: if there was a Confirmation
+    #    #    (here: for LookAt, Manipulate)
+    #    #    and it has been applied
+    #    #    or if there was an AttemptFailedEvent: unset
+    #    #    "AwaitConfirmation" flag
+    #    #
+    #    self.plugin_engine_message.event_list.append(event)
 
-        #    ControlEngine: if there was a Confirmation
-        #    (here: for LookAt, Manipulate)
-        #    and it has been applied
-        #    or if there was an AttemptFailedEvent: unset
-        #    "AwaitConfirmation" flag
-        #
-        self.presentation_engine_message.event_list.append(event)
-
-    def process_SaysEvent(self, event):
-        '''The PresentationEngine usually must display the 
-           spoken text. Thus the event is put in the
-           event queue for the PresentationEngine.
-           The PresentationEngine is going to notify
-           the Entity once it starts speaking so it
-           can provide an animation.'''
-
-        self.presentation_engine_message.event_list.append(event)
+    #def process_SaysEvent(self, event):
+    #    '''The PresentationEngine usually must display the 
+    #       spoken text. Thus the event is put in the
+    #       event queue for the PresentationEngine.
+    #       The PresentationEngine is going to notify
+    #       the Entity once it starts speaking so it
+    #       can provide an animation.'''
+    #
+    #    self.plugin_engine_message.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event):
         '''Store the tile given in self.map, 
@@ -375,7 +334,7 @@ class ClientControlEngine:
 
         # Append the event to the queue for the PresentationEngine.
         #
-        self.presentation_engine_message.event_list.append(event)
+        self.plugin_engine_message.event_list.append(event)
 
     def process_DeleteEvent(self, event):
         '''Save the Entity to be deleted in the
@@ -400,7 +359,7 @@ class ClientControlEngine:
             # The PresentationEngine needs the event for knowing
             # when exactly to remove the Entity.
             #
-            self.presentation_engine_message.event_list.append(event)
+            self.plugin_engine_message.event_list.append(event)
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -441,15 +400,15 @@ class ClientControlEngine:
         # so the PresentationEngine knows what happend after
         # that.
         #
-        self.presentation_engine_message.has_EnterRoomEvent = True
+        self.plugin_engine_message.has_EnterRoomEvent = True
 
-        self.presentation_engine_message.event_list.append(event)
+        self.plugin_engine_message.event_list.append(event)
 
     def process_RoomCompleteEvent(self, event):
         '''RoomCompleteEvent notifies the client that
            the player, all map elements, items and
            NPCs have been transfered. By the time the
-           event arrives the ClientControlEngine should
+           event arrives the ClientCoreEngine should
            have saved all important data in data
            structures. So the event is queued for
            the PresentationEngine here.'''
@@ -457,12 +416,12 @@ class ClientControlEngine:
         # This is a convenience flag so the PresentationEngine
         # does not have to scan the event_list.
         #
-        self.presentation_engine_message.has_RoomCompleteEvent = True
+        self.plugin_engine_message.has_RoomCompleteEvent = True
 
         # Queue the event. All events after this are
         # rendered.
         #
-        self.presentation_engine_message.event_list.append(event)
+        self.plugin_engine_message.event_list.append(event)
 
     def process_SpawnEvent(self, event):
         '''Add the Entity given to the entity_dict
@@ -470,4 +429,4 @@ class ClientControlEngine:
 
         self.entity_dict[event.entity.identifier] = event.entity
 
-        self.presentation_engine_message.event_list.append(event)
+        self.plugin_engine_message.event_list.append(event)

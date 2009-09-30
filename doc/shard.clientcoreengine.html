@@ -1,0 +1,198 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module shard.clientcoreengine</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="shard.html"><font color="#ffffff">shard</font></a>.clientcoreengine</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/clientcoreengine.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/clientcoreengine.py</a></font></td></tr></table>
+    <p><tt>Shard&nbsp;Client&nbsp;Core&nbsp;Engine<br>
+&nbsp;<br>
+Extracted&nbsp;from&nbsp;shard.py&nbsp;on&nbsp;22.&nbsp;Sep&nbsp;2009</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="shard.html">shard</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="shard.coreengine.html#CoreEngine">shard.coreengine.CoreEngine</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="shard.clientcoreengine.html#ClientCoreEngine">ClientCoreEngine</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ClientCoreEngine">class <strong>ClientCoreEngine</strong></a>(<a href="shard.coreengine.html#CoreEngine">shard.coreengine.CoreEngine</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>An&nbsp;instance&nbsp;of&nbsp;this&nbsp;class&nbsp;is&nbsp;the&nbsp;main&nbsp;engine&nbsp;in&nbsp;every<br>
+Shard&nbsp;client.&nbsp;It&nbsp;connects&nbsp;to&nbsp;the&nbsp;Client&nbsp;Interface&nbsp;and<br>
+to&nbsp;the&nbsp;PresentationEngine,&nbsp;passes&nbsp;events&nbsp;and&nbsp;keeps&nbsp;track<br>
+of&nbsp;Entities.&nbsp;It&nbsp;is&nbsp;normally&nbsp;instantiated&nbsp;in&nbsp;a&nbsp;small<br>
+setup&nbsp;script&nbsp;"run_shard.py".<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ClientCoreEngine-__init__"><strong>__init__</strong></a>(self, interface_instance, presentation_engine_instance, logger)</dt><dd><tt>The&nbsp;<a href="#ClientCoreEngine">ClientCoreEngine</a>&nbsp;must&nbsp;be&nbsp;instantiated&nbsp;with&nbsp;an<br>
+instance&nbsp;of&nbsp;a&nbsp;subclass&nbsp;of&nbsp;shard.interfaces.Interface<br>
+which&nbsp;handles&nbsp;the&nbsp;connection&nbsp;to&nbsp;the&nbsp;server&nbsp;or&nbsp;supplies<br>
+events&nbsp;in&nbsp;some&nbsp;other&nbsp;way,&nbsp;and&nbsp;an&nbsp;instance&nbsp;of&nbsp;PresentationEngine<br>
+which&nbsp;presents&nbsp;the&nbsp;game&nbsp;action.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event)</dt><dd><tt>Store&nbsp;the&nbsp;tile&nbsp;given&nbsp;in&nbsp;self.<strong>map</strong>,&nbsp;<br>
+a&nbsp;dict&nbsp;of&nbsp;dicts&nbsp;with&nbsp;x-&nbsp;and<br>
+y-coordinates&nbsp;as&nbsp;keys.&nbsp;Also&nbsp;save<br>
+it&nbsp;for&nbsp;the&nbsp;PresentationEngine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, event)</dt><dd><tt>The&nbsp;key-value&nbsp;dict&nbsp;of&nbsp;a&nbsp;CustomEntiyEvent&nbsp;<br>
+is&nbsp;just&nbsp;passed&nbsp;on&nbsp;to&nbsp;the&nbsp;Entity.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event)</dt><dd><tt>Save&nbsp;the&nbsp;Entity&nbsp;to&nbsp;be&nbsp;deleted&nbsp;in&nbsp;the<br>
+deleted_entities_dict&nbsp;for&nbsp;the&nbsp;<br>
+PresentationEngine,&nbsp;then&nbsp;remove&nbsp;it&nbsp;from&nbsp;the<br>
+entity_dict.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event)</dt><dd><tt>An&nbsp;EnterRoomEvent&nbsp;means&nbsp;the&nbsp;server&nbsp;is<br>
+about&nbsp;to&nbsp;send&nbsp;a&nbsp;new&nbsp;map,&nbsp;respawn&nbsp;the<br>
+player&nbsp;and&nbsp;send&nbsp;items&nbsp;and&nbsp;NPCs.&nbsp;So<br>
+this&nbsp;method&nbsp;empties&nbsp;all&nbsp;data&nbsp;<br>
+structures&nbsp;and&nbsp;passes&nbsp;the&nbsp;event&nbsp;on&nbsp;to&nbsp;<br>
+the&nbsp;PresentationEngine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event)</dt><dd><tt>RoomCompleteEvent&nbsp;notifies&nbsp;the&nbsp;client&nbsp;that<br>
+the&nbsp;player,&nbsp;all&nbsp;map&nbsp;elements,&nbsp;items&nbsp;and<br>
+NPCs&nbsp;have&nbsp;been&nbsp;transfered.&nbsp;By&nbsp;the&nbsp;time&nbsp;the<br>
+event&nbsp;arrives&nbsp;the&nbsp;<a href="#ClientCoreEngine">ClientCoreEngine</a>&nbsp;should<br>
+have&nbsp;saved&nbsp;all&nbsp;important&nbsp;data&nbsp;in&nbsp;data<br>
+structures.&nbsp;So&nbsp;the&nbsp;event&nbsp;is&nbsp;queued&nbsp;for<br>
+the&nbsp;PresentationEngine&nbsp;here.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event)</dt><dd><tt>Add&nbsp;the&nbsp;Entity&nbsp;given&nbsp;to&nbsp;the&nbsp;entity_dict<br>
+and&nbsp;pass&nbsp;the&nbsp;SpawnEvent&nbsp;on&nbsp;to&nbsp;the&nbsp;PresentationEngine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-run"><strong>run</strong></a>(self)</dt><dd><tt>Main&nbsp;loop&nbsp;of&nbsp;the&nbsp;<a href="#ClientCoreEngine">ClientCoreEngine</a>.&nbsp;This&nbsp;is<br>
+a&nbsp;blocking&nbsp;method.&nbsp;It&nbsp;calls&nbsp;all&nbsp;the&nbsp;process&nbsp;methods<br>
+to&nbsp;process&nbsp;events.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.coreengine.html#CoreEngine">shard.coreengine.CoreEngine</a>:<br>
+<dl><dt><a name="ClientCoreEngine-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_DropsEvent"><strong>process_DropsEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_InitEvent"><strong>process_InitEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_LookedAtEvent"><strong>process_LookedAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_MessageAppliedEvent"><strong>process_MessageAppliedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_PerceptionEvent"><strong>process_PerceptionEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_PickedUpEvent"><strong>process_PickedUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_PicksUpEvent"><strong>process_PicksUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_SaysEvent"><strong>process_SaysEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToLookAtEvent"><strong>process_TriesToLookAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToManipulateEvent"><strong>process_TriesToManipulateEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToMoveEvent"><strong>process_TriesToMoveEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToPickUpEvent"><strong>process_TriesToPickUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_TriesToTalkToEvent"><strong>process_TriesToTalkToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
+the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-setup"><strong>setup</strong></a>(self, interface_instance, plugin_engine_instance, logger)</dt><dd><tt>CoreEngines&nbsp;need&nbsp;an&nbsp;instance&nbsp;of&nbsp;a&nbsp;subclass<br>
+of&nbsp;shard.interfaces.Interface&nbsp;to&nbsp;communicate<br>
+with&nbsp;the&nbsp;remote&nbsp;host.&nbsp;Most&nbsp;CoreEngines&nbsp;will<br>
+deploy&nbsp;a&nbsp;plugin&nbsp;engine&nbsp;to&nbsp;control&nbsp;or&nbsp;present<br>
+the&nbsp;game.&nbsp;Finally,&nbsp;logger&nbsp;is&nbsp;an&nbsp;instance&nbsp;of<br>
+logging.Logger&nbsp;for,&nbsp;eh,&nbsp;logging&nbsp;purposes.&nbsp;;-)</tt></dd></dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

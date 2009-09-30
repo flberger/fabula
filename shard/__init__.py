@@ -391,7 +391,7 @@ class Entity:
        with multiple inheritance) or custom attachements
        to instances of this class to implement the
        game objects used by the rendering engine (2D
-       sprites, 3D models). Usually the ClientControlEngine
+       sprites, 3D models). Usually the ClientCoreEngine
        manages a list of Entity instances. Everything
        concernig the actual graphical representation is
        done by the PresentationEngine. Since this is very
@@ -469,13 +469,13 @@ class Entity:
         '''The MovesToEvent is supplied to the
            Entity so it can update its location.
            The rationale behind this is that
-           the ClientControlEngine can be entirely
+           the ClientCoreEngine can be entirely
            agnostic about the type of world
            and location (text, 2D, 3D).
            A call to this method does not mean
            that the PresentationEngine has started
            the movement. This is rather called
-           by the ClientControlEngine to signal
+           by the ClientCoreEngine to signal
            where the Entity is about to move.
            See the other methods of this class.'''
         # EXAMPLE

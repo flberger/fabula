@@ -32,7 +32,7 @@ class PresentationEngine:
            If you override this method, make sure 
            you do all these initiaizations, too.
            For your convenience there is a method
-           self.custom_init() which you can savely
+           self.setup() which you can savely
            override. 
            This method must not block, it has to 
            return once everything is set up.'''
@@ -55,10 +55,10 @@ class PresentationEngine:
         # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
         # exit request by the user. This value is
-        # checked in the ClientControlEngine main loop.
+        # checked in the ClientCoreEngine main loop.
         self.exit_requested = False
 
-        # Variables to be filled by the ClientControlEngine
+        # Variables to be filled by the ClientCoreEngine
         # before each call to render_message()
         self.entity_dict = {}
         self.deleted_entities_dict = {}
@@ -72,7 +72,8 @@ class PresentationEngine:
         self.waiting_for_RoomCompleteEvent = True
 
         # See the method for explaination.
-        self.custom_init()
+        #
+        self.setup()
 
         self.logger.info("complete")
         self.logger.info("now waiting for RoomCompleteEvent")
@@ -84,18 +85,18 @@ class PresentationEngine:
 
     def render_message(self, message):
         '''This is the main method of the PresentationEngine.
-           It is called regularly by the ClientControlEngine
+           It is called regularly by the ClientCoreEngine
            with a list of events to display (note: the
            list may be empty). It may take all the time 
            it needs to render the action, just a couple 
            or even hundreds of frames, but it must 
            return once the events have been displayed. 
            It must neither block completely nor run in 
-           a thread since the ClientControlEngine has to 
+           a thread since the ClientCoreEngine has to 
            grab new events and change state between 
            calls to render_message(). Put that way, 
            render_message() is simply a part of 
-           ClientControlEngine.run().
+           ClientCoreEngine.run().
            You should normally not override this method
            unless you have to do some really advanced
            stuff. Overriding the other methods of this
@@ -471,7 +472,7 @@ class PresentationEngine:
     # Most docstrings describe 2D stuff (images).
     # Rewrite 2D-3D-agnostic.
 
-    def custom_init(self):
+    def setup(self):
         '''When creating a subclass, you should not
            override the standard __init__() method
            of the PresentationEngine class. Instead place
