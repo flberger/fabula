@@ -12,7 +12,8 @@
     <p><tt>Shard&nbsp;Core&nbsp;Engine&nbsp;Base&nbsp;Class<br>
 &nbsp;<br>
 Work&nbsp;started&nbsp;on&nbsp;30.&nbsp;Sep&nbsp;2009<br>
-Based&nbsp;on&nbsp;a&nbsp;former&nbsp;implementations&nbsp;of<br>
+&nbsp;<br>
+Based&nbsp;on&nbsp;former&nbsp;implementations&nbsp;of<br>
 the&nbsp;ClientControlEngine</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -48,10 +49,10 @@ so&nbsp;the&nbsp;use&nbsp;of&nbsp;this&nbsp;class&nbsp;is&nbsp;providing<br>
 a&nbsp;structure&nbsp;for&nbsp;CoreEngines.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="CoreEngine-__init__"><strong>__init__</strong></a>(self, interface_instance, plugin_engine_instance, logger)</dt><dd><tt>When&nbsp;subclassing&nbsp;<a href="#CoreEngine">CoreEngine</a>&nbsp;you&nbsp;will&nbsp;very<br>
+<dl><dt><a name="CoreEngine-__init__"><strong>__init__</strong></a>(self, interface_instance, plugin_instance, logger)</dt><dd><tt>When&nbsp;subclassing&nbsp;<a href="#CoreEngine">CoreEngine</a>&nbsp;you&nbsp;will&nbsp;very<br>
 likely&nbsp;want&nbsp;to&nbsp;write&nbsp;your&nbsp;own&nbsp;<a href="#CoreEngine-__init__">__init__</a>()<br>
 method.&nbsp;That's&nbsp;fine,&nbsp;but&nbsp;be&nbsp;sure&nbsp;to&nbsp;call<br>
-the&nbsp;<a href="#CoreEngine-setup">setup</a>()&nbsp;method&nbsp;of&nbsp;this&nbsp;class&nbsp;with&nbsp;the<br>
+the&nbsp;<a href="#CoreEngine-setup_core_engine">setup_core_engine</a>()&nbsp;method&nbsp;of&nbsp;this&nbsp;class&nbsp;with&nbsp;the<br>
 appropriate&nbsp;arguments&nbsp;as&nbsp;done&nbsp;by&nbsp;the<br>
 default&nbsp;implementation.</tt></dd></dl>
 
@@ -184,7 +185,7 @@ the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
 the&nbsp;business&nbsp;logic&nbsp;here.&nbsp;This&nbsp;is&nbsp;a&nbsp;blocking&nbsp;method<br>
 which&nbsp;calls&nbsp;all&nbsp;the&nbsp;process&nbsp;methods&nbsp;to&nbsp;process&nbsp;events.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-setup"><strong>setup</strong></a>(self, interface_instance, plugin_engine_instance, logger)</dt><dd><tt>CoreEngines&nbsp;need&nbsp;an&nbsp;instance&nbsp;of&nbsp;a&nbsp;subclass<br>
+<dl><dt><a name="CoreEngine-setup_core_engine"><strong>setup_core_engine</strong></a>(self, interface_instance, plugin_instance, logger)</dt><dd><tt>CoreEngines&nbsp;need&nbsp;an&nbsp;instance&nbsp;of&nbsp;a&nbsp;subclass<br>
 of&nbsp;shard.interfaces.Interface&nbsp;to&nbsp;communicate<br>
 with&nbsp;the&nbsp;remote&nbsp;host.&nbsp;Most&nbsp;CoreEngines&nbsp;will<br>
 deploy&nbsp;a&nbsp;plugin&nbsp;engine&nbsp;to&nbsp;control&nbsp;or&nbsp;present<br>

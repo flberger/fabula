@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-'''run_shard.py - Initialize and run a Shard server or client
+"""run_shard.py - Initialize and run a Shard server or client
    
    (c) Florian Berger <fberger@fbmd.de>
    
@@ -9,7 +9,7 @@
    Server part adapted from run_shardclient.py on 25. Sep 2009
 
    Unfied for client and server usage on 30. Sep 2009
-'''
+"""
 
 ##############################
 # Imports
@@ -20,6 +20,7 @@ import shard.interfaces
 import shard.servercoreengine
 import shard.assetengine
 import shard.presentationengine
+import shard.plugin
 import shard.clientcoreengine
 import thread
 
@@ -117,7 +118,7 @@ def main():
 
         asset_engine = shard.assetengine.AssetEngine(logger)
 
-        plugin_engine = shard.presentationengine.PresentationEngine(asset_engine,
+        plugin = shard.presentationengine.PresentationEngine(asset_engine,
                                                                     FRAMERATE,
                                                                     logger)
 
@@ -127,20 +128,20 @@ def main():
 
         interface_class = shard.interfaces.ServerInterface
 
-        plugin_engine = "dummy plugin engine replacement"
+        plugin = shard.plugin.Plugin(logger)
 
         coreengine_class = shard.servercoreengine.ServerCoreEngine
 
     interface = interface_class(("localhost", PORT), logger)
 
     coreengine_instance = coreengine_class(interface,
-                                           plugin_engine,
+                                           plugin,
                                            logger)
 
     thread.start_new_thread(interface.handle_messages, ())
 
     # This method will return when the plugin
-    # engine sets plugin_engine.exit_requested
+    # engine sets plugin.exit_requested
     # to True
     #
     coreengine_instance.run()

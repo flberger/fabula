@@ -1,7 +1,8 @@
 """Shard Core Engine Base Class
 
    Work started on 30. Sep 2009
-   Based on a former implementations of
+
+   Based on former implementations of
    the ClientControlEngine
 """
 
@@ -17,20 +18,20 @@ class CoreEngine:
        a structure for CoreEngines.
     """
 
-    def __init__(self, interface_instance, plugin_engine_instance, logger):
+    def __init__(self, interface_instance, plugin_instance, logger):
         """When subclassing CoreEngine you will very
            likely want to write your own __init__()
            method. That's fine, but be sure to call
-           the setup() method of this class with the
+           the setup_core_engine() method of this class with the
            appropriate arguments as done by the
            default implementation.
         """
 
-        self.setup(interface_instance,
-                   plugin_engine_instance,
-                   logger)
+        self.setup_core_engine(interface_instance,
+                               plugin_instance,
+                               logger)
 
-    def setup(self, interface_instance, plugin_engine_instance, logger):
+    def setup_core_engine(self, interface_instance, plugin_instance, logger):
         """CoreEngines need an instance of a subclass
            of shard.interfaces.Interface to communicate
            with the remote host. Most CoreEngines will
@@ -45,7 +46,7 @@ class CoreEngine:
 
         self.interface = interface_instance
 
-        self.plugin_engine = plugin_engine_instance
+        self.plugin = plugin_instance
 
         # A dictionary that maps event classes to functions 
         # to be called for the respective event.
@@ -111,7 +112,7 @@ class CoreEngine:
         # The CoreEngine has to empty the Message once 
         # the PluginEngine has processed all Events.
         #
-        self.plugin_engine_message = shard.Message([])
+        self.message_for_plugin = shard.Message([])
 
         # In self.message_for_remote we collect events to be
         # sent to the remote host in each loop.
@@ -132,13 +133,13 @@ class CoreEngine:
         # plugin engine decides that the game is
         # over.
         #
-        while not self.plugin_engine.exit_requested:
+        while not self.plugin.exit_requested:
             pass
 
         # exit has been requested
         
         self.logger.info("exit requested from "
-              + "PluginiEngine, shutting down interface...")
+              + "PluginEngine, shutting down interface...")
 
         # stop the Interface thread
         #
@@ -157,7 +158,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_TriesToLookAtEvent(self, event):
         """Process the Event.
@@ -166,7 +169,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_TriesToPickUpEvent(self, event):
         """Process the Event.
@@ -175,7 +180,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_TriesToDropEvent(self, event):
         """Process the Event.
@@ -184,7 +191,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_TriesToManipulateEvent(self, event):
         """Process the Event.
@@ -193,7 +202,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_TriesToTalkToEvent(self, event):
         """Process the Event.
@@ -202,7 +213,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_MovesToEvent(self, event):
         """Process the Event.
@@ -211,7 +224,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_PicksUpEvent(self, event):
         """Process the Event.
@@ -220,7 +235,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_DropsEvent(self, event):
         """Process the Event.
@@ -229,7 +246,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_CanSpeakEvent(self, event):
         """Process the Event.
@@ -238,7 +257,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_AttemptFailedEvent(self, event):
         """Process the Event.
@@ -247,7 +268,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_PerceptionEvent(self, event):
         """Process the Event.
@@ -256,7 +279,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_SaysEvent(self, event):
         """Process the Event.
@@ -265,7 +290,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_CustomEntityEvent(self, event):
         """Process the Event.
@@ -274,7 +301,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_PassedEvent(self, event):
         """Process the Event.
@@ -283,7 +312,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_LookedAtEvent(self, event):
         """Process the Event.
@@ -292,7 +323,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_PickedUpEvent(self, event):
         """Process the Event.
@@ -301,7 +334,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_DroppedEvent(self, event):
         """Process the Event.
@@ -310,7 +345,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_SpawnEvent(self, event):
         """Process the Event.
@@ -319,7 +356,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_DeleteEvent(self, event):
         """Process the Event.
@@ -328,7 +367,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_EnterRoomEvent(self, event):
         """Process the Event.
@@ -337,7 +378,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_RoomCompleteEvent(self, event):
         """Process the Event.
@@ -346,7 +389,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event):
         """Process the Event.
@@ -355,7 +400,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_InitEvent(self, event):
         """Process the Event.
@@ -364,7 +411,9 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)
 
     def process_MessageAppliedEvent(self, event):
         """Process the Event.
@@ -373,4 +422,6 @@ class CoreEngine:
            the plugin engine.
         """
 
-        self.plugin_engine_message.event_list.append(event)
+        self.logger.debug("called")
+
+        self.message_for_plugin.event_list.append(event)

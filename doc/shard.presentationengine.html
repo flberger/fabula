@@ -31,13 +31,18 @@ Renamed&nbsp;from&nbsp;VisualEngine&nbsp;to&nbsp;<a href="#PresentationEngine">P
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="shard.plugin.html#Plugin">shard.plugin.Plugin</a>
+</font></dt><dd>
+<dl>
 <dt><font face="helvetica, arial"><a href="shard.presentationengine.html#PresentationEngine">PresentationEngine</a>
 </font></dt></dl>
+</dd>
+</dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PresentationEngine">class <strong>PresentationEngine</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="PresentationEngine">class <strong>PresentationEngine</strong></a>(<a href="shard.plugin.html#Plugin">shard.plugin.Plugin</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;<a href="#PresentationEngine">PresentationEngine</a>&nbsp;for&nbsp;the<br>
@@ -51,17 +56,12 @@ possible&nbsp;to&nbsp;write&nbsp;2D&nbsp;and&nbsp;3D&nbsp;PresentationEngines&nb
 even&nbsp;a&nbsp;text&nbsp;interface.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="PresentationEngine-__init__"><strong>__init__</strong></a>(self, asset_engine, framerate, logger)</dt><dd><tt>This&nbsp;method&nbsp;initializes&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
-asset_engine&nbsp;must&nbsp;be&nbsp;an&nbsp;instance&nbsp;of<br>
-shard.AssetEngine&nbsp;or&nbsp;a&nbsp;subclass.<br>
-framerate&nbsp;must&nbsp;be&nbsp;an&nbsp;integer&nbsp;and&nbsp;sets<br>
-the&nbsp;maximum&nbsp;(not&nbsp;minimum&nbsp;;-))&nbsp;frames&nbsp;per<br>
-second&nbsp;the&nbsp;client&nbsp;will&nbsp;run&nbsp;in.<br>
-If&nbsp;you&nbsp;override&nbsp;this&nbsp;method,&nbsp;make&nbsp;sure&nbsp;<br>
-you&nbsp;do&nbsp;all&nbsp;these&nbsp;initiaizations,&nbsp;too.<br>
-For&nbsp;your&nbsp;convenience&nbsp;there&nbsp;is&nbsp;a&nbsp;method<br>
-<a href="#PresentationEngine-setup">setup</a>()&nbsp;which&nbsp;you&nbsp;can&nbsp;savely<br>
-override.&nbsp;<br>
+<dl><dt><a name="PresentationEngine-__init__"><strong>__init__</strong></a>(self, asset_engine, framerate, logger)</dt><dd><tt>Initialize&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.&nbsp;You&nbsp;are<br>
+welcome&nbsp;to&nbsp;override&nbsp;this&nbsp;method,&nbsp;but&nbsp;make<br>
+sure&nbsp;to&nbsp;call&nbsp;<a href="#PresentationEngine-setup_presentation_engine">setup_presentation_engine</a>()<br>
+with&nbsp;the&nbsp;appropriate&nbsp;arguments&nbsp;to&nbsp;properly<br>
+initialize&nbsp;internals.<br>
+This&nbsp;is&nbsp;what&nbsp;the&nbsp;default&nbsp;implementation&nbsp;does.<br>
 This&nbsp;method&nbsp;must&nbsp;not&nbsp;block,&nbsp;it&nbsp;has&nbsp;to&nbsp;<br>
 return&nbsp;once&nbsp;everything&nbsp;is&nbsp;set&nbsp;up.</tt></dd></dl>
 
@@ -203,7 +203,7 @@ if&nbsp;they&nbsp;are&nbsp;off-screen.&nbsp;This&nbsp;method<br>
 must&nbsp;change&nbsp;the&nbsp;event_list&nbsp;in&nbsp;place.<br>
 The&nbsp;default&nbsp;is&nbsp;no&nbsp;filtering.</tt></dd></dl>
 
-<dl><dt><a name="PresentationEngine-render_message"><strong>render_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
+<dl><dt><a name="PresentationEngine-process_message"><strong>process_message</strong></a>(self, message, entity_dict, deleted_entities_dict, tile_list, map)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
 It&nbsp;is&nbsp;called&nbsp;regularly&nbsp;by&nbsp;the&nbsp;ClientCoreEngine<br>
 with&nbsp;a&nbsp;list&nbsp;of&nbsp;events&nbsp;to&nbsp;display&nbsp;(note:&nbsp;the<br>
 list&nbsp;may&nbsp;be&nbsp;empty).&nbsp;It&nbsp;may&nbsp;take&nbsp;all&nbsp;the&nbsp;time&nbsp;<br>
@@ -213,30 +213,29 @@ return&nbsp;once&nbsp;the&nbsp;events&nbsp;have&nbsp;been&nbsp;displayed.&nbsp;<
 It&nbsp;must&nbsp;neither&nbsp;block&nbsp;completely&nbsp;nor&nbsp;run&nbsp;in&nbsp;<br>
 a&nbsp;thread&nbsp;since&nbsp;the&nbsp;ClientCoreEngine&nbsp;has&nbsp;to&nbsp;<br>
 grab&nbsp;new&nbsp;events&nbsp;and&nbsp;change&nbsp;state&nbsp;between&nbsp;<br>
-calls&nbsp;to&nbsp;<a href="#PresentationEngine-render_message">render_message</a>().&nbsp;Put&nbsp;that&nbsp;way,&nbsp;<br>
-<a href="#PresentationEngine-render_message">render_message</a>()&nbsp;is&nbsp;simply&nbsp;a&nbsp;part&nbsp;of&nbsp;<br>
+calls&nbsp;to&nbsp;<a href="#PresentationEngine-process_message">process_message</a>().&nbsp;Put&nbsp;that&nbsp;way,&nbsp;<br>
+<a href="#PresentationEngine-process_message">process_message</a>()&nbsp;is&nbsp;simply&nbsp;a&nbsp;part&nbsp;of&nbsp;<br>
 ClientCoreEngine.run().<br>
 You&nbsp;should&nbsp;normally&nbsp;not&nbsp;override&nbsp;this&nbsp;method<br>
 unless&nbsp;you&nbsp;have&nbsp;to&nbsp;do&nbsp;some&nbsp;really&nbsp;advanced<br>
 stuff.&nbsp;Overriding&nbsp;the&nbsp;other&nbsp;methods&nbsp;of&nbsp;this<br>
 class&nbsp;(which&nbsp;in&nbsp;turn&nbsp;are&nbsp;called&nbsp;from&nbsp;<br>
-<a href="#PresentationEngine-render_message">render_message</a>())&nbsp;should&nbsp;be&nbsp;just&nbsp;fine.&nbsp;See&nbsp;<br>
+<a href="#PresentationEngine-process_message">process_message</a>())&nbsp;should&nbsp;be&nbsp;just&nbsp;fine.&nbsp;See&nbsp;<br>
 the&nbsp;other&nbsp;methods&nbsp;and&nbsp;the&nbsp;source&nbsp;code&nbsp;for&nbsp;<br>
 details.</tt></dd></dl>
 
-<dl><dt><a name="PresentationEngine-setup"><strong>setup</strong></a>(self)</dt><dd><tt>When&nbsp;creating&nbsp;a&nbsp;subclass,&nbsp;you&nbsp;should&nbsp;not<br>
-override&nbsp;the&nbsp;standard&nbsp;<a href="#PresentationEngine-__init__">__init__</a>()&nbsp;method<br>
-of&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>&nbsp;class.&nbsp;Instead&nbsp;place<br>
-all&nbsp;your&nbsp;custom&nbsp;setup&nbsp;code&nbsp;here.&nbsp;You&nbsp;can&nbsp;<br>
-initialize&nbsp;your&nbsp;graphics&nbsp;module&nbsp;here&nbsp;and<br>
-display&nbsp;a&nbsp;splash&nbsp;screen.&nbsp;Everything<br>
-is&nbsp;fine,&nbsp;as&nbsp;long&nbsp;as&nbsp;you&nbsp;return.&nbsp;:-)</tt></dd></dl>
+<dl><dt><a name="PresentationEngine-setup_presentation_engine"><strong>setup_presentation_engine</strong></a>(self, asset_engine, framerate, logger)</dt><dd><tt>This&nbsp;method&nbsp;initializes&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
+asset_engine&nbsp;must&nbsp;be&nbsp;an&nbsp;instance&nbsp;of<br>
+shard.AssetEngine&nbsp;or&nbsp;a&nbsp;subclass.<br>
+framerate&nbsp;must&nbsp;be&nbsp;an&nbsp;integer&nbsp;and&nbsp;sets<br>
+the&nbsp;maximum&nbsp;(not&nbsp;minimum&nbsp;;-))&nbsp;frames&nbsp;per<br>
+second&nbsp;the&nbsp;client&nbsp;will&nbsp;run&nbsp;in.</tt></dd></dl>
 
 <dl><dt><a name="PresentationEngine-update_frame_timer"><strong>update_frame_timer</strong></a>(self)</dt><dd><tt>Your&nbsp;graphics&nbsp;module&nbsp;might&nbsp;provide&nbsp;a<br>
 timer&nbsp;which&nbsp;must&nbsp;be&nbsp;notified&nbsp;once&nbsp;per<br>
 frame.&nbsp;Do&nbsp;this&nbsp;here&nbsp;and&nbsp;use&nbsp;this&nbsp;method<br>
 wherever&nbsp;you&nbsp;need&nbsp;it.&nbsp;It&nbsp;is&nbsp;also&nbsp;called<br>
-from&nbsp;<a href="#PresentationEngine-render_message">render_message</a>()&nbsp;when&nbsp;appropriate.<br>
+from&nbsp;<a href="#PresentationEngine-process_message">process_message</a>()&nbsp;when&nbsp;appropriate.<br>
 This&nbsp;method&nbsp;may&nbsp;block&nbsp;execution&nbsp;to&nbsp;slow<br>
 the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>&nbsp;down&nbsp;to&nbsp;a&nbsp;certain<br>
 frame&nbsp;rate.<br>

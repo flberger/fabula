@@ -39,7 +39,7 @@ class Interface:
            the default implementation does.
         """
 
-        setup_interface(address_port_tuple, logger)
+        self.setup_interface(address_port_tuple, logger)
 
     def setup_interface(self, address_port_tuple, logger):
         """An interface is initialized with an
@@ -128,14 +128,14 @@ class MessageBuffer:
         """This is meant to be a base class
            to be inherited from. This default
            __init__() method simply calls
-           self.message_buffer_setup(). You
+           self.setup_message_buffer(). You
            should do so, too, when subclassing
            this with a custom implementation.
         """
 
-        self.message_buffer_setup()
+        self.setup_message_buffer()
 
-    def message_buffer_setup(self):
+    def setup_message_buffer(self):
         """This method sets up the internal
            queues (in this case instances
            of collections.deque)
@@ -197,9 +197,9 @@ class ClientInterface(MessageBuffer, Interface):
 
         # This is a subclass of MessageBuffer, but
         # since we override __init__(), we have to
-        # call message_buffer_setup().
+        # call setup_message_buffer().
         #
-        self.message_buffer_setup()
+        self.setup_message_buffer()
 
         # Set up UDP socket
         # It wouldn't be unreasonable to also use

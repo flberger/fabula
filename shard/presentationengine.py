@@ -6,10 +6,11 @@
 """
 
 import shard
+import shard.plugin
 import time
 
-class PresentationEngine:
-    '''This is the base class for a PresentationEngine for the
+class PresentationEngine(shard.plugin.Plugin):
+    """This is the base class for a PresentationEngine for the
        Shard Client. Subclasses should override the
        appropriate methods of this class and implement a 
        graphical representation of the game and the 
@@ -17,49 +18,63 @@ class PresentationEngine:
        but apart from that it makes very few assumptions 
        about the graphical rendering. Thus it is 
        possible to write 2D and 3D PresentationEngines and 
-       even a text interface.'''
+       even a text interface."""
 
     ####################
     # Initialization
 
     def __init__(self, asset_engine, framerate, logger):
-        '''This method initializes the PresentationEngine.
+        """Initialize the PresentationEngine. You are
+           welcome to override this method, but make
+           sure to call self.setup_presentation_engine()
+           with the appropriate arguments to properly
+           initialize internals.
+           This is what the default implementation does.
+           This method must not block, it has to 
+           return once everything is set up.
+        """
+
+        self.setup_presentation_engine(asset_engine, framerate, logger)
+
+    def setup_presentation_engine(self, asset_engine, framerate, logger):
+        """This method initializes the PresentationEngine.
            asset_engine must be an instance of
            shard.AssetEngine or a subclass.
            framerate must be an integer and sets
            the maximum (not minimum ;-)) frames per
            second the client will run in.
-           If you override this method, make sure 
-           you do all these initiaizations, too.
-           For your convenience there is a method
-           self.setup() which you can savely
-           override. 
-           This method must not block, it has to 
-           return once everything is set up.'''
+        """
 
         # Attach logger
+        #
         self.logger = logger
 
         # Get framerate and asset_engine from parameters
+        #
         self.framerate = framerate
         self.asset_engine = asset_engine
 
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.
+        #
         self.action_time = 0.5
 
         # A list of events derived from player input, 
         # cleared and updated on each rendering
+        #
         self.player_event_list = []
 
         # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
         # exit request by the user. This value is
         # checked in the ClientCoreEngine main loop.
+        # TODO: maybe return self.exit_requested along with client events in a tuple
+        #
         self.exit_requested = False
 
         # Variables to be filled by the ClientCoreEngine
-        # before each call to render_message()
+        # before each call to process_message()
+        #
         self.entity_dict = {}
         self.deleted_entities_dict = {}
         self.tile_list = []
@@ -69,11 +84,8 @@ class PresentationEngine:
         # an EnterRoomEvent? Upon initialization this
         # is True, since a room has not yet been
         # transfered.
-        self.waiting_for_RoomCompleteEvent = True
-
-        # See the method for explaination.
         #
-        self.setup()
+        self.waiting_for_RoomCompleteEvent = True
 
         self.logger.info("complete")
         self.logger.info("now waiting for RoomCompleteEvent")
@@ -83,8 +95,13 @@ class PresentationEngine:
     ####################
     # PresentationEngine Main Loop
 
-    def render_message(self, message):
-        '''This is the main method of the PresentationEngine.
+    def process_message(self,
+                        message,
+                        entity_dict,
+                        deleted_entities_dict,
+                        tile_list,
+                        map):
+        """This is the main method of the PresentationEngine.
            It is called regularly by the ClientCoreEngine
            with a list of events to display (note: the
            list may be empty). It may take all the time 
@@ -94,16 +111,16 @@ class PresentationEngine:
            It must neither block completely nor run in 
            a thread since the ClientCoreEngine has to 
            grab new events and change state between 
-           calls to render_message(). Put that way, 
-           render_message() is simply a part of 
+           calls to process_message(). Put that way, 
+           process_message() is simply a part of 
            ClientCoreEngine.run().
            You should normally not override this method
            unless you have to do some really advanced
            stuff. Overriding the other methods of this
            class (which in turn are called from 
-           render_message()) should be just fine. See 
+           process_message()) should be just fine. See 
            the other methods and the source code for 
-           details.'''
+           details."""
 
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
@@ -116,6 +133,11 @@ class PresentationEngine:
 
         ####################
         # Initialize
+
+        self.entity_dict = entity_dict
+        self.deleted_entities_dict = deleted_entities_dict
+        self.tile_list = tile_list
+        self.map = map
 
         # Reset the list of events triggered by 
         # player actions
@@ -234,7 +256,8 @@ class PresentationEngine:
                 self.update_frame_timer()
 
                 # Discard and check the next message.
-                return
+                #
+                return shard.Message(self.player_event_list)
 
         ####################
         # Grouping Event List
@@ -337,7 +360,7 @@ class PresentationEngine:
                 # See the method for explaination.
                 self.collect_player_input()
 
-                return
+                return shard.Message(self.player_event_list)
 
             # We have at least one event.
 
@@ -345,7 +368,7 @@ class PresentationEngine:
                 # See the method for explaination.
                 self.display_CanSpeakEvent(event_list[0])
                 
-                return
+                return shard.Message(self.player_event_list)
 
             # If there was no CanSpeakEvent, we are
             # still here. 
@@ -463,7 +486,7 @@ class PresentationEngine:
         ####################
         # Return to ControlEngine
 
-        return
+        return shard.Message(self.player_event_list)
 
     ####################
     # Auxiliary Methods To Override
@@ -472,35 +495,25 @@ class PresentationEngine:
     # Most docstrings describe 2D stuff (images).
     # Rewrite 2D-3D-agnostic.
 
-    def setup(self):
-        '''When creating a subclass, you should not
-           override the standard __init__() method
-           of the PresentationEngine class. Instead place
-           all your custom setup code here. You can 
-           initialize your graphics module here and
-           display a splash screen. Everything
-           is fine, as long as you return. :-)'''
-        return
-
     def display_EnterRoomEvent(self):
-        '''This method is called when the PresentationEngine
+        """This method is called when the PresentationEngine
            has encoutered an EnterRoomEvent. You should
            override it, blank the screen here and display
            a waiting message since the PresentationEngine is
            going to twiddle thumbs until it receives a 
-           RoomCompleteEvent.'''
+           RoomCompleteEvent."""
 
         self.logger.info("called")
 
         return
 
     def display_asset_exception(self, asset):
-        '''This method is called when the asset_engine
+        """This method is called when the asset_engine
            is unable to retrieve the asset. This is a 
            serious error which prohibits continuation.
            The user should be asked to check his
            installation, file system or network
-           connection.'''
+           connection."""
 
         self.logger.critical("A required asset (image, animation,"
               + " sound) could not be fetched. The problematic asset was '"
@@ -510,11 +523,11 @@ class PresentationEngine:
         raise SystemExit
 
     def display_RoomCompleteEvent(self):
-        '''This method is called when everything
+        """This method is called when everything
            is fetched and ready after a
            RoomCompleteEvent. Here you should 
            set up the main screen and display 
-           some Map elements and Entities.'''
+           some Map elements and Entities."""
 
         self.logger.info("called")
 
@@ -527,39 +540,39 @@ class PresentationEngine:
         return
 
     def update_frame_timer(self):
-        '''Your graphics module might provide a
+        """Your graphics module might provide a
            timer which must be notified once per
            frame. Do this here and use this method
            wherever you need it. It is also called
-           from render_message() when appropriate.
+           from process_message() when appropriate.
            This method may block execution to slow
            the PresentationEngine down to a certain
            frame rate.
            The default implementation waits
            1.0/self.framerate seconds.
-        '''
+        """
 
         time.sleep(1.0/self.framerate)
 
         return
 
     def filter_events(self, event_list):
-        '''This is method is called with a list of
+        """This is method is called with a list of
            parallel events before they are rendered.
            You can filter events here, for example
            if they are off-screen. This method
            must change the event_list in place.
-           The default is no filtering.'''
+           The default is no filtering."""
         return
 
     def display_CanSpeakEvent(self, CanSpeakEvent_instance):
-        '''This method is called when the PresentationEngine
+        """This method is called when the PresentationEngine
            needs to render a CanSpeakEvent. This is the
            last event rendered before returning to
            the ControlEngine. You have to prompt for
            appropriate user input here and add a
            corresponding SaysEvent to self.player_event_list, 
-           which is evaluated by the ControlEngine.'''
+           which is evaluated by the ControlEngine."""
 
         self.logger.info("called")
 
@@ -577,13 +590,13 @@ class PresentationEngine:
         return
 
     def display_static_frame(self):
-        '''This method is called when the PresentationEngine
+        """This method is called when the PresentationEngine
            decides that is need to enter a single frame
            of the current game state. There is nothing
            special going on here, so you should notify
            the Entities that there is a next frame to
            be displayed (however that is done in your 
-           implementation) and update their graphics.'''
+           implementation) and update their graphics."""
 
         # You might want to restrict your updates to
         # visible Entities
@@ -595,7 +608,7 @@ class PresentationEngine:
         return
 
     def collect_player_input(self):
-        '''The module you use for actual graphics
+        """The module you use for actual graphics
            rendering most probably has a way to
            capture user input. This method is called
            when the PresentationEngine has displayed a
@@ -616,7 +629,7 @@ class PresentationEngine:
            input action.
            The default implementation reads
            user input from the console.
-        '''
+        """
 
         user_input = raw_input("Quit? (y/n):")
 
@@ -626,7 +639,7 @@ class PresentationEngine:
         return
 
     def display_multiple_frame_action(self, MovesToEvent_list):
-        '''This method is called when the PresentationEngine
+        """This method is called when the PresentationEngine
            is ready to render Move, Drop or PickUp
            actions. All visible Entities are already
            notified about their state at this point.
@@ -639,7 +652,7 @@ class PresentationEngine:
            frames to display PickUp and Drop animations. 
            You might get away with just changing the 
            screen coordinates and calling 
-           self.display_static_frame().'''
+           self.display_static_frame()."""
         # Compute start and end position and movement per
         # frame for all moving Entities
  
@@ -658,19 +671,19 @@ class PresentationEngine:
         return
 
     def display_SpawnEvents(self, event_list):
-        '''This method is called with a list of
+        """This method is called with a list of
            instances of SpawnEvent to be displayed. 
            All you need to do here is adding the 
            new Enties to a list of visible Entities 
            you might have set up and render a static
-           frame. Note that event_list may be empty.'''
+           frame. Note that event_list may be empty."""
 
         self.logger.info("called")
 
         return           
 
     def display_DeleteEvents(self, event_list):
-        '''This method is called with a list of 
+        """This method is called with a list of 
            instances of DeleteEvent. You need
            to remove the Entites affected from
            your data structures and draw a
@@ -679,14 +692,14 @@ class PresentationEngine:
            the Entities to be removed are
            already gone in self.event_dict, 
            so use self.deleted_entities_dict
-           instead.'''
+           instead."""
 
         self.logger.info("called")
 
         return
 
     def display_ChangeMapElementEvents(self, event_list):
-        '''This method is called with a list of
+        """This method is called with a list of
            instances of ChangeMapElementEvent.
            There are only visible Map elements
            in the list if you hav implemented
@@ -695,25 +708,25 @@ class PresentationEngine:
            major redraw of the display, updating all
            Map elements and after that all Entities.
            This is only a single frame though.
-           Note that event_list may be empty.'''
+           Note that event_list may be empty."""
 
         self.logger.info("called")
 
         return
 
     def update_inventory(self):
-        '''We do not have to care about the object of
+        """We do not have to care about the object of
            a DropsEvent and PicksUpEvent since the 
            ControlEngine has generated an respective 
            SpawnEvent and DeleteEvent, which is already 
            rendered. All that is left is to update the 
            inventory visualisation. You can use that
-           to enter a frame for the Entities as well.'''
+           to enter a frame for the Entities as well."""
         self.display_static_frame()
         return
 
     def display_PerceptionEvents(self, event_list):
-        '''This method is called with a list of
+        """This method is called with a list of
            instances of PerceptionEvent. You
            have to provide an implementation
            whicht displays them one by one, 
@@ -722,7 +735,7 @@ class PresentationEngine:
            not continue animation of other
            Entities during the perception so
            there are no background actions 
-           which may pass unnoticed.'''
+           which may pass unnoticed."""
 
         self.logger.info("called")
 
@@ -733,7 +746,7 @@ class PresentationEngine:
         return           
 
     def display_SaysEvents(self, event_list):
-        '''This method is called with a list
+        """This method is called with a list
            of instances of SaysEvent when the
            PresentationEngine is ready to display
            what Entities say. In this method
@@ -749,7 +762,7 @@ class PresentationEngine:
            confirmation. Please do not continue 
            animation of other Entities so there 
            are no background actions which may 
-           pass unnoticed.'''
+           pass unnoticed."""
 
         self.logger.info("called")
 
@@ -758,4 +771,3 @@ class PresentationEngine:
         self.update_frame_timer()
 
         return
-

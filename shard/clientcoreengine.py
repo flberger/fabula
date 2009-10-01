@@ -25,17 +25,17 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # First setup CoreEngine internals
         #
-        self.setup(interface_instance,
-                   presentation_engine_instance,
-                   logger)
+        self.setup_core_engine(interface_instance,
+                               presentation_engine_instance,
+                               logger)
 
         # We attach custom flags to the Message created in
         # setup() to notify the PresentationEngine whether
         # an EnterRoomEvent or RoomCompleteEvent occured,
         # so it does not have to scan the events.
         #
-        self.plugin_engine_message.has_EnterRoomEvent = False
-        self.plugin_engine_message.has_RoomCompleteEvent = False
+        self.message_for_plugin.has_EnterRoomEvent = False
+        self.message_for_plugin.has_RoomCompleteEvent = False
 
         # Set up flags used by self.run()
         #
@@ -49,7 +49,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # A dict for Entites which have been deleted, for
         # the convenience of the PresentationEngine. Usually it
-        # should be cleared after each rendering.
+        # should be cleared after each processing.
         #
         self.deleted_entities_dict = {}
 
@@ -98,7 +98,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.interface.send_message(shard.Message([shard.InitEvent()]))
 
-        while not self.plugin_engine.exit_requested:
+        while not self.plugin.exit_requested:
 
             # grab_message must and will return a Message, but
             # it possibly has an empty event_list.
@@ -129,35 +129,34 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 # functions. We use the class of the event supplied as
                 # a key to call the appropriate handler, and hand over
                 # the event.
+                # These methods may add events for the plugin engine
+                # to self.message_for_plugin
                 #
                 self.event_dict[current_event.__class__](current_event)
 
             # Now that everything is set and stored, call
-            # the PresentationEngine to render the messages.
-
-            # First hand over / update the necessary data.
-            #
-            self.plugin_engine.entity_dict = self.entity_dict
-            self.plugin_engine.deleted_entities_dict = self.deleted_entities_dict
-            self.plugin_engine.tile_list = self.tile_list
-            self.plugin_engine.Map = self.map
+            # the PresentationEngine to process the messages.
 
             # This call may take an almost arbitrary amount
             # of time, since there may be long actions to
             # be shown by the PresentationEngine.
-            # Notice: render_message() must be called regularly
+            # Notice: process_message() must be called regularly
             # even if the server Message and thus the
             # PresentationEngine_message are empty!
             #
-            self.plugin_engine.render_message(self.plugin_engine_message)
+            message_from_plugin = self.plugin.process_message(self.message_for_plugin,
+                                                                            self.entity_dict,
+                                                                            self.deleted_entities_dict,
+                                                                            self.tile_list,
+                                                                            self.map)
 
             # The PresentationEngine returned, the Server Message has
-            # been applied and rendered. Clean up.
+            # been applied and processed. Clean up.
             #
-            self.plugin_engine_message = shard.Message([])
+            self.message_for_plugin = shard.Message([])
             self.deleted_entities_dict = {}
-            self.plugin_engine_message.has_EnterRoomEvent = False
-            self.plugin_engine_message.has_RoomCompleteEvent = False
+            self.message_for_plugin.has_EnterRoomEvent = False
+            self.message_for_plugin.has_RoomCompleteEvent = False
 
             # Up to now, we did not care whether the server Message
             # had any events at all. But we only send a 
@@ -175,14 +174,14 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # The PresentationEngine might have collected some
             # player input and converted it to events.
             #
-            if (self.plugin_engine.player_event_list
+            if (message_from_plugin.event_list
                 and not self.await_confirmation):
 
                 # We queue player triggered events before 
                 # MessageAppliedEvent so the server processes
                 # all events before sending anything new.
                 #
-                self.message_for_remote.event_list = (self.plugin_engine.player_event_list
+                self.message_for_remote.event_list = (message_from_plugin.event_list
                                                   + self.message_for_remote.event_list)
 
                 # Since we had player input, we now await confirmation
@@ -233,7 +232,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
     #    # Pass on the event.
     #    #
-    #    self.plugin_engine_message.event_list.append(event)
+    #    self.message_for_plugin.event_list.append(event)
 
     #def process_DropsEvent(self, event):
     #    '''Currently not implemented.'''
@@ -295,7 +294,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #    or if there was an AttemptFailedEvent: unset
     #    #    "AwaitConfirmation" flag
     #    #
-    #    self.plugin_engine_message.event_list.append(event)
+    #    self.message_for_plugin.event_list.append(event)
 
     #def process_SaysEvent(self, event):
     #    '''The PresentationEngine usually must display the 
@@ -305,7 +304,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #       the Entity once it starts speaking so it
     #       can provide an animation.'''
     #
-    #    self.plugin_engine_message.event_list.append(event)
+    #    self.message_for_plugin.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event):
         '''Store the tile given in self.map, 
@@ -334,7 +333,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Append the event to the queue for the PresentationEngine.
         #
-        self.plugin_engine_message.event_list.append(event)
+        self.message_for_plugin.event_list.append(event)
 
     def process_DeleteEvent(self, event):
         '''Save the Entity to be deleted in the
@@ -359,7 +358,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # The PresentationEngine needs the event for knowing
             # when exactly to remove the Entity.
             #
-            self.plugin_engine_message.event_list.append(event)
+            self.message_for_plugin.event_list.append(event)
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -400,9 +399,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # so the PresentationEngine knows what happend after
         # that.
         #
-        self.plugin_engine_message.has_EnterRoomEvent = True
+        self.message_for_plugin.has_EnterRoomEvent = True
 
-        self.plugin_engine_message.event_list.append(event)
+        self.message_for_plugin.event_list.append(event)
 
     def process_RoomCompleteEvent(self, event):
         '''RoomCompleteEvent notifies the client that
@@ -416,12 +415,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # This is a convenience flag so the PresentationEngine
         # does not have to scan the event_list.
         #
-        self.plugin_engine_message.has_RoomCompleteEvent = True
+        self.message_for_plugin.has_RoomCompleteEvent = True
 
         # Queue the event. All events after this are
-        # rendered.
+        # processed.
         #
-        self.plugin_engine_message.event_list.append(event)
+        self.message_for_plugin.event_list.append(event)
 
     def process_SpawnEvent(self, event):
         '''Add the Entity given to the entity_dict
@@ -429,4 +428,4 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.entity_dict[event.entity.identifier] = event.entity
 
-        self.plugin_engine_message.event_list.append(event)
+        self.message_for_plugin.event_list.append(event)
