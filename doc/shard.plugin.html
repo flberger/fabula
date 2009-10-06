@@ -42,9 +42,9 @@ to&nbsp;be&nbsp;used&nbsp;by&nbsp;an&nbsp;instance&nbsp;of<br>
 shard.coreengine.CoreEngine.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Plugin-__init__"><strong>__init__</strong></a>(self, logger)</dt><dd><tt>Initialize&nbsp;the&nbsp;plugin.<br>
-logger&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
+<dl><dt><a name="Plugin-__init__"><strong>__init__</strong></a>(self, logger)</dt><dd><tt>You&nbsp;can&nbsp;override&nbsp;this.&nbsp;Be&nbsp;sure&nbsp;to<br>
+call&nbsp;<a href="#Plugin-setup_plugin">setup_plugin</a>()&nbsp;like&nbsp;the&nbsp;default<br>
+implementation&nbsp;does.</tt></dd></dl>
 
 <dl><dt><a name="Plugin-process_message"><strong>process_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;a&nbsp;plugin.<br>
 It&nbsp;is&nbsp;called&nbsp;with&nbsp;an&nbsp;instance&nbsp;of<br>
@@ -57,6 +57,10 @@ and&nbsp;possibly&nbsp;to&nbsp;be&nbsp;sent&nbsp;to&nbsp;the<br>
 remote&nbsp;host.<br>
 The&nbsp;default&nbsp;implementation&nbsp;returns<br>
 an&nbsp;empty&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="Plugin-setup_plugin"><strong>setup_plugin</strong></a>(self, logger)</dt><dd><tt>Initialize&nbsp;the&nbsp;plugin.<br>
+logger&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.<br>
+The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>

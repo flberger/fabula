@@ -20,6 +20,18 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         """Initialize the ServerCoreEngine.
         """
 
+        # First setup base class
+        #
+        self.setup_eventprocessor()
+
+        # Now we have:
+        #
+        # self.event_dict
+        #
+        #     Dictionary that maps event classes to
+        #     functions to be called for the respective
+        #     event
+
         self.setup_core_engine(interface_instance,
                                plugin_instance,
                                logger)
@@ -55,13 +67,6 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     StoryEngine
         #
         #
-        # self.event_dict
-        #
-        #     Dictionary that maps event classes to
-        #     functions to be called for the respective
-        #     event
-        #
-        #
         # self.message_for_plugin
         #
         #     Events for special consideration for the
@@ -73,6 +78,24 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #
         #     Events to be sent to the remote host in
         #     each loop
+        #
+        #
+        # self.entity_dict = {}
+        #
+        #     self.entity_dict keeps track of all active Entites.
+        #     It uses the identifier as a key, assuming that it
+        #     is unique.
+        #
+        #
+        # self.map = {}
+        #
+        #
+        #     self.map is an attempt of an efficient storage of
+        #     an arbitrary two-dimensional map. To save space, 
+        #     only explicitly defined elements are stored. This
+        #     is done in a dict whose keys are tuples. Access the
+        #     element using self.map[(x, y)]. The upper left element
+        #     is self.map[(0, 0)].
 
         # Message to be broadcasted to all clients
         #
@@ -87,6 +110,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         signal.signal(signal.SIGINT, self.handle_exit)
         signal.signal(signal.SIGQUIT, self.handle_exit)
         signal.signal(signal.SIGTERM, self.handle_exit)
+
+        # TODO: restart plugin when SIGHUP is received
 
     def run(self):
         """ServerCoreEngine main method, calling
@@ -107,6 +132,14 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 for event in message.event_list:
 
+                    # TODO: most client implementations should be allowed to send a single event per turn only!
+                    # Otherwise, a long burst of events might unfairly
+                    # block other clients. (hint by Alexander Marbach)
+
+                    # TODO: call story engine even if client message is empty!
+                    # Probably at the end of the connections loop, treating 
+                    # the plugin as another client (idea Alexander Marbach).
+
                     # This is a bit of Python magic. 
                     # self.event_dict is a dict which maps classes to handling
                     # functions. We use the class of the event supplied as
@@ -115,7 +148,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                     # These methods may add events for the plugin engine
                     # to self.message_for_plugin
                     #
-                    self.event_dict[event.__class__](event)
+                    self.event_dict[event.__class__](event, self.message_for_plugin)
 
                     # Contrary to the ClientCoreEngine, the
                     # ServerCoreEngine calls its plugin engine
@@ -141,28 +174,64 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                     # We cannot just forward them since we
                     # may be required to change maps, spawn
                     # entities etc.
-                    # TODO: should add them to a different queue of course
+                    # Note that this time resulting events
+                    # are queued for the remote host, not
+                    # the plugin.
                     #
-                    for event in message_from_plugin.event_list:
-                        self.event_dict[event.__class__](event)
-
                     # TODO: could we be required to send any new events to the story engine?
                     #       But this could become an infinite loop!
+                    #
+                    for event in message_from_plugin.event_list:
+                        self.event_dict[event.__class__](event, self.message_for_remote)
 
                     # If this iteration yielded any events, send them.
-                    # Message for remote host only
+                    # Message for remote host first
                     #
                     if self.message_for_remote.event_list:
 
                         current_message_buffer.send_message(self.message_for_remote)
 
-                    # Broadcast message
+                    # Build broadcast message for all clients
                     #
-                    if self.message_for_all.event_list:
+                    for event in self.message_for_remote.event_list:
+
+                        # We currently leave out ChangeMapElementEvent
+                        # since it is tightly coupled to EnterRoom.
+                        #
+                        # We also broadcast all SpawnEvents. That means
+                        # that when a new client joins, all entities
+                        # (in the current room) are respawned. This
+                        # should do no harm, since InitEvents are rare
+                        # and all entitiy locations are up to date in
+                        # the server.
+                        # TODO: respawning might cause some loss of internal entity state
+                        #
+                        if event.__class__ in [shard.DropsEvent, 
+                                               shard.MovesToEvent, 
+                                               shard.PicksUpEvent,
+                                               shard.SaysEvent,
+                                               shard.SpawnEvent,
+                                               shard.DeleteEvent]:
+
+                            self.message_for_all.event_list.append(event)
+
+                    self.logger.debug("message for all clients: "
+                                      + str(self.message_for_all.event_list))
+
+                    # Only send self.message_for_all when not empty
+                    #
+                    if len(self.message_for_all.event_list):
 
                         for message_buffer in self.interface.client_connections.values():
 
-                            message_buffer.send_message(self.message_for_all)
+                            # Leave out current MessageBuffer which
+                            # already has reveived the events above.
+                            # We can compare MessageBuffer instances
+                            # right away. ;-)
+                            #
+                            if not message_buffer == current_message_buffer:
+
+                                message_buffer.send_message(self.message_for_all)
 
                     # Clean up
                     #
@@ -212,4 +281,80 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         self.exit_requested = True
 
-    # TODO: restart plugin when SIGHUP is received
+    def process_TriesToMoveEvent(self, event, message):
+        """Test if the Entity is allowed to move
+           to the desired location, and append an
+           according event to the message.
+        """
+
+        self.logger.debug("called")
+
+        # TODO: replace random if tests with design by contract ;-)
+        #
+        if (event.identifier in self.entity_dict
+            and
+            event.target_identifier in shard.DIRECTION_VECTOR):
+
+            self.logger.debug(str(event.identifier)
+                              + " -> "
+                              + str(event.target_identifier))
+
+            # Test if a movement from the current
+            # entity location to the new location
+            # on the map is possible
+            #
+            new_x = (self.entity_dict[event.identifier].location[0]
+                     + shard.DIRECTION_VECTOR[event.target_identifier][0])
+
+            new_y = (self.entity_dict[event.identifier].location[1]
+                     + shard.DIRECTION_VECTOR[event.target_identifier][1])
+
+            try:
+                if self.map[(new_x, new_y)].tile_type == "FLOOR":
+
+                    message.event_list.append(shard.MovesToEvent(event.identifier,
+                                                                 event.target_identifier))
+
+            except KeyError:
+
+                message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        else:
+            self.logger.error("wrong direction or entity: "
+                              + str(event.identifier)
+                              + " -> "
+                              + str(event.target_identifier))
+
+    def process_InitEvent(self, event, message):
+        """Check if we already have a room and
+           entities and send the data to the
+           client. If not, pass on to the plugin.
+        """
+
+        if len(self.map):
+
+            self.logger.debug("sending existing map and entities")
+
+            # It's not very clean to write to
+            # self.message_for_remote directly
+            # since the procces_() methods are
+            # not supposed to do so.
+            #
+            self.message_for_remote.event_list.append(shard.EnterRoomEvent())
+
+            for tuple in self.map:
+
+                self.message_for_remote.event_list.append(shard.ChangeMapElementEvent(self.map[tuple],
+                                                                                      tuple))
+
+            for entity in self.entity_dict.values():
+
+                self.message_for_remote.event_list.append(shard.SpawnEvent(entity))
+
+            self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
+
+        # If a room has already been sent,
+        # the plugin should only spawn a
+        # new player entity.
+        #
+        message.event_list.append(event)

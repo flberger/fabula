@@ -244,7 +244,9 @@ class ClientInterface(MessageBuffer, Interface):
 
                 self.logger.debug("sending 1 message of " + str(len(self.messages_for_remote)))
 
-                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft()), 
+                # -1 = use highest available pickle protocol
+                #
+                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft(), 0), 
                                  self.address_port_tuple)
 
             # Now listen for incoming server
@@ -257,7 +259,9 @@ class ClientInterface(MessageBuffer, Interface):
 
             try:
 
-                data_received = self.sock.recv(4096)
+                # TODO: pickled messages are rather large. Better use the struct module. :-)
+                #
+                data_received = self.sock.recv(65536)
 
             except socket.timeout:
 
@@ -270,7 +274,9 @@ class ClientInterface(MessageBuffer, Interface):
 
                 # TODO: accepts data from *anywhere*
 
-                self.logger.debug("received server message")
+                self.logger.debug("received server message (" 
+                                  + str(len(data_received))
+                                  + "/65536 bytes)")
 
                 self.messages_for_local.append(cPickle.loads(data_received))
 
@@ -393,7 +399,9 @@ class ServerInterface(Interface):
                                       + " to client "
                                       + str(address_port_tuple))
 
-                    server.socket.sendto(cPickle.dumps(messagebuffer.messages_for_remote.popleft()), 
+                    # -1 = use highest available pickle protocol
+                    #
+                    server.socket.sendto(cPickle.dumps(messagebuffer.messages_for_remote.popleft(), -1),
                                          address_port_tuple)
 
         # Caught shutdown notification, stopping thread

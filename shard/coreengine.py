@@ -7,8 +7,9 @@
 """
 
 import shard
+import shard.eventprocessor
 
-class CoreEngine:
+class CoreEngine(shard.eventprocessor.EventProcessor):
     """This is the common base class for Shard
        server and client core engines. They define
        a main method run() and some auxiliary
@@ -26,6 +27,10 @@ class CoreEngine:
            appropriate arguments as done by the
            default implementation.
         """
+
+        # First setup base class
+        #
+        self.setup_eventprocessor()
 
         self.setup_core_engine(interface_instance,
                                plugin_instance,
@@ -48,63 +53,6 @@ class CoreEngine:
 
         self.plugin = plugin_instance
 
-        # A dictionary that maps event classes to functions 
-        # to be called for the respective event.
-        # I just love to use dicts to avoid endless
-        # if... elif... clauses. :-)
-        #
-        self.event_dict = {shard.TriesToMoveEvent :
-                               self.process_TriesToMoveEvent,
-                           shard.TriesToLookAtEvent :
-                               self.process_TriesToLookAtEvent,
-                           shard.TriesToPickUpEvent :
-                               self.process_TriesToPickUpEvent,
-                           shard.TriesToDropEvent :
-                               self.process_TriesToDropEvent,
-                           shard.TriesToManipulateEvent :
-                               self.process_TriesToManipulateEvent,
-                           shard.TriesToTalkToEvent :
-                               self.process_TriesToTalkToEvent,
-                           shard.MovesToEvent :
-                               self.process_MovesToEvent,
-                           shard.PicksUpEvent :
-                               self.process_PicksUpEvent,
-                           shard.DropsEvent :
-                               self.process_DropsEvent,
-                           shard.CanSpeakEvent :
-                               self.process_CanSpeakEvent,
-                           shard.AttemptFailedEvent :
-                               self.process_AttemptFailedEvent,
-                           shard.PerceptionEvent :
-                               self.process_PerceptionEvent,
-                           shard.SaysEvent :
-                               self.process_SaysEvent,
-                           shard.CustomEntityEvent :
-                               self.process_CustomEntityEvent,
-                           shard.PassedEvent :
-                               self.process_PassedEvent,
-                           shard.LookedAtEvent :
-                               self.process_LookedAtEvent,
-                           shard.PickedUpEvent :
-                               self.process_PickedUpEvent,
-                           shard.DroppedEvent :
-                               self.process_DroppedEvent,
-                           shard.SpawnEvent :
-                               self.process_SpawnEvent,
-                           shard.DeleteEvent :
-                               self.process_DeleteEvent,
-                           shard.EnterRoomEvent :
-                               self.process_EnterRoomEvent,
-                           shard.RoomCompleteEvent :
-                               self.process_RoomCompleteEvent,
-                           shard.ChangeMapElementEvent :
-                               self.process_ChangeMapElementEvent,
-                           shard.InitEvent :
-                               self.process_InitEvent,
-                           shard.MessageAppliedEvent :
-                               self.process_MessageAppliedEvent
-                          }
-
         # The CoreEngine examines the events of a received
         # Message and applies them. Events for special
         # consideration for the PluginEngine are collected
@@ -119,6 +67,21 @@ class CoreEngine:
         #
         self.message_for_remote = shard.Message([])
         
+        # self.entity_dict keeps track of all active Entites.
+        # It uses the identifier as a key, assuming that it
+        # is unique.
+        #
+        self.entity_dict = {}
+
+        # self.map is an attempt of an efficient storage of
+        # an arbitrary two-dimensional map. To save space, 
+        # only explicitly defined elements are stored. This
+        # is done in a dict whose keys are tuples. Access the
+        # elemty using self.map[(x, y)]. The upper left element
+        # is self.map[(0, 0)].
+        #
+        self.map = {}
+
         self.logger.info("complete")
 
     def run(self):
@@ -151,277 +114,266 @@ class CoreEngine:
 
         return
 
-    def process_TriesToMoveEvent(self, event):
+    def process_TriesToMoveEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_TriesToLookAtEvent(self, event):
+    def process_TriesToLookAtEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_TriesToPickUpEvent(self, event):
+    def process_TriesToPickUpEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_TriesToDropEvent(self, event):
+    def process_TriesToDropEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_TriesToManipulateEvent(self, event):
+    def process_TriesToManipulateEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_TriesToTalkToEvent(self, event):
+    def process_TriesToTalkToEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_MovesToEvent(self, event):
+    def process_MovesToEvent(self, event, message):
+        """Notify the Entity and add
+           the event to the message.
+        """
+
+        self.logger.debug("entity location before call: "
+                          + str(self.entity_dict[event.identifier].location))
+
+        self.entity_dict[event.identifier].process_MovesToEvent(event)
+
+        self.logger.debug("entity location after call: "
+                          + str(self.entity_dict[event.identifier].location))
+
+        message.event_list.append(event)
+
+    def process_PicksUpEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_PicksUpEvent(self, event):
+    def process_DropsEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_DropsEvent(self, event):
+    def process_CanSpeakEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_CanSpeakEvent(self, event):
+    def process_AttemptFailedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_AttemptFailedEvent(self, event):
+    def process_PerceptionEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_PerceptionEvent(self, event):
+    def process_SaysEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_SaysEvent(self, event):
+    def process_CustomEntityEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_CustomEntityEvent(self, event):
+    def process_PassedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_PassedEvent(self, event):
+    def process_LookedAtEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_LookedAtEvent(self, event):
+    def process_PickedUpEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_PickedUpEvent(self, event):
+    def process_DroppedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_DroppedEvent(self, event):
+    def process_SpawnEvent(self, event, message):
+        """Add the Entity given to the entity_dict
+           and pass the SpawnEvent on.
+        """
+
+        self.logger.debug("adding/updating in entity_dict: "
+                          + str(event.entity.identifier))
+
+        self.entity_dict[event.entity.identifier] = event.entity
+
+        message.event_list.append(event)
+
+    def process_DeleteEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_SpawnEvent(self, event):
-        """Process the Event.
-           The default implementation adds
-           the event to the message for
-           the plugin engine.
+    def process_EnterRoomEvent(self, event, message):
+        """An EnterRoomEvent means the server is
+           about to send a new map, respawn the
+           player and send items and NPCs. So
+           this method empties all data 
+           structures and passes the event on.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        # All Entities in this room have to be sent.
+        # No use keeping old ones around, expecially with old
+        # locations.
+        #
+        self.entity_dict = {}
 
-    def process_DeleteEvent(self, event):
+        # Awaiting a new map!
+        #
+        self.map = {}
+
+        message.event_list.append(event)
+
+    def process_RoomCompleteEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)
 
-    def process_EnterRoomEvent(self, event):
-        """Process the Event.
-           The default implementation adds
-           the event to the message for
-           the plugin engine.
+    def process_ChangeMapElementEvent(self, event, message):
+        """Store the tile given in self.map, 
+           a dict of dicts with x- and
+           y-coordinates as keys. Also save
+           it in the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
+        # possibly overwrite existing tile
+        #
+        self.map[event.location] = event.tile
 
-    def process_RoomCompleteEvent(self, event):
+        message.event_list.append(event)
+
+    def process_InitEvent(self, event, message):
         """Process the Event.
            The default implementation adds
-           the event to the message for
-           the plugin engine.
+           the event to the message.
         """
 
         self.logger.debug("called")
 
-        self.message_for_plugin.event_list.append(event)
-
-    def process_ChangeMapElementEvent(self, event):
-        """Process the Event.
-           The default implementation adds
-           the event to the message for
-           the plugin engine.
-        """
-
-        self.logger.debug("called")
-
-        self.message_for_plugin.event_list.append(event)
-
-    def process_InitEvent(self, event):
-        """Process the Event.
-           The default implementation adds
-           the event to the message for
-           the plugin engine.
-        """
-
-        self.logger.debug("called")
-
-        self.message_for_plugin.event_list.append(event)
-
-    def process_MessageAppliedEvent(self, event):
-        """Process the Event.
-           The default implementation adds
-           the event to the message for
-           the plugin engine.
-        """
-
-        self.logger.debug("called")
-
-        self.message_for_plugin.event_list.append(event)
+        message.event_list.append(event)

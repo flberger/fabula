@@ -1,4 +1,4 @@
-docs: doc/shard.html doc/shard.assetengine.html doc/shard.clientcoreengine.html doc/shard.presentationengine.html doc/shard.servercoreengine.html doc/shard.interfaces.html doc/shard.coreengine.html doc/shard.plugin.html
+docs: doc/shard.html doc/shard.assetengine.html doc/shard.clientcoreengine.html doc/shard.presentationengine.html doc/shard.servercoreengine.html doc/shard.interfaces.html doc/shard.coreengine.html doc/shard.plugin.html doc/shard.eventprocessor.html doc/shard.run.html
 
 doc/shard.html: shard/__init__.py
 	rm -fv shard/__init__.pyc
@@ -39,3 +39,13 @@ doc/shard.plugin.html: shard/plugin.py
 	rm -fv shard/plugin.pyc
 	pydoc -w shard.plugin
 	mv shard.plugin.html doc/
+
+doc/shard.eventprocessor.html: shard/eventprocessor.py
+	rm -fv shard/eventprocessor.pyc
+	pydoc -w shard.eventprocessor
+	mv shard.eventprocessor.html doc/
+
+doc/shard.run.html: shard/run.py
+	rm -fv shard/run.pyc
+	pydoc -w shard.run
+	mv shard.run.html doc/

@@ -31,13 +31,18 @@ the&nbsp;ClientControlEngine</tt></p>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>
+</font></dt><dd>
+<dl>
 <dt><font face="helvetica, arial"><a href="shard.coreengine.html#CoreEngine">CoreEngine</a>
 </font></dt></dl>
+</dd>
+</dl>
  <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="CoreEngine">class <strong>CoreEngine</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="CoreEngine">class <strong>CoreEngine</strong></a>(<a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;common&nbsp;base&nbsp;class&nbsp;for&nbsp;Shard<br>
@@ -56,130 +61,102 @@ the&nbsp;<a href="#CoreEngine-setup_core_engine">setup_core_engine</a>()&nbsp;me
 appropriate&nbsp;arguments&nbsp;as&nbsp;done&nbsp;by&nbsp;the<br>
 default&nbsp;implementation.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+<dl><dt><a name="CoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event, message)</dt><dd><tt>Store&nbsp;the&nbsp;tile&nbsp;given&nbsp;in&nbsp;self.<strong>map</strong>,&nbsp;<br>
+a&nbsp;dict&nbsp;of&nbsp;dicts&nbsp;with&nbsp;x-&nbsp;and<br>
+y-coordinates&nbsp;as&nbsp;keys.&nbsp;Also&nbsp;save<br>
+it&nbsp;in&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_DropsEvent"><strong>process_DropsEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_DropsEvent"><strong>process_DropsEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+<dl><dt><a name="CoreEngine-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event, message)</dt><dd><tt>An&nbsp;EnterRoomEvent&nbsp;means&nbsp;the&nbsp;server&nbsp;is<br>
+about&nbsp;to&nbsp;send&nbsp;a&nbsp;new&nbsp;map,&nbsp;respawn&nbsp;the<br>
+player&nbsp;and&nbsp;send&nbsp;items&nbsp;and&nbsp;NPCs.&nbsp;So<br>
+this&nbsp;method&nbsp;empties&nbsp;all&nbsp;data&nbsp;<br>
+structures&nbsp;and&nbsp;passes&nbsp;the&nbsp;event&nbsp;on.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_InitEvent"><strong>process_InitEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_InitEvent"><strong>process_InitEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_LookedAtEvent"><strong>process_LookedAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_LookedAtEvent"><strong>process_LookedAtEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_MessageAppliedEvent"><strong>process_MessageAppliedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+<dl><dt><a name="CoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event, message)</dt><dd><tt>Notify&nbsp;the&nbsp;Entity&nbsp;and&nbsp;add<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_PerceptionEvent"><strong>process_PerceptionEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_PerceptionEvent"><strong>process_PerceptionEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_PickedUpEvent"><strong>process_PickedUpEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_PickedUpEvent"><strong>process_PickedUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_PicksUpEvent"><strong>process_PicksUpEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_PicksUpEvent"><strong>process_PicksUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_SaysEvent"><strong>process_SaysEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_SaysEvent"><strong>process_SaysEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+<dl><dt><a name="CoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event, message)</dt><dd><tt>Add&nbsp;the&nbsp;Entity&nbsp;given&nbsp;to&nbsp;the&nbsp;entity_dict<br>
+and&nbsp;pass&nbsp;the&nbsp;SpawnEvent&nbsp;on.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToLookAtEvent"><strong>process_TriesToLookAtEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_TriesToLookAtEvent"><strong>process_TriesToLookAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToManipulateEvent"><strong>process_TriesToManipulateEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_TriesToManipulateEvent"><strong>process_TriesToManipulateEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToMoveEvent"><strong>process_TriesToMoveEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_TriesToMoveEvent"><strong>process_TriesToMoveEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToPickUpEvent"><strong>process_TriesToPickUpEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="CoreEngine-process_TriesToPickUpEvent"><strong>process_TriesToPickUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+<dl><dt><a name="CoreEngine-process_TriesToTalkToEvent"><strong>process_TriesToTalkToEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
-
-<dl><dt><a name="CoreEngine-process_TriesToTalkToEvent"><strong>process_TriesToTalkToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message&nbsp;for<br>
-the&nbsp;plugin&nbsp;engine.</tt></dd></dl>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
 <dl><dt><a name="CoreEngine-run"><strong>run</strong></a>(self)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;loop&nbsp;of&nbsp;a&nbsp;<a href="#CoreEngine">CoreEngine</a>.&nbsp;Put&nbsp;all<br>
 the&nbsp;business&nbsp;logic&nbsp;here.&nbsp;This&nbsp;is&nbsp;a&nbsp;blocking&nbsp;method<br>
@@ -191,6 +168,12 @@ with&nbsp;the&nbsp;remote&nbsp;host.&nbsp;Most&nbsp;CoreEngines&nbsp;will<br>
 deploy&nbsp;a&nbsp;plugin&nbsp;engine&nbsp;to&nbsp;control&nbsp;or&nbsp;present<br>
 the&nbsp;game.&nbsp;Finally,&nbsp;logger&nbsp;is&nbsp;an&nbsp;instance&nbsp;of<br>
 logging.Logger&nbsp;for,&nbsp;eh,&nbsp;logging&nbsp;purposes.&nbsp;;-)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>:<br>
+<dl><dt><a name="CoreEngine-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;a&nbsp;dictionary&nbsp;that&nbsp;maps&nbsp;event&nbsp;classes<br>
+to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for&nbsp;the&nbsp;respective<br>
+event.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>

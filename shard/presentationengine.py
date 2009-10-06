@@ -34,9 +34,13 @@ class PresentationEngine(shard.plugin.Plugin):
            return once everything is set up.
         """
 
-        self.setup_presentation_engine(asset_engine, framerate, logger)
+        # First set up the plugin
+        #
+        self.setup_plugin(logger)
 
-    def setup_presentation_engine(self, asset_engine, framerate, logger):
+        self.setup_presentation_engine(asset_engine, framerate)
+
+    def setup_presentation_engine(self, asset_engine, framerate):
         """This method initializes the PresentationEngine.
            asset_engine must be an instance of
            shard.AssetEngine or a subclass.
@@ -44,10 +48,6 @@ class PresentationEngine(shard.plugin.Plugin):
            the maximum (not minimum ;-)) frames per
            second the client will run in.
         """
-
-        # Attach logger
-        #
-        self.logger = logger
 
         # Get framerate and asset_engine from parameters
         #
@@ -58,11 +58,6 @@ class PresentationEngine(shard.plugin.Plugin):
         # Map element to Map element take, in seconds.
         #
         self.action_time = 0.5
-
-        # A list of events derived from player input, 
-        # cleared and updated on each rendering
-        #
-        self.player_event_list = []
 
         # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
@@ -99,6 +94,7 @@ class PresentationEngine(shard.plugin.Plugin):
                         message,
                         entity_dict,
                         deleted_entities_dict,
+                        player_id,
                         tile_list,
                         map):
         """This is the main method of the PresentationEngine.
@@ -136,12 +132,14 @@ class PresentationEngine(shard.plugin.Plugin):
 
         self.entity_dict = entity_dict
         self.deleted_entities_dict = deleted_entities_dict
+        self.player_id = player_id
         self.tile_list = tile_list
         self.map = map
 
         # Reset the list of events triggered by 
         # player actions
-        self.player_event_list = []
+        #
+        self.message_for_host = shard.Message([])
         
         # Compute the number of frames per action.
         # See __init__() for details.
@@ -257,7 +255,7 @@ class PresentationEngine(shard.plugin.Plugin):
 
                 # Discard and check the next message.
                 #
-                return shard.Message(self.player_event_list)
+                return self.message_for_host
 
         ####################
         # Grouping Event List
@@ -360,7 +358,7 @@ class PresentationEngine(shard.plugin.Plugin):
                 # See the method for explaination.
                 self.collect_player_input()
 
-                return shard.Message(self.player_event_list)
+                return self.message_for_host
 
             # We have at least one event.
 
@@ -368,7 +366,7 @@ class PresentationEngine(shard.plugin.Plugin):
                 # See the method for explaination.
                 self.display_CanSpeakEvent(event_list[0])
                 
-                return shard.Message(self.player_event_list)
+                return self.message_for_host
 
             # If there was no CanSpeakEvent, we are
             # still here. 
@@ -486,7 +484,7 @@ class PresentationEngine(shard.plugin.Plugin):
         ####################
         # Return to ControlEngine
 
-        return shard.Message(self.player_event_list)
+        return self.message_for_host
 
     ####################
     # Auxiliary Methods To Override
@@ -571,7 +569,7 @@ class PresentationEngine(shard.plugin.Plugin):
            last event rendered before returning to
            the ControlEngine. You have to prompt for
            appropriate user input here and add a
-           corresponding SaysEvent to self.player_event_list, 
+           corresponding SaysEvent to self.message_for_host,
            which is evaluated by the ControlEngine."""
 
         self.logger.info("called")
@@ -580,8 +578,8 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         for current_entity in self.entity_dict.values():
             if current_entity.entity_type == "PLAYER":
-                self.player_event_list.append(shard.SaysEvent(current_entity.identifier,
-                                                              "display_CanSpeakEvent: dummy"))
+                self.message_for_host.event_list.append(shard.SaysEvent(current_entity.identifier,
+                                                        "display_CanSpeakEvent: dummy"))
         # Don't forget the frame counter in
         # your implementation.
         #
@@ -618,7 +616,7 @@ class PresentationEngine(shard.plugin.Plugin):
            provided by your module into Shard 
            events, most probably instances of 
            shard.AttemptEvent. You must append them
-           to self.player_event_list which is
+           to self.message_for_host which is
            evaluated by the ControlEngine.
            Note that your module might provide you
            with numerous user actions if the user
@@ -627,9 +625,15 @@ class PresentationEngine(shard.plugin.Plugin):
            reasonable subset of those actions, 
            e.g. select only the very last user
            input action.
+           The PresentationEngine should only ever
+           collect and send one single client event
+           to prevent cheating and blocking other
+           clients in the server. (hint by Alexander Marbach)
            The default implementation reads
            user input from the console.
         """
+
+        self.logger.info("called")
 
         user_input = raw_input("Quit? (y/n):")
 
@@ -653,19 +657,25 @@ class PresentationEngine(shard.plugin.Plugin):
            You might get away with just changing the 
            screen coordinates and calling 
            self.display_static_frame()."""
+
+        self.logger.info("called")
+
         # Compute start and end position and movement per
         # frame for all moving Entities
  
         # This creates a copy since framerate is
         # immutable.
+        #
         i = self.action_frames
 
-        while i:
         # for each frame:
-            # move moving Entities by respective Movement
-            # render a graphic for each visible entity
-            # The should supply a new one on each call
-            # update frame counter
+        #
+        while i:
+            # - move moving Entities by respective Movement
+            # - render a graphic for each visible entity
+            #   The should supply a new one on each call
+            # - update frame counter
+            #
             self.display_static_frame()
             i = i - 1
         return

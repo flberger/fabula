@@ -75,7 +75,7 @@ method,&nbsp;you&nbsp;have&nbsp;to&nbsp;convert&nbsp;the&nbsp;data<br>
 provided&nbsp;by&nbsp;your&nbsp;module&nbsp;into&nbsp;Shard&nbsp;<br>
 events,&nbsp;most&nbsp;probably&nbsp;instances&nbsp;of&nbsp;<br>
 shard.AttemptEvent.&nbsp;You&nbsp;must&nbsp;append&nbsp;them<br>
-to&nbsp;self.<strong>player_event_list</strong>&nbsp;which&nbsp;is<br>
+to&nbsp;self.<strong>message_for_host</strong>&nbsp;which&nbsp;is<br>
 evaluated&nbsp;by&nbsp;the&nbsp;ControlEngine.<br>
 Note&nbsp;that&nbsp;your&nbsp;module&nbsp;might&nbsp;provide&nbsp;you<br>
 with&nbsp;numerous&nbsp;user&nbsp;actions&nbsp;if&nbsp;the&nbsp;user<br>
@@ -84,6 +84,10 @@ rendering.&nbsp;You&nbsp;should&nbsp;create&nbsp;a&nbsp;<br>
 reasonable&nbsp;subset&nbsp;of&nbsp;those&nbsp;actions,&nbsp;<br>
 e.g.&nbsp;select&nbsp;only&nbsp;the&nbsp;very&nbsp;last&nbsp;user<br>
 input&nbsp;action.<br>
+The&nbsp;<a href="#PresentationEngine">PresentationEngine</a>&nbsp;should&nbsp;only&nbsp;ever<br>
+collect&nbsp;and&nbsp;send&nbsp;one&nbsp;single&nbsp;client&nbsp;event<br>
+to&nbsp;prevent&nbsp;cheating&nbsp;and&nbsp;blocking&nbsp;other<br>
+clients&nbsp;in&nbsp;the&nbsp;server.&nbsp;(hint&nbsp;by&nbsp;Alexander&nbsp;Marbach)<br>
 The&nbsp;default&nbsp;implementation&nbsp;reads<br>
 user&nbsp;input&nbsp;from&nbsp;the&nbsp;console.</tt></dd></dl>
 
@@ -92,7 +96,7 @@ needs&nbsp;to&nbsp;render&nbsp;a&nbsp;CanSpeakEvent.&nbsp;This&nbsp;is&nbsp;the<
 last&nbsp;event&nbsp;rendered&nbsp;before&nbsp;returning&nbsp;to<br>
 the&nbsp;ControlEngine.&nbsp;You&nbsp;have&nbsp;to&nbsp;prompt&nbsp;for<br>
 appropriate&nbsp;user&nbsp;input&nbsp;here&nbsp;and&nbsp;add&nbsp;a<br>
-corresponding&nbsp;SaysEvent&nbsp;to&nbsp;self.<strong>player_event_list</strong>,&nbsp;<br>
+corresponding&nbsp;SaysEvent&nbsp;to&nbsp;self.<strong>message_for_host</strong>,<br>
 which&nbsp;is&nbsp;evaluated&nbsp;by&nbsp;the&nbsp;ControlEngine.</tt></dd></dl>
 
 <dl><dt><a name="PresentationEngine-display_ChangeMapElementEvents"><strong>display_ChangeMapElementEvents</strong></a>(self, event_list)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of<br>
@@ -203,7 +207,7 @@ if&nbsp;they&nbsp;are&nbsp;off-screen.&nbsp;This&nbsp;method<br>
 must&nbsp;change&nbsp;the&nbsp;event_list&nbsp;in&nbsp;place.<br>
 The&nbsp;default&nbsp;is&nbsp;no&nbsp;filtering.</tt></dd></dl>
 
-<dl><dt><a name="PresentationEngine-process_message"><strong>process_message</strong></a>(self, message, entity_dict, deleted_entities_dict, tile_list, map)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
+<dl><dt><a name="PresentationEngine-process_message"><strong>process_message</strong></a>(self, message, entity_dict, deleted_entities_dict, player_id, tile_list, map)</dt><dd><tt>This&nbsp;is&nbsp;the&nbsp;main&nbsp;method&nbsp;of&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
 It&nbsp;is&nbsp;called&nbsp;regularly&nbsp;by&nbsp;the&nbsp;ClientCoreEngine<br>
 with&nbsp;a&nbsp;list&nbsp;of&nbsp;events&nbsp;to&nbsp;display&nbsp;(note:&nbsp;the<br>
 list&nbsp;may&nbsp;be&nbsp;empty).&nbsp;It&nbsp;may&nbsp;take&nbsp;all&nbsp;the&nbsp;time&nbsp;<br>
@@ -224,7 +228,7 @@ class&nbsp;(which&nbsp;in&nbsp;turn&nbsp;are&nbsp;called&nbsp;from&nbsp;<br>
 the&nbsp;other&nbsp;methods&nbsp;and&nbsp;the&nbsp;source&nbsp;code&nbsp;for&nbsp;<br>
 details.</tt></dd></dl>
 
-<dl><dt><a name="PresentationEngine-setup_presentation_engine"><strong>setup_presentation_engine</strong></a>(self, asset_engine, framerate, logger)</dt><dd><tt>This&nbsp;method&nbsp;initializes&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
+<dl><dt><a name="PresentationEngine-setup_presentation_engine"><strong>setup_presentation_engine</strong></a>(self, asset_engine, framerate)</dt><dd><tt>This&nbsp;method&nbsp;initializes&nbsp;the&nbsp;<a href="#PresentationEngine">PresentationEngine</a>.<br>
 asset_engine&nbsp;must&nbsp;be&nbsp;an&nbsp;instance&nbsp;of<br>
 shard.AssetEngine&nbsp;or&nbsp;a&nbsp;subclass.<br>
 framerate&nbsp;must&nbsp;be&nbsp;an&nbsp;integer&nbsp;and&nbsp;sets<br>
@@ -249,6 +253,12 @@ SpawnEvent&nbsp;and&nbsp;DeleteEvent,&nbsp;which&nbsp;is&nbsp;already&nbsp;<br>
 rendered.&nbsp;All&nbsp;that&nbsp;is&nbsp;left&nbsp;is&nbsp;to&nbsp;update&nbsp;the&nbsp;<br>
 inventory&nbsp;visualisation.&nbsp;You&nbsp;can&nbsp;use&nbsp;that<br>
 to&nbsp;enter&nbsp;a&nbsp;frame&nbsp;for&nbsp;the&nbsp;Entities&nbsp;as&nbsp;well.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.plugin.html#Plugin">shard.plugin.Plugin</a>:<br>
+<dl><dt><a name="PresentationEngine-setup_plugin"><strong>setup_plugin</strong></a>(self, logger)</dt><dd><tt>Initialize&nbsp;the&nbsp;plugin.<br>
+logger&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.<br>
+The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>

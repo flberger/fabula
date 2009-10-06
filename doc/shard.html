@@ -29,12 +29,14 @@ Transformed&nbsp;into&nbsp;a&nbsp;package&nbsp;on&nbsp;22.&nbsp;September&nbsp;2
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="shard.assetengine.html">assetengine</a><br>
 <a href="shard.clientcoreengine.html">clientcoreengine</a><br>
-</td><td width="25%" valign=top><a href="shard.coreengine.html">coreengine</a><br>
+<a href="shard.coreengine.html">coreengine</a><br>
+</td><td width="25%" valign=top><a href="shard.eventprocessor.html">eventprocessor</a><br>
 <a href="shard.interfaces.html">interfaces</a><br>
-</td><td width="25%" valign=top><a href="shard.plugin.html">plugin</a><br>
-<a href="shard.presentationengine.html">presentationengine</a><br>
-</td><td width="25%" valign=top><a href="shard.servercoreengine.html">servercoreengine</a><br>
-</td></tr></table></td></tr></table><p>
+<a href="shard.plugin.html">plugin</a><br>
+</td><td width="25%" valign=top><a href="shard.presentationengine.html">presentationengine</a><br>
+<a href="shard.run.html">run</a><br>
+<a href="shard.servercoreengine.html">servercoreengine</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -55,13 +57,6 @@ Transformed&nbsp;into&nbsp;a&nbsp;package&nbsp;on&nbsp;22.&nbsp;September&nbsp;2
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToMoveEvent">TriesToMoveEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToPickUpEvent">TriesToPickUpEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToTalkToEvent">TriesToTalkToEvent</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="shard.html#ClientEvent">ClientEvent</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#InitEvent">InitEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#MessageAppliedEvent">MessageAppliedEvent</a>
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="shard.html#ConfirmEvent">ConfirmEvent</a>
@@ -98,7 +93,8 @@ Transformed&nbsp;into&nbsp;a&nbsp;package&nbsp;on&nbsp;22.&nbsp;September&nbsp;2
 </dd>
 </dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="shard.html#Message">Message</a>
+<dt><font face="helvetica, arial"><a href="shard.html#InitEvent">InitEvent</a>
+</font></dt><dt><font face="helvetica, arial"><a href="shard.html#Message">Message</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#ShardException">ShardException</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#Tile">Tile</a>
 </font></dt></dl>
@@ -204,19 +200,6 @@ possibly&nbsp;only&nbsp;a&nbsp;string&nbsp;like&nbsp;"lobby".<br>
 The&nbsp;server&nbsp;stores&nbsp;the&nbsp;relevant<br>
 information&nbsp;and&nbsp;passes&nbsp;the&nbsp;tile&nbsp;and&nbsp;the<br>
 location&nbsp;on&nbsp;to&nbsp;the&nbsp;client.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ClientEvent">class <strong>ClientEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;administrative<br>
-client&nbsp;events.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="ClientEvent-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Client&nbsp;events&nbsp;have&nbsp;no&nbsp;parameters.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -376,47 +359,9 @@ the&nbsp;PresentationEngine&nbsp;for&nbsp;further&nbsp;insight&nbsp;on&nbsp;how&
 handles&nbsp;game&nbsp;objects.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Entity-__init__"><strong>__init__</strong></a>(self, entity_type, identifier, location, asset)</dt><dd><tt>entity_type&nbsp;is&nbsp;one&nbsp;of&nbsp;the&nbsp;strings&nbsp;"PLAYER",&nbsp;"NPC",&nbsp;<br>
-"ITEM".<br>
-&nbsp;<br>
-identifier&nbsp;must&nbsp;be&nbsp;an&nbsp;object&nbsp;whose&nbsp;string&nbsp;<br>
-representation&nbsp;yields&nbsp;an&nbsp;unique&nbsp;<br>
-identification.<br>
-&nbsp;<br>
-location&nbsp;is&nbsp;an&nbsp;object&nbsp;describing&nbsp;the<br>
-location&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;in&nbsp;the&nbsp;game&nbsp;world,&nbsp;<br>
-most&nbsp;probably&nbsp;a&nbsp;tuple&nbsp;of&nbsp;coordinates,&nbsp;but<br>
-possibly&nbsp;only&nbsp;a&nbsp;string&nbsp;like&nbsp;"lobby".&nbsp;The<br>
-location&nbsp;should&nbsp;not&nbsp;be&nbsp;too&nbsp;precise&nbsp;when<br>
-using&nbsp;coordinates,&nbsp;since&nbsp;it&nbsp;is&nbsp;not<br>
-incremented&nbsp;during&nbsp;movement.&nbsp;It&nbsp;should<br>
-rather&nbsp;store&nbsp;where&nbsp;the&nbsp;entity&nbsp;will&nbsp;be<br>
-once&nbsp;the&nbsp;next&nbsp;movement&nbsp;is&nbsp;complete.<br>
-&nbsp;<br>
-asset&nbsp;finally&nbsp;is&nbsp;preferably&nbsp;a&nbsp;string<br>
-with&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;URI&nbsp;of&nbsp;a&nbsp;media<br>
-file&nbsp;containing&nbsp;the&nbsp;data&nbsp;for&nbsp;visualizing<br>
-the&nbsp;<a href="#Entity">Entity</a>.&nbsp;Do&nbsp;not&nbsp;put&nbsp;large&nbsp;objects&nbsp;here<br>
-since&nbsp;Entities&nbsp;are&nbsp;pushed&nbsp;around&nbsp;quite&nbsp;a<br>
-bit&nbsp;and&nbsp;transfered&nbsp;across&nbsp;the&nbsp;network.<br>
-The&nbsp;PresentationEngine&nbsp;may&nbsp;fetch&nbsp;the&nbsp;asset&nbsp;and<br>
-attach&nbsp;it&nbsp;to&nbsp;the&nbsp;instance&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>.</tt></dd></dl>
-
-<dl><dt><a name="Entity-custom_init"><strong>custom_init</strong></a>(self)</dt><dd><tt>You&nbsp;should&nbsp;not&nbsp;override&nbsp;<a href="#Entity">Entity</a>.<a href="#Entity-__init__">__init__</a>()<br>
-since&nbsp;it&nbsp;performs&nbsp;required&nbsp;setup.&nbsp;Instead,&nbsp;<br>
-override&nbsp;this&nbsp;method&nbsp;to&nbsp;perform&nbsp;custom<br>
-initialization.&nbsp;It&nbsp;is&nbsp;called&nbsp;from<br>
-<a href="#Entity">Entity</a>.<a href="#Entity-__init__">__init__</a>().</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_2d_direction"><strong>process_2d_direction</strong></a>(self, direction)</dt><dd><tt>This&nbsp;is&nbsp;an&nbsp;auxiliary&nbsp;default&nbsp;method<br>
-called&nbsp;from&nbsp;<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>().&nbsp;It<br>
-implements&nbsp;&nbsp;a&nbsp;movement&nbsp;on&nbsp;a&nbsp;2D&nbsp;map&nbsp;<br>
-with&nbsp;rectangular&nbsp;elements.&nbsp;If&nbsp;you&nbsp;<br>
-override&nbsp;<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>()&nbsp;(to&nbsp;<br>
-include&nbsp;animation&nbsp;for&nbsp;example),&nbsp;be&nbsp;<br>
-sure&nbsp;to&nbsp;call<br>
-<a href="#Entity-process_2d_direction">process_2d_direction</a>(event.direction)<br>
-or&nbsp;implement&nbsp;the&nbsp;update&nbsp;yourself.</tt></dd></dl>
+<dl><dt><a name="Entity-__init__"><strong>__init__</strong></a>(self, entity_type, identifier, location, asset)</dt><dd><tt>You&nbsp;are&nbsp;welcome&nbsp;to&nbsp;override&nbsp;this&nbsp;method,&nbsp;but<br>
+be&nbsp;sure&nbsp;to&nbsp;call&nbsp;<a href="#Entity-setup">setup</a>()&nbsp;as&nbsp;done&nbsp;by&nbsp;the&nbsp;default<br>
+implementation&nbsp;of&nbsp;this&nbsp;method.</tt></dd></dl>
 
 <dl><dt><a name="Entity-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, key_value_dict)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;Client&nbsp;with<br>
 the&nbsp;key-value&nbsp;dict&nbsp;of&nbsp;an&nbsp;<a href="#CustomEntityEvent">CustomEntityEvent</a><br>
@@ -438,6 +383,34 @@ the&nbsp;movement.&nbsp;This&nbsp;is&nbsp;rather&nbsp;called<br>
 by&nbsp;the&nbsp;ClientCoreEngine&nbsp;to&nbsp;signal<br>
 where&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;about&nbsp;to&nbsp;move.<br>
 See&nbsp;the&nbsp;other&nbsp;methods&nbsp;of&nbsp;this&nbsp;class.</tt></dd></dl>
+
+<dl><dt><a name="Entity-setup"><strong>setup</strong></a>(self, entity_type, identifier, location, asset)</dt><dd><tt>entity_type&nbsp;is&nbsp;one&nbsp;of&nbsp;the&nbsp;strings&nbsp;"PLAYER",&nbsp;"NPC",&nbsp;<br>
+"ITEM".<br>
+&nbsp;<br>
+identifier&nbsp;must&nbsp;be&nbsp;an&nbsp;object&nbsp;whose&nbsp;string&nbsp;<br>
+representation&nbsp;yields&nbsp;an&nbsp;unique&nbsp;<br>
+identification.<br>
+&nbsp;<br>
+location&nbsp;is&nbsp;an&nbsp;object&nbsp;describing&nbsp;the<br>
+location&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;in&nbsp;the&nbsp;game&nbsp;world,&nbsp;<br>
+most&nbsp;probably&nbsp;a&nbsp;tuple&nbsp;of&nbsp;coordinates,&nbsp;but<br>
+possibly&nbsp;only&nbsp;a&nbsp;string&nbsp;like&nbsp;"lobby".&nbsp;The<br>
+location&nbsp;should&nbsp;not&nbsp;be&nbsp;too&nbsp;precise&nbsp;when<br>
+using&nbsp;coordinates,&nbsp;since&nbsp;it&nbsp;is&nbsp;not<br>
+incremented&nbsp;during&nbsp;movement.&nbsp;It&nbsp;should<br>
+rather&nbsp;store&nbsp;where&nbsp;the&nbsp;entity&nbsp;will&nbsp;be<br>
+once&nbsp;the&nbsp;next&nbsp;movement&nbsp;is&nbsp;complete.<br>
+&nbsp;<br>
+asset&nbsp;is&nbsp;preferably&nbsp;a&nbsp;string<br>
+with&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;URI&nbsp;of&nbsp;a&nbsp;media<br>
+file&nbsp;containing&nbsp;the&nbsp;data&nbsp;for&nbsp;visualizing<br>
+the&nbsp;<a href="#Entity">Entity</a>.&nbsp;Do&nbsp;not&nbsp;put&nbsp;large&nbsp;objects&nbsp;here<br>
+since&nbsp;Entities&nbsp;are&nbsp;pushed&nbsp;around&nbsp;quite&nbsp;a<br>
+bit&nbsp;and&nbsp;transfered&nbsp;across&nbsp;the&nbsp;network.<br>
+The&nbsp;PresentationEngine&nbsp;may&nbsp;fetch&nbsp;the&nbsp;asset&nbsp;and<br>
+attach&nbsp;it&nbsp;to&nbsp;the&nbsp;instance&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>.<br>
+&nbsp;<br>
+logger&nbsp;finally&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.</tt></dd></dl>
 
 <dl><dt><a name="Entity-starts_dropping"><strong>starts_dropping</strong></a>(self, frames, framerate)</dt><dd><tt>The&nbsp;PresentationEngine&nbsp;makes&nbsp;dropped&nbsp;objects<br>
 disappear&nbsp;in&nbsp;the&nbsp;inventory&nbsp;and&nbsp;appear<br>
@@ -540,7 +513,7 @@ by&nbsp;this&nbsp;event.</tt></dd></dl>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="InitEvent">class <strong>InitEvent</strong></a>(<a href="shard.html#ClientEvent">ClientEvent</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="InitEvent">class <strong>InitEvent</strong></a></font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;event&nbsp;is&nbsp;sent&nbsp;once&nbsp;by&nbsp;the&nbsp;client&nbsp;upon&nbsp;startup.<br>
@@ -550,14 +523,8 @@ usually&nbsp;a&nbsp;number&nbsp;of&nbsp;ChangeMapElementEvents&nbsp;and&nbsp;Spa
 The&nbsp;client&nbsp;interface&nbsp;may&nbsp;decide&nbsp;to&nbsp;issue&nbsp;this&nbsp;event<br>
 again&nbsp;in&nbsp;case&nbsp;there&nbsp;has&nbsp;been&nbsp;a&nbsp;connection&nbsp;failure.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#InitEvent">InitEvent</a></dd>
-<dd><a href="shard.html#ClientEvent">ClientEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#ClientEvent">ClientEvent</a>:<br>
-<dl><dt><a name="InitEvent-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Client&nbsp;events&nbsp;have&nbsp;no&nbsp;parameters.</tt></dd></dl>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="InitEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>identifier&nbsp;must&nbsp;be&nbsp;unique&nbsp;for&nbsp;each&nbsp;client.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -599,32 +566,6 @@ expose&nbsp;a&nbsp;single&nbsp;Python&nbsp;list&nbsp;object&nbsp;as&nbsp;<a href
 <dl><dt><a name="Message-__init__"><strong>__init__</strong></a>(self, event_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;<a href="#Message">Message</a>&nbsp;with&nbsp;a&nbsp;list&nbsp;of&nbsp;objects<br>
 derived&nbsp;from&nbsp;shard.<a href="#Event">Event</a>.&nbsp;An&nbsp;empty&nbsp;list&nbsp;may<br>
 be&nbsp;supplied.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="MessageAppliedEvent">class <strong>MessageAppliedEvent</strong></a>(<a href="shard.html#ClientEvent">ClientEvent</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;client&nbsp;sends&nbsp;this&nbsp;event&nbsp;when&nbsp;it&nbsp;has&nbsp;applied&nbsp;the<br>
-last&nbsp;server&nbsp;<a href="#Message">Message</a>,&nbsp;i.e.&nbsp;deleted&nbsp;NPCs,&nbsp;spawned<br>
-items,&nbsp;moved&nbsp;the&nbsp;player&nbsp;etc.&nbsp;To&nbsp;stay&nbsp;in&nbsp;sync,&nbsp;the<br>
-server&nbsp;should&nbsp;wait&nbsp;for&nbsp;this&nbsp;event&nbsp;before&nbsp;sending&nbsp;any<br>
-new&nbsp;Messages.&nbsp;Currently&nbsp;there&nbsp;is&nbsp;no&nbsp;identifier&nbsp;for<br>
-Messages,&nbsp;so&nbsp;if&nbsp;the&nbsp;server&nbsp;does&nbsp;not&nbsp;wait&nbsp;for&nbsp;the<br>
-<a href="#MessageAppliedEvent">MessageAppliedEvent</a>&nbsp;before&nbsp;sending&nbsp;new&nbsp;events,&nbsp;<br>
-it&nbsp;will&nbsp;not&nbsp;be&nbsp;able&nbsp;to&nbsp;determine&nbsp;which&nbsp;message&nbsp;is&nbsp;<br>
-confirmed&nbsp;by&nbsp;the&nbsp;next&nbsp;<a href="#MessageAppliedEvent">MessageAppliedEvent</a>.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#MessageAppliedEvent">MessageAppliedEvent</a></dd>
-<dd><a href="shard.html#ClientEvent">ClientEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#ClientEvent">ClientEvent</a>:<br>
-<dl><dt><a name="MessageAppliedEvent-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Client&nbsp;events&nbsp;have&nbsp;no&nbsp;parameters.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -1040,5 +981,5 @@ NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>DIRECTION_VECTOR</strong> = {'E': (1, 0), 'N': (0, 1), 'NE': (1, 1), 'NW': (-1, 1), 'S': (0, -1), 'SE': (1, -1), 'SW': (-1, -1), 'W': (-1, 0)}</td></tr></table>
+<td width="100%"><strong>DIRECTION_VECTOR</strong> = {'E': (1, 0), 'N': (0, -1), 'NE': (1, -1), 'NW': (-1, -1), 'S': (0, 1), 'SE': (1, 1), 'SW': (-1, 1), 'W': (-1, 0)}</td></tr></table>
 </body></html>
