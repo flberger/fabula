@@ -300,16 +300,19 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         message.event_list.append(event)
 
     def process_SpawnEvent(self, event, message):
-        """Add the Entity given to the entity_dict
-           and pass the SpawnEvent on.
+        """If not already present, add the Entity given to
+           the entity_dict and pass the SpawnEvent on.
         """
 
-        self.logger.debug("adding/updating in entity_dict: "
-                          + str(event.entity.identifier))
+        if event.entity.identifier in self.entity_dict:
+            self.logger.debug("entity already in entity_dict: %s" % event.entity.identifier)
 
-        self.entity_dict[event.entity.identifier] = event.entity
+        else:
+            self.logger.debug("spawning entity: %s" % event.entity.identifier)
 
-        message.event_list.append(event)
+            self.entity_dict[event.entity.identifier] = event.entity
+
+            message.event_list.append(event)
 
     def process_DeleteEvent(self, event, message):
         """Process the Event.

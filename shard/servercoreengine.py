@@ -200,10 +200,10 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                         #
                         # We also broadcast all SpawnEvents. That means
                         # that when a new client joins, all entities
-                        # (in the current room) are respawned. This
-                        # should do no harm, since InitEvents are rare
-                        # and all entitiy locations are up to date in
-                        # the server.
+                        # (in the current room) are respawned.
+                        # process_SpawnEvent in the core engine will
+                        # filter duplicate entities, so no harm done.
+                        # 
                         # TODO: respawning might cause some loss of internal entity state
                         #
                         if event.__class__ in [shard.DropsEvent, 

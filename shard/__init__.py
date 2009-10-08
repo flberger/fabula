@@ -11,12 +11,9 @@
    Transformed into a package on 22. September 2009.
 """
 
-# TODO:
-#
-# - reasonable package docstring above: what is where :)
-#
-# - Some more blank lines to make the code more
-#   readable without coloring.
+# TODO: reasonable package docstring above: what is where :)
+# TODO: "%s" % s instead of "s" + "s" in the whole package!
+# TODO: use map() instead of "for" loops
 
 ############################################################
 # Events

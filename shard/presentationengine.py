@@ -38,6 +38,12 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         self.setup_plugin(logger)
 
+        # Set how long actions like a movement from
+        # Map element to Map element take, in seconds.
+        # Must be set before calling self.setup_presentation_engine()!
+        #
+        self.action_time = 0.5
+
         self.setup_presentation_engine(asset_engine, framerate)
 
     def setup_presentation_engine(self, asset_engine, framerate):
@@ -54,10 +60,9 @@ class PresentationEngine(shard.plugin.Plugin):
         self.framerate = framerate
         self.asset_engine = asset_engine
 
-        # Set how long actions like a movement from
-        # Map element to Map element take, in seconds.
-        #
-        self.action_time = 0.5
+        # Compute the number of frames per action.
+        # See __init__() for details.
+        self.action_frames = int(self.action_time * self.framerate)
 
         # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
@@ -140,10 +145,6 @@ class PresentationEngine(shard.plugin.Plugin):
         # player actions
         #
         self.message_for_host = shard.Message([])
-        
-        # Compute the number of frames per action.
-        # See __init__() for details.
-        self.action_frames = int(self.action_time * self.framerate)
 
         ####################
         # Check EnterRoomEvent
