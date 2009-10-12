@@ -238,6 +238,24 @@ class SaysEvent(Event):
 
         self.text = text
 
+class ChangeStateEvent(Event):
+    """Each instance of shard.Entity has a state.
+       This Event is issued to trigger a state
+       change.
+    """
+
+    # ChangeState is based on a concept by Alexander Marbach.
+
+    def __init__(self, identifier, state):
+        """state is the new state for the Entity
+           identified by identifier. In the simplest
+           case state may be a number or a verbose
+           string.
+        """
+        self.identifier = identifier
+
+        self.state = state
+
 ####################
 # Passive events
 
@@ -535,112 +553,45 @@ class Entity:
 
         self.location = (new_x, new_y)
 
-    def starts_moving(self, frames, framerate):
-        """The PresentationEngine is responsible for the
+    def change_state(self, state, frames=None, framerate=None):
+        """Called when the state of the Entity is
+           changed from outside.
+           The PresentationEngine is responsible for the
            gradual movement of the Entity to the
-           target, but not for the animation. It
-           calls this method once to signal that
-           the Entity starts moving now. Entities
-           may implement a flag or some logic
-           which changes their graphical 
-           representation on every frame, yielding
-           an animation. starts_moving() is always
-           called after process_MovesToEvent(), so
-           the Entity knows about the direction.
-           The PresentationEngine provides the number of
-           frames for the movement and the framerate.
-           Thus the entity can adapt to different
-           frame rates by adjusting how many frames
-           an image is shown. The Entity is advised
-           to stop the animation once the number
-           of frames given has passed, but it does
-           not need to do so.
-           The default implementation simply sets
-           the variable self.moves to True."""
-        self.moves = True
-
-#    def stopsMoving(self):
-#        """Called when the PresentationEngine has
-#           completed the movement. This should
-#           trigger a stop of the movement 
-#           animation. The default implementation
-#           sets self.moves to False."""
-#        self.moves = False
-
-    def starts_speaking(self, frames, framerate):
-        """The PresentationEngine displays text spoken 
-           by the Entity, but does not enforce any
-           animation. It calls this method to 
-           signal that the Entity starts speaking
-           now. Entities may implement a flag or 
-           some logic which changes their graphical 
-           representation on every frame, yielding
-           an animation.
-           The PresentationEngine provides the number of
-           frames for the speaking action and the 
-           framerate. Thus the entity can adapt to 
-           different frame rates by adjusting how 
-           many frames an image is shown. 
-           The Entity is advised to stop the 
-           animation once the number of frames 
-           given has passed, but it does not need 
-           to do so.
-           The default implementation simply sets 
-           the variable self.speaks to True."""
-        self.speaks = True
-
-#    def stopsSpeaking(self):
-#        """Called when the PresentationEngine is about
-#           to erase the spoken text from the 
-#           screen. This should trigger a stop of 
-#           the speaking animation. The default 
-#           implementation sets self.speaks
-#           to False."""
-#        self.speaks = False
-
-    def starts_picking_up(self, frames, framerate):
-        """The PresentationEngine makes picked up objects
+           target, the display of text spoken 
+           by the Entity, making picked up objects
            disappear and appear in the inventory, 
-           but does not enforce any animation. It 
-           calls this method to signal that the 
-           Entity starts picking up something now. 
-           Entities may implement a flag or some 
+           but not for any Entity animation.
+           Instead, the PresentationEngine will
+           call this method with the following states:
+           "MOVING"
+           "SPEAKING"
+           "PICKING_UP"
+           "DROPPING"
+           to signal that the Entity starts the action
+           now. Entities may implement a flag or some
            logic which changes their graphical 
-           representation on every frame, yielding 
+           representation on every frame, yielding
            an animation.
-           The PresentationEngine provides the number of
-           frames for the action and the framerate.
+           process_ChangeStateEvent() is always
+           called after process_MovesToEvent() etc.,
+           so the Entity already knows about the result
+           of the action.
+           The PresentationEngine may provide the number
+           of frames for the movement and the framerate.
            Thus the entity can adapt to different
            frame rates by adjusting how many frames
            an image is shown. The Entity is advised
            to stop the animation once the number
            of frames given has passed, but it does
            not need to do so.
-           The default implementation simply sets 
-           the variable self.picks_up to True."""
-        self.picks_up = True
+           The default implementation sets Entity.state
+           to the state given.
+        """
 
-    def starts_dropping(self, frames, framerate):
-        """The PresentationEngine makes dropped objects
-           disappear in the inventory and appear
-           on the map, but does not enforce any 
-           animation. It calls this method to 
-           signal that the Entity starts picking 
-           up something now. Entities may 
-           implement a flag or some logic which 
-           changes their graphical representation 
-           on every frame, yielding an animation.
-           The PresentationEngine provides the number of
-           frames for the action and the framerate.
-           Thus the entity can adapt to different
-           frame rates by adjusting how many frames
-           an image is shown. The Entity is advised
-           to stop the animation once the number
-           of frames given has passed, but it does
-           not need to do so.
-           The default implementation simply sets 
-           the variable self.picks_up to True."""
-        self.drops = True
+        # ChangeState is based on a concept by Alexander Marbach.
+
+        self.state = state
 
 ############################################################
 # Tiles

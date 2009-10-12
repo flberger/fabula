@@ -408,8 +408,10 @@ class PresentationEngine(shard.plugin.Plugin):
 
                     # Notify the Entity that the animation is
                     # about to start. No need to queue the event.
-                    self.entity_dict[current_event.identifier].starts_dropping(self.action_frames,
-                                                                               self.framerate)
+                    #
+                    self.entity_dict[current_event.identifier].change_state("DROPPING",
+                                                                            self.action_frames,
+                                                                            self.framerate)
 
                 elif isinstance(current_event, shard.PicksUpEvent):
                     # This is a multiple frame action.
@@ -420,8 +422,9 @@ class PresentationEngine(shard.plugin.Plugin):
 
                     # Notify the Entity that the animation is
                     # about to start. No need to queue the event.
-                    self.entity_dict[current_event.identifier].starts_picking_up(self.action_frames,
-                                                                                 self.framerate)
+                    self.entity_dict[current_event.identifier].change_state("PICKING_UP",
+                                                                            self.action_frames,
+                                                                            self.framerate)
 
                 elif isinstance(current_event, shard.MovesToEvent):
                     # This is a multiple frame action.
@@ -429,8 +432,9 @@ class PresentationEngine(shard.plugin.Plugin):
 
                     # Notify the Entity that the animation
                     # is about to start.
-                    self.entity_dict[current_event.identifier].starts_moving(self.action_frames,
-                                                                             self.framerate)
+                    self.entity_dict[current_event.identifier].change_state("MOVING",
+                                                                            self.action_frames,
+                                                                            self.framerate)
 
                     # Queue for later use.
                     MovesToEvent_list.append(current_event)
@@ -768,12 +772,13 @@ class PresentationEngine(shard.plugin.Plugin):
            Once you start displaying the text, 
            you have to notify the affected 
            Entity by calling
-           Entity.starts_speaking(self, frames, framerate).
+           Entity.change_state("SPEAKING", frames, framerate).
            You should catch some user 
            confirmation. Please do not continue 
            animation of other Entities so there 
            are no background actions which may 
-           pass unnoticed."""
+           pass unnoticed.
+        """
 
         self.logger.info("called")
 

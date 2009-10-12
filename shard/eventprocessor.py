@@ -51,6 +51,8 @@ class EventProcessor:
                                self.process_PerceptionEvent,
                            shard.SaysEvent :
                                self.process_SaysEvent,
+                           shard.ChangeStateEvent :
+                               self.process_ChangeStateEvent,
                            shard.PassedEvent :
                                self.process_PassedEvent,
                            shard.LookedAtEvent :
@@ -146,6 +148,12 @@ class EventProcessor:
         pass
 
     def process_SaysEvent(self, event):
+        """Process the Event.
+           The default implementation does nothing.
+        """
+        pass
+
+    def process_ChangeStateEvent(self, event):
         """Process the Event.
            The default implementation does nothing.
         """
