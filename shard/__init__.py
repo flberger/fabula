@@ -4,12 +4,12 @@
    "Stories On A Grid"
 
    (c) Florian Berger <fberger@fbmd.de>
-
-   This file has been started on 19. May 2008, building
-   on some drafts done in May 2008.
-
-   Transformed into a package on 22. September 2009.
 """
+
+# This file has been started on 19. May 2008, building
+# on some drafts done in May 2008.
+#
+# Transformed into a package on 22. September 2009.
 
 # TODO: reasonable package docstring above: what is where :)
 # TODO: "%s" % s instead of "s" + "s" in the whole package!

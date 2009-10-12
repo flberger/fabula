@@ -1,9 +1,9 @@
 """Shard Presentation Engine
-
-   Extracted from shard.py on 22. Sep 2009
-
-   Renamed from VisualEngine to PresentationEngine on 29. Sep 2009
 """
+
+# Extracted from shard.py on 22. Sep 2009
+#
+# Renamed from VisualEngine to PresentationEngine on 29. Sep 2009
 
 import shard
 import shard.plugin

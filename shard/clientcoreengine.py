@@ -1,7 +1,7 @@
 """ Shard Client Core Engine
-
-    Extracted from shard.py on 22. Sep 2009
 """
+
+# Extracted from shard.py on 22. Sep 2009
 
 import shard
 import shard.coreengine

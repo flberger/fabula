@@ -1,15 +1,15 @@
 """shard.run - Initialize and run Shard client and server
 
    (c) Florian Berger <fberger@fbmd.de>
-
-   Work started on 27. May 2008
-
-   Server part adapted from run_shardclient.py on 25. Sep 2009
-
-   Unfied for client and server usage on 30. Sep 2009
-
-   Converted from run_shard.py on 06. Oct 2009
 """
+
+# Work started on 27. May 2008
+#
+# Server part adapted from run_shardclient.py on 25. Sep 2009
+#
+# Unfied for client and server usage on 30. Sep 2009
+#
+# Converted from run_shard.py on 06. Oct 2009
 
 import shard.interfaces
 import shard.clientcoreengine

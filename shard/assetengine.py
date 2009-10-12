@@ -1,7 +1,7 @@
 """Shard Asset Engine
-
-   Extracted from shard.py on 22. Sep 2009
 """
+
+# Extracted from shard.py on 22. Sep 2009
 
 from . import ShardException
 

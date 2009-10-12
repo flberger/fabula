@@ -1,20 +1,20 @@
 """Shard Interface Classes
 
-   Work started on 28. Sep 2009
-
    Based on former client- and server
    interface implementations
-
-   Shard Client Interface extracted from
-   shard.py on 22. Sep 2009
-
-   Shard Message Buffer based on methods from
-   ClientInterface and the ClienConnection class
-   in ServerInterface
-
-   Work on Shard server interface started
-   on 24. Sep 2009
 """
+
+# Work started on 28. Sep 2009
+#
+# Shard Client Interface extracted from
+# shard.py on 22. Sep 2009
+#
+# Shard Message Buffer based on methods from
+# ClientInterface and the ClienConnection class
+# in ServerInterface
+#
+# Work on Shard server interface started
+# on 24. Sep 2009
 
 import shard
 from collections import deque
