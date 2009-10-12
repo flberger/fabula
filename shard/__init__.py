@@ -200,26 +200,6 @@ class SaysEvent(Event):
         self.identifier = identifier
         self.text = text
 
-class CustomEntityEvent(Event):
-    """Shard Game Entities (the player, NPCs, items) may
-       be able to change state, graphics or animations.
-       Since these may be very customized actions, they
-       are not defined here. Instead, the server can
-       issue a CustomEntityEvent to trigger such a 
-       custom action in the entity.
-       A CustomEntityEvent should feed an internal
-       queue of an Entity. All CustonEntityEvents of a
-       Message are passed to the Entity before the
-       Message is rendered by the PresentationEngine. They
-       are not supplied in real time during the rendering."""
-
-    def __init__(self, identifier, key_value_dict):
-        """key_value_dict is a Python dictionary 
-           containing the parameters of the custom
-           event."""
-        self.identifier = identifier
-        self.key_value_dict = key_value_dict
-
 ####################
 # Passive events
 
@@ -497,16 +477,6 @@ class Entity:
                  + DIRECTION_VECTOR[event.direction][1])
 
         self.location = (new_x, new_y)
-
-    def process_CustomEntityEvent(self, key_value_dict):
-        """This method is called by the Client with
-           the key-value dict of an CustomEntityEvent
-           which possibly changes the client state. 
-           The interpretation of CustomEntityEvents 
-           is entirely up to the Entity. The default 
-           implementation does nothing, so you 
-           should override it."""
-        pass
 
     def starts_moving(self, frames, framerate):
         """The PresentationEngine is responsible for the

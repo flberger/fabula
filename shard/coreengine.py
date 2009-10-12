@@ -249,16 +249,6 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
-    def process_CustomEntityEvent(self, event, message):
-        """Process the Event.
-           The default implementation adds
-           the event to the message.
-        """
-
-        self.logger.debug("called")
-
-        message.event_list.append(event)
-
     def process_PassedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
