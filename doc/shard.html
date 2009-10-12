@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>shard</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/doc-cleanup/shard/__init__.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/doc-cleanup/shard/__init__.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/__init__.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/__init__.py</a></font></td></tr></table>
     <p><tt>Shard&nbsp;-&nbsp;A&nbsp;Client-Server&nbsp;System&nbsp;for&nbsp;Interactive&nbsp;<br>
 Storytelling&nbsp;by&nbsp;means&nbsp;of&nbsp;an&nbsp;Adventure&nbsp;Game&nbsp;Environment<br>
 &nbsp;<br>
@@ -54,17 +54,19 @@ Storytelling&nbsp;by&nbsp;means&nbsp;of&nbsp;an&nbsp;Adventure&nbsp;Game&nbsp;En
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToTalkToEvent">TriesToTalkToEvent</a>
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="shard.html#ConfirmEvent">ConfirmEvent</a>
+<dt><font face="helvetica, arial"><a href="shard.html#ChangeStateEvent">ChangeStateEvent</a>
+</font></dt><dt><font face="helvetica, arial"><a href="shard.html#ConfirmEvent">ConfirmEvent</a>
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="shard.html#AttemptFailedEvent">AttemptFailedEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#CanSpeakEvent">CanSpeakEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#DropsEvent">DropsEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#MovesToEvent">MovesToEvent</a>
+</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PerceptionEvent">PerceptionEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#PicksUpEvent">PicksUpEvent</a>
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="shard.html#CustomEntityEvent">CustomEntityEvent</a>
+<dt><font face="helvetica, arial"><a href="shard.html#InitEvent">InitEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#PassiveEvent">PassiveEvent</a>
 </font></dt><dd>
 <dl>
@@ -74,8 +76,7 @@ Storytelling&nbsp;by&nbsp;means&nbsp;of&nbsp;an&nbsp;Adventure&nbsp;Game&nbsp;En
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#PickedUpEvent">PickedUpEvent</a>
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="shard.html#PerceptionEvent">PerceptionEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#SaysEvent">SaysEvent</a>
+<dt><font face="helvetica, arial"><a href="shard.html#SaysEvent">SaysEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#ServerEvent">ServerEvent</a>
 </font></dt><dd>
 <dl>
@@ -88,8 +89,7 @@ Storytelling&nbsp;by&nbsp;means&nbsp;of&nbsp;an&nbsp;Adventure&nbsp;Game&nbsp;En
 </dd>
 </dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="shard.html#InitEvent">InitEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#Message">Message</a>
+<dt><font face="helvetica, arial"><a href="shard.html#Message">Message</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#ShardException">ShardException</a>
 </font></dt><dt><font face="helvetica, arial"><a href="shard.html#Tile">Tile</a>
 </font></dt></dl>
@@ -106,9 +106,9 @@ by&nbsp;the&nbsp;player&nbsp;or&nbsp;NPCs.<br>&nbsp;</tt></td></tr>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="AttemptEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
@@ -200,6 +200,23 @@ location&nbsp;on&nbsp;to&nbsp;the&nbsp;client.</tt></dd></dl>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ChangeStateEvent">class <strong>ChangeStateEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Each&nbsp;instance&nbsp;of&nbsp;shard.<a href="#Entity">Entity</a>&nbsp;has&nbsp;a&nbsp;state.<br>
+This&nbsp;<a href="#Event">Event</a>&nbsp;is&nbsp;issued&nbsp;to&nbsp;trigger&nbsp;a&nbsp;state<br>
+change.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ChangeStateEvent-__init__"><strong>__init__</strong></a>(self, identifier, state)</dt><dd><tt>state&nbsp;is&nbsp;the&nbsp;new&nbsp;state&nbsp;for&nbsp;the&nbsp;<a href="#Entity">Entity</a><br>
+identified&nbsp;by&nbsp;identifier.&nbsp;In&nbsp;the&nbsp;simplest<br>
+case&nbsp;state&nbsp;may&nbsp;be&nbsp;a&nbsp;number&nbsp;or&nbsp;a&nbsp;verbose<br>
+string.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="ConfirmEvent">class <strong>ConfirmEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
@@ -211,30 +228,6 @@ of&nbsp;attempt&nbsp;events.<br>&nbsp;</tt></td></tr>
 an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
 (player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
 by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="CustomEntityEvent">class <strong>CustomEntityEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Shard&nbsp;Game&nbsp;Entities&nbsp;(the&nbsp;player,&nbsp;NPCs,&nbsp;items)&nbsp;may<br>
-be&nbsp;able&nbsp;to&nbsp;change&nbsp;state,&nbsp;graphics&nbsp;or&nbsp;animations.<br>
-Since&nbsp;these&nbsp;may&nbsp;be&nbsp;very&nbsp;customized&nbsp;actions,&nbsp;they<br>
-are&nbsp;not&nbsp;defined&nbsp;here.&nbsp;Instead,&nbsp;the&nbsp;server&nbsp;can<br>
-issue&nbsp;a&nbsp;<a href="#CustomEntityEvent">CustomEntityEvent</a>&nbsp;to&nbsp;trigger&nbsp;such&nbsp;a&nbsp;<br>
-custom&nbsp;action&nbsp;in&nbsp;the&nbsp;entity.<br>
-A&nbsp;<a href="#CustomEntityEvent">CustomEntityEvent</a>&nbsp;should&nbsp;feed&nbsp;an&nbsp;internal<br>
-queue&nbsp;of&nbsp;an&nbsp;<a href="#Entity">Entity</a>.&nbsp;All&nbsp;CustonEntityEvents&nbsp;of&nbsp;a<br>
-<a href="#Message">Message</a>&nbsp;are&nbsp;passed&nbsp;to&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;before&nbsp;the<br>
-<a href="#Message">Message</a>&nbsp;is&nbsp;rendered&nbsp;by&nbsp;the&nbsp;PresentationEngine.&nbsp;They<br>
-are&nbsp;not&nbsp;supplied&nbsp;in&nbsp;real&nbsp;time&nbsp;during&nbsp;the&nbsp;rendering.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="CustomEntityEvent-__init__"><strong>__init__</strong></a>(self, identifier, key_value_dict)</dt><dd><tt>key_value_dict&nbsp;is&nbsp;a&nbsp;Python&nbsp;dictionary&nbsp;<br>
-containing&nbsp;the&nbsp;parameters&nbsp;of&nbsp;the&nbsp;custom<br>
-event.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -293,7 +286,7 @@ attempt&nbsp;to&nbsp;drop&nbsp;an&nbsp;item&nbsp;by&nbsp;the&nbsp;player<br>
 or&nbsp;an&nbsp;NPC.<br>
 This&nbsp;event&nbsp;does&nbsp;normally&nbsp;not&nbsp;occur&nbsp;when&nbsp;the<br>
 drop&nbsp;action&nbsp;evaluates&nbsp;to&nbsp;a&nbsp;"use&nbsp;with"&nbsp;action,&nbsp;<br>
-as&nbsp;described&nbsp;in&nbsp;<a href="#TriesToDropEvent">TriesToDropEvent</a>.&nbsp;I&nbsp;that&nbsp;case<br>
+as&nbsp;described&nbsp;in&nbsp;<a href="#TriesToDropEvent">TriesToDropEvent</a>.&nbsp;In&nbsp;that&nbsp;case<br>
 the&nbsp;item&nbsp;stays&nbsp;in&nbsp;the&nbsp;posession&nbsp;of&nbsp;its&nbsp;owner,&nbsp;<br>
 and&nbsp;some&nbsp;other&nbsp;events&nbsp;are&nbsp;issued.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
@@ -358,13 +351,39 @@ handles&nbsp;game&nbsp;objects.<br>&nbsp;</tt></td></tr>
 be&nbsp;sure&nbsp;to&nbsp;call&nbsp;<a href="#Entity-setup">setup</a>()&nbsp;as&nbsp;done&nbsp;by&nbsp;the&nbsp;default<br>
 implementation&nbsp;of&nbsp;this&nbsp;method.</tt></dd></dl>
 
-<dl><dt><a name="Entity-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, key_value_dict)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;Client&nbsp;with<br>
-the&nbsp;key-value&nbsp;dict&nbsp;of&nbsp;an&nbsp;<a href="#CustomEntityEvent">CustomEntityEvent</a><br>
-which&nbsp;possibly&nbsp;changes&nbsp;the&nbsp;client&nbsp;state.&nbsp;<br>
-The&nbsp;interpretation&nbsp;of&nbsp;CustomEntityEvents&nbsp;<br>
-is&nbsp;entirely&nbsp;up&nbsp;to&nbsp;the&nbsp;<a href="#Entity">Entity</a>.&nbsp;The&nbsp;default&nbsp;<br>
-implementation&nbsp;does&nbsp;nothing,&nbsp;so&nbsp;you&nbsp;<br>
-should&nbsp;override&nbsp;it.</tt></dd></dl>
+<dl><dt><a name="Entity-change_state"><strong>change_state</strong></a>(self, state, frames<font color="#909090">=None</font>, framerate<font color="#909090">=None</font>)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;state&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is<br>
+changed&nbsp;from&nbsp;outside.<br>
+The&nbsp;PresentationEngine&nbsp;is&nbsp;responsible&nbsp;for&nbsp;the<br>
+gradual&nbsp;movement&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;to&nbsp;the<br>
+target,&nbsp;the&nbsp;display&nbsp;of&nbsp;text&nbsp;spoken&nbsp;<br>
+by&nbsp;the&nbsp;<a href="#Entity">Entity</a>,&nbsp;making&nbsp;picked&nbsp;up&nbsp;objects<br>
+disappear&nbsp;and&nbsp;appear&nbsp;in&nbsp;the&nbsp;inventory,&nbsp;<br>
+but&nbsp;not&nbsp;for&nbsp;any&nbsp;<a href="#Entity">Entity</a>&nbsp;animation.<br>
+Instead,&nbsp;the&nbsp;PresentationEngine&nbsp;will<br>
+call&nbsp;this&nbsp;method&nbsp;with&nbsp;the&nbsp;following&nbsp;states:<br>
+"MOVING"<br>
+"SPEAKING"<br>
+"PICKING_UP"<br>
+"DROPPING"<br>
+to&nbsp;signal&nbsp;that&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;starts&nbsp;the&nbsp;action<br>
+now.&nbsp;Entities&nbsp;may&nbsp;implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;some<br>
+logic&nbsp;which&nbsp;changes&nbsp;their&nbsp;graphical&nbsp;<br>
+representation&nbsp;on&nbsp;every&nbsp;frame,&nbsp;yielding<br>
+an&nbsp;animation.<br>
+process_ChangeStateEvent()&nbsp;is&nbsp;always<br>
+called&nbsp;after&nbsp;<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>()&nbsp;etc.,<br>
+so&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;already&nbsp;knows&nbsp;about&nbsp;the&nbsp;result<br>
+of&nbsp;the&nbsp;action.<br>
+The&nbsp;PresentationEngine&nbsp;may&nbsp;provide&nbsp;the&nbsp;number<br>
+of&nbsp;frames&nbsp;for&nbsp;the&nbsp;movement&nbsp;and&nbsp;the&nbsp;framerate.<br>
+Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;different<br>
+frame&nbsp;rates&nbsp;by&nbsp;adjusting&nbsp;how&nbsp;many&nbsp;frames<br>
+an&nbsp;image&nbsp;is&nbsp;shown.&nbsp;The&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;advised<br>
+to&nbsp;stop&nbsp;the&nbsp;animation&nbsp;once&nbsp;the&nbsp;number<br>
+of&nbsp;frames&nbsp;given&nbsp;has&nbsp;passed,&nbsp;but&nbsp;it&nbsp;does<br>
+not&nbsp;need&nbsp;to&nbsp;do&nbsp;so.<br>
+The&nbsp;default&nbsp;implementation&nbsp;sets&nbsp;<a href="#Entity">Entity</a>.state<br>
+to&nbsp;the&nbsp;state&nbsp;given.</tt></dd></dl>
 
 <dl><dt><a name="Entity-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>The&nbsp;<a href="#MovesToEvent">MovesToEvent</a>&nbsp;is&nbsp;supplied&nbsp;to&nbsp;the<br>
 <a href="#Entity">Entity</a>&nbsp;so&nbsp;it&nbsp;can&nbsp;update&nbsp;its&nbsp;location.<br>
@@ -407,88 +426,6 @@ attach&nbsp;it&nbsp;to&nbsp;the&nbsp;instance&nbsp;of&nbsp;the&nbsp;<a href="#En
 &nbsp;<br>
 logger&nbsp;finally&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.</tt></dd></dl>
 
-<dl><dt><a name="Entity-starts_dropping"><strong>starts_dropping</strong></a>(self, frames, framerate)</dt><dd><tt>The&nbsp;PresentationEngine&nbsp;makes&nbsp;dropped&nbsp;objects<br>
-disappear&nbsp;in&nbsp;the&nbsp;inventory&nbsp;and&nbsp;appear<br>
-on&nbsp;the&nbsp;map,&nbsp;but&nbsp;does&nbsp;not&nbsp;enforce&nbsp;any&nbsp;<br>
-animation.&nbsp;It&nbsp;calls&nbsp;this&nbsp;method&nbsp;to&nbsp;<br>
-signal&nbsp;that&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;starts&nbsp;picking&nbsp;<br>
-up&nbsp;something&nbsp;now.&nbsp;Entities&nbsp;may&nbsp;<br>
-implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;some&nbsp;logic&nbsp;which&nbsp;<br>
-changes&nbsp;their&nbsp;graphical&nbsp;representation&nbsp;<br>
-on&nbsp;every&nbsp;frame,&nbsp;yielding&nbsp;an&nbsp;animation.<br>
-The&nbsp;PresentationEngine&nbsp;provides&nbsp;the&nbsp;number&nbsp;of<br>
-frames&nbsp;for&nbsp;the&nbsp;action&nbsp;and&nbsp;the&nbsp;framerate.<br>
-Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;different<br>
-frame&nbsp;rates&nbsp;by&nbsp;adjusting&nbsp;how&nbsp;many&nbsp;frames<br>
-an&nbsp;image&nbsp;is&nbsp;shown.&nbsp;The&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;advised<br>
-to&nbsp;stop&nbsp;the&nbsp;animation&nbsp;once&nbsp;the&nbsp;number<br>
-of&nbsp;frames&nbsp;given&nbsp;has&nbsp;passed,&nbsp;but&nbsp;it&nbsp;does<br>
-not&nbsp;need&nbsp;to&nbsp;do&nbsp;so.<br>
-The&nbsp;default&nbsp;implementation&nbsp;simply&nbsp;sets&nbsp;<br>
-the&nbsp;variable&nbsp;self.<strong>picks_up</strong>&nbsp;to&nbsp;True.</tt></dd></dl>
-
-<dl><dt><a name="Entity-starts_moving"><strong>starts_moving</strong></a>(self, frames, framerate)</dt><dd><tt>The&nbsp;PresentationEngine&nbsp;is&nbsp;responsible&nbsp;for&nbsp;the<br>
-gradual&nbsp;movement&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;to&nbsp;the<br>
-target,&nbsp;but&nbsp;not&nbsp;for&nbsp;the&nbsp;animation.&nbsp;It<br>
-calls&nbsp;this&nbsp;method&nbsp;once&nbsp;to&nbsp;signal&nbsp;that<br>
-the&nbsp;<a href="#Entity">Entity</a>&nbsp;starts&nbsp;moving&nbsp;now.&nbsp;Entities<br>
-may&nbsp;implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;some&nbsp;logic<br>
-which&nbsp;changes&nbsp;their&nbsp;graphical&nbsp;<br>
-representation&nbsp;on&nbsp;every&nbsp;frame,&nbsp;yielding<br>
-an&nbsp;animation.&nbsp;<a href="#Entity-starts_moving">starts_moving</a>()&nbsp;is&nbsp;always<br>
-called&nbsp;after&nbsp;<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>(),&nbsp;so<br>
-the&nbsp;<a href="#Entity">Entity</a>&nbsp;knows&nbsp;about&nbsp;the&nbsp;direction.<br>
-The&nbsp;PresentationEngine&nbsp;provides&nbsp;the&nbsp;number&nbsp;of<br>
-frames&nbsp;for&nbsp;the&nbsp;movement&nbsp;and&nbsp;the&nbsp;framerate.<br>
-Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;different<br>
-frame&nbsp;rates&nbsp;by&nbsp;adjusting&nbsp;how&nbsp;many&nbsp;frames<br>
-an&nbsp;image&nbsp;is&nbsp;shown.&nbsp;The&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;advised<br>
-to&nbsp;stop&nbsp;the&nbsp;animation&nbsp;once&nbsp;the&nbsp;number<br>
-of&nbsp;frames&nbsp;given&nbsp;has&nbsp;passed,&nbsp;but&nbsp;it&nbsp;does<br>
-not&nbsp;need&nbsp;to&nbsp;do&nbsp;so.<br>
-The&nbsp;default&nbsp;implementation&nbsp;simply&nbsp;sets<br>
-the&nbsp;variable&nbsp;self.<strong>moves</strong>&nbsp;to&nbsp;True.</tt></dd></dl>
-
-<dl><dt><a name="Entity-starts_picking_up"><strong>starts_picking_up</strong></a>(self, frames, framerate)</dt><dd><tt>The&nbsp;PresentationEngine&nbsp;makes&nbsp;picked&nbsp;up&nbsp;objects<br>
-disappear&nbsp;and&nbsp;appear&nbsp;in&nbsp;the&nbsp;inventory,&nbsp;<br>
-but&nbsp;does&nbsp;not&nbsp;enforce&nbsp;any&nbsp;animation.&nbsp;It&nbsp;<br>
-calls&nbsp;this&nbsp;method&nbsp;to&nbsp;signal&nbsp;that&nbsp;the&nbsp;<br>
-<a href="#Entity">Entity</a>&nbsp;starts&nbsp;picking&nbsp;up&nbsp;something&nbsp;now.&nbsp;<br>
-Entities&nbsp;may&nbsp;implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;some&nbsp;<br>
-logic&nbsp;which&nbsp;changes&nbsp;their&nbsp;graphical&nbsp;<br>
-representation&nbsp;on&nbsp;every&nbsp;frame,&nbsp;yielding&nbsp;<br>
-an&nbsp;animation.<br>
-The&nbsp;PresentationEngine&nbsp;provides&nbsp;the&nbsp;number&nbsp;of<br>
-frames&nbsp;for&nbsp;the&nbsp;action&nbsp;and&nbsp;the&nbsp;framerate.<br>
-Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;different<br>
-frame&nbsp;rates&nbsp;by&nbsp;adjusting&nbsp;how&nbsp;many&nbsp;frames<br>
-an&nbsp;image&nbsp;is&nbsp;shown.&nbsp;The&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;advised<br>
-to&nbsp;stop&nbsp;the&nbsp;animation&nbsp;once&nbsp;the&nbsp;number<br>
-of&nbsp;frames&nbsp;given&nbsp;has&nbsp;passed,&nbsp;but&nbsp;it&nbsp;does<br>
-not&nbsp;need&nbsp;to&nbsp;do&nbsp;so.<br>
-The&nbsp;default&nbsp;implementation&nbsp;simply&nbsp;sets&nbsp;<br>
-the&nbsp;variable&nbsp;self.<strong>picks_up</strong>&nbsp;to&nbsp;True.</tt></dd></dl>
-
-<dl><dt><a name="Entity-starts_speaking"><strong>starts_speaking</strong></a>(self, frames, framerate)</dt><dd><tt>The&nbsp;PresentationEngine&nbsp;displays&nbsp;text&nbsp;spoken&nbsp;<br>
-by&nbsp;the&nbsp;<a href="#Entity">Entity</a>,&nbsp;but&nbsp;does&nbsp;not&nbsp;enforce&nbsp;any<br>
-animation.&nbsp;It&nbsp;calls&nbsp;this&nbsp;method&nbsp;to&nbsp;<br>
-signal&nbsp;that&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;starts&nbsp;speaking<br>
-now.&nbsp;Entities&nbsp;may&nbsp;implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;<br>
-some&nbsp;logic&nbsp;which&nbsp;changes&nbsp;their&nbsp;graphical&nbsp;<br>
-representation&nbsp;on&nbsp;every&nbsp;frame,&nbsp;yielding<br>
-an&nbsp;animation.<br>
-The&nbsp;PresentationEngine&nbsp;provides&nbsp;the&nbsp;number&nbsp;of<br>
-frames&nbsp;for&nbsp;the&nbsp;speaking&nbsp;action&nbsp;and&nbsp;the&nbsp;<br>
-framerate.&nbsp;Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;<br>
-different&nbsp;frame&nbsp;rates&nbsp;by&nbsp;adjusting&nbsp;how&nbsp;<br>
-many&nbsp;frames&nbsp;an&nbsp;image&nbsp;is&nbsp;shown.&nbsp;<br>
-The&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;advised&nbsp;to&nbsp;stop&nbsp;the&nbsp;<br>
-animation&nbsp;once&nbsp;the&nbsp;number&nbsp;of&nbsp;frames&nbsp;<br>
-given&nbsp;has&nbsp;passed,&nbsp;but&nbsp;it&nbsp;does&nbsp;not&nbsp;need&nbsp;<br>
-to&nbsp;do&nbsp;so.<br>
-The&nbsp;default&nbsp;implementation&nbsp;simply&nbsp;sets&nbsp;<br>
-the&nbsp;variable&nbsp;self.<strong>speaks</strong>&nbsp;to&nbsp;True.</tt></dd></dl>
-
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
@@ -508,7 +445,7 @@ by&nbsp;this&nbsp;event.</tt></dd></dl>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="InitEvent">class <strong>InitEvent</strong></a></font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="InitEvent">class <strong>InitEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;event&nbsp;is&nbsp;sent&nbsp;once&nbsp;by&nbsp;the&nbsp;client&nbsp;upon&nbsp;startup.<br>
@@ -624,17 +561,25 @@ entities.</tt></dd></dl>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PerceptionEvent">class <strong>PerceptionEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="PerceptionEvent">class <strong>PerceptionEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;perception&nbsp;for&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC<br>
 issued&nbsp;by&nbsp;the&nbsp;server,&nbsp;usually&nbsp;the&nbsp;result&nbsp;of&nbsp;<br>
-a&nbsp;<a href="#TriesToLookAtEvent">TriesToLookAtEvent</a>.<br>&nbsp;</tt></td></tr>
+a&nbsp;<a href="#TriesToLookAtEvent">TriesToLookAtEvent</a>.&nbsp;Note&nbsp;that&nbsp;a&nbsp;<a href="#PerceptionEvent">PerceptionEvent</a><br>
+may&nbsp;be&nbsp;issued&nbsp;by&nbsp;the&nbsp;server&nbsp;without&nbsp;any&nbsp;previous<br>
+attempts&nbsp;by&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;affected.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="shard.html#PerceptionEvent">PerceptionEvent</a></dd>
+<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
+<dd><a href="shard.html#Event">Event</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
 <dl><dt><a name="PerceptionEvent-__init__"><strong>__init__</strong></a>(self, identifier, perception)</dt><dd><tt>perception&nbsp;is&nbsp;a&nbsp;string&nbsp;to&nbsp;be&nbsp;displayed<br>
-by&nbsp;the&nbsp;client.&nbsp;When&nbsp;used&nbsp;with&nbsp;an&nbsp;NPC,&nbsp;this<br>
-could&nbsp;be&nbsp;used&nbsp;to&nbsp;feed&nbsp;a&nbsp;memory&nbsp;database.</tt></dd></dl>
+by&nbsp;the&nbsp;client.&nbsp;Note:&nbsp;When&nbsp;used&nbsp;with&nbsp;an&nbsp;NPC,<br>
+this&nbsp;could&nbsp;feed&nbsp;a&nbsp;memory&nbsp;database.</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -724,7 +669,8 @@ speak.<br>&nbsp;</tt></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;various&nbsp;events&nbsp;issued&nbsp;by&nbsp;the<br>
-server,&nbsp;including&nbsp;map&nbsp;and&nbsp;room&nbsp;events.<br>&nbsp;</tt></td></tr>
+server&nbsp;that&nbsp;are&nbsp;no&nbsp;ConfirmEvents,&nbsp;including<br>
+map&nbsp;and&nbsp;room&nbsp;events.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods inherited from <a href="shard.html#Event">Event</a>:<br>
 <dl><dt><a name="ServerEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
@@ -756,7 +702,7 @@ appropriate,&nbsp;providing&nbsp;an&nbsp;error&nbsp;description.<br>&nbsp;</tt><
 <font color="#000000" face="helvetica, arial"><a name="SpawnEvent">class <strong>SpawnEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;creates&nbsp;the&nbsp;player&nbsp;or&nbsp;a&nbsp;new&nbsp;item&nbsp;/&nbsp;NPC&nbsp;on&nbsp;the&nbsp;map.<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt>This&nbsp;event&nbsp;creates&nbsp;the&nbsp;player&nbsp;/&nbsp;new&nbsp;item&nbsp;/&nbsp;NPC&nbsp;on&nbsp;the&nbsp;map.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="shard.html#SpawnEvent">SpawnEvent</a></dd>
@@ -811,14 +757,14 @@ Methods defined here:<br>
 <dl><dt><a name="TriesToDropEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, target_identifier)</dt><dd><tt>An&nbsp;attempt&nbsp;to&nbsp;drop&nbsp;the&nbsp;item&nbsp;identified&nbsp;by<br>
 item_identifier.&nbsp;When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;<br>
 target_identifier&nbsp;must&nbsp;describe&nbsp;the&nbsp;<br>
-desired&nbsp;direction.&nbsp;The&nbsp;PyGameClient<br>
-uses&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;of&nbsp;<br>
-"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".&nbsp;Note&nbsp;<br>
-that&nbsp;this&nbsp;attempt&nbsp;can&nbsp;turn&nbsp;out&nbsp;as&nbsp;a&nbsp;"use"&nbsp;<br>
-action,&nbsp;for&nbsp;example&nbsp;when&nbsp;dropping&nbsp;a&nbsp;key&nbsp;<br>
-on&nbsp;a&nbsp;padlock.&nbsp;In&nbsp;this&nbsp;case,&nbsp;the&nbsp;server&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;with&nbsp;an&nbsp;item&nbsp;<br>
+desired&nbsp;direction.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;of&nbsp;<br>
+"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+Note&nbsp;that&nbsp;this&nbsp;attempt&nbsp;can&nbsp;turn&nbsp;out&nbsp;as&nbsp;a<br>
+"use"&nbsp;action,&nbsp;for&nbsp;example&nbsp;when&nbsp;dropping<br>
+a&nbsp;key&nbsp;on&nbsp;a&nbsp;padlock.&nbsp;In&nbsp;this&nbsp;case,&nbsp;the<br>
+server&nbsp;replaces&nbsp;the&nbsp;direction&nbsp;with&nbsp;an&nbsp;item&nbsp;<br>
 identifier&nbsp;and&nbsp;passes&nbsp;that&nbsp;on&nbsp;to&nbsp;the<br>
 story&nbsp;engine.</tt></dd></dl>
 
@@ -841,9 +787,9 @@ element&nbsp;or&nbsp;an&nbsp;item<br>&nbsp;</tt></td></tr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToLookAtEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
@@ -870,9 +816,9 @@ manipulate&nbsp;an&nbsp;item.&nbsp;NPCs&nbsp;cannot&nbsp;be&nbsp;manipulated.<br
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToManipulateEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
@@ -899,9 +845,9 @@ awaiting&nbsp;server&nbsp;confirmation.<br>&nbsp;</tt></td></tr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToMoveEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
@@ -929,9 +875,9 @@ or&nbsp;answered&nbsp;with&nbsp;an&nbsp;error.<br>&nbsp;</tt></td></tr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToPickUpEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
@@ -959,9 +905,9 @@ It&nbsp;is&nbsp;not&nbsp;possible&nbsp;to&nbsp;talk&nbsp;to&nbsp;items.<br>&nbsp
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToTalkToEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
 must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.&nbsp;The&nbsp;PyGameClient&nbsp;uses&nbsp;a&nbsp;<br>
-two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements,&nbsp;so&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
+the&nbsp;attempt.<br>
+On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
+elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
 of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>

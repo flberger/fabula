@@ -19,17 +19,20 @@
 # Events
 
 class Event:
-    """Shard event base class."""
+    """Shard event base class.
+    """
 
     def __init__(self, identifier):
         """This constructor must be called with
            an unique identifier for the object
            (player, item, NPC) which is affected
-           by this event."""
+           by this event.
+        """
         # By defining it here, the variable is
         # part of the instance object, not the
         # class object. See "Class definitions"
         # in the Python Reference Manual.
+        #
         self.identifier = identifier
 
 ####################
@@ -37,69 +40,81 @@ class Event:
 
 class AttemptEvent(Event):
     """This is the base class for attempt events
-       by the player or NPCs."""
+       by the player or NPCs.
+    """
 
     def __init__(self, identifier, target_identifier):
         """When sent by the client, target_identifier
            must describe the desired direction of
-           the attempt. The PyGameClient uses a 
-           two-dimensional map with rectangular
-           elements, so target_identifier may be one 
+           the attempt.
+           On a two-dimensional map with rectangular
+           elements target_identifier may be one 
            of "N", "NE", "E", "SE", "S", "SW", "W", "NW".
            The server determines what is being 
            looked at / picked up / manipulated / 
            talked to in that direction, and 
            replaces the direction string with an item, 
-           NPC or player identifier if appropriate."""
+           NPC or player identifier if appropriate.
+        """
         self.identifier = identifier
+
         self.target_identifier = target_identifier
 
 class TriesToMoveEvent(AttemptEvent):
     """Issued when the player or an NPC wants to move, 
-       awaiting server confirmation."""
+       awaiting server confirmation.
+    """
     pass
 
 class TriesToLookAtEvent(AttemptEvent):
     """Issued when the player or an NPC looks at a map 
-       element or an item"""
+       element or an item
+    """
     pass
 
 class TriesToPickUpEvent(AttemptEvent):
     """Issued when the player or an NPC tries to pick up
        an item. Attempts to pick up NPCs are discarded 
-       or answered with an error."""
+       or answered with an error.
+    """
     pass
 
 class TriesToDropEvent(AttemptEvent):
-    """The player or NPC tries to drop an item."""
+    """The player or NPC tries to drop an item.
+    """
 
     def __init__(self, identifier, item_identifier, target_identifier):
         """An attempt to drop the item identified by
            item_identifier. When sent by the client, 
            target_identifier must describe the 
-           desired direction. The PyGameClient
-           uses a two-dimensional map with rectangular
-           elements, so target_identifier may be one of 
-           "N", "NE", "E", "SE", "S", "SW", "W", "NW". Note 
-           that this attempt can turn out as a "use" 
-           action, for example when dropping a key 
-           on a padlock. In this case, the server 
-           replaces the direction with an item 
+           desired direction.
+           On a two-dimensional map with rectangular
+           elements target_identifier may be one of 
+           "N", "NE", "E", "SE", "S", "SW", "W", "NW".
+           Note that this attempt can turn out as a
+           "use" action, for example when dropping
+           a key on a padlock. In this case, the
+           server replaces the direction with an item 
            identifier and passes that on to the
-           story engine."""
+           story engine.
+        """
         self.identifier = identifier
+
         self.item_identifier = item_identifier
+
         self.target_identifier = target_identifier
 
 class TriesToManipulateEvent(AttemptEvent):
     """Issued when the player or an NPC tries to
-       manipulate an item. NPCs cannot be manipulated."""
+       manipulate an item. NPCs cannot be manipulated.
+    """
     pass
 
 class TriesToTalkToEvent(AttemptEvent):
     """Issued when the player or an NPC wants to start 
        a conversation with another entity.
-       It is not possible to talk to items."""
+       It is not possible to talk to items.
+    """
     pass
 
 ####################
@@ -107,28 +122,35 @@ class TriesToTalkToEvent(AttemptEvent):
 
 class ConfirmEvent(Event):
     """This is the base class for server confirmations
-       of attempt events."""
+       of attempt events.
+    """
     pass
 
 class MovesToEvent(ConfirmEvent):
-    """This is the server confirmation of a movement."""
+    """This is the server confirmation of a movement.
+    """
 
     def __init__(self, identifier, direction):
         """direction is a description as in
-           the TriesToMoveEvent."""
+           the TriesToMoveEvent.
+        """
         self.identifier = identifier
+
         self.direction = direction
 
 class PicksUpEvent(ConfirmEvent):
     """This is a server confirmation of a
        TriesToPickUpEvent issued by the player
-       or an NPC."""
+       or an NPC.
+    """
 
     def __init__(self, identifier, item_identifier):
         """item_identifier identifies the item to
            pick up. This item should be known to
-           the client."""
+           the client.
+        """
         self.identifier = identifier
+
         self.item_identifier = item_identifier
 
 class DropsEvent(ConfirmEvent):
@@ -137,16 +159,20 @@ class DropsEvent(ConfirmEvent):
        or an NPC.
        This event does normally not occur when the
        drop action evaluates to a "use with" action, 
-       as described in TriesToDropEvent. I that case
+       as described in TriesToDropEvent. In that case
        the item stays in the posession of its owner, 
-       and some other events are issued."""
+       and some other events are issued.
+    """
 
     def __init__(self, identifier, item_identifier, direction):
         """item_identifier identifies the item to be 
            dropped on the map. direction is a 
-           description as in the TriesToMoveEvent."""
+           description as in the TriesToMoveEvent.
+        """
         self.identifier = identifier
+
         self.item_identifier = item_identifier
+
         self.direction = direction
 
 class CanSpeakEvent(ConfirmEvent):
@@ -154,14 +180,17 @@ class CanSpeakEvent(ConfirmEvent):
        an NPC to speak. Since this event requires
        immediate user input, it is always executed
        as the last event of a Message by the 
-       PresentationEngine."""
+       PresentationEngine.
+    """
 
     def __init__(self, identifier, sentences):
         """sentences is a list of strings for the
            player or NPC to choose from. If this list
            is empty, the client should offer a free-form
-           text input."""
+           text input.
+        """
         self.identifier = identifier
+
         self.sentences = sentences
 
 class AttemptFailedEvent(ConfirmEvent):
@@ -169,23 +198,29 @@ class AttemptFailedEvent(ConfirmEvent):
        server announcement that the last AttemptEvent
        sent by the entity identified by identifier
        failed. This should unblock the entity and
-       allow new attempts."""
+       allow new attempts.
+    """
     pass
 
-####################
-# Unclassified events without a special base class
-
-class PerceptionEvent(Event):
+class PerceptionEvent(ConfirmEvent):
     """This is a perception for the player or an NPC
        issued by the server, usually the result of 
-       a TriesToLookAtEvent."""
+       a TriesToLookAtEvent. Note that a PerceptionEvent
+       may be issued by the server without any previous
+       attempts by the Entity affected.
+    """
 
     def __init__(self, identifier, perception):
         """perception is a string to be displayed
-           by the client. When used with an NPC, this
-           could be used to feed a memory database."""
+           by the client. Note: When used with an NPC,
+           this could feed a memory database.
+        """
         self.identifier = identifier
+
         self.perception = perception
+
+####################
+# Unclassified events without a special base class
 
 class SaysEvent(Event):
     """This normally is a reaction to the CanSpeakEvent, 
@@ -193,32 +228,33 @@ class SaysEvent(Event):
        in that case a SaysEvent is issued by he Story 
        Engine. Players usually have to send an 
        TriesToTalkToEvent before they are allowed to
-       speak."""
+       speak.
+    """
 
     def __init__(self, identifier, text):
-        """text is a string to be spoken by the entity."""
+        """text is a string to be spoken by the entity.
+        """
         self.identifier = identifier
+
         self.text = text
 
-class CustomEntityEvent(Event):
-    """Shard Game Entities (the player, NPCs, items) may
-       be able to change state, graphics or animations.
-       Since these may be very customized actions, they
-       are not defined here. Instead, the server can
-       issue a CustomEntityEvent to trigger such a 
-       custom action in the entity.
-       A CustomEntityEvent should feed an internal
-       queue of an Entity. All CustonEntityEvents of a
-       Message are passed to the Entity before the
-       Message is rendered by the PresentationEngine. They
-       are not supplied in real time during the rendering."""
+class ChangeStateEvent(Event):
+    """Each instance of shard.Entity has a state.
+       This Event is issued to trigger a state
+       change.
+    """
 
-    def __init__(self, identifier, key_value_dict):
-        """key_value_dict is a Python dictionary 
-           containing the parameters of the custom
-           event."""
+    # ChangeState is based on a concept by Alexander Marbach.
+
+    def __init__(self, identifier, state):
+        """state is the new state for the Entity
+           identified by identifier. In the simplest
+           case state may be a number or a verbose
+           string.
+        """
         self.identifier = identifier
-        self.key_value_dict = key_value_dict
+
+        self.state = state
 
 ####################
 # Passive events
@@ -226,34 +262,41 @@ class CustomEntityEvent(Event):
 class PassiveEvent(Event):
     """The base class for events concerning items
        ot NPCs when they are being passed, looked at, 
-       picked up and the like."""
+       picked up and the like.
+    """
 
     def __init__(self, identifier, trigger_identifier):
         """The trigger_identifier identifies the
            entity that triggered the event. This makes it
            possible to react differently to several
-           entities."""
+           entities.
+        """
         self.identifier = identifier
+
         self.trigger_identifier = trigger_identifier
 
 class PassedEvent(PassiveEvent):
     """Issued by the server when an item or an NPC is
-       being passed by the player or an NPC."""
+       being passed by the player or an NPC.
+    """
     pass
 
 class LookedAtEvent(PassiveEvent):
     """Issued by the server when an item or NPC is
-       being looked at by the player or an NPC."""
+       being looked at by the player or an NPC.
+    """
     pass
 
 class PickedUpEvent(PassiveEvent):
     """Issued by the server when an item is being
-       picked up by the player or an NPC."""
+       picked up by the player or an NPC.
+    """
     pass
 
 class DroppedEvent(PassiveEvent):
     """Issued by the server when an item is being
-       dropped by the player or an NPC."""
+       dropped by the player or an NPC.
+    """
     pass
 
 ####################
@@ -261,24 +304,29 @@ class DroppedEvent(PassiveEvent):
 
 class ServerEvent(Event):
     """Base class for various events issued by the
-       server, including map and room events."""
+       server that are no ConfirmEvents, including
+       map and room events.
+    """
     pass
 
 class SpawnEvent(ServerEvent):
-    """This event creates the player or a new item / NPC on the map."""
+    """This event creates the player / new item / NPC on the map.
+    """
 
     def __init__(self, entity):
         """Entity is an instance of shard.Entity, 
            having a type, identifier, location and
            assets. The server stores the relevant
            information and passes the entity on to
-           the client."""
+           the client.
+        """
         self.entity = entity
 
 class DeleteEvent(ServerEvent):
     """This event deletes an item or NPC from the map.
        Note that items may still persist in the players
-       posessions."""
+       posessions.
+    """
     pass
 
 class EnterRoomEvent(ServerEvent):
@@ -286,18 +334,22 @@ class EnterRoomEvent(ServerEvent):
        room. Events building the map and spawning the
        player, items and NPCs should follow. The room 
        is done and can be used when the server issues 
-       RoomCompleteEvent."""
+       RoomCompleteEvent.
+    """
 
     def __init__(self):
-        """This event has no parameters."""
+        """This event has no parameters.
+        """
         pass
 
 class RoomCompleteEvent(ServerEvent):
     """Issued by the server after an EnterRoomEvent when
-       the room is populated with a map, items and NPCs."""
+       the room is populated with a map, items and NPCs.
+    """
 
     def __init__(self):
-        """This event has no parameters."""
+        """This event has no parameters.
+        """
         pass
 
 class ChangeMapElementEvent(ServerEvent):
@@ -305,7 +357,8 @@ class ChangeMapElementEvent(ServerEvent):
        two-dimensional map. When sent in a Message, 
        these events are executed immediately and
        in parallel upon the rendering of the
-       Message by the PresentationEngine."""
+       Message by the PresentationEngine.
+    """
     
     def __init__(self, tile, location):
         """tile is a shard map object having a type 
@@ -316,8 +369,10 @@ class ChangeMapElementEvent(ServerEvent):
            possibly only a string like "lobby".
            The server stores the relevant
            information and passes the tile and the
-           location on to the client."""
+           location on to the client.
+        """
         self.tile = tile
+
         self.location = location
 
 ####################
@@ -333,7 +388,7 @@ class ChangeMapElementEvent(ServerEvent):
 #         """Client events have no parameters."""
 #         pass
 
-class InitEvent():
+class InitEvent(Event):
     """This event is sent once by the client upon startup.
        It asks the server to supply anything that is needed
        to update the client to the current game state -
@@ -498,122 +553,44 @@ class Entity:
 
         self.location = (new_x, new_y)
 
-    def process_CustomEntityEvent(self, key_value_dict):
-        """This method is called by the Client with
-           the key-value dict of an CustomEntityEvent
-           which possibly changes the client state. 
-           The interpretation of CustomEntityEvents 
-           is entirely up to the Entity. The default 
-           implementation does nothing, so you 
-           should override it."""
-        pass
-
-    def starts_moving(self, frames, framerate):
-        """The PresentationEngine is responsible for the
+    def change_state(self, state, frames=None, framerate=None):
+        """Called when the state of the Entity is
+           changed from outside.
+           The PresentationEngine is responsible for the
            gradual movement of the Entity to the
-           target, but not for the animation. It
-           calls this method once to signal that
-           the Entity starts moving now. Entities
-           may implement a flag or some logic
-           which changes their graphical 
-           representation on every frame, yielding
-           an animation. starts_moving() is always
-           called after process_MovesToEvent(), so
-           the Entity knows about the direction.
-           The PresentationEngine provides the number of
-           frames for the movement and the framerate.
-           Thus the entity can adapt to different
-           frame rates by adjusting how many frames
-           an image is shown. The Entity is advised
-           to stop the animation once the number
-           of frames given has passed, but it does
-           not need to do so.
-           The default implementation simply sets
-           the variable self.moves to True."""
-        self.moves = True
-
-#    def stopsMoving(self):
-#        """Called when the PresentationEngine has
-#           completed the movement. This should
-#           trigger a stop of the movement 
-#           animation. The default implementation
-#           sets self.moves to False."""
-#        self.moves = False
-
-    def starts_speaking(self, frames, framerate):
-        """The PresentationEngine displays text spoken 
-           by the Entity, but does not enforce any
-           animation. It calls this method to 
-           signal that the Entity starts speaking
-           now. Entities may implement a flag or 
-           some logic which changes their graphical 
-           representation on every frame, yielding
-           an animation.
-           The PresentationEngine provides the number of
-           frames for the speaking action and the 
-           framerate. Thus the entity can adapt to 
-           different frame rates by adjusting how 
-           many frames an image is shown. 
-           The Entity is advised to stop the 
-           animation once the number of frames 
-           given has passed, but it does not need 
-           to do so.
-           The default implementation simply sets 
-           the variable self.speaks to True."""
-        self.speaks = True
-
-#    def stopsSpeaking(self):
-#        """Called when the PresentationEngine is about
-#           to erase the spoken text from the 
-#           screen. This should trigger a stop of 
-#           the speaking animation. The default 
-#           implementation sets self.speaks
-#           to False."""
-#        self.speaks = False
-
-    def starts_picking_up(self, frames, framerate):
-        """The PresentationEngine makes picked up objects
+           target, the display of text spoken 
+           by the Entity, making picked up objects
            disappear and appear in the inventory, 
-           but does not enforce any animation. It 
-           calls this method to signal that the 
-           Entity starts picking up something now. 
-           Entities may implement a flag or some 
+           but not for any Entity animation.
+           Instead, the PresentationEngine will
+           call this method with the following states:
+           "MOVING"
+           "SPEAKING"
+           "PICKING_UP"
+           "DROPPING"
+           to signal that the Entity starts the action
+           now. Entities may implement a flag or some
            logic which changes their graphical 
-           representation on every frame, yielding 
+           representation on every frame, yielding
            an animation.
-           The PresentationEngine provides the number of
-           frames for the action and the framerate.
+           change_state() is always called after
+           process_MovesToEvent() etc., so the Entity
+           already knows about the result of the action.
+           The PresentationEngine may provide the number
+           of frames for the movement and the framerate.
            Thus the entity can adapt to different
            frame rates by adjusting how many frames
            an image is shown. The Entity is advised
            to stop the animation once the number
            of frames given has passed, but it does
            not need to do so.
-           The default implementation simply sets 
-           the variable self.picks_up to True."""
-        self.picks_up = True
+           The default implementation sets Entity.state
+           to the state given.
+        """
 
-    def starts_dropping(self, frames, framerate):
-        """The PresentationEngine makes dropped objects
-           disappear in the inventory and appear
-           on the map, but does not enforce any 
-           animation. It calls this method to 
-           signal that the Entity starts picking 
-           up something now. Entities may 
-           implement a flag or some logic which 
-           changes their graphical representation 
-           on every frame, yielding an animation.
-           The PresentationEngine provides the number of
-           frames for the action and the framerate.
-           Thus the entity can adapt to different
-           frame rates by adjusting how many frames
-           an image is shown. The Entity is advised
-           to stop the animation once the number
-           of frames given has passed, but it does
-           not need to do so.
-           The default implementation simply sets 
-           the variable self.picks_up to True."""
-        self.drops = True
+        # ChangeState is based on a concept by Alexander Marbach.
+
+        self.state = state
 
 ############################################################
 # Tiles

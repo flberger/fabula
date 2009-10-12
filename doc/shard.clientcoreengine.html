@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="shard.html"><font color="#ffffff">shard</font></a>.clientcoreengine</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/doc-cleanup/shard/clientcoreengine.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/doc-cleanup/shard/clientcoreengine.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/clientcoreengine.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/clientcoreengine.py</a></font></td></tr></table>
     <p><tt>Shard&nbsp;Client&nbsp;Core&nbsp;Engine</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -67,9 +67,6 @@ a&nbsp;dict&nbsp;of&nbsp;dicts&nbsp;with&nbsp;x-&nbsp;and<br>
 y-coordinates&nbsp;as&nbsp;keys.&nbsp;Also&nbsp;save<br>
 it&nbsp;for&nbsp;the&nbsp;PresentationEngine.</tt></dd></dl>
 
-<dl><dt><a name="ClientCoreEngine-process_CustomEntityEvent"><strong>process_CustomEntityEvent</strong></a>(self, event, message)</dt><dd><tt>The&nbsp;key-value&nbsp;dict&nbsp;of&nbsp;a&nbsp;CustomEntiyEvent&nbsp;<br>
-is&nbsp;just&nbsp;passed&nbsp;on&nbsp;to&nbsp;the&nbsp;Entity.</tt></dd></dl>
-
 <dl><dt><a name="ClientCoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event, message)</dt><dd><tt>Save&nbsp;the&nbsp;Entity&nbsp;to&nbsp;be&nbsp;deleted&nbsp;in&nbsp;the<br>
 deleted_entities_dict&nbsp;for&nbsp;the&nbsp;<br>
 PresentationEngine,&nbsp;then&nbsp;remove&nbsp;it&nbsp;from&nbsp;the<br>
@@ -100,6 +97,10 @@ to&nbsp;process&nbsp;events.</tt></dd></dl>
 <hr>
 Methods inherited from <a href="shard.coreengine.html#CoreEngine">shard.coreengine.CoreEngine</a>:<br>
 <dl><dt><a name="ClientCoreEngine-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
+The&nbsp;default&nbsp;implementation&nbsp;adds<br>
+the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_ChangeStateEvent"><strong>process_ChangeStateEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 

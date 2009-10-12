@@ -301,12 +301,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #
     #    pass
 
-    def process_CustomEntityEvent(self, event, message):
-        """The key-value dict of a CustomEntiyEvent 
-           is just passed on to the Entity."""
-
-        self.entity_dict[event.identifier].process_CustomEntityEvent(event.key_value_dict)
-
     #def process_PerceptionEvent(self, event, message):
     #    """A perception must be displayed by the 
     #       PresentationEngine, so it is queued in a Message passed

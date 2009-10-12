@@ -85,9 +85,10 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.info("complete")
 
     def run(self):
-        """This is the main loop of a CoreEngine. Put all
-           the business logic here. This is a blocking method
-           which calls all the process methods to process events.
+        """This is the main loop of a CoreEngine.
+           Put all the business logic here. This
+           is a blocking method which should call
+           all the process methods to process events.
         """
 
         self.logger.info("starting")
@@ -249,7 +250,13 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
-    def process_CustomEntityEvent(self, event, message):
+    def process_ChangeStateEvent(self, event, message):
+        """The new state
+           is just passed on to the Entity."""
+
+        self.entity_dict[event.identifier].change_state(event.state)
+
+    def process_ChangeStateEvent(self, event, message):
         """Process the Event.
            The default implementation adds
            the event to the message.

@@ -51,8 +51,8 @@ class EventProcessor:
                                self.process_PerceptionEvent,
                            shard.SaysEvent :
                                self.process_SaysEvent,
-                           shard.CustomEntityEvent :
-                               self.process_CustomEntityEvent,
+                           shard.ChangeStateEvent :
+                               self.process_ChangeStateEvent,
                            shard.PassedEvent :
                                self.process_PassedEvent,
                            shard.LookedAtEvent :
@@ -153,7 +153,7 @@ class EventProcessor:
         """
         pass
 
-    def process_CustomEntityEvent(self, event):
+    def process_ChangeStateEvent(self, event):
         """Process the Event.
            The default implementation does nothing.
         """
