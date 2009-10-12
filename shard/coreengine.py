@@ -1,10 +1,10 @@
 """Shard Core Engine Base Class
 
-   Work started on 30. Sep 2009
-
    Based on former implementations of
    the ClientControlEngine
 """
+
+# Work started on 30. Sep 2009
 
 import shard
 import shard.eventprocessor

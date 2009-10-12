@@ -1,7 +1,7 @@
 """Shard Core Engine Plugin Base Class
- 
-   Work started on 30. Sep 2009
 """
+
+# Work started on 30. Sep 2009
 
 import shard           
 

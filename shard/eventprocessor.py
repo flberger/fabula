@@ -1,7 +1,7 @@
 """Shard Event Processor Base Class
-
-   Work started on 01. Oct 2009
 """
+
+# Work started on 01. Oct 2009
 
 import shard
 

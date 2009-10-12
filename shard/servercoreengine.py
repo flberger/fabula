@@ -1,9 +1,9 @@
 """Shard Server Core Engine
-
-   Started with a dummy implementation on 25. Sep 2009
-
-   Detailed work started on 30. Sep 2009
 """
+
+# Started with a dummy implementation on 25. Sep 2009
+#
+# Detailed work started on 30. Sep 2009
 
 import shard
 import shard.coreengine
