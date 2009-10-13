@@ -314,6 +314,9 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                     message.event_list.append(shard.MovesToEvent(event.identifier,
                                                                  event.target_identifier))
+                else:
+
+                    message.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             except KeyError:
 

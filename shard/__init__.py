@@ -14,6 +14,7 @@
 # TODO: reasonable package docstring above: what is where :)
 # TODO: "%s" % s instead of "s" + "s" in the whole package!
 # TODO: use map() instead of "for" loops
+# TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
 
 ############################################################
 # Events
