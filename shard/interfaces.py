@@ -182,13 +182,15 @@ class MessageBuffer:
             return shard.Message([])
 
 
-class ClientInterface(MessageBuffer, Interface):
-    '''This is the base class for a Shard Client Interface.
+class UDPClientInterface(MessageBuffer, Interface):
+    """This is the base class for a Shard Client Interface.
        Implementations should subclass this one an override
-       the default methods, which showcase a simple example.'''
+       the default methods, which showcase a simple example.
+    """
 
     def __init__(self, address_port_tuple, logger):
-        '''Interface initialization.'''
+        """Interface initialization.
+        """
 
         # First call setup_interface() from the
         # base class
@@ -219,7 +221,7 @@ class ClientInterface(MessageBuffer, Interface):
         self.logger.info("complete")
 
     def handle_messages(self):
-        '''The task of this method is to do whatever is
+        """The task of this method is to do whatever is
            necessary to send client messages and obtain 
            server messages. It is meant to be the back end 
            of send_message() and grab_message(). Put some 
@@ -232,7 +234,8 @@ class ClientInterface(MessageBuffer, Interface):
            has been called, and if so, it should notify
            shutdown() in some way (so that it can return
            True), and then raise SystemExit to stop 
-           the thread.'''
+           the thread.
+        """
 
         self.logger.debug("starting up")
 
@@ -289,13 +292,14 @@ class ClientInterface(MessageBuffer, Interface):
         raise SystemExit
 
 
-class ServerInterface(Interface):
-    '''This is the base class for a Shard Server Interface.
+class UDPServerInterface(Interface):
+    """This is the base class for a Shard Server Interface.
        Implementations should subclass this one an override
-       the default methods, which do nothing.'''
+       the default methods, which do nothing.
+    """
 
     def __init__(self, address_port_tuple, logger):
-        '''Interface initialization.'''
+        """Interface initialization."""
 
         # First call setup_interface() from the
         # base class
@@ -310,7 +314,7 @@ class ServerInterface(Interface):
         self.logger.debug("complete")
 
     def handle_messages(self):
-        '''The task of this method is to do whatever is
+        """The task of this method is to do whatever is
            necessary to send server messages and obtain 
            client messages. It is meant to be the back end 
            of send_message() and grab_message(). Put some 
@@ -323,7 +327,8 @@ class ServerInterface(Interface):
            has been called, and if so, it should notify
            shutdown() in some way (so that it can return
            True), and then raise SystemExit to stop 
-           the thread.'''
+           the thread.
+        """
 
         self.logger.debug("starting up")
 
