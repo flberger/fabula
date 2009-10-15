@@ -259,9 +259,9 @@ class ClientInterface(MessageBuffer, Interface):
 
             try:
 
-                # TODO: pickled messages are rather large. Better use the struct module. :-)
+                # TODO: UDP sockets may lock up on large packets (tested). Use the struct module to encode events and messages.
                 #
-                data_received = self.sock.recv(65536)
+                data_received = self.sock.recv(16384)
 
             except socket.timeout:
 
@@ -276,7 +276,7 @@ class ClientInterface(MessageBuffer, Interface):
 
                 self.logger.debug("received server message (" 
                                   + str(len(data_received))
-                                  + "/65536 bytes)")
+                                  + "/16384 bytes)")
 
                 self.messages_for_local.append(cPickle.loads(data_received))
 
