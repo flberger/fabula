@@ -494,7 +494,13 @@ class TCPClientInterface(MessageBuffer, Interface):
 
                 # -1 = use highest available pickle protocol
                 #
-                self.sock.send(cPickle.dumps(self.messages_for_remote.popleft(), 0))
+                pickled_message = cPickle.dumps(self.messages_for_remote.popleft(), -1)
+
+                # Separating messages with the standard
+                # double newline.
+                # TODO: Check that double newlines are illegal in pickled data.
+                #
+                self.sock.send(pickled_message + "\n\n")
 
             # Now listen for incoming server
             # messages for some time
@@ -521,33 +527,34 @@ class TCPClientInterface(MessageBuffer, Interface):
 
                 self.logger.debug("received server message: %s/32768 bytes" % len(data_received))
 
-                # TODO: This is a hack. Implement a better loop. Implement separators between messages.
-                # TODO: This is of course also an issue on the server side.
+                # Now. Keep reading data from the
+                # socket until we end up with a
+                # double newline terminated message.
                 #
-                try:
-                    message = cPickle.loads(data_received)
-
-                except EOFError:
+                # TODO: This of course only works if some time passes between messages. Otherwise there might already be new data after the double newline.
+                #
+                while not data_received.endswith("\n\n"):
 
                     # The infamous 16k packet issue.
                     #
-                    self.logger.debug("pickle EOF error - reading more data from socket")
-
-                    orig_len = len(data_received)
+                    self.logger.debug("reading more data from socket")
 
                     # Read some more.
                     #
                     data_received = data_received + self.sock.recv(32768)
 
-                    new_len = len(data_received)
+                # Now we have double newline terminated
+                # data in data_received.
 
-                    self.logger.debug("old length %s, new length %s" % (orig_len, new_len))
+                self.logger.debug("read %s characters in total" % len(data_received))
 
-                    message = cPickle.loads(data_received)
+                # Remove newlines
+                #
+                message = cPickle.loads(data_received.rstrip("\n"))
 
-                self.messages_for_local.append(cPickle.loads(data_received))
+                self.messages_for_local.append(message)
 
-        # Caught shutdown notification, stopping thread
+        # Caught shutdown notification
         #
         self.logger.info("shutting down")
 
@@ -557,6 +564,8 @@ class TCPClientInterface(MessageBuffer, Interface):
 
         self.shutdown_confirmed = True
 
+        # Stopping thread
+        #
         raise SystemExit
 
 
@@ -592,12 +601,16 @@ class TCPServerInterface(Interface):
         # client_connections is a dict of MessageBuffer
         # instances, indexed by (address, port) tuples.
         #
+        # TODO: Copied from UDP implementation. Can we get along with a simple list here? Address and port are available through the socket anyway, and there won't be multiple connections from the same client port.
+        #
         self.client_connections = {}
 
         # Set up TCP socket
         #
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         self.sock.bind(self.address_port_tuple)
+
         self.sock.listen(1)
 
         # Server timeout, so server.handle_request()
@@ -634,8 +647,7 @@ class TCPServerInterface(Interface):
             # TODO: several threads for send and receive
 
             try:
-
-                # wait for a connections until the timeout
+                # wait for a connection until the timeout
                 # set above in self.sock.settimeout() occurs
                 #
                 socket_address_tuple = self.sock.accept()
@@ -649,11 +661,14 @@ class TCPServerInterface(Interface):
                 connection_socket = socket_address_tuple[0]
                 address_port_tuple = socket_address_tuple[1]
 
+                # TODO: This check is rather useless. Incoming connections with the same TCP port are very unlikely. Adding the MessageBuffer to a list should do.
+                #
                 if not address_port_tuple in self.client_connections:
 
                     # New client.
 
-                    # Do not forget socket timeout. ;-)
+                    # Do not forget the socket timeout. ;-)
+                    # Otherwise socket operations will block.
                     #
                     connection_socket.settimeout(0.1)
 
@@ -711,10 +726,30 @@ class TCPServerInterface(Interface):
 
                     self.logger.debug("received client message: %s/32768 bytes" % len(data_received))
 
-                    # Append the message to the message buffer.
-                    # (inbetween steps to avoid a long line ;-) )
+                    # Now. Keep reading data from the
+                    # socket until we end up with a
+                    # double newline terminated message.
                     #
-                    message = cPickle.loads(data_received)
+                    # TODO: This of course only works if some time passes between messages. Otherwise there might already be new data after the double newline.
+                    #
+                    while not data_received.endswith("\n\n"):
+
+                        # The infamous 16k packet issue.
+                        #
+                        self.logger.debug("reading more data from socket")
+
+                        # Read some more.
+                        #
+                        data_received = data_received + message_buffer.sock.recv(32768)
+
+                    # Now we have double newline terminated
+                    # data in data_received.
+
+                    self.logger.debug("read %s characters in total" % len(data_received))
+
+                    # Remove newlines
+                    #
+                    message = cPickle.loads(data_received.rstrip("\n"))
 
                     message_buffer.messages_for_local.append(message)
 
@@ -743,7 +778,11 @@ class TCPServerInterface(Interface):
                     pickled_message = cPickle.dumps(message_buffer.messages_for_remote.popleft(),
                                                     -1)
 
-                    bytes = message_buffer.sock.send(pickled_message)
+                    # Separating messages with the standard
+                    # double newline.
+                    # TODO: Check that double newlines are illegal in pickled data.
+                    #
+                    bytes = message_buffer.sock.send(pickled_message + "\n\n")
 
                     self.logger.debug("sent %s bytes" % bytes)
 

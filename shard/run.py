@@ -97,7 +97,6 @@ def run(mode,
                                              logger)
 
     thread.start_new_thread(interface.handle_messages, ())
-    #interface.handle_messages()
 
     # This method will return when the plugin
     # engine sets plugin.exit_requested

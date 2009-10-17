@@ -251,7 +251,6 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             #
             #self.logger.debug("reading client messages")
 
-
         # exit has been requested
         #
         self.logger.info("exit flag set, shutting down interface")
