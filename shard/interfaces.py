@@ -22,6 +22,8 @@ import socket
 import cPickle
 import SocketServer
 
+# Base and helper classes
+
 class Interface:
     """This is a base class for Shard interfaces
        which handle all the network traffic. A
@@ -181,6 +183,8 @@ class MessageBuffer:
             #
             return shard.Message([])
 
+
+# UDP implementation
 
 class UDPClientInterface(MessageBuffer, Interface):
     """This is the base class for a Shard Client Interface.
@@ -359,13 +363,13 @@ class UDPServerInterface(Interface):
                                       + str(self.client_address))
 
                 # Append the message.
-                # (inbetween steps to avoid a loong line ;-) )
+                # (inbetween steps to avoid a long line ;-) )
                 #
                 message = cPickle.loads(self.request[0])
 
-                messagebuffer = client_connections_proxy[self.client_address]
+                message_buffer = client_connections_proxy[self.client_address]
 
-                messagebuffer.messages_for_local.append(message)
+                message_buffer.messages_for_local.append(message)
 
                 # End of handle() method.
 
@@ -395,23 +399,367 @@ class UDPServerInterface(Interface):
             #
             for address_port_tuple in self.client_connections:
 
-                messagebuffer = self.client_connections[address_port_tuple]
+                message_buffer = self.client_connections[address_port_tuple]
 
-                if messagebuffer.messages_for_remote:
+                if message_buffer.messages_for_remote:
 
                     self.logger.debug("sending 1 message of "
-                                      + str(len(messagebuffer.messages_for_remote))
+                                      + str(len(message_buffer.messages_for_remote))
                                       + " to client "
                                       + str(address_port_tuple))
 
                     # -1 = use highest available pickle protocol
                     #
-                    server.socket.sendto(cPickle.dumps(messagebuffer.messages_for_remote.popleft(), -1),
+                    server.socket.sendto(cPickle.dumps(message_buffer.messages_for_remote.popleft(), -1),
                                          address_port_tuple)
 
         # Caught shutdown notification, stopping thread
         #
         self.logger.info("shutting down")
+
+        self.shutdown_confirmed = True
+
+        raise SystemExit
+
+
+# TCP implementation
+
+# TODO: catch socket exceptions (like "connection reset by peer")
+
+class TCPClientInterface(MessageBuffer, Interface):
+    """A Shard Client Interface using TCP.
+    """
+
+    def __init__(self, address_port_tuple, logger):
+        """Interface initialization.
+        """
+
+        # First call setup_interface() from the
+        # base class
+        #
+        self.setup_interface(address_port_tuple, logger)
+
+        # This is a subclass of MessageBuffer, but
+        # since we override __init__(), we have to
+        # call setup_message_buffer().
+        #
+        self.setup_message_buffer()
+
+        # Set up TCP socket
+        #
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.logger.debug("connecting to %s:%s" % address_port_tuple)
+
+        # TODO: handle error
+        #
+        self.sock.connect(self.address_port_tuple)
+
+        self.logger.debug("connect() returned")
+
+        # The socket timeout is used for
+        # socket.recv() operations, which
+        # take turns with socket.sendto().
+        #
+        self.sock.settimeout(0.3)
+
+        self.logger.info("complete")
+
+    def handle_messages(self):
+        """The task of this method is to do whatever is
+           necessary to send client messages and obtain 
+           server messages. It is meant to be the back end 
+           of send_message() and grab_message(). Put some 
+           networking code, a GUI or a random generator 
+           here. 
+           This method is put in a background thread 
+           automatically, so it can do all sorts of 
+           polling or blocking IO.
+           It should regularly check whether shutdown()
+           has been called, and if so, it should notify
+           shutdown() in some way (so that it can return
+           True), and then raise SystemExit to stop 
+           the thread.
+        """
+
+        self.logger.debug("starting up")
+
+        # Run thread as long as no shutdown is requested
+        #
+        while not self.shutdown_flag:
+
+            if self.messages_for_remote:
+
+                self.logger.debug("sending 1 message of %s" % len(self.messages_for_remote))
+
+                # -1 = use highest available pickle protocol
+                #
+                self.sock.send(cPickle.dumps(self.messages_for_remote.popleft(), 0))
+
+            # Now listen for incoming server
+            # messages for some time
+            # (set in __init__()). This will
+            # catch any messages received in
+            # the meantime by the OS (tested).
+            #
+            data_received = ""
+
+            try:
+
+                # TODO: Pickle produces large amounts of data. The struct module with a custom encoding should be used instead.
+                #
+                data_received = self.sock.recv(32768)
+
+            except socket.timeout:
+
+                # We do not log here since this
+                # happens too often
+                #
+                pass
+
+            if data_received:
+
+                self.logger.debug("received server message: %s/32768 bytes" % len(data_received))
+
+                # TODO: This is a hack. Implement a better loop. Implement separators between messages.
+                # TODO: This is of course also an issue on the server side.
+                #
+                try:
+                    message = cPickle.loads(data_received)
+
+                except EOFError:
+
+                    # The infamous 16k packet issue.
+                    #
+                    self.logger.debug("pickle EOF error - reading more data from socket")
+
+                    orig_len = len(data_received)
+
+                    # Read some more.
+                    #
+                    data_received = data_received + self.sock.recv(32768)
+
+                    new_len = len(data_received)
+
+                    self.logger.debug("old length %s, new length %s" % (orig_len, new_len))
+
+                    message = cPickle.loads(data_received)
+
+                self.messages_for_local.append(cPickle.loads(data_received))
+
+        # Caught shutdown notification, stopping thread
+        #
+        self.logger.info("shutting down")
+
+        # This is TCP, so be nice and close the socket.
+        #
+        self.sock.close()
+
+        self.shutdown_confirmed = True
+
+        raise SystemExit
+
+
+class TCPMessageBuffer(MessageBuffer):
+    """A message buffer with a connected
+       socket as attribute.
+    """
+
+    def __init__(self, sock):
+        """Calls setup_message_buffer and
+           sets up the sock attribute.
+        """
+
+        self.setup_message_buffer()
+
+        self.sock = sock
+
+        return
+
+
+class TCPServerInterface(Interface):
+    """A Shard Server Interface using TCP.
+    """
+
+    def __init__(self, address_port_tuple, logger):
+        """Interface initialization."""
+
+        # First call setup_interface() from the
+        # base class
+        #
+        self.setup_interface(address_port_tuple, logger)
+
+        # client_connections is a dict of MessageBuffer
+        # instances, indexed by (address, port) tuples.
+        #
+        self.client_connections = {}
+
+        # Set up TCP socket
+        #
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind(self.address_port_tuple)
+        self.sock.listen(1)
+
+        # Server timeout, so server.handle_request()
+        # doesn't wait forever, which would prevent
+        # shutdown.
+        #
+        self.sock.settimeout(0.1)
+
+        self.logger.debug("complete")
+
+    def handle_messages(self):
+        """The task of this method is to do whatever is
+           necessary to send server messages and obtain 
+           client messages. It is meant to be the back end 
+           of send_message() and grab_message(). Put some 
+           networking code, a GUI or a random generator 
+           here. 
+           This method is put in a background thread 
+           automatically, so it can do all sorts of 
+           polling or blocking IO.
+           It should regularly check whether shutdown()
+           has been called, and if so, it should notify
+           shutdown() in some way (so that it can return
+           True), and then raise SystemExit to stop 
+           the thread.
+        """
+
+        self.logger.debug("starting up")
+
+        # Run thread as long as no shutdown is requested
+        #
+        while not self.shutdown_flag:
+
+            # TODO: several threads for send and receive
+
+            try:
+
+                # wait for a connections until the timeout
+                # set above in self.sock.settimeout() occurs
+                #
+                socket_address_tuple = self.sock.accept()
+
+                # We get here if no timeout occured and a
+                # connection has been made
+
+                # Test for new client,
+                # i.e. not (address, port) tuple in keys
+                #
+                connection_socket = socket_address_tuple[0]
+                address_port_tuple = socket_address_tuple[1]
+
+                if not address_port_tuple in self.client_connections:
+
+                    # New client.
+
+                    # Do not forget socket timeout. ;-)
+                    #
+                    connection_socket.settimeout(0.1)
+
+                    # Create a new TCPMessageBuffer
+                    # and add it to the dict
+                    #
+                    self.client_connections[address_port_tuple] = TCPMessageBuffer(connection_socket)
+
+                    self.logger.info("adding new client: %s:%s" % address_port_tuple)
+
+            except socket.timeout:
+
+                # We do not log here since this
+                # happens too often
+                #
+                pass
+
+            # Now check all known connections for messages.
+            #
+            # There is a bit of duplicate work going on
+            # here since the ServerCoreEngine also checks
+            # the client connections round robin. But
+            # interfaces are explicitly meant to act
+            # as a buffer, freeing the OS from queued
+            # network packets and queueing them for the
+            # CoreEngines.
+            #
+            # TODO: Well. Shouldn't we put all of the following stuff into the TCPMessageBuffer instances and just call according methods? This would make the code a bit cleaner.
+
+            for message_buffer in self.client_connections.values():
+
+                # Read a message. Will throw
+                # an exception when the timeout
+                # set upon accepting the connection
+                # has passed.
+
+                # TODO: in part a code duplicate from TCPClientInterface
+
+                data_received = ""
+
+                try:
+
+                    # TODO: Pickle produces large amounts of data. The struct module with a custom encoding should be used instead.
+                    #
+                    data_received = message_buffer.sock.recv(32768)
+
+                except socket.timeout:
+
+                    # We do not log here since this
+                    # happens too often
+                    #
+                    pass
+
+                if data_received:
+
+                    self.logger.debug("received client message: %s/32768 bytes" % len(data_received))
+
+                    # Append the message to the message buffer.
+                    # (inbetween steps to avoid a long line ;-) )
+                    #
+                    message = cPickle.loads(data_received)
+
+                    message_buffer.messages_for_local.append(message)
+
+                # Next client connection
+
+            # Done reading all client connections
+
+            # Finally flush server event queues.
+            #
+            # Iterate over dict keys
+            #
+            for address_port_tuple in self.client_connections:
+
+                message_buffer = self.client_connections[address_port_tuple]
+
+                if message_buffer.messages_for_remote:
+
+                    self.logger.debug("sending 1 message of %s to client %s"
+                                      % (len(message_buffer.messages_for_remote),
+                                         address_port_tuple
+                                        )
+                                     )
+
+                    # -1 = use highest available pickle protocol
+                    #
+                    pickled_message = cPickle.dumps(message_buffer.messages_for_remote.popleft(),
+                                                    -1)
+
+                    bytes = message_buffer.sock.send(pickled_message)
+
+                    self.logger.debug("sent %s bytes" % bytes)
+
+            # loop again
+            #
+            #self.logger.debug("restarting loop")
+
+        # Caught shutdown notification, stopping thread
+        #
+        self.logger.info("shutting down")
+
+        # Close TCP connections
+        #
+        for message_buffer in self.client_connections.values():
+
+            message_buffer.sock.close()
 
         self.shutdown_confirmed = True
 

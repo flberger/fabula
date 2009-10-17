@@ -70,7 +70,9 @@ def run(mode,
 
         logger.info("Using framerate " + str(framerate))
 
-        interface_class = shard.interfaces.ClientInterface
+        # TODO: hardwired TCP protocol
+        #
+        interface_class = shard.interfaces.TCPClientInterface
 
         asset_engine = asset_engine_class(logger)
 
@@ -80,7 +82,9 @@ def run(mode,
 
     elif mode == "server":
 
-        interface_class = shard.interfaces.ServerInterface
+        # TODO: hardwired TCP protocol
+        #
+        interface_class = shard.interfaces.TCPServerInterface
 
         plugin = plugin_class(logger)
 
@@ -93,6 +97,7 @@ def run(mode,
                                              logger)
 
     thread.start_new_thread(interface.handle_messages, ())
+    #interface.handle_messages()
 
     # This method will return when the plugin
     # engine sets plugin.exit_requested
