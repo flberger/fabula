@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="shard.html"><font color="#ffffff">shard</font></a>.interfaces</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/interfaces.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/interfaces.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/TCP_interfaces/shard/interfaces.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/TCP_interfaces/shard/interfaces.py</a></font></td></tr></table>
     <p><tt>Shard&nbsp;<a href="#Interface">Interface</a>&nbsp;Classes<br>
 &nbsp;<br>
 Based&nbsp;on&nbsp;former&nbsp;client-&nbsp;and&nbsp;server<br>
@@ -35,89 +35,20 @@ interface&nbsp;implementations</tt></p>
 <dt><font face="helvetica, arial"><a href="shard.interfaces.html#Interface">Interface</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="shard.interfaces.html#ServerInterface">ServerInterface</a>
+<dt><font face="helvetica, arial"><a href="shard.interfaces.html#TCPServerInterface">TCPServerInterface</a>
+</font></dt><dt><font face="helvetica, arial"><a href="shard.interfaces.html#UDPServerInterface">UDPServerInterface</a>
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="shard.interfaces.html#ClientInterface">ClientInterface</a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)
+<dt><font face="helvetica, arial"><a href="shard.interfaces.html#TCPClientInterface">TCPClientInterface</a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)
+</font></dt><dt><font face="helvetica, arial"><a href="shard.interfaces.html#TCPMessageBuffer">TCPMessageBuffer</a>
+</font></dt><dt><font face="helvetica, arial"><a href="shard.interfaces.html#UDPClientInterface">UDPClientInterface</a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)
 </font></dt></dl>
 </dd>
 </dl>
  <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ClientInterface">class <strong>ClientInterface</strong></a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;Shard&nbsp;Client&nbsp;<a href="#Interface">Interface</a>.<br>
-Implementations&nbsp;should&nbsp;subclass&nbsp;this&nbsp;one&nbsp;an&nbsp;override<br>
-the&nbsp;default&nbsp;methods,&nbsp;which&nbsp;showcase&nbsp;a&nbsp;simple&nbsp;example.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.interfaces.html#ClientInterface">ClientInterface</a></dd>
-<dd><a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a></dd>
-<dd><a href="shard.interfaces.html#Interface">Interface</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="ClientInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
-
-<dl><dt><a name="ClientInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
-necessary&nbsp;to&nbsp;send&nbsp;client&nbsp;messages&nbsp;and&nbsp;obtain&nbsp;<br>
-server&nbsp;messages.&nbsp;It&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;the&nbsp;back&nbsp;end&nbsp;<br>
-of&nbsp;<a href="#ClientInterface-send_message">send_message</a>()&nbsp;and&nbsp;<a href="#ClientInterface-grab_message">grab_message</a>().&nbsp;Put&nbsp;some&nbsp;<br>
-networking&nbsp;code,&nbsp;a&nbsp;GUI&nbsp;or&nbsp;a&nbsp;random&nbsp;generator&nbsp;<br>
-here.&nbsp;<br>
-This&nbsp;method&nbsp;is&nbsp;put&nbsp;in&nbsp;a&nbsp;background&nbsp;thread&nbsp;<br>
-automatically,&nbsp;so&nbsp;it&nbsp;can&nbsp;do&nbsp;all&nbsp;sorts&nbsp;of&nbsp;<br>
-polling&nbsp;or&nbsp;blocking&nbsp;IO.<br>
-It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#ClientInterface-shutdown">shutdown</a>()<br>
-has&nbsp;been&nbsp;called,&nbsp;and&nbsp;if&nbsp;so,&nbsp;it&nbsp;should&nbsp;notify<br>
-<a href="#ClientInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
-True),&nbsp;and&nbsp;then&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;<br>
-the&nbsp;thread.</tt></dd></dl>
-
-<hr>
-Methods inherited from <a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>:<br>
-<dl><dt><a name="ClientInterface-grab_message"><strong>grab_message</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
-engine&nbsp;to&nbsp;obtain&nbsp;a&nbsp;new&nbsp;buffered&nbsp;message<br>
-from&nbsp;the&nbsp;remote&nbsp;host.&nbsp;It&nbsp;must&nbsp;return&nbsp;an<br>
-instance&nbsp;of&nbsp;shard.Message,&nbsp;and&nbsp;it&nbsp;must<br>
-do&nbsp;so&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.&nbsp;If<br>
-there&nbsp;is&nbsp;no&nbsp;new&nbsp;message&nbsp;from&nbsp;remote,&nbsp;it<br>
-must&nbsp;return&nbsp;an&nbsp;empty&nbsp;message.</tt></dd></dl>
-
-<dl><dt><a name="ClientInterface-send_message"><strong>send_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
-engine&nbsp;with&nbsp;a&nbsp;message&nbsp;ready&nbsp;to&nbsp;be&nbsp;sent&nbsp;to<br>
-the&nbsp;remote&nbsp;host.&nbsp;The&nbsp;Message&nbsp;object&nbsp;given<br>
-is&nbsp;an&nbsp;instance&nbsp;of&nbsp;shard.Message.&nbsp;This&nbsp;method<br>
-must&nbsp;return&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.</tt></dd></dl>
-
-<dl><dt><a name="ClientInterface-setup_message_buffer"><strong>setup_message_buffer</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;internal<br>
-queues&nbsp;(in&nbsp;this&nbsp;case&nbsp;instances<br>
-of&nbsp;collections.deque)</tt></dd></dl>
-
-<hr>
-Methods inherited from <a href="shard.interfaces.html#Interface">Interface</a>:<br>
-<dl><dt><a name="ClientInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
-("address",&nbsp;port)&nbsp;tuple&nbsp;holding&nbsp;the<br>
-server's&nbsp;address&nbsp;and&nbsp;port,&nbsp;and&nbsp;an<br>
-instance&nbsp;of&nbsp;logging.Logger.&nbsp;Be&nbsp;sure<br>
-to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#ClientInterface-__init__">__init__</a>()<br>
-when&nbsp;subclassing.</tt></dd></dl>
-
-<dl><dt><a name="ClientInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
-about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#ClientInterface-handle_messages">handle_messages</a>()<br>
-to&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;the&nbsp;thread<br>
-properly&nbsp;by&nbsp;setting&nbsp;self.<strong>shutdown_flag</strong>.<br>
-<a href="#ClientInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
-<a href="#ClientInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
-and&nbsp;is&nbsp;about&nbsp;to&nbsp;exit.</tt></dd></dl>
-
-</td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -208,17 +139,119 @@ of&nbsp;collections.deque)</tt></dd></dl>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ServerInterface">class <strong>ServerInterface</strong></a>(<a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="TCPClientInterface">class <strong>TCPClientInterface</strong></a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;Shard&nbsp;Server&nbsp;<a href="#Interface">Interface</a>.<br>
-Implementations&nbsp;should&nbsp;subclass&nbsp;this&nbsp;one&nbsp;an&nbsp;override<br>
-the&nbsp;default&nbsp;methods,&nbsp;which&nbsp;do&nbsp;nothing.<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt>A&nbsp;Shard&nbsp;Client&nbsp;<a href="#Interface">Interface</a>&nbsp;using&nbsp;TCP.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="shard.interfaces.html#TCPClientInterface">TCPClientInterface</a></dd>
+<dd><a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a></dd>
+<dd><a href="shard.interfaces.html#Interface">Interface</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="TCPClientInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
+
+<dl><dt><a name="TCPClientInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
+necessary&nbsp;to&nbsp;send&nbsp;client&nbsp;messages&nbsp;and&nbsp;obtain&nbsp;<br>
+server&nbsp;messages.&nbsp;It&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;the&nbsp;back&nbsp;end&nbsp;<br>
+of&nbsp;<a href="#TCPClientInterface-send_message">send_message</a>()&nbsp;and&nbsp;<a href="#TCPClientInterface-grab_message">grab_message</a>().&nbsp;Put&nbsp;some&nbsp;<br>
+networking&nbsp;code,&nbsp;a&nbsp;GUI&nbsp;or&nbsp;a&nbsp;random&nbsp;generator&nbsp;<br>
+here.&nbsp;<br>
+This&nbsp;method&nbsp;is&nbsp;put&nbsp;in&nbsp;a&nbsp;background&nbsp;thread&nbsp;<br>
+automatically,&nbsp;so&nbsp;it&nbsp;can&nbsp;do&nbsp;all&nbsp;sorts&nbsp;of&nbsp;<br>
+polling&nbsp;or&nbsp;blocking&nbsp;IO.<br>
+It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#TCPClientInterface-shutdown">shutdown</a>()<br>
+has&nbsp;been&nbsp;called,&nbsp;and&nbsp;if&nbsp;so,&nbsp;it&nbsp;should&nbsp;notify<br>
+<a href="#TCPClientInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
+True),&nbsp;and&nbsp;then&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;<br>
+the&nbsp;thread.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>:<br>
+<dl><dt><a name="TCPClientInterface-grab_message"><strong>grab_message</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;to&nbsp;obtain&nbsp;a&nbsp;new&nbsp;buffered&nbsp;message<br>
+from&nbsp;the&nbsp;remote&nbsp;host.&nbsp;It&nbsp;must&nbsp;return&nbsp;an<br>
+instance&nbsp;of&nbsp;shard.Message,&nbsp;and&nbsp;it&nbsp;must<br>
+do&nbsp;so&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.&nbsp;If<br>
+there&nbsp;is&nbsp;no&nbsp;new&nbsp;message&nbsp;from&nbsp;remote,&nbsp;it<br>
+must&nbsp;return&nbsp;an&nbsp;empty&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="TCPClientInterface-send_message"><strong>send_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;with&nbsp;a&nbsp;message&nbsp;ready&nbsp;to&nbsp;be&nbsp;sent&nbsp;to<br>
+the&nbsp;remote&nbsp;host.&nbsp;The&nbsp;Message&nbsp;object&nbsp;given<br>
+is&nbsp;an&nbsp;instance&nbsp;of&nbsp;shard.Message.&nbsp;This&nbsp;method<br>
+must&nbsp;return&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.</tt></dd></dl>
+
+<dl><dt><a name="TCPClientInterface-setup_message_buffer"><strong>setup_message_buffer</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;internal<br>
+queues&nbsp;(in&nbsp;this&nbsp;case&nbsp;instances<br>
+of&nbsp;collections.deque)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.interfaces.html#Interface">Interface</a>:<br>
+<dl><dt><a name="TCPClientInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
+("address",&nbsp;port)&nbsp;tuple&nbsp;holding&nbsp;the<br>
+server's&nbsp;address&nbsp;and&nbsp;port,&nbsp;and&nbsp;an<br>
+instance&nbsp;of&nbsp;logging.Logger.&nbsp;Be&nbsp;sure<br>
+to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#TCPClientInterface-__init__">__init__</a>()<br>
+when&nbsp;subclassing.</tt></dd></dl>
+
+<dl><dt><a name="TCPClientInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
+about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#TCPClientInterface-handle_messages">handle_messages</a>()<br>
+to&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;the&nbsp;thread<br>
+properly&nbsp;by&nbsp;setting&nbsp;self.<strong>shutdown_flag</strong>.<br>
+<a href="#TCPClientInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
+<a href="#TCPClientInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
+and&nbsp;is&nbsp;about&nbsp;to&nbsp;exit.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TCPMessageBuffer">class <strong>TCPMessageBuffer</strong></a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;message&nbsp;buffer&nbsp;with&nbsp;a&nbsp;connected<br>
+socket&nbsp;as&nbsp;attribute.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="ServerInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
+<dl><dt><a name="TCPMessageBuffer-__init__"><strong>__init__</strong></a>(self, sock)</dt><dd><tt>Calls&nbsp;setup_message_buffer&nbsp;and<br>
+sets&nbsp;up&nbsp;the&nbsp;sock&nbsp;attribute.</tt></dd></dl>
 
-<dl><dt><a name="ServerInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
+<hr>
+Methods inherited from <a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>:<br>
+<dl><dt><a name="TCPMessageBuffer-grab_message"><strong>grab_message</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;to&nbsp;obtain&nbsp;a&nbsp;new&nbsp;buffered&nbsp;message<br>
+from&nbsp;the&nbsp;remote&nbsp;host.&nbsp;It&nbsp;must&nbsp;return&nbsp;an<br>
+instance&nbsp;of&nbsp;shard.Message,&nbsp;and&nbsp;it&nbsp;must<br>
+do&nbsp;so&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.&nbsp;If<br>
+there&nbsp;is&nbsp;no&nbsp;new&nbsp;message&nbsp;from&nbsp;remote,&nbsp;it<br>
+must&nbsp;return&nbsp;an&nbsp;empty&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="TCPMessageBuffer-send_message"><strong>send_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;with&nbsp;a&nbsp;message&nbsp;ready&nbsp;to&nbsp;be&nbsp;sent&nbsp;to<br>
+the&nbsp;remote&nbsp;host.&nbsp;The&nbsp;Message&nbsp;object&nbsp;given<br>
+is&nbsp;an&nbsp;instance&nbsp;of&nbsp;shard.Message.&nbsp;This&nbsp;method<br>
+must&nbsp;return&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.</tt></dd></dl>
+
+<dl><dt><a name="TCPMessageBuffer-setup_message_buffer"><strong>setup_message_buffer</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;internal<br>
+queues&nbsp;(in&nbsp;this&nbsp;case&nbsp;instances<br>
+of&nbsp;collections.deque)</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TCPServerInterface">class <strong>TCPServerInterface</strong></a>(<a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;Shard&nbsp;Server&nbsp;<a href="#Interface">Interface</a>&nbsp;using&nbsp;TCP.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="TCPServerInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
+
+<dl><dt><a name="TCPServerInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
 necessary&nbsp;to&nbsp;send&nbsp;server&nbsp;messages&nbsp;and&nbsp;obtain&nbsp;<br>
 client&nbsp;messages.&nbsp;It&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;the&nbsp;back&nbsp;end&nbsp;<br>
 of&nbsp;send_message()&nbsp;and&nbsp;grab_message().&nbsp;Put&nbsp;some&nbsp;<br>
@@ -227,27 +260,145 @@ here.&nbsp;<br>
 This&nbsp;method&nbsp;is&nbsp;put&nbsp;in&nbsp;a&nbsp;background&nbsp;thread&nbsp;<br>
 automatically,&nbsp;so&nbsp;it&nbsp;can&nbsp;do&nbsp;all&nbsp;sorts&nbsp;of&nbsp;<br>
 polling&nbsp;or&nbsp;blocking&nbsp;IO.<br>
-It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#ServerInterface-shutdown">shutdown</a>()<br>
+It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#TCPServerInterface-shutdown">shutdown</a>()<br>
 has&nbsp;been&nbsp;called,&nbsp;and&nbsp;if&nbsp;so,&nbsp;it&nbsp;should&nbsp;notify<br>
-<a href="#ServerInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
+<a href="#TCPServerInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
 True),&nbsp;and&nbsp;then&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;<br>
 the&nbsp;thread.</tt></dd></dl>
 
 <hr>
 Methods inherited from <a href="shard.interfaces.html#Interface">Interface</a>:<br>
-<dl><dt><a name="ServerInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
+<dl><dt><a name="TCPServerInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
 ("address",&nbsp;port)&nbsp;tuple&nbsp;holding&nbsp;the<br>
 server's&nbsp;address&nbsp;and&nbsp;port,&nbsp;and&nbsp;an<br>
 instance&nbsp;of&nbsp;logging.Logger.&nbsp;Be&nbsp;sure<br>
-to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#ServerInterface-__init__">__init__</a>()<br>
+to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#TCPServerInterface-__init__">__init__</a>()<br>
 when&nbsp;subclassing.</tt></dd></dl>
 
-<dl><dt><a name="ServerInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
-about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#ServerInterface-handle_messages">handle_messages</a>()<br>
+<dl><dt><a name="TCPServerInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
+about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#TCPServerInterface-handle_messages">handle_messages</a>()<br>
 to&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;the&nbsp;thread<br>
 properly&nbsp;by&nbsp;setting&nbsp;self.<strong>shutdown_flag</strong>.<br>
-<a href="#ServerInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
-<a href="#ServerInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
+<a href="#TCPServerInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
+<a href="#TCPServerInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
+and&nbsp;is&nbsp;about&nbsp;to&nbsp;exit.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="UDPClientInterface">class <strong>UDPClientInterface</strong></a>(<a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>, <a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;Shard&nbsp;Client&nbsp;<a href="#Interface">Interface</a>.<br>
+Implementations&nbsp;should&nbsp;subclass&nbsp;this&nbsp;one&nbsp;an&nbsp;override<br>
+the&nbsp;default&nbsp;methods,&nbsp;which&nbsp;showcase&nbsp;a&nbsp;simple&nbsp;example.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="shard.interfaces.html#UDPClientInterface">UDPClientInterface</a></dd>
+<dd><a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a></dd>
+<dd><a href="shard.interfaces.html#Interface">Interface</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="UDPClientInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
+
+<dl><dt><a name="UDPClientInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
+necessary&nbsp;to&nbsp;send&nbsp;client&nbsp;messages&nbsp;and&nbsp;obtain&nbsp;<br>
+server&nbsp;messages.&nbsp;It&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;the&nbsp;back&nbsp;end&nbsp;<br>
+of&nbsp;<a href="#UDPClientInterface-send_message">send_message</a>()&nbsp;and&nbsp;<a href="#UDPClientInterface-grab_message">grab_message</a>().&nbsp;Put&nbsp;some&nbsp;<br>
+networking&nbsp;code,&nbsp;a&nbsp;GUI&nbsp;or&nbsp;a&nbsp;random&nbsp;generator&nbsp;<br>
+here.&nbsp;<br>
+This&nbsp;method&nbsp;is&nbsp;put&nbsp;in&nbsp;a&nbsp;background&nbsp;thread&nbsp;<br>
+automatically,&nbsp;so&nbsp;it&nbsp;can&nbsp;do&nbsp;all&nbsp;sorts&nbsp;of&nbsp;<br>
+polling&nbsp;or&nbsp;blocking&nbsp;IO.<br>
+It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#UDPClientInterface-shutdown">shutdown</a>()<br>
+has&nbsp;been&nbsp;called,&nbsp;and&nbsp;if&nbsp;so,&nbsp;it&nbsp;should&nbsp;notify<br>
+<a href="#UDPClientInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
+True),&nbsp;and&nbsp;then&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;<br>
+the&nbsp;thread.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.interfaces.html#MessageBuffer">MessageBuffer</a>:<br>
+<dl><dt><a name="UDPClientInterface-grab_message"><strong>grab_message</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;to&nbsp;obtain&nbsp;a&nbsp;new&nbsp;buffered&nbsp;message<br>
+from&nbsp;the&nbsp;remote&nbsp;host.&nbsp;It&nbsp;must&nbsp;return&nbsp;an<br>
+instance&nbsp;of&nbsp;shard.Message,&nbsp;and&nbsp;it&nbsp;must<br>
+do&nbsp;so&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.&nbsp;If<br>
+there&nbsp;is&nbsp;no&nbsp;new&nbsp;message&nbsp;from&nbsp;remote,&nbsp;it<br>
+must&nbsp;return&nbsp;an&nbsp;empty&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="UDPClientInterface-send_message"><strong>send_message</strong></a>(self, message)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the&nbsp;local<br>
+engine&nbsp;with&nbsp;a&nbsp;message&nbsp;ready&nbsp;to&nbsp;be&nbsp;sent&nbsp;to<br>
+the&nbsp;remote&nbsp;host.&nbsp;The&nbsp;Message&nbsp;object&nbsp;given<br>
+is&nbsp;an&nbsp;instance&nbsp;of&nbsp;shard.Message.&nbsp;This&nbsp;method<br>
+must&nbsp;return&nbsp;immediately&nbsp;to&nbsp;avoid&nbsp;blocking.</tt></dd></dl>
+
+<dl><dt><a name="UDPClientInterface-setup_message_buffer"><strong>setup_message_buffer</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;internal<br>
+queues&nbsp;(in&nbsp;this&nbsp;case&nbsp;instances<br>
+of&nbsp;collections.deque)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.interfaces.html#Interface">Interface</a>:<br>
+<dl><dt><a name="UDPClientInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
+("address",&nbsp;port)&nbsp;tuple&nbsp;holding&nbsp;the<br>
+server's&nbsp;address&nbsp;and&nbsp;port,&nbsp;and&nbsp;an<br>
+instance&nbsp;of&nbsp;logging.Logger.&nbsp;Be&nbsp;sure<br>
+to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#UDPClientInterface-__init__">__init__</a>()<br>
+when&nbsp;subclassing.</tt></dd></dl>
+
+<dl><dt><a name="UDPClientInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
+about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#UDPClientInterface-handle_messages">handle_messages</a>()<br>
+to&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;the&nbsp;thread<br>
+properly&nbsp;by&nbsp;setting&nbsp;self.<strong>shutdown_flag</strong>.<br>
+<a href="#UDPClientInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
+<a href="#UDPClientInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
+and&nbsp;is&nbsp;about&nbsp;to&nbsp;exit.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="UDPServerInterface">class <strong>UDPServerInterface</strong></a>(<a href="shard.interfaces.html#Interface">Interface</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;a&nbsp;Shard&nbsp;Server&nbsp;<a href="#Interface">Interface</a>.<br>
+Implementations&nbsp;should&nbsp;subclass&nbsp;this&nbsp;one&nbsp;an&nbsp;override<br>
+the&nbsp;default&nbsp;methods,&nbsp;which&nbsp;do&nbsp;nothing.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="UDPServerInterface-__init__"><strong>__init__</strong></a>(self, address_port_tuple, logger)</dt><dd><tt><a href="#Interface">Interface</a>&nbsp;initialization.</tt></dd></dl>
+
+<dl><dt><a name="UDPServerInterface-handle_messages"><strong>handle_messages</strong></a>(self)</dt><dd><tt>The&nbsp;task&nbsp;of&nbsp;this&nbsp;method&nbsp;is&nbsp;to&nbsp;do&nbsp;whatever&nbsp;is<br>
+necessary&nbsp;to&nbsp;send&nbsp;server&nbsp;messages&nbsp;and&nbsp;obtain&nbsp;<br>
+client&nbsp;messages.&nbsp;It&nbsp;is&nbsp;meant&nbsp;to&nbsp;be&nbsp;the&nbsp;back&nbsp;end&nbsp;<br>
+of&nbsp;send_message()&nbsp;and&nbsp;grab_message().&nbsp;Put&nbsp;some&nbsp;<br>
+networking&nbsp;code,&nbsp;a&nbsp;GUI&nbsp;or&nbsp;a&nbsp;random&nbsp;generator&nbsp;<br>
+here.&nbsp;<br>
+This&nbsp;method&nbsp;is&nbsp;put&nbsp;in&nbsp;a&nbsp;background&nbsp;thread&nbsp;<br>
+automatically,&nbsp;so&nbsp;it&nbsp;can&nbsp;do&nbsp;all&nbsp;sorts&nbsp;of&nbsp;<br>
+polling&nbsp;or&nbsp;blocking&nbsp;IO.<br>
+It&nbsp;should&nbsp;regularly&nbsp;check&nbsp;whether&nbsp;<a href="#UDPServerInterface-shutdown">shutdown</a>()<br>
+has&nbsp;been&nbsp;called,&nbsp;and&nbsp;if&nbsp;so,&nbsp;it&nbsp;should&nbsp;notify<br>
+<a href="#UDPServerInterface-shutdown">shutdown</a>()&nbsp;in&nbsp;some&nbsp;way&nbsp;(so&nbsp;that&nbsp;it&nbsp;can&nbsp;return<br>
+True),&nbsp;and&nbsp;then&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;<br>
+the&nbsp;thread.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="shard.interfaces.html#Interface">Interface</a>:<br>
+<dl><dt><a name="UDPServerInterface-setup_interface"><strong>setup_interface</strong></a>(self, address_port_tuple, logger)</dt><dd><tt>An&nbsp;interface&nbsp;is&nbsp;initialized&nbsp;with&nbsp;an<br>
+("address",&nbsp;port)&nbsp;tuple&nbsp;holding&nbsp;the<br>
+server's&nbsp;address&nbsp;and&nbsp;port,&nbsp;and&nbsp;an<br>
+instance&nbsp;of&nbsp;logging.Logger.&nbsp;Be&nbsp;sure<br>
+to&nbsp;call&nbsp;this&nbsp;method&nbsp;from&nbsp;<a href="#UDPServerInterface-__init__">__init__</a>()<br>
+when&nbsp;subclassing.</tt></dd></dl>
+
+<dl><dt><a name="UDPServerInterface-shutdown"><strong>shutdown</strong></a>(self)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;engine&nbsp;is<br>
+about&nbsp;to&nbsp;exit.&nbsp;It&nbsp;notifies&nbsp;<a href="#UDPServerInterface-handle_messages">handle_messages</a>()<br>
+to&nbsp;raise&nbsp;SystemExit&nbsp;to&nbsp;stop&nbsp;the&nbsp;thread<br>
+properly&nbsp;by&nbsp;setting&nbsp;self.<strong>shutdown_flag</strong>.<br>
+<a href="#UDPServerInterface-shutdown">shutdown</a>()&nbsp;will&nbsp;return&nbsp;True&nbsp;when<br>
+<a href="#UDPServerInterface-handle_messages">handle_messages</a>()&nbsp;received&nbsp;the&nbsp;notification<br>
 and&nbsp;is&nbsp;about&nbsp;to&nbsp;exit.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>

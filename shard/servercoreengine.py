@@ -248,6 +248,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             time.sleep(0.1)
 
             # reiterate over client connections
+            #
+            #self.logger.debug("reading client messages")
 
         # exit has been requested
         #
