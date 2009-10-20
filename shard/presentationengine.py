@@ -251,6 +251,8 @@ class PresentationEngine(shard.plugin.Plugin):
                 # Technically this waiting corresponds to a
                 # frame, though we do not render anything.
 
+                # TODO: Well, we completely lock out the user here. If the server is down, he will not be able to interact with the application (quit, for examlpe).
+
                 # See method for explaination.
                 self.update_frame_timer()
 

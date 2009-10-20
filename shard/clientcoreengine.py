@@ -130,6 +130,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             elif not self.got_empty_message:
 
+                # TODO: The PresentationEngine currently locks up when there are no answers from the server. The ClientCoreEngine should time out and exit politely if there is no initial answer from the server or there has been no answer for some time.
+
                 self.logger.info("got an empty server_message.")
 
                 self.got_empty_message = True
