@@ -19,7 +19,7 @@ import thread
 import logging
 
 def run(mode,
-        port,
+        address_port_tuple,
         framerate,
         plugin_class,
         asset_engine_class,
@@ -90,7 +90,7 @@ def run(mode,
 
         core_engine_class = shard.servercoreengine.ServerCoreEngine
 
-    interface = interface_class(("localhost", port), logger)
+    interface = interface_class(address_port_tuple, logger)
 
     core_engine_instance = core_engine_class(interface,
                                              plugin,
