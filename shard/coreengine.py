@@ -315,7 +315,10 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
             self.logger.debug("entity already in entity_dict: %s" % event.entity.identifier)
 
         else:
-            self.logger.debug("spawning entity: %s" % event.entity.identifier)
+            self.logger.debug("spawning entity '%s', type %s, location %s" %
+                              (event.entity.identifier,
+                               event.entity.entity_type,
+                               event.entity.location))
 
             self.entity_dict[event.entity.identifier] = event.entity
 
