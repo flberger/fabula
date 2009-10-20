@@ -370,10 +370,9 @@ now.&nbsp;Entities&nbsp;may&nbsp;implement&nbsp;a&nbsp;flag&nbsp;or&nbsp;some<br
 logic&nbsp;which&nbsp;changes&nbsp;their&nbsp;graphical&nbsp;<br>
 representation&nbsp;on&nbsp;every&nbsp;frame,&nbsp;yielding<br>
 an&nbsp;animation.<br>
-process_ChangeStateEvent()&nbsp;is&nbsp;always<br>
-called&nbsp;after&nbsp;<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>()&nbsp;etc.,<br>
-so&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;already&nbsp;knows&nbsp;about&nbsp;the&nbsp;result<br>
-of&nbsp;the&nbsp;action.<br>
+<a href="#Entity-change_state">change_state</a>()&nbsp;is&nbsp;always&nbsp;called&nbsp;after<br>
+<a href="#Entity-process_MovesToEvent">process_MovesToEvent</a>()&nbsp;etc.,&nbsp;so&nbsp;the&nbsp;<a href="#Entity">Entity</a><br>
+already&nbsp;knows&nbsp;about&nbsp;the&nbsp;result&nbsp;of&nbsp;the&nbsp;action.<br>
 The&nbsp;PresentationEngine&nbsp;may&nbsp;provide&nbsp;the&nbsp;number<br>
 of&nbsp;frames&nbsp;for&nbsp;the&nbsp;movement&nbsp;and&nbsp;the&nbsp;framerate.<br>
 Thus&nbsp;the&nbsp;entity&nbsp;can&nbsp;adapt&nbsp;to&nbsp;different<br>

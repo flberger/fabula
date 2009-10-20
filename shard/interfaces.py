@@ -21,6 +21,7 @@ from collections import deque
 import socket
 import cPickle
 import SocketServer
+import time
 
 # Base and helper classes
 
@@ -449,14 +450,29 @@ class TCPClientInterface(MessageBuffer, Interface):
         #
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.logger.debug("connecting to %s:%s" % address_port_tuple)
+        self.connected = False
 
-        # TODO: handle error
-        #
-        self.sock.connect(self.address_port_tuple)
+        while not self.connected:
 
-        self.logger.debug("connect() returned")
+            try:
+                self.logger.debug("trying to connect to %s:%s" % address_port_tuple)
 
+                self.sock.connect(self.address_port_tuple)
+
+                self.logger.debug("connect() returned")
+
+                self.connected = True
+
+            except socket.error:
+
+                # This is most likely "connection refused"
+                # because the server is not running.
+                # Keep trying.
+                #
+                self.logger.debug("connection failed, trying again in 5s")
+
+                time.sleep(5)
+                
         # The socket timeout is used for
         # socket.recv() operations, which
         # take turns with socket.sendto().
@@ -503,8 +519,8 @@ class TCPClientInterface(MessageBuffer, Interface):
                 self.sock.send(pickled_message + "\n\n")
 
             # Now listen for incoming server
-            # messages for some time
-            # (set in __init__()). This will
+            # messages for some time as
+            # set in __init__(). This will
             # catch any messages received in
             # the meantime by the OS (tested).
             #
@@ -758,7 +774,9 @@ class TCPServerInterface(Interface):
             # Done reading all client connections
 
             # Finally flush server event queues.
-            #
+ 
+            connections_to_delete = []
+
             # Iterate over dict keys
             #
             for address_port_tuple in self.client_connections:
@@ -778,13 +796,34 @@ class TCPServerInterface(Interface):
                     pickled_message = cPickle.dumps(message_buffer.messages_for_remote.popleft(),
                                                     -1)
 
-                    # Separating messages with the standard
-                    # double newline.
-                    # TODO: Check that double newlines are illegal in pickled data.
-                    #
-                    bytes = message_buffer.sock.send(pickled_message + "\n\n")
+                    try:
+                        # Separating messages with the standard
+                        # double newline.
+                        # TODO: Check that double newlines are illegal in pickled data.
+                        #
+                        bytes = message_buffer.sock.send(pickled_message + "\n\n")
 
-                    self.logger.debug("sent %s bytes" % bytes)
+                        self.logger.debug("sent %s bytes" % bytes)
+
+                    except socket.error:
+
+                        # Most likely a "broken pipe" because
+                        # the client has exited.
+                        #
+                        self.logger.debug("socket error, removing connection after loop")
+
+                        # We can not change a dict while runnnig
+                        # a loop on it, so we remember the failed
+                        # connection and remove it after the loop
+                        #
+                        connections_to_delete.append(address_port_tuple)
+
+            # Now remove connections that caused
+            # an error
+            #
+            for address_port_tuple in connections_to_delete:
+
+                del self.client_connections[address_port_tuple]
 
             # loop again
             #
