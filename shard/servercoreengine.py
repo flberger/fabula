@@ -301,9 +301,17 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                               + " -> "
                               + str(event.target_identifier))
 
+            # In case of an AttemptEvent, make the
+            # affected entity turn into the direction
+            # of the event
+            #
+            self.entity_dict[event.identifier].direction = event.target_identifier
+
             # Test if a movement from the current
             # entity location to the new location
             # on the map is possible
+            #
+            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
             #
             new_x = (self.entity_dict[event.identifier].location[0]
                      + shard.DIRECTION_VECTOR[event.target_identifier][0])

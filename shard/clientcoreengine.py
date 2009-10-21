@@ -197,6 +197,18 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 self.message_for_remote.event_list = (message_from_plugin.event_list
                                                   + self.message_for_remote.event_list)
 
+                for event in message_from_plugin.event_list:
+
+                    if isinstance(event, shard.AttemptEvent):
+
+                        # In case of an AttemptEvent, make the
+                        # affected entity turn into the direction
+                        # of the event
+                        #
+                        self.entity_dict[event.identifier].direction = event.target_identifier
+
+                        self.logger.debug("found AttemptEvent, setting direction: %s -> %s" % (event.identifier, event.target_identifier))
+
                 # Since we had player input, we now await confirmation
                 #
                 self.logger.debug("awaiting confirmation, discarding further user input")

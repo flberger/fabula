@@ -492,11 +492,11 @@ class Entity:
         self.location = location
         self.asset = asset
 
-        # Store current direction and movement
-        # "At dawn, look to the east." -Gandalf 
-        #        in Peter Jackson's "Two Towers"
+        # Store current direction and movement.
+        # Default direction is 'S' so that the entity
+        # will have a front view in most implementations.
         #
-        self.direction = 'E'
+        self.direction = 'S'
         self.moves = False
 
         # Other flags for Entity actions
