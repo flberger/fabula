@@ -108,8 +108,15 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # install signal handlers
         #
         signal.signal(signal.SIGINT, self.handle_exit)
-        signal.signal(signal.SIGQUIT, self.handle_exit)
         signal.signal(signal.SIGTERM, self.handle_exit)
+
+        try:
+            signal.signal(signal.SIGQUIT, self.handle_exit)
+
+        except:
+            # Microsoft Windows has no SIGQUIT - ignore
+            #
+            pass
 
         # TODO: restart plugin when SIGHUP is received
 
