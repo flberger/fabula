@@ -83,6 +83,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.logger.info("complete")
 
+        # Remember the latest local MovesToEvent
+        #
+        self.local_moves_to_event = shard.MovesToEvent(None, None)
+
         # TODO: set up the inventory
 
     ####################
@@ -164,11 +168,11 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # PresentationEngine_message are empty!
             #
             message_from_plugin = self.plugin.process_message(self.message_for_plugin,
-                                                                            self.entity_dict,
-                                                                            self.deleted_entities_dict,
-                                                                            self.player_id,
-                                                                            self.tile_list,
-                                                                            self.map)
+                                                              self.entity_dict,
+                                                              self.deleted_entities_dict,
+                                                              self.player_id,
+                                                              self.tile_list,
+                                                              self.map)
 
             # The PresentationEngine returned, the Server Message has
             # been applied and processed. Clean up.
@@ -208,6 +212,72 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                         self.entity_dict[event.identifier].direction = event.target_identifier
 
                         self.logger.debug("found AttemptEvent, setting direction: %s -> %s" % (event.identifier, event.target_identifier))
+
+                        # In case of a TriesToMoveEvent, test and
+                        # approve the movement locally to allow
+                        # for a smooth user experience. We have
+                        # the current map information after all.
+                        #
+                        if isinstance(event, shard.TriesToMoveEvent):
+
+                            self.logger.debug("applying TriesToMoveEvent locally")
+
+                            # TODO: event.identifier in self.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
+
+                            # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
+
+                            # Test if a movement from the current
+                            # entity location to the new location
+                            # on the map is possible
+                            #
+                            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
+                            #
+                            new_x = (self.entity_dict[event.identifier].location[0]
+                                     + shard.DIRECTION_VECTOR[event.target_identifier][0])
+
+                            new_y = (self.entity_dict[event.identifier].location[1]
+                                     + shard.DIRECTION_VECTOR[event.target_identifier][1])
+
+                            # We queue the event in self.message_for_plugin,
+                            # so it will be rendered upon next call. That
+                            # way it bypasses the ClientCoreEngine; its status
+                            # will be updated upon server confirmation. So
+                            # we will have a difference between client state
+                            # and presentation. We trust that it will be resolved
+                            # by the server in very short time.
+                            #
+                            try:
+                                if self.map[(new_x, new_y)].tile_type == "FLOOR":
+
+                                    moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                        event.target_identifier)
+ 
+                                    # Notifies Entity, needed for PresentationEngine
+                                    #
+                                    self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
+
+                                    # Remember event for crosscheck with
+                                    # event from ServerCoreEngine
+                                    #
+                                    self.local_moves_to_event = moves_to_event
+
+                                else:
+
+                                    # Instead of
+                                    #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                                    # we wait for the server to respond with
+                                    # AttemptFailedEvent
+                                    #
+                                    pass
+
+                            except KeyError:
+
+                                # Instead of
+                                #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                                # we wait for the server to respond with
+                                # AttemptFailedEvent
+                                #
+                                pass
 
                 # Since we had player input, we now await confirmation
                 #
@@ -282,20 +352,38 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            the event to the message.
         """
 
-        # DEFAULT IMPLEMENTATION
+        # Is this the very same as the latest
+        # local MovesToEvent?
+        #
+        if (event.identifier == self.local_moves_to_event.identifier
+            and event.direction == self.local_moves_to_event.direction):
 
-        self.logger.debug("entity location before call: "
-                          + str(self.entity_dict[event.identifier].location))
+            # Fine, we already had that.
+            #
+            self.logger.debug("suppressing server issued MovesToEvent ('%s', '%s')"
+                              % (event.identifier, event.direction))
 
-        self.entity_dict[event.identifier].process_MovesToEvent(event)
+            # Reset copy of local event
+            #
+            self.local_moves_to_event = shard.MovesToEvent(None, None)
 
-        self.logger.debug("entity location after call: "
-                          + str(self.entity_dict[event.identifier].location))
+        else:
+            # DEFAULT IMPLEMENTATION
 
-        message.event_list.append(event)
+            self.logger.debug("entity location before call: (%s, %s)"
+                              % self.entity_dict[event.identifier].location)
 
-        # END DEFAULT IMPLEMENTATION
+            self.entity_dict[event.identifier].process_MovesToEvent(event)
 
+            self.logger.debug("entity location after call: (%s, %s)"
+                              % self.entity_dict[event.identifier].location)
+
+            message.event_list.append(event)
+
+            # END DEFAULT IMPLEMENTATION
+
+        # TODO: rather put this in the above if clause?
+        #
         self.await_confirmation = False
 
     #def process_PicksUpEvent(self, event, message):
