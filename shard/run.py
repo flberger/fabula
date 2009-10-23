@@ -98,6 +98,10 @@ def run(mode,
 
     thread.start_new_thread(interface.handle_messages, ())
 
+    # Or instead, for debugging:
+    #
+    #interface.handle_messages()
+
     # This method will return when the plugin
     # engine sets plugin.exit_requested
     # to True

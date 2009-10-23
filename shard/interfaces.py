@@ -17,10 +17,19 @@
 # on 24. Sep 2009
 
 import shard
+
 from collections import deque
+
 import socket
-import cPickle
 import SocketServer
+
+import twisted.internet
+import twisted.internet.protocol
+import twisted.internet.reactor
+import twisted.internet.task
+
+import cPickle
+
 import time
 
 # Base and helper classes
@@ -423,12 +432,13 @@ class UDPServerInterface(Interface):
         raise SystemExit
 
 
-# TCP implementation
-
-# TODO: catch socket exceptions (like "connection reset by peer")
+# TCP implementation uswing the Twisted framework
+#
+# Based on a pure socket implementation done in Oct 2009
 
 class TCPClientInterface(MessageBuffer, Interface):
-    """A Shard Client Interface using TCP.
+    """A Shard Client Interface using TCP,
+       built upon the Twisted framework.
     """
 
     def __init__(self, address_port_tuple, logger):
@@ -440,44 +450,23 @@ class TCPClientInterface(MessageBuffer, Interface):
         #
         self.setup_interface(address_port_tuple, logger)
 
+        # Now we have:
+        #
+        # self.address_port_tuple
+        # self.logger
+        # self.shutdown_flag
+        # self.shutdown_confirmed
+
         # This is a subclass of MessageBuffer, but
         # since we override __init__(), we have to
         # call setup_message_buffer().
         #
         self.setup_message_buffer()
 
-        # Set up TCP socket
+        # Now we have:
         #
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        self.connected = False
-
-        while not self.connected:
-
-            try:
-                self.logger.debug("trying to connect to %s:%s" % address_port_tuple)
-
-                self.sock.connect(self.address_port_tuple)
-
-                self.logger.debug("connect() returned")
-
-                self.connected = True
-
-            except socket.error:
-
-                # This is most likely "connection refused"
-                # because the server is not running.
-                # Keep trying.
-                #
-                self.logger.debug("connection failed, trying again in 5s")
-
-                time.sleep(5)
-                
-        # The socket timeout is used for
-        # socket.recv() operations, which
-        # take turns with socket.sendto().
-        #
-        self.sock.settimeout(0.3)
+        # self.messages_for_local
+        # self.messages_for_remote
 
         self.logger.info("complete")
 
@@ -500,94 +489,206 @@ class TCPClientInterface(MessageBuffer, Interface):
 
         self.logger.debug("starting up")
 
-        # Run thread as long as no shutdown is requested
-        #
-        while not self.shutdown_flag:
+        # We do all the Twisted setup here so
+        # class instances can use the proxies
+        # for the TCPClientInterface attributes.
 
-            if self.messages_for_remote:
+        # Set up proxies
+        #
+        messages_for_local_proxy = self.messages_for_local
+
+        logger_proxy = self.logger
+
+        class MessageProtocol(twisted.internet.protocol.Protocol):
+            """An instance of this class is created
+               by Twisted every time a connection
+               is made.
+            """
+
+            def __init__(self):
+                """Additional init method, not
+                   required by Twisted Protocol.
+                """
+
+                self.data_buffer = ""
+
+                logger_proxy.debug("complete")
+
+            def connectionMade(self):
+                """Standard Twisted Protocol method.
+                   Attaches a reference to
+                   MessageProtocol.transport to the
+                   creating Factory as
+                   Factory.current_transport to be used
+                   by the outside world.
+                """
+
+                logger_proxy.debug("called")
+
+                self.factory.current_transport = self.transport
+
+            def dataReceived(self, data):
+                """Twisted Protocol standard method:
+                   handle received data.
+                """
+                # From the Twisted documentation:
+                #   Please keep in mind that you will probably need
+                #   to buffer some data, as partial (or multiple)
+                #   protocol messages may be received! I recommend
+                #   that unit tests for protocols call through to
+                #   this method with differing chunk sizes, down to
+                #   one byte at a time.
+
+                logger_proxy.debug("received server message: %s characters" % len(data))
+
+                # Keep buffering data until we end up with a
+                # double newline terminated message.
+                #
+                # TODO: This of course only works if some time passes between messages. Otherwise there might already be new data after the double newline.
+                #
+                self.data_buffer = self.data_buffer + data
+
+                if self.data_buffer.endswith("\n\n"):
+
+                    # Now we have double newline terminated
+                    # data in self.data_buffer.
+
+                    logger_proxy.debug("message complete: %s characters"
+                                       % len(self.data_buffer))
+
+                    # Remove newlines and unpickle
+                    #
+                    message = cPickle.loads(self.data_buffer.rstrip("\n"))
+
+                    messages_for_local_proxy.append(message)
+
+                    self.data_buffer = ""
+
+            # End of MessageProtocol class.
+
+        class MessageProtocolFactory(twisted.internet.protocol.ClientFactory):
+            """Twisted ClientFactory implementation,
+               producing a MessageProtocol instance
+               on every connection.
+            """
+
+            def __init__(self, protocol_class):
+                """Additional init method, not required by
+                   Twisted Protocol.
+                   This method initializes
+                   MessageProtocolFactory.current_transport
+                   to None. Once a connection is made, this
+                   will be replaced by a usable Twisted
+                   transport object by the MessageProtocol
+                   (assuming there will only ever be one
+                   single connection).
+                """
+
+                # Will be used by the default
+                # Factory.buildProtocol method
+                #
+                self.protocol = protocol_class
+
+                self.current_transport = None
+
+                logger_proxy.debug("complete")
+
+            # Not overriding def buildProtocol(self, addr):
+            # Standard Twisted Factory method which
+            # creates an returns an instance of
+            # Factory.protocol.
+
+            def clientConnectionFailed(self, connector, reason):
+
+                logger_proxy.info("reason: %s" % reason)
+
+            def clientConnectionLost(self, connector, reason):
+
+                logger_proxy.info("reason: %s" % reason)
+
+            #def startedConnecting(self, connector):
+            #
+            #    logger_proxy.info("called")
+
+            # End of MessageProtocolFactory class
+
+        # The following twists are lessons learned
+        # from developing the Shard-based CharanisMLClient
+        # in May 2008
+
+        def check_shutdown():
+
+            if self.shutdown_flag:
+
+                self.logger.info("caught shutdown_flag, closing connection and stopping reactor")
+
+                self.shutdown_confirmed = True
+
+                message_protocol_factory.current_transport.loseConnection()
+
+                twisted.internet.reactor.stop()
+
+                # End of check_shutdown()
+    
+        def send_queued_message():
+
+            # TODO: checking current_transport is fairly expensive. Try to avoid.
+            #
+            if (self.messages_for_remote
+                and message_protocol_factory.current_transport != None):
 
                 self.logger.debug("sending 1 message of %s" % len(self.messages_for_remote))
 
                 # -1 = use highest available pickle protocol
                 #
-                pickled_message = cPickle.dumps(self.messages_for_remote.popleft(), -1)
-
                 # Separating messages with the standard
                 # double newline.
+                #
                 # TODO: Check that double newlines are illegal in pickled data.
                 #
-                self.sock.send(pickled_message + "\n\n")
+                pickled_message = (cPickle.dumps(self.messages_for_remote.popleft(), -1)
+                                   + "\n\n")
 
-            # Now listen for incoming server
-            # messages for some time as
-            # set in __init__(). This will
-            # catch any messages received in
-            # the meantime by the OS (tested).
-            #
-            data_received = ""
+                message_protocol_factory.current_transport.write(pickled_message)
 
-            try:
+                self.logger.debug("sent %s characters" % len(pickled_message))
 
-                # TODO: Pickle produces large amounts of data. The struct module with a custom encoding should be used instead.
-                #
-                data_received = self.sock.recv(32768)
+                # End of send_queued_message()
 
-            except socket.timeout:
-
-                # We do not log here since this
-                # happens too often
-                #
-                pass
-
-            if data_received:
-
-                self.logger.debug("received server message: %s/32768 bytes" % len(data_received))
-
-                # Now. Keep reading data from the
-                # socket until we end up with a
-                # double newline terminated message.
-                #
-                # TODO: This of course only works if some time passes between messages. Otherwise there might already be new data after the double newline.
-                #
-                while not data_received.endswith("\n\n"):
-
-                    # The infamous 16k packet issue.
-                    #
-                    self.logger.debug("reading more data from socket")
-
-                    # Read some more.
-                    #
-                    data_received = data_received + self.sock.recv(32768)
-
-                    print(data_received)
-
-                    self.logger.debug("data_received: %s" % len(data_received))
-
-                # Now we have double newline terminated
-                # data in data_received.
-
-                self.logger.debug("read %s characters in total" % len(data_received))
-
-                # Remove newlines
-                #
-                message = cPickle.loads(data_received.rstrip("\n"))
-
-                self.messages_for_local.append(message)
-
-        # Caught shutdown notification
+        # Create Twisted LoopingCalls
         #
-        self.logger.info("shutting down")
+        check_shutdown_call = twisted.internet.task.LoopingCall(check_shutdown)
 
-        # This is TCP, so be nice and close the socket.
+        send_queued_message_call = twisted.internet.task.LoopingCall(send_queued_message)
+
+        # Check every 0.5s
         #
-        self.sock.close()
+        check_shutdown_call.start(0.5)
 
-        self.shutdown_confirmed = True
-
-        # Stopping thread
+        # Check every 0.3s as done in the earlier implementation
         #
+        send_queued_message_call.start(0.3)
+
+        # Get ready
+        #
+        message_protocol_factory = MessageProtocolFactory(MessageProtocol)
+
+        twisted.internet.reactor.connectTCP(self.address_port_tuple[0],
+                                            self.address_port_tuple[1],
+                                            message_protocol_factory)
+
+        # Now run Twisted loop as long as no
+        # shutdown is requested.
+        #
+        # installSignalHandlers=0 to run flawlessy in a thread
+        #
+        twisted.internet.reactor.run(installSignalHandlers = 0)
+
+        # twisted.internet.reactor.run() returned
+        #
+        self.logger.info("connection closed, reactor stopped, stopping thread")
+
         raise SystemExit
-
 
 class TCPMessageBuffer(MessageBuffer):
     """A message buffer with a connected
@@ -605,9 +706,9 @@ class TCPMessageBuffer(MessageBuffer):
 
         return
 
-
 class TCPServerInterface(Interface):
-    """A Shard Server Interface using TCP.
+    """A Shard Server Interface using TCP,
+       built upon the Twisted framework.
     """
 
     def __init__(self, address_port_tuple, logger):
@@ -806,8 +907,6 @@ class TCPServerInterface(Interface):
                         # TODO: Check that double newlines are illegal in pickled data.
                         #
                         pickled_message = pickled_message + "\n\n"
-
-                        print(pickled_message)
 
                         self.logger.debug("pickled_message: %s characters" % len(pickled_message))
 
