@@ -559,6 +559,10 @@ class TCPClientInterface(MessageBuffer, Interface):
                     #
                     data_received = data_received + self.sock.recv(32768)
 
+                    print(data_received)
+
+                    self.logger.debug("data_received: %s" % len(data_received))
+
                 # Now we have double newline terminated
                 # data in data_received.
 
@@ -801,7 +805,13 @@ class TCPServerInterface(Interface):
                         # double newline.
                         # TODO: Check that double newlines are illegal in pickled data.
                         #
-                        bytes = message_buffer.sock.send(pickled_message + "\n\n")
+                        pickled_message = pickled_message + "\n\n"
+
+                        print(pickled_message)
+
+                        self.logger.debug("pickled_message: %s characters" % len(pickled_message))
+
+                        bytes = message_buffer.sock.send(pickled_message)
 
                         self.logger.debug("sent %s bytes" % bytes)
 
