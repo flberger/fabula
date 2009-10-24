@@ -6,6 +6,7 @@
 import shard
 import shard.coreengine
 import random
+import time
 
 class ClientCoreEngine(shard.coreengine.CoreEngine):
     """An instance of this class is the main engine in every
@@ -112,14 +113,29 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.player_id = id
 
-        self.interface.send_message(shard.Message([shard.InitEvent(id)]))
+        self.logger.info("waiting for interface to connect")
+
+        while not self.interface.connections:
+
+            self.logger.info("no connection yet, waiting 1s")
+
+            time.sleep(1.0)
+
+        self.logger.info("connection found, sending InitEvent")
+
+        # There is only one connection in the
+        # ClientInterface, so use the first one
+        #
+        self.message_buffer = self.interface.connections.values()[0] 
+
+        self.message_buffer.send_message(shard.Message([shard.InitEvent(id)]))
 
         while not self.plugin.exit_requested:
 
             # grab_message must and will return a Message, but
             # it possibly has an empty event_list.
             #
-            server_message = self.interface.grab_message()
+            server_message = self.message_buffer.grab_message()
 
             if server_message.event_list:
 
@@ -217,7 +233,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # If this iteration yielded any events, send them.
             #
             if self.message_for_remote.event_list:
-                self.interface.send_message(self.message_for_remote)
+
+                self.message_buffer.send_message(self.message_for_remote)
 
                 # Clean up
                 #
