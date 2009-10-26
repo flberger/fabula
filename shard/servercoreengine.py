@@ -298,52 +298,37 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         self.logger.debug("called")
 
-        # TODO: replace random if tests with design by contract ;-)
+        # TODO: design by contract: entity in entity_dict? Target a tuple? ...
+
+        self.logger.debug("%s -> %s" % (event.identifier, event.target_identifier))
+
+        # In case of an AttemptEvent, make the
+        # affected entity turn into the direction
+        # of the event
         #
-        if (event.identifier in self.entity_dict
-            and
-            event.target_identifier in shard.DIRECTION_VECTOR):
+        direction = shard.difference_2d(self.entity_dict[event.identifier].location,
+                                        event.target_identifier)
 
-            self.logger.debug(str(event.identifier)
-                              + " -> "
-                              + str(event.target_identifier))
+        self.entity_dict[event.identifier].direction = direction
 
-            # In case of an AttemptEvent, make the
-            # affected entity turn into the direction
-            # of the event
-            #
-            self.entity_dict[event.identifier].direction = event.target_identifier
+        # Test if a movement from the current
+        # entity location to the new location
+        # on the map is possible
+        #
+        # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
+        #
+        try:
+            if self.map[event.target_identifier].tile_type == "FLOOR":
 
-            # Test if a movement from the current
-            # entity location to the new location
-            # on the map is possible
-            #
-            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
-            #
-            new_x = (self.entity_dict[event.identifier].location[0]
-                     + shard.DIRECTION_VECTOR[event.target_identifier][0])
-
-            new_y = (self.entity_dict[event.identifier].location[1]
-                     + shard.DIRECTION_VECTOR[event.target_identifier][1])
-
-            try:
-                if self.map[(new_x, new_y)].tile_type == "FLOOR":
-
-                    message.event_list.append(shard.MovesToEvent(event.identifier,
-                                                                 event.target_identifier))
-                else:
-
-                    message.event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-            except KeyError:
+                message.event_list.append(shard.MovesToEvent(event.identifier,
+                                                             event.target_identifier))
+            else:
 
                 message.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-        else:
-            self.logger.error("wrong direction or entity: "
-                              + str(event.identifier)
-                              + " -> "
-                              + str(event.target_identifier))
+        except KeyError:
+
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
     def process_InitEvent(self, event, message):
         """Check if we already have a room and

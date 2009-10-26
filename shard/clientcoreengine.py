@@ -199,19 +199,24 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the ClientCoreEngine?
                 #
                 self.message_for_remote.event_list = (message_from_plugin.event_list
-                                                  + self.message_for_remote.event_list)
+                                                      + self.message_for_remote.event_list)
 
                 for event in message_from_plugin.event_list:
 
                     if isinstance(event, shard.AttemptEvent):
+                        # TODO: copied from ServerCoreEngine.process_TriesToMoveEvent()
 
                         # In case of an AttemptEvent, make the
                         # affected entity turn into the direction
                         # of the event
                         #
-                        self.entity_dict[event.identifier].direction = event.target_identifier
+                        direction = shard.difference_2d(self.entity_dict[event.identifier].location,
+                                                        event.target_identifier)
 
-                        self.logger.debug("found AttemptEvent, setting direction: %s -> %s" % (event.identifier, event.target_identifier))
+                        self.entity_dict[event.identifier].direction = direction
+
+                        self.logger.debug("found AttemptEvent, setting direction: %s -> %s"
+                                          % (event.identifier, direction))
 
                         # In case of a TriesToMoveEvent, test and
                         # approve the movement locally to allow
@@ -232,12 +237,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                             #
                             # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
                             #
-                            new_x = (self.entity_dict[event.identifier].location[0]
-                                     + shard.DIRECTION_VECTOR[event.target_identifier][0])
-
-                            new_y = (self.entity_dict[event.identifier].location[1]
-                                     + shard.DIRECTION_VECTOR[event.target_identifier][1])
-
                             # We queue the event in self.message_for_plugin,
                             # so it will be rendered upon next call. That
                             # way it bypasses the ClientCoreEngine; its status
@@ -247,7 +246,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                             # by the server in very short time.
                             #
                             try:
-                                if self.map[(new_x, new_y)].tile_type == "FLOOR":
+                                if self.map[event.target_identifier].tile_type == "FLOOR":
 
                                     moves_to_event = shard.MovesToEvent(event.identifier,
                                                                         event.target_identifier)
@@ -356,12 +355,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # local MovesToEvent?
         #
         if (event.identifier == self.local_moves_to_event.identifier
-            and event.direction == self.local_moves_to_event.direction):
+            and event.location == self.local_moves_to_event.location):
 
             # Fine, we already had that.
             #
-            self.logger.debug("suppressing server issued MovesToEvent ('%s', '%s')"
-                              % (event.identifier, event.direction))
+            self.logger.debug("server issued MovesToEvent already applied: ('%s', '%s')"
+                              % (event.identifier, event.location))
 
             # Reset copy of local event
             #

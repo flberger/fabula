@@ -15,6 +15,7 @@
 # TODO: "%s" % s instead of "s" + "s" in the whole package!
 # TODO: use map() instead of "for" loops
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
+# TODO: readable __repr__ of Events and Messages
 
 ############################################################
 # Events
@@ -46,15 +47,16 @@ class AttemptEvent(Event):
 
     def __init__(self, identifier, target_identifier):
         """When sent by the client, target_identifier
-           must describe the desired direction of
-           the attempt.
+           must describe the target location of the
+           attempt.
            On a two-dimensional map with rectangular
-           elements target_identifier may be one 
-           of "N", "NE", "E", "SE", "S", "SW", "W", "NW".
+           elements target_identifier is a tuple of
+           (x, y) integer coordinates, with (0, 0) being
+           the upper left corner.
            The server determines what is being 
            looked at / picked up / manipulated / 
-           talked to in that direction, and 
-           replaces the direction string with an item, 
+           talked to at that location, and 
+           replaces the location string with an item, 
            NPC or player identifier if appropriate.
         """
         self.identifier = identifier
@@ -69,7 +71,7 @@ class TriesToMoveEvent(AttemptEvent):
 
 class TriesToLookAtEvent(AttemptEvent):
     """Issued when the player or an NPC looks at a map 
-       element or an item
+       element or an item.
     """
     pass
 
@@ -88,14 +90,15 @@ class TriesToDropEvent(AttemptEvent):
         """An attempt to drop the item identified by
            item_identifier. When sent by the client, 
            target_identifier must describe the 
-           desired direction.
+           desired location.
            On a two-dimensional map with rectangular
-           elements target_identifier may be one of 
-           "N", "NE", "E", "SE", "S", "SW", "W", "NW".
+           elements target_identifier is a tuple of
+           (x, y) integer coordinates, with (0, 0) being
+           the upper left corner.
            Note that this attempt can turn out as a
            "use" action, for example when dropping
            a key on a padlock. In this case, the
-           server replaces the direction with an item 
+           server replaces the location with an item 
            identifier and passes that on to the
            story engine.
         """
@@ -131,13 +134,13 @@ class MovesToEvent(ConfirmEvent):
     """This is the server confirmation of a movement.
     """
 
-    def __init__(self, identifier, direction):
-        """direction is a description as in
+    def __init__(self, identifier, location):
+        """location is a description as in
            the TriesToMoveEvent.
         """
         self.identifier = identifier
 
-        self.direction = direction
+        self.location = location
 
 class PicksUpEvent(ConfirmEvent):
     """This is a server confirmation of a
@@ -165,16 +168,16 @@ class DropsEvent(ConfirmEvent):
        and some other events are issued.
     """
 
-    def __init__(self, identifier, item_identifier, direction):
+    def __init__(self, identifier, item_identifier, location):
         """item_identifier identifies the item to be 
-           dropped on the map. direction is a 
+           dropped on the map. location is a 
            description as in the TriesToMoveEvent.
         """
         self.identifier = identifier
 
         self.item_identifier = item_identifier
 
-        self.direction = direction
+        self.location = location
 
 class CanSpeakEvent(ConfirmEvent):
     """This is a server invitation for the player or
@@ -413,12 +416,15 @@ class Message:
        of a certain time frame. The PresentationEngine has to
        decide which events happen in parallel and which 
        ones happen sequential. Instances of Message 
-       expose a single Python list object as Message.event_list."""
+       expose a single Python list object as Message.event_list.
+    """
 
     def __init__(self, event_list):
         """Initialize the Message with a list of objects
            derived from shard.Event. An empty list may
-           be supplied."""
+           be supplied.
+        """
+
         #CHECKME: check the list elements for being
         #         instances of shard.Event here?
         self.event_list = event_list
@@ -435,7 +441,14 @@ class Message:
 class Entity:
     """An Entity is a Shard game object. This is the base
        class for the player, NPCs and items. An Entity
-       holds information used by the Shard game logic.
+       holds information used by the Shard game logic:
+
+       Entity.entity_type
+       Entity.identifier
+       Entity.location
+       Entity.asset
+       Entity.direction
+
        A Shard Client should use subclasses (possibly
        with multiple inheritance) or custom attachements
        to instances of this class to implement the
@@ -447,7 +460,10 @@ class Entity:
        application dependent it is not covered in the
        base class. Check the documentation and source of 
        the PresentationEngine for further insight on how it 
-       handles game objects."""
+       handles game objects.
+    """
+
+    # TODO: Are Entities EventProcessors?
 
     def __init__(self, entity_type, identifier, location, asset):
         """You are welcome to override this method, but
@@ -458,33 +474,38 @@ class Entity:
         self.setup(entity_type, identifier, location, asset)
 
     def setup(self, entity_type, identifier, location, asset):
-        """entity_type is one of the strings "PLAYER", "NPC", 
-           "ITEM".
+        """This method sets up the following attributes
+           from the values givens:
 
-           identifier must be an object whose string 
-           representation yields an unique 
-           identification.
+           Entity.entity_type
+           One of the strings "PLAYER", "NPC", "ITEM".
 
-           location is an object describing the
-           location of the Entity in the game world, 
-           most probably a tuple of coordinates, but
-           possibly only a string like "lobby". The
-           location should not be too precise when
-           using coordinates, since it is not
-           incremented during movement. It should
-           rather store where the entity will be
-           once the next movement is complete.
+           Entity.identifier
+           Must be an object whose string representation
+           yields an unique identification.
 
-           asset is preferably a string
-           with a file name or an URI of a media
-           file containing the data for visualizing
-           the Entity. Do not put large objects here
-           since Entities are pushed around quite a
-           bit and transfered across the network.
+           Entity.location
+           An object describing the location of the
+           Entity in the game world, most probably
+           a tuple of coordinates, but possibly only
+           a string like "lobby". The location should
+           not be too precise when using coordinates,
+           since it is not incremented during movement.
+           It should rather store where the entity will
+           be once the next movement is complete.
+
+           Entity.asset
+           Preferably a string with a file name or an URI
+           of a media file containing the data for visualizing
+           the Entity. Do not put large objects here since
+           Entities are pushed around quite a bit and
+           transfered across the network.
            The PresentationEngine may fetch the asset and
            attach it to the instance of the Entity.
 
-           logger finally is an instance of logging.Logger.
+           Entity.direction
+           The direction the Entity is facing, expressed
+           as a vector tuple. The default is (0, 1).
         """
 
         self.entity_type = entity_type
@@ -493,17 +514,11 @@ class Entity:
         self.asset = asset
 
         # Store current direction and movement.
-        # Default direction is 'S' so that the entity
-        # will have a front view in most implementations.
+        # Default direction is (0, 1) = South so that the
+        # entity will have a front view in most
+        # implementations.
         #
-        self.direction = 'S'
-        self.moves = False
-
-        # Other flags for Entity actions
-        #
-        self.speaks = False
-        self.picks_up = False
-        self.drops = False
+        self.direction = (0, 1)
 
     # TODO:
     # Entities should be notified about all attempts
@@ -528,31 +543,20 @@ class Entity:
            the movement. This is rather called
            by the ClientCoreEngine to signal
            where the Entity is about to move.
-           See the other methods of this class."""
+           See the other methods of this class.
+        """
 
         # In a contract-like design, we should
         # check preconditions like
         # isinstance(Event, MovesToEvent)
         # or len(self.location) == 2.
         
-        # EXAMPLE
-        #
-        # Store the movement, maybe for 
+        # Store direction and movement, maybe for 
         # animation purposes
         #
-        self.direction = event.direction
+        self.direction = difference_2d(self.location, event.location)
 
-        # We use shard.DIRECTION_VECTOR which maps
-        # direction strings like "NW", "SE" to
-        # a 2D vector tuple
-
-        new_x = (self.location[0]
-                 + DIRECTION_VECTOR[event.direction][0])
-
-        new_y = (self.location[1]
-                 + DIRECTION_VECTOR[event.direction][1])
-
-        self.location = (new_x, new_y)
+        self.location = event.location
 
     def change_state(self, state, frames=None, framerate=None):
         """Called when the state of the Entity is
@@ -609,26 +613,20 @@ class Tile:
            
            asset is preferably a string with a file 
            name or an URI of a media file containing 
-           the data for visualizing the tile."""
+           the data for visualizing the tile.
+        """
         self.tile_type = tile_type
         self.asset = asset
 
-############################################################
-# Utilities
-
-# Set up a DIRECTION_VECTOR for 2D movement
-# processing. It is assumed that (0, 0) is
-# the upper left corner
+# Convenience function to compute differences
 #
-DIRECTION_VECTOR = {'N' : (0, -1),
-                    'NE' : (1, -1),
-                    'E' : (1, 0),
-                    'SE' : (1, 1),
-                    'S' : (0, 1),
-                    'SW' : (-1, 1),
-                    'W' : (-1, 0),
-                    'NW' : (-1, -1)
-                   }
+def difference_2d(start_tuple, end_tuple):
+    """Return the difference vector between
+       a 2D start and end position.
+    """
+
+    return (end_tuple[0] - start_tuple[0],
+            end_tuple[1] - start_tuple[1])
 
 ############################################################
 # Exceptions
