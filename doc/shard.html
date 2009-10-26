@@ -105,15 +105,16 @@ by&nbsp;the&nbsp;player&nbsp;or&nbsp;NPCs.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="AttemptEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -297,8 +298,8 @@ and&nbsp;some&nbsp;other&nbsp;events&nbsp;are&nbsp;issued.<br>&nbsp;</tt></td></
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="DropsEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, direction)</dt><dd><tt>item_identifier&nbsp;identifies&nbsp;the&nbsp;item&nbsp;to&nbsp;be&nbsp;<br>
-dropped&nbsp;on&nbsp;the&nbsp;map.&nbsp;direction&nbsp;is&nbsp;a&nbsp;<br>
+<dl><dt><a name="DropsEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, location)</dt><dd><tt>item_identifier&nbsp;identifies&nbsp;the&nbsp;item&nbsp;to&nbsp;be&nbsp;<br>
+dropped&nbsp;on&nbsp;the&nbsp;map.&nbsp;location&nbsp;is&nbsp;a&nbsp;<br>
 description&nbsp;as&nbsp;in&nbsp;the&nbsp;<a href="#TriesToMoveEvent">TriesToMoveEvent</a>.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -332,7 +333,14 @@ Methods defined here:<br>
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>An&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;a&nbsp;Shard&nbsp;game&nbsp;object.&nbsp;This&nbsp;is&nbsp;the&nbsp;base<br>
 class&nbsp;for&nbsp;the&nbsp;player,&nbsp;NPCs&nbsp;and&nbsp;items.&nbsp;An&nbsp;<a href="#Entity">Entity</a><br>
-holds&nbsp;information&nbsp;used&nbsp;by&nbsp;the&nbsp;Shard&nbsp;game&nbsp;logic.<br>
+holds&nbsp;information&nbsp;used&nbsp;by&nbsp;the&nbsp;Shard&nbsp;game&nbsp;logic:<br>
+&nbsp;<br>
+<a href="#Entity">Entity</a>.entity_type<br>
+<a href="#Entity">Entity</a>.identifier<br>
+<a href="#Entity">Entity</a>.location<br>
+<a href="#Entity">Entity</a>.asset<br>
+<a href="#Entity">Entity</a>.direction<br>
+&nbsp;<br>
 A&nbsp;Shard&nbsp;Client&nbsp;should&nbsp;use&nbsp;subclasses&nbsp;(possibly<br>
 with&nbsp;multiple&nbsp;inheritance)&nbsp;or&nbsp;custom&nbsp;attachements<br>
 to&nbsp;instances&nbsp;of&nbsp;this&nbsp;class&nbsp;to&nbsp;implement&nbsp;the<br>
@@ -397,33 +405,38 @@ by&nbsp;the&nbsp;ClientCoreEngine&nbsp;to&nbsp;signal<br>
 where&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;about&nbsp;to&nbsp;move.<br>
 See&nbsp;the&nbsp;other&nbsp;methods&nbsp;of&nbsp;this&nbsp;class.</tt></dd></dl>
 
-<dl><dt><a name="Entity-setup"><strong>setup</strong></a>(self, entity_type, identifier, location, asset)</dt><dd><tt>entity_type&nbsp;is&nbsp;one&nbsp;of&nbsp;the&nbsp;strings&nbsp;"PLAYER",&nbsp;"NPC",&nbsp;<br>
-"ITEM".<br>
+<dl><dt><a name="Entity-setup"><strong>setup</strong></a>(self, entity_type, identifier, location, asset)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;following&nbsp;attributes<br>
+from&nbsp;the&nbsp;values&nbsp;givens:<br>
 &nbsp;<br>
-identifier&nbsp;must&nbsp;be&nbsp;an&nbsp;object&nbsp;whose&nbsp;string&nbsp;<br>
-representation&nbsp;yields&nbsp;an&nbsp;unique&nbsp;<br>
-identification.<br>
+<a href="#Entity">Entity</a>.entity_type<br>
+One&nbsp;of&nbsp;the&nbsp;strings&nbsp;"PLAYER",&nbsp;"NPC",&nbsp;"ITEM".<br>
 &nbsp;<br>
-location&nbsp;is&nbsp;an&nbsp;object&nbsp;describing&nbsp;the<br>
-location&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;in&nbsp;the&nbsp;game&nbsp;world,&nbsp;<br>
-most&nbsp;probably&nbsp;a&nbsp;tuple&nbsp;of&nbsp;coordinates,&nbsp;but<br>
-possibly&nbsp;only&nbsp;a&nbsp;string&nbsp;like&nbsp;"lobby".&nbsp;The<br>
-location&nbsp;should&nbsp;not&nbsp;be&nbsp;too&nbsp;precise&nbsp;when<br>
-using&nbsp;coordinates,&nbsp;since&nbsp;it&nbsp;is&nbsp;not<br>
-incremented&nbsp;during&nbsp;movement.&nbsp;It&nbsp;should<br>
-rather&nbsp;store&nbsp;where&nbsp;the&nbsp;entity&nbsp;will&nbsp;be<br>
-once&nbsp;the&nbsp;next&nbsp;movement&nbsp;is&nbsp;complete.<br>
+<a href="#Entity">Entity</a>.identifier<br>
+Must&nbsp;be&nbsp;an&nbsp;object&nbsp;whose&nbsp;string&nbsp;representation<br>
+yields&nbsp;an&nbsp;unique&nbsp;identification.<br>
 &nbsp;<br>
-asset&nbsp;is&nbsp;preferably&nbsp;a&nbsp;string<br>
-with&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;URI&nbsp;of&nbsp;a&nbsp;media<br>
-file&nbsp;containing&nbsp;the&nbsp;data&nbsp;for&nbsp;visualizing<br>
-the&nbsp;<a href="#Entity">Entity</a>.&nbsp;Do&nbsp;not&nbsp;put&nbsp;large&nbsp;objects&nbsp;here<br>
-since&nbsp;Entities&nbsp;are&nbsp;pushed&nbsp;around&nbsp;quite&nbsp;a<br>
-bit&nbsp;and&nbsp;transfered&nbsp;across&nbsp;the&nbsp;network.<br>
+<a href="#Entity">Entity</a>.location<br>
+An&nbsp;object&nbsp;describing&nbsp;the&nbsp;location&nbsp;of&nbsp;the<br>
+<a href="#Entity">Entity</a>&nbsp;in&nbsp;the&nbsp;game&nbsp;world,&nbsp;most&nbsp;probably<br>
+a&nbsp;tuple&nbsp;of&nbsp;coordinates,&nbsp;but&nbsp;possibly&nbsp;only<br>
+a&nbsp;string&nbsp;like&nbsp;"lobby".&nbsp;The&nbsp;location&nbsp;should<br>
+not&nbsp;be&nbsp;too&nbsp;precise&nbsp;when&nbsp;using&nbsp;coordinates,<br>
+since&nbsp;it&nbsp;is&nbsp;not&nbsp;incremented&nbsp;during&nbsp;movement.<br>
+It&nbsp;should&nbsp;rather&nbsp;store&nbsp;where&nbsp;the&nbsp;entity&nbsp;will<br>
+be&nbsp;once&nbsp;the&nbsp;next&nbsp;movement&nbsp;is&nbsp;complete.<br>
+&nbsp;<br>
+<a href="#Entity">Entity</a>.asset<br>
+Preferably&nbsp;a&nbsp;string&nbsp;with&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;URI<br>
+of&nbsp;a&nbsp;media&nbsp;file&nbsp;containing&nbsp;the&nbsp;data&nbsp;for&nbsp;visualizing<br>
+the&nbsp;<a href="#Entity">Entity</a>.&nbsp;Do&nbsp;not&nbsp;put&nbsp;large&nbsp;objects&nbsp;here&nbsp;since<br>
+Entities&nbsp;are&nbsp;pushed&nbsp;around&nbsp;quite&nbsp;a&nbsp;bit&nbsp;and<br>
+transfered&nbsp;across&nbsp;the&nbsp;network.<br>
 The&nbsp;PresentationEngine&nbsp;may&nbsp;fetch&nbsp;the&nbsp;asset&nbsp;and<br>
 attach&nbsp;it&nbsp;to&nbsp;the&nbsp;instance&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>.<br>
 &nbsp;<br>
-logger&nbsp;finally&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;logging.Logger.</tt></dd></dl>
+<a href="#Entity">Entity</a>.direction<br>
+The&nbsp;direction&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;facing,&nbsp;expressed<br>
+as&nbsp;a&nbsp;vector&nbsp;tuple.&nbsp;The&nbsp;default&nbsp;is&nbsp;(0,&nbsp;1).</tt></dd></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -514,7 +527,7 @@ be&nbsp;supplied.</tt></dd></dl>
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="MovesToEvent-__init__"><strong>__init__</strong></a>(self, identifier, direction)</dt><dd><tt>direction&nbsp;is&nbsp;a&nbsp;description&nbsp;as&nbsp;in<br>
+<dl><dt><a name="MovesToEvent-__init__"><strong>__init__</strong></a>(self, identifier, location)</dt><dd><tt>location&nbsp;is&nbsp;a&nbsp;description&nbsp;as&nbsp;in<br>
 the&nbsp;<a href="#TriesToMoveEvent">TriesToMoveEvent</a>.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -756,14 +769,15 @@ Methods defined here:<br>
 <dl><dt><a name="TriesToDropEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, target_identifier)</dt><dd><tt>An&nbsp;attempt&nbsp;to&nbsp;drop&nbsp;the&nbsp;item&nbsp;identified&nbsp;by<br>
 item_identifier.&nbsp;When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;<br>
 target_identifier&nbsp;must&nbsp;describe&nbsp;the&nbsp;<br>
-desired&nbsp;direction.<br>
+desired&nbsp;location.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;of&nbsp;<br>
-"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 Note&nbsp;that&nbsp;this&nbsp;attempt&nbsp;can&nbsp;turn&nbsp;out&nbsp;as&nbsp;a<br>
 "use"&nbsp;action,&nbsp;for&nbsp;example&nbsp;when&nbsp;dropping<br>
 a&nbsp;key&nbsp;on&nbsp;a&nbsp;padlock.&nbsp;In&nbsp;this&nbsp;case,&nbsp;the<br>
-server&nbsp;replaces&nbsp;the&nbsp;direction&nbsp;with&nbsp;an&nbsp;item&nbsp;<br>
+server&nbsp;replaces&nbsp;the&nbsp;location&nbsp;with&nbsp;an&nbsp;item&nbsp;<br>
 identifier&nbsp;and&nbsp;passes&nbsp;that&nbsp;on&nbsp;to&nbsp;the<br>
 story&nbsp;engine.</tt></dd></dl>
 
@@ -775,7 +789,7 @@ story&nbsp;engine.</tt></dd></dl>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;looks&nbsp;at&nbsp;a&nbsp;map&nbsp;<br>
-element&nbsp;or&nbsp;an&nbsp;item<br>&nbsp;</tt></td></tr>
+element&nbsp;or&nbsp;an&nbsp;item.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="shard.html#TriesToLookAtEvent">TriesToLookAtEvent</a></dd>
@@ -785,15 +799,16 @@ element&nbsp;or&nbsp;an&nbsp;item<br>&nbsp;</tt></td></tr>
 <hr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToLookAtEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -814,15 +829,16 @@ manipulate&nbsp;an&nbsp;item.&nbsp;NPCs&nbsp;cannot&nbsp;be&nbsp;manipulated.<br
 <hr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToManipulateEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -843,15 +859,16 @@ awaiting&nbsp;server&nbsp;confirmation.<br>&nbsp;</tt></td></tr>
 <hr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToMoveEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -873,15 +890,16 @@ or&nbsp;answered&nbsp;with&nbsp;an&nbsp;error.<br>&nbsp;</tt></td></tr>
 <hr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToPickUpEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table> <p>
@@ -903,23 +921,26 @@ It&nbsp;is&nbsp;not&nbsp;possible&nbsp;to&nbsp;talk&nbsp;to&nbsp;items.<br>&nbsp
 <hr>
 Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
 <dl><dt><a name="TriesToTalkToEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;desired&nbsp;direction&nbsp;of<br>
-the&nbsp;attempt.<br>
+must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
+attempt.<br>
 On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;may&nbsp;be&nbsp;one&nbsp;<br>
-of&nbsp;"N",&nbsp;"NE",&nbsp;"E",&nbsp;"SE",&nbsp;"S",&nbsp;"SW",&nbsp;"W",&nbsp;"NW".<br>
+elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
+(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
+the&nbsp;upper&nbsp;left&nbsp;corner.<br>
 The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
 looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;in&nbsp;that&nbsp;direction,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;direction&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
+talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
+replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
 NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#55aa55">
+<tr bgcolor="#eeaa77">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
-<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>DIRECTION_VECTOR</strong> = {'E': (1, 0), 'N': (0, -1), 'NE': (1, -1), 'NW': (-1, -1), 'S': (0, 1), 'SE': (1, 1), 'SW': (-1, 1), 'W': (-1, 0)}</td></tr></table>
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-difference_2d"><strong>difference_2d</strong></a>(start_tuple, end_tuple)</dt><dd><tt>Return&nbsp;the&nbsp;difference&nbsp;vector&nbsp;between<br>
+a&nbsp;2D&nbsp;start&nbsp;and&nbsp;end&nbsp;position.</tt></dd></dl>
+</td></tr></table>
 </body></html>
