@@ -49,7 +49,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     shard.interfaces.ServerInterface
         #
         #
-        #     self.interface.client_connections
+        #     self.interface.connections
         #
         #         A dict of MessageBuffer instances,
         #         indexed by (address, port) tuples
@@ -131,9 +131,9 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #
         while not self.exit_requested:
 
-            for address_port_tuple in self.interface.client_connections:
+            for address_port_tuple in self.interface.connections:
 
-                current_message_buffer = self.interface.client_connections[address_port_tuple]
+                current_message_buffer = self.interface.connections[address_port_tuple]
 
                 message = current_message_buffer.grab_message()
 
@@ -229,7 +229,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                     #
                     if len(self.message_for_all.event_list):
 
-                        for message_buffer in self.interface.client_connections.values():
+                        for message_buffer in self.interface.connections.values():
 
                             # Leave out current MessageBuffer which
                             # already has reveived the events above.
