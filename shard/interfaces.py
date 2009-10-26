@@ -561,10 +561,27 @@ class ProtocolMessageBuffer(MessageBuffer,
 
             self.logger.debug("sent %s characters" % len(pickled_message))
 
-class TCPClientInterface(Interface):
-    """A Shard Client Interface using TCP,
+class TCPInterface(Interface):
+    """A generic Shard Interface using TCP,
        built upon the Twisted framework.
     """
+
+    def __init__(self, address_port_tuple, logger, interface_type, send_interval):
+        """addres_port_tuple and logger are
+           arguments for setup_interface.
+           interface_type is either "client"
+           or "server". send_interval is the
+           interval of sending queued messages
+           in seconds (float).
+        """
+
+        self.setup_interface(address_port_tuple, logger)
+
+        self.interface_type = interface_type
+
+        self.send_interval = send_interval
+
+        self.logger.debug("complete")
 
     def handle_messages(self):
         """The task of this method is to do whatever is
@@ -583,142 +600,8 @@ class TCPClientInterface(Interface):
            the thread.
         """
 
-        self.logger.debug("starting up")
-
-        # We do all the Twisted setup here so
-        # class instances can use the proxies
-        # for the TCPClientInterface attributes.
-
-        # Set up proxies
-        #
-        logger_proxy = self.logger
-        connections_proxy = self.connections
-
-        class MessageProtocolFactory(twisted.internet.protocol.ClientFactory):
-            """Twisted ClientFactory implementation,
-               producing a ProtocolMessageBuffer instance
-               for every connection.
-            """
-
-            def buildProtocol(self, addr):
-                """Standard Twisted Factory method which
-                   creates an returns an instance of
-                   ProtocolMessageBuffer.
-                """
-
-                protocol_message_buffer = ProtocolMessageBuffer(logger_proxy)
-
-                # Register at Interface level
-                #
-                logger_proxy.info("adding new connection: (%s, %s)"
-                                  % (addr.host, addr.port))
-
-                connections_proxy[(addr.host, addr.port)] = protocol_message_buffer
-
-                return protocol_message_buffer
-
-            def clientConnectionFailed(self, connector, reason):
-
-                logger_proxy.info("reason: %s" % reason)
-
-            def clientConnectionLost(self, connector, reason):
-
-                logger_proxy.info("reason: %s" % reason)
-
-            #def startedConnecting(self, connector):
-            #
-            #    logger_proxy.info("called")
-
-            # End of MessageProtocolFactory class
-
-        # The following twists are lessons learned
-        # from developing the Shard-based CharanisMLClient
-        # in May 2008
-
-        def check_shutdown():
-
-            if self.shutdown_flag:
-
-                self.logger.info("caught shutdown_flag, closing connection and stopping reactor")
-
-                self.shutdown_confirmed = True
-
-                for protocol_message_buffer in self.connections.values():
-
-                    protocol_message_buffer.transport.loseConnection()
-
-                twisted.internet.reactor.stop()
-
-            # End of check_shutdown()
-
-        def send_all_queued_messages():
-
-            for protocol_message_buffer in self.connections.values():
-
-                protocol_message_buffer.send_queued_message()
-
-            # End of send_all_queued_messages()
-
-        # Create Twisted LoopingCalls
-        #
-        check_shutdown_call = twisted.internet.task.LoopingCall(check_shutdown)
-
-        send_all_queued_messages_call = twisted.internet.task.LoopingCall(send_all_queued_messages)
-
-        # Check every 0.5s
-        #
-        check_shutdown_call.start(0.5)
-
-        # Check every 0.3s as done in the earlier implementation
-        #
-        send_all_queued_messages_call.start(0.3)
-
-        # Get ready
-        #
-        twisted.internet.reactor.connectTCP(self.address_port_tuple[0],
-                                            self.address_port_tuple[1],
-                                            MessageProtocolFactory())
-
-        # Now run Twisted loop as long as no
-        # shutdown is requested.
-        #
-        # installSignalHandlers=0 to run flawlessy in a thread
-        #
-        twisted.internet.reactor.run(installSignalHandlers = 0)
-
-        # twisted.internet.reactor.run() returned
-        #
-        self.logger.info("connection closed, reactor stopped, stopping thread")
-
-        raise SystemExit
-
-
-class TCPServerInterface(Interface):
-    """A Shard Server Interface using TCP,
-       built upon the Twisted framework.
-    """
-
-    def handle_messages(self):
-        """The task of this method is to do whatever is
-           necessary to send server messages and obtain 
-           client messages. It is meant to be the back end 
-           of send_message() and grab_message(). Put some 
-           networking code, a GUI or a random generator 
-           here. 
-           This method is put in a background thread 
-           automatically, so it can do all sorts of 
-           polling or blocking IO.
-           It should regularly check whether shutdown()
-           has been called, and if so, it should notify
-           shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop 
-           the thread.
-        """
-
         # TODO: remove connections that caused an error?
 
-        # BEGIN COPY + PASTE
-
         self.logger.debug("starting up")
 
         # We do all the Twisted setup here so
@@ -805,23 +688,26 @@ class TCPServerInterface(Interface):
         #
         check_shutdown_call.start(0.5)
 
-        # BEGIN DEVIATION FROM COPY + PASTE
-
-        # Check every 0.1s as done in the earlier implementation
+        # Given in __init__ as send_interval
         #
-        send_all_queued_messages_call.start(0.1)
-
-        # END DEVIATION FROM COPY + PASTE
-
-        # BEGIN DEVIATION FROM COPY + PASTE
+        send_all_queued_messages_call.start(self.send_interval)
 
         # Get ready
         #
-        twisted.internet.reactor.listenTCP(self.address_port_tuple[1],
-                                           MessageProtocolFactory(),
-                                           interface = self.address_port_tuple[0])
+        if self.interface_type == "client":
 
-        # END DEVIATION FROM COPY + PASTE
+            self.logger.info("running in client mode")
+
+            twisted.internet.reactor.connectTCP(self.address_port_tuple[0],
+                                                self.address_port_tuple[1],
+                                                MessageProtocolFactory())
+        else:
+
+            self.logger.info("running in server mode")
+
+            twisted.internet.reactor.listenTCP(self.address_port_tuple[1],
+                                               MessageProtocolFactory(),
+                                               interface = self.address_port_tuple[0])
 
         # Now run Twisted loop as long as no
         # shutdown is requested.
@@ -835,5 +721,3 @@ class TCPServerInterface(Interface):
         self.logger.info("connection closed, reactor stopped, stopping thread")
 
         raise SystemExit
-
-        # END COPY + PASTE

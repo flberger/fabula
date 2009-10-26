@@ -62,17 +62,20 @@ def run(mode,
 
     logger.addHandler(stderr_handler)
 
-    logger.info("Running in " + str(mode) + " mode")
+    logger.info("running in %s mode" % mode)
 
     # Set up mode specific objects
 
     if mode == "client":
 
-        logger.info("Using framerate " + str(framerate))
+        logger.info("using framerate %s" % framerate)
 
         # TODO: hardwired TCP protocol
         #
-        interface_class = shard.interfaces.TCPClientInterface
+        interface = shard.interfaces.TCPInterface(address_port_tuple,
+                                                  logger,
+                                                  interface_type = mode,
+                                                  send_interval = 0.3)
 
         asset_engine = asset_engine_class(logger)
 
@@ -84,13 +87,14 @@ def run(mode,
 
         # TODO: hardwired TCP protocol
         #
-        interface_class = shard.interfaces.TCPServerInterface
+        interface = shard.interfaces.TCPInterface(address_port_tuple,
+                                                  logger,
+                                                  interface_type = mode,
+                                                  send_interval = 0.1)
 
         plugin = plugin_class(logger)
 
         core_engine_class = shard.servercoreengine.ServerCoreEngine
-
-    interface = interface_class(address_port_tuple, logger)
 
     core_engine_instance = core_engine_class(interface,
                                              plugin,
