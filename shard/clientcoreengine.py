@@ -261,7 +261,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                     self.local_moves_to_event = moves_to_event
 
                                 else:
-
                                     # Instead of
                                     #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
                                     # we wait for the server to respond with
@@ -318,6 +317,21 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         """
 
         self.logger.debug("called")
+
+        # Did this fail for the Entity we just moved locally?
+        #
+        if event.identifier == self.local_moves_to_event.identifier:
+
+            entity = self.entity_dict[event.identifier]
+
+            self.logger.debug("attempt failed for %s, now at %s" % (entity.identifier, entity.location))
+
+            new_x = entity.location[0] - entity.direction[0]
+            new_y = entity.location[1] - entity.direction[1]
+
+            entity.location = (new_x, new_y)
+
+            self.logger.debug("%s now reverted to %s" % (entity.identifier, entity.location))
 
         self.await_confirmation = False
 
