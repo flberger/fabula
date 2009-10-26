@@ -23,6 +23,10 @@ from collections import deque
 import socket
 import SocketServer
 
+# Importing the Twisted base module for executable makers
+#
+import twisted
+
 import twisted.internet
 import twisted.internet.protocol
 import twisted.internet.reactor
