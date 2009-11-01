@@ -12,8 +12,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     """An instance of this class is the main engine in every
        Shard client. It connects to the Client Interface and
        to the PresentationEngine, passes events and keeps track
-       of Entities. It is normally instantiated in a small
-       setup script "run_shard.py"."""
+       of Entities. It is normally instantiated in shard.run.
+    """
 
     ####################
     # Init
@@ -23,7 +23,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            instance of a subclass of shard.interfaces.Interface
            which handles the connection to the server or supplies
            events in some other way, and an instance of PresentationEngine
-           which presents the game action."""
+           which presents the game action.
+        """
 
         # First setup base class
         #
@@ -37,21 +38,20 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Now we have:
         #
-        # self.entity_dict = {}
+        # self.room = shard.Room()
         #
-        #     self.entity_dict keeps track of all active Entites.
-        #     It uses the identifier as a key, assuming that it
-        #     is unique.
+        #     self.room.entity_dict
+        #         A dict of all Entities in this room,
+        #         mapping Entity identifiers to Entity
+        #         instances.
         #
+        #     self.room.floor_plan
+        #         A dict mapping 2D coordinate tuples
+        #         to a FloorPlanElement instance.
         #
-        # self.map = {}
-        #
-        #     self.map is an attempt of an efficient storage of
-        #     an arbitrary two-dimensional map. To save space, 
-        #     only explicitly defined elements are stored. This
-        #     is done in a dict whose keys are tuples. Access the
-        #     element using self.map[(x, y)]. The upper left element
-        #     is self.map[(0, 0)].
+        #     self.room.entity_locations
+        #         A dict mapping Entity identifiers to a
+        #         2D coordinate tuple.
 
         # We attach custom flags to the Message created in
         # setup() to notify the PresentationEngine whether
@@ -70,11 +70,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # should be cleared after each processing.
         #
         self.deleted_entities_dict = {}
-
-        # A list of tiles for the current room, for
-        # the convenience of the PresentationEngine.
-        #
-        self.tile_list = []
 
         # Save the player id for the PresentationEngine.
         #
@@ -95,8 +90,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
     def run(self):
         """Main loop of the ClientCoreEngine. This is
-           a blocking method. It calls all the process methods
-           to process events."""
+           a blocking method. It calls all the process
+           methods to process events.
+        """
 
         # TODO: The current implementation is too overtrustful.
         # It should check much more thoroughly if the
@@ -143,8 +139,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             if server_message.event_list:
 
-                self.logger.info("got server_message: \n"
-                      + str(server_message.event_list))
+                self.logger.info("got server_message: %s"
+                                 % server_message.event_list)
 
                 self.got_empty_message = False
 
@@ -157,8 +153,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 self.got_empty_message = True
 
             # First handle the events in the ClientCoreEngine, 
-            # gathering Entities and Map Elements and preparing
-            # a Message for the PresentationEngine
+            # updating the room and preparing a Message for
+            # the PresentationEngine
             #
             for current_event in server_message.event_list:
 
@@ -176,19 +172,17 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # Now that everything is set and stored, call
             # the PresentationEngine to process the messages.
 
-            # This call may take an almost arbitrary amount
-            # of time, since there may be long actions to
-            # be shown by the PresentationEngine.
-            # Notice: process_message() must be called regularly
-            # even if the server Message and thus the
-            # PresentationEngine_message are empty!
+            # Ideally we want to call process_message()
+            # once per frame, but the call may take an
+            # almost arbitrary amount of time.
+            # At least process_message() must be called
+            # regularly even if the server Message and
+            # thus message_for_plugin  are empty.
             #
             message_from_plugin = self.plugin.process_message(self.message_for_plugin,
-                                                              self.entity_dict,
+                                                              self.room,
                                                               self.deleted_entities_dict,
-                                                              self.player_id,
-                                                              self.tile_list,
-                                                              self.map)
+                                                              self.player_id)
 
             # The PresentationEngine returned, the Server Message has
             # been applied and processed. Clean up.
@@ -217,81 +211,97 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 self.message_for_remote.event_list = (message_from_plugin.event_list
                                                       + self.message_for_remote.event_list)
 
+                # Local movement tests
+                #
                 for event in message_from_plugin.event_list:
 
                     if isinstance(event, shard.AttemptEvent):
-                        # TODO: copied from ServerCoreEngine.process_TriesToMoveEvent()
 
-                        # In case of an AttemptEvent, make the
-                        # affected entity turn into the direction
-                        # of the event
+                        # TODO: similar to ServerCoreEngine.process_TriesToMoveEvent()
+
+                        # Do we need to move / turn at all?
                         #
-                        direction = shard.difference_2d(self.entity_dict[event.identifier].location,
-                                                        event.target_identifier)
+                        location = self.room.entity_locations[event.identifier]
+                        difference = shard.difference_2d(location,
+                                                         event.target_identifier)
 
-                        self.entity_dict[event.identifier].direction = direction
+                        if difference != (0, 0):
 
-                        self.logger.debug("found AttemptEvent, setting direction: %s -> %s"
-                                          % (event.identifier, direction))
-
-                        # In case of a TriesToMoveEvent, test and
-                        # approve the movement locally to allow
-                        # for a smooth user experience. We have
-                        # the current map information after all.
-                        #
-                        if isinstance(event, shard.TriesToMoveEvent):
-
-                            self.logger.debug("applying TriesToMoveEvent locally")
-
-                            # TODO: event.identifier in self.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
-
-                            # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
-
-                            # Test if a movement from the current
-                            # entity location to the new location
-                            # on the map is possible
+                            # In case of an AttemptEvent, make the
+                            # affected entity turn into the direction
+                            # of the event
                             #
-                            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
+                            # Convert from vector to symbol
                             #
-                            # We queue the event in self.message_for_plugin,
-                            # so it will be rendered upon next call. That
-                            # way it bypasses the ClientCoreEngine; its status
-                            # will be updated upon server confirmation. So
-                            # we will have a difference between client state
-                            # and presentation. We trust that it will be resolved
-                            # by the server in very short time.
+                            direction = shard.direction_vector_dict[difference]
+
+                            # TODO: external Entity attribute access. Probably replace by a method call.
                             #
-                            try:
-                                if self.map[event.target_identifier].tile_type == "FLOOR":
+                            self.room.entity_dict[event.identifier].direction = direction
 
-                                    moves_to_event = shard.MovesToEvent(event.identifier,
-                                                                        event.target_identifier)
- 
-                                    # Notifies Entity, needed for PresentationEngine
-                                    #
-                                    self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
+                            self.logger.debug("found AttemptEvent, setting direction: %s -> '%s'"
+                                              % (event.identifier, direction))
 
-                                    # Remember event for crosscheck with
-                                    # event from ServerCoreEngine
-                                    #
-                                    self.local_moves_to_event = moves_to_event
+                            # In case of a TriesToMoveEvent, test and
+                            # approve the movement locally to allow
+                            # for a smooth user experience. We have
+                            # the current map information after all.
+                            #
+                            if isinstance(event, shard.TriesToMoveEvent):
 
-                                else:
+                                self.logger.debug("applying TriesToMoveEvent locally")
+
+                                # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
+
+                                # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
+
+                                # Test if a movement from the current
+                                # entity location to the new location
+                                # on the map is possible
+                                #
+                                # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
+                                #
+                                # We queue the event in self.message_for_plugin,
+                                # so it will be rendered upon next call. That
+                                # way it bypasses the ClientCoreEngine; its status
+                                # will be updated upon server confirmation. So
+                                # we will have a difference between client state
+                                # and presentation. We trust that it will be resolved
+                                # by the server in very short time.
+                                #
+                                try:
+                                    tile = self.room.floor_plan[event.target_identifier].tile 
+
+                                    if tile.tile_type == "FLOOR":
+
+                                        moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                            event.target_identifier)
+     
+                                        # Update room, needed for PresentationEngine
+                                        #
+                                        self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
+
+                                        # Remember event for crosscheck with
+                                        # event from ServerCoreEngine
+                                        #
+                                        self.local_moves_to_event = moves_to_event
+
+                                    else:
+                                        # Instead of
+                                        #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                                        # we wait for the server to respond with
+                                        # AttemptFailedEvent
+                                        #
+                                        pass
+
+                                except KeyError:
+
                                     # Instead of
                                     #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
                                     # we wait for the server to respond with
                                     # AttemptFailedEvent
                                     #
                                     pass
-
-                            except KeyError:
-
-                                # Instead of
-                                #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
-                                # we wait for the server to respond with
-                                # AttemptFailedEvent
-                                #
-                                pass
 
                 # Since we had player input, we now await confirmation
                 #
@@ -339,16 +349,22 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         if event.identifier == self.local_moves_to_event.identifier:
 
-            entity = self.entity_dict[event.identifier]
+            entity = self.room.entity_dict[event.identifier]
+            location = self.room.entity_locations[event.identifier]
 
-            self.logger.debug("attempt failed for %s, now at %s" % (entity.identifier, entity.location))
+            self.logger.debug("attempt failed for %s, now at %s"
+                              % (event.identifier, location))
 
-            new_x = entity.location[0] - entity.direction[0]
-            new_y = entity.location[1] - entity.direction[1]
+            vector = shard.direction_vector_dict[entity.direction]
 
-            entity.location = (new_x, new_y)
+            new_x = location[0] - vector[0]
+            new_y = location[1] - vector[1]
 
-            self.logger.debug("%s now reverted to %s" % (entity.identifier, entity.location))
+            self.room.process_MovesToEvent(shard.MovesToEvent(event.identifier,
+                                                              (new_x, new_y)))
+
+            self.logger.debug("%s now reverted to %s" % (event.identifier,
+                                                         (new_x, new_y)))
 
         self.await_confirmation = False
 
@@ -378,8 +394,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    pass
 
     def process_MovesToEvent(self, event, message):
-        """Notify the Entity and add
-           the event to the message.
+        """Notify the Room and add the event to the message.
         """
 
         # Is this the very same as the latest
@@ -397,24 +412,21 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             #
             self.local_moves_to_event = shard.MovesToEvent(None, None)
 
+            self.await_confirmation = False
+
         else:
-            # DEFAULT IMPLEMENTATION
+            # Call default implementation
+            #
+            shard.coreengine.CoreEngine.process_MovesToEvent(self, event, message)
 
-            self.logger.debug("entity location before call: (%s, %s)"
-                              % self.entity_dict[event.identifier].location)
+            # Only allow new input if the last
+            # MovesToEvent has been confirmed.
+            #
+            if self.local_moves_to_event.identifier == None:
 
-            self.entity_dict[event.identifier].process_MovesToEvent(event)
-
-            self.logger.debug("entity location after call: (%s, %s)"
-                              % self.entity_dict[event.identifier].location)
-
-            message.event_list.append(event)
-
-            # END DEFAULT IMPLEMENTATION
-
-        # TODO: rather put this in the above if clause?
-        #
-        self.await_confirmation = False
+                # TODO: check location == None as well?
+                #
+                self.await_confirmation = False
 
     #def process_PicksUpEvent(self, event, message):
     #    """Currently not implemented."""
@@ -455,54 +467,27 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #
     #    message.event_list.append(event)
 
-    def process_ChangeMapElementEvent(self, event, message):
-        """Store the tile given in self.map, 
-           a dict of dicts with x- and
-           y-coordinates as keys. Also save
-           it for the PresentationEngine.
-        """
-
-        # DEFAULT IMPLEMENTATION
-
-        self.logger.debug("called")
-
-        # possibly overwrite existing tile
-        #
-        self.map[event.location] = event.tile
-
-        message.event_list.append(event)
-
-        # END DEFAULT IMPLEMENTATION
-
-        # Append the tile to a list for easy
-        # fetching of the tile's asset
-        #
-        self.tile_list.append(event.tile)
-
     def process_DeleteEvent(self, event, message):
         """Save the Entity to be deleted in the
            deleted_entities_dict for the 
-           PresentationEngine, then remove it from the
-           entity_dict."""
+           PresentationEngine, then let self.room
+           process the Event.
+        """
 
         # TODO: This is just a hack, see TODO for run() for details
         #
-        if event.identifier in self.entity_dict.keys():
+        if event.identifier in self.room.entity_dict:
 
             # Save the Entity in the deleted_entities_dict
             # to notify the PresentationEngine
             #
-            self.deleted_entities_dict[event.identifier] = self.entity_dict[event.identifier]
+            self.deleted_entities_dict[event.identifier] = self.room.entity_dict[event.identifier]
 
-            # Now remove the Entity
+            # Now call default implementation which
+            # lets self.room process the Event and
+            # queues it in the Message given
             #
-            del self.entity_dict[event.identifier]
-
-            # Append the event to the queue for the PresentationEngine.
-            # The PresentationEngine needs the event for knowing
-            # when exactly to remove the Entity.
-            #
-            message.event_list.append(event)
+            shard.coreengine.CoreEngine.process_DeleteEvent(self, event, message)
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -515,21 +500,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            structures and passes the event on to 
            the PresentationEngine."""
 
-        # DEFAULT IMPLEMENTATION
-
-        # All Entities in this room have to be sent.
-        # No use keeping old ones around, expecially with old
-        # locations.
+        # Call default implementation
         #
-        self.entity_dict = {}
-
-        # Awaiting a new map!
-        #
-        self.map = {}
-
-        message.event_list.append(event)
-
-        # END DEFAULT IMPLEMENTATION
+        shard.coreengine.CoreEngine.process_EnterRoomEvent(self, event, message)
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them
@@ -539,10 +512,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # Clear the dict of Entites which have been deleted.
         #
         self.deleted_entities_dict = {}
-
-        # Clear the list of tiles for the room.
-        #
-        self.tile_list = []
 
         # Finally set the flag in the Message
         # for the PresentationEngine and queue the event
@@ -565,7 +534,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         message.has_RoomCompleteEvent = True
 
-        # Queue the event. All events after this are
-        # processed.
+        # Call default implementation
         #
-        message.event_list.append(event)
+        shard.coreengine.CoreEngine.process_RoomCompleteEvent(self, event, message)

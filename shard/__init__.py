@@ -15,7 +15,12 @@
 # TODO: "%s" % s instead of "s" + "s" in the whole package!
 # TODO: use map() instead of "for" loops
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
+# TODO: most prominently: message.event_list.append -> message.append
 # TODO: readable __repr__ of Events and Messages
+# TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
+# TODO: fix docstrings for pydoctor documentation (first line -> complete sentence)
+
+import eventprocessor
 
 ############################################################
 # Events
@@ -317,14 +322,17 @@ class SpawnEvent(ServerEvent):
     """This event creates the player / new item / NPC on the map.
     """
 
-    def __init__(self, entity):
-        """Entity is an instance of shard.Entity, 
-           having a type, identifier, location and
-           assets. The server stores the relevant
+    def __init__(self, entity, location):
+        """entity is an instance of shard.Entity, 
+           having a type, identifier and asset.
+           location is a tuple of 2D integer
+           coordinates.
+           The server stores the relevant
            information and passes the entity on to
            the client.
         """
         self.entity = entity
+        self.location = location
 
 class DeleteEvent(ServerEvent):
     """This event deletes an item or NPC from the map.
@@ -438,16 +446,22 @@ class Message:
 ############################################################
 # Entities
 
-class Entity:
+class Entity(eventprocessor.EventProcessor):
     """An Entity is a Shard game object. This is the base
        class for the player, NPCs and items. An Entity
        holds information used by the Shard game logic:
 
        Entity.entity_type
        Entity.identifier
-       Entity.location
        Entity.asset
        Entity.direction
+       Entity.state
+
+       In addition,
+
+       Entity.presentation_engine
+
+       is added by and points to the PresentationEngine.
 
        A Shard Client should use subclasses (possibly
        with multiple inheritance) or custom attachements
@@ -463,17 +477,22 @@ class Entity:
        handles game objects.
     """
 
-    # TODO: Are Entities EventProcessors?
-
-    def __init__(self, entity_type, identifier, location, asset):
+    def __init__(self, entity_type, identifier, asset):
         """You are welcome to override this method, but
-           be sure to call setup() as done by the default
+           be sure to call setup_eventprocessor() and
+           setup_entity() as done by the default
            implementation of this method.
         """
 
-        self.setup(entity_type, identifier, location, asset)
+        self.setup_eventprocessor()
 
-    def setup(self, entity_type, identifier, location, asset):
+        # Now we have:
+        # self.event_dict
+        # which maps Event classes to handler methods
+
+        self.setup_entity(entity_type, identifier, asset)
+
+    def setup_entity(self, entity_type, identifier, asset):
         """This method sets up the following attributes
            from the values givens:
 
@@ -483,16 +502,6 @@ class Entity:
            Entity.identifier
            Must be an object whose string representation
            yields an unique identification.
-
-           Entity.location
-           An object describing the location of the
-           Entity in the game world, most probably
-           a tuple of coordinates, but possibly only
-           a string like "lobby". The location should
-           not be too precise when using coordinates,
-           since it is not incremented during movement.
-           It should rather store where the entity will
-           be once the next movement is complete.
 
            Entity.asset
            Preferably a string with a file name or an URI
@@ -504,98 +513,104 @@ class Entity:
            attach it to the instance of the Entity.
 
            Entity.direction
-           The direction the Entity is facing, expressed
-           as a vector tuple. The default is (0, 1).
+           One of the strings "<", "^", ">", "v", initially
+           "v", facing the user in most implementations.
+
+           Entity.state
+           The state the Entity is in. Defaults to None.
         """
 
         self.entity_type = entity_type
         self.identifier = identifier
-        self.location = location
         self.asset = asset
+        self.direction = "v"
+        self.state = None
 
-        # Store current direction and movement.
-        # Default direction is (0, 1) = South so that the
-        # entity will have a front view in most
-        # implementations.
-        #
-        self.direction = (0, 1)
-
-    # TODO:
-    # Entities should be notified about all attempts
-    # or actions to be able to display an according
-    # image or animation:
-    # lookAt, 
-    # Manipulate, 
-    # They also need to know the direction (to turn
-    # in the right one).
-    # AttemptFailed should also be passed to the
-    # Entity so it can switch to a neutral image.
+    # EventProcessor overrides
+    #
+    # These are called by the PresentationEngine,
+    # which also has added the Entity.framerate
+    # and Entity.action_frames attributes
 
     def process_MovesToEvent(self, event):
-        """The MovesToEvent is supplied to the
-           Entity so it can update its location.
-           The rationale behind this is that
-           the ClientCoreEngine can be entirely
-           agnostic about the type of world
-           and location (text, 2D, 3D).
-           A call to this method does not mean
-           that the PresentationEngine has started
-           the movement. This is rather called
-           by the ClientCoreEngine to signal
-           where the Entity is about to move.
-           See the other methods of this class.
+        """This method is called by the
+           PresentationEngine. The Entity
+           representation has to execute the
+           according action over the course
+           of Entity.action_frames frames.
+           But it must du so in an non-blocking
+           fashion - this method must return
+           as soon as possible. So do set up
+           counters or frame queues here.
+           Your implementation may call
+           another method once per frame, do
+           the actual work there.
         """
+        pass
 
-        # In a contract-like design, we should
-        # check preconditions like
-        # isinstance(Event, MovesToEvent)
-        # or len(self.location) == 2.
-        
-        # Store direction and movement, maybe for 
-        # animation purposes
-        #
-        self.direction = difference_2d(self.location, event.location)
-
-        self.location = event.location
-
-    def change_state(self, state, frames=None, framerate=None):
-        """Called when the state of the Entity is
-           changed from outside.
-           The PresentationEngine is responsible for the
-           gradual movement of the Entity to the
-           target, the display of text spoken 
-           by the Entity, making picked up objects
-           disappear and appear in the inventory, 
-           but not for any Entity animation.
-           Instead, the PresentationEngine will
-           call this method with the following states:
-           "MOVING"
-           "SPEAKING"
-           "PICKING_UP"
-           "DROPPING"
-           to signal that the Entity starts the action
-           now. Entities may implement a flag or some
-           logic which changes their graphical 
-           representation on every frame, yielding
-           an animation.
-           change_state() is always called after
-           process_MovesToEvent() etc., so the Entity
-           already knows about the result of the action.
-           The PresentationEngine may provide the number
-           of frames for the movement and the framerate.
-           Thus the entity can adapt to different
-           frame rates by adjusting how many frames
-           an image is shown. The Entity is advised
-           to stop the animation once the number
-           of frames given has passed, but it does
-           not need to do so.
-           The default implementation sets Entity.state
-           to the state given.
+    def process_ChangeStateEvent(self, event):
+        """This method is called by the
+           PresentationEngine. The Entity
+           representation has to execute the
+           according action over the course
+           of Entity.action_frames frames.
+           But it must du so in an non-blocking
+           fashion - this method must return
+           as soon as possible. So do set up
+           counters or frame queues here.
+           Your implementation may call
+           another method once per frame, do
+           the actual work there.
         """
+        pass
 
-        # ChangeState is based on a concept by Alexander Marbach.
+    def process_DropsEvent(self, event):
+        """This method is called by the
+           PresentationEngine. The Entity
+           representation has to execute the
+           according action over the course
+           of Entity.action_frames frames.
+           But it must du so in an non-blocking
+           fashion - this method must return
+           as soon as possible. So do set up
+           counters or frame queues here.
+           Your implementation may call
+           another method once per frame, do
+           the actual work there.
+        """
+        pass
 
-        self.state = state
+    def process_PicksUpEvent(self, event):
+        """This method is called by the
+           PresentationEngine. The Entity
+           representation has to execute the
+           according action over the course
+           of Entity.action_frames frames.
+           But it must du so in an non-blocking
+           fashion - this method must return
+           as soon as possible. So do set up
+           counters or frame queues here.
+           Your implementation may call
+           another method once per frame, do
+           the actual work there.
+        """
+        pass
+
+    def process_SaysEvent(self, event):
+        """This method is called by the
+           PresentationEngine. The Entity
+           representation has to execute the
+           according action over the course
+           of Entity.action_frames frames.
+           But it must du so in an non-blocking
+           fashion - this method must return
+           as soon as possible. So do set up
+           counters or frame queues here.
+           Your implementation may call
+           another method once per frame, do
+           the actual work there.
+        """
+        pass
 
 ############################################################
 # Tiles
@@ -618,6 +633,166 @@ class Tile:
         self.tile_type = tile_type
         self.asset = asset
 
+############################################################
+# Rooms
+
+class Room(eventprocessor.EventProcessor):
+    """An instance of this class is maintained for
+       the current room in the ClientCoreEngine and
+       for all active rooms in the ServerCoreEngine.
+       It saves the map as well as Entities and
+       their locations.
+    """
+
+    def __init__(self):
+        """Initialize a room.
+
+           Room.entity_dict
+               A dict of all Entities in this room,
+               mapping Entity identifiers to Entity
+               instances.
+
+           Room.floor_plan
+               A dict mapping 2D coordinate tuples
+               to a FloorPlanElement instance.
+
+           Room.entity_locations
+               A dict mapping Entity identifiers to a
+               2D coordinate tuple.
+
+           Room.tile_list
+               A list of tiles for the current room,
+               for easy asset fetching.
+
+           Note that all these dicts assume that
+           Entity identifiers are unique.
+        """
+
+        self.setup_eventprocessor()
+
+        # Now we have:
+        # self.event_dict
+        # mapping Event classes to handler methods
+        # though we do not need it since all
+        # methods of this class are called from
+        # the outside.
+
+        # floor_plan is an attempt of an efficient storage of
+        # an arbitrary two-dimensional map. To save space, 
+        # only explicitly defined elements are stored. This
+        # is done in a dict whose keys are tuples. Access the
+        # elements using floor_plan[(x, y)]. The upper left element
+        # is floor_plan[(0, 0)].
+        #
+        self.floor_plan = {}
+
+        self.tile_list = []
+
+        self.entity_dict = {}
+        self.entity_locations = {}
+
+        return
+
+    def process_ChangeMapElementEvent(self, event):
+        """Update all affected dicts.
+        """
+
+        if event.location in self.floor_plan:
+
+            self.floor_plan[event.location].tile = event.tile
+
+        else:
+
+            self.floor_plan[event.location] = FloorPlanElement(event.tile)
+
+        self.tile_list.append(event.tile)
+
+        return
+
+    def process_SpawnEvent(self, event):
+        """Update all affected dicts.
+        """
+        if event.location not in self.floor_plan:
+
+            raise ShardException("cannot spawn entity %s at undefined location %s"
+                                 % (event.entity.identifier, event.location))
+
+        # If Entity is already there, just do nothing.
+        # This is no error, so no exception is raised.
+        # TODO: We would like to log that, but Entities have no logging access.
+        #
+        if event.entity.identifier not in self.entity_dict:
+
+            self.floor_plan[event.location].entities.append(event.entity)
+
+            self.entity_dict[event.entity.identifier] = event.entity
+
+            self.entity_locations[event.entity.identifier] = event.location
+
+        return
+
+    def process_MovesToEvent(self, event):
+        """Update all affected dicts.
+        """
+        if event.identifier not in self.entity_dict:
+
+            raise ShardException("cannot move unknown entity %s"
+                                 % event.identifier)
+
+        # Only process changed locations
+        #
+        if self.entity_locations[event.identifier] != event.location:
+
+            # Remove old entity location
+            #
+            # identifier should point to the same
+            # object that is in the respective
+            # FloorPlanElement list
+            #
+            entity = self.entity_dict[event.identifier]
+            location = self.entity_locations[event.identifier]
+
+            self.floor_plan[location].entities.remove(entity)
+
+            # (Over)write new entity location
+            #
+            self.floor_plan[event.location].entities.append(entity)
+
+            self.entity_locations[event.identifier] = event.location
+
+        return
+
+    def process_DeleteEvent(self, event):
+        """Update all affected dicts.
+        """
+        if event.identifier not in self.entity_dict:
+
+            raise ShardException("cannot delete unknown entity %s"
+                                 % event.identifier)
+
+        entity = self.entity_dict[event.identifier]
+
+        self.floor_plan[event.location].entities.remove(entity)
+
+        del self.entity_dict[event.identifier]
+
+        del self.entity_locations[event.identifier]
+
+        return
+
+class FloorPlanElement:
+    """Convenience class for floor plan elements.
+    """
+    def __init__(self, tile):
+        """FloorPlanElement.tile = shard.Tile()
+           FloorPlanElement.entities = []
+        """
+        self.tile = tile
+        self.entities = []
+
+############################################################
+# Utilities
+
 # Convenience function to compute differences
 #
 def difference_2d(start_tuple, end_tuple):
@@ -627,6 +802,18 @@ def difference_2d(start_tuple, end_tuple):
 
     return (end_tuple[0] - start_tuple[0],
             end_tuple[1] - start_tuple[1])
+
+# Convenience dict converting symbolic
+# directions to a vector
+#
+direction_vector_dict = {"^" : (0, -1),
+                         ">" : (1, 0),
+                         "v" : (0, 1),
+                         "<" : (-1, 0),
+                         (0, -1) : "^",
+                         (1, 0) : ">",
+                         (0, 1) : "v",
+                         (-1, 0) : "<"}
 
 ############################################################
 # Exceptions

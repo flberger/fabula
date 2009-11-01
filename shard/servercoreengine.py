@@ -80,22 +80,20 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     each loop
         #
         #
-        # self.entity_dict = {}
+        # self.room = shard.Room()
         #
-        #     self.entity_dict keeps track of all active Entites.
-        #     It uses the identifier as a key, assuming that it
-        #     is unique.
+        #     self.room.entity_dict
+        #         A dict of all Entities in this room,
+        #         mapping Entity identifiers to Entity
+        #         instances.
         #
+        #     self.room.floor_plan
+        #         A dict mapping 2D coordinate tuples
+        #         to a FloorPlanElement instance.
         #
-        # self.map = {}
-        #
-        #
-        #     self.map is an attempt of an efficient storage of
-        #     an arbitrary two-dimensional map. To save space, 
-        #     only explicitly defined elements are stored. This
-        #     is done in a dict whose keys are tuples. Access the
-        #     element using self.map[(x, y)]. The upper left element
-        #     is self.map[(0, 0)].
+        #     self.room.entity_locations
+        #         A dict mapping Entity identifiers to a
+        #         2D coordinate tuple.
 
         # Message to be broadcasted to all clients
         #
@@ -279,14 +277,11 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         signal_dict = {2 : "SIGINT",
                        3 : "SIGQUIT",
-                       15 : "SIGTERM"
-                      }
+                       15 : "SIGTERM"}
 
-        self.logger.info("caught signal "
-              + str(signalnum)
-              + " ("
-              + signal_dict[signalnum]
-              + "), setting exit flag")
+        self.logger.info("caught signal %s (%s), setting exit flag"
+                         % (signalnum, signal_dict[signalnum]))
+
 
         self.exit_requested = True
 
@@ -296,39 +291,57 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
            according event to the message.
         """
 
-        self.logger.debug("called")
-
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
 
         self.logger.debug("%s -> %s" % (event.identifier, event.target_identifier))
 
-        # In case of an AttemptEvent, make the
-        # affected entity turn into the direction
-        # of the event
+        # Do we need to move / turn at all?
         #
-        direction = shard.difference_2d(self.entity_dict[event.identifier].location,
-                                        event.target_identifier)
+        location = self.room.entity_locations[event.identifier]
+        difference = shard.difference_2d(location,
+                                         event.target_identifier)
 
-        self.entity_dict[event.identifier].direction = direction
+        if difference != (0, 0):
 
-        # Test if a movement from the current
-        # entity location to the new location
-        # on the map is possible
-        #
-        # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
-        #
-        try:
-            if self.map[event.target_identifier].tile_type == "FLOOR":
+            # In case of an AttemptEvent, make the
+            # affected entity turn into the direction
+            # of the event
+            #
+            # Convert from vector to symbol
+            #
+            direction = shard.direction_vector_dict[difference]
 
-                message.event_list.append(shard.MovesToEvent(event.identifier,
-                                                             event.target_identifier))
-            else:
+            # TODO: external Entity attribute access. Probably replace by a method call.
+            #
+            self.room.entity_dict[event.identifier].direction = direction
+
+            self.logger.debug("found AttemptEvent, setting direction: %s -> '%s'"
+                              % (event.identifier, direction))
+
+            # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
+
+            # Test if a movement from the current
+            # entity location to the new location
+            # on the map is possible
+            #
+            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
+            #
+            try:
+                tile = self.room.floor_plan[event.target_identifier].tile 
+
+                if tile.tile_type == "FLOOR":
+
+                    message.event_list.append(shard.MovesToEvent(event.identifier,
+                                                                 event.target_identifier))
+                else:
+
+                    message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            except KeyError:
 
                 message.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-        except KeyError:
-
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
 
     def process_InitEvent(self, event, message):
         """Check if we already have a room and
@@ -336,9 +349,9 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
            client. If not, pass on to the plugin.
         """
 
-        if len(self.map):
+        if len(self.room.floor_plan):
 
-            self.logger.debug("sending existing map and entities")
+            self.logger.debug("sending existing floor_plan and entities")
 
             # It's not very clean to write to
             # self.message_for_remote directly
@@ -347,14 +360,20 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             #
             self.message_for_remote.event_list.append(shard.EnterRoomEvent())
 
-            for tuple in self.map:
+            for tuple in self.room.floor_plan:
 
-                self.message_for_remote.event_list.append(shard.ChangeMapElementEvent(self.map[tuple],
-                                                                                      tuple))
+                tile = self.room.floor_plan[tuple].tile
 
-            for entity in self.entity_dict.values():
+                change_map_element_event = shard.ChangeMapElementEvent(tile, tuple)
 
-                self.message_for_remote.event_list.append(shard.SpawnEvent(entity))
+                self.message_for_remote.event_list.append(change_map_element_event)
+
+            for identifier in self.room.entity_locations:
+
+                spawn_event = shard.SpawnEvent(self.room.entity_dict[identifier],
+                                               self.room.entity_locations[identifier])
+
+                self.message_for_remote.event_list.append(spawn_event)
 
             self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
 

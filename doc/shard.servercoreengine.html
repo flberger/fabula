@@ -79,18 +79,16 @@ the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="ServerCoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event, message)</dt><dd><tt>Store&nbsp;the&nbsp;tile&nbsp;given&nbsp;in&nbsp;self.<strong>map</strong>,&nbsp;<br>
-a&nbsp;dict&nbsp;of&nbsp;dicts&nbsp;with&nbsp;x-&nbsp;and<br>
-y-coordinates&nbsp;as&nbsp;keys.&nbsp;Also&nbsp;save<br>
-it&nbsp;in&nbsp;the&nbsp;message.</tt></dd></dl>
+<dl><dt><a name="ServerCoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;the&nbsp;shard.Room&nbsp;instance&nbsp;in<br>
+self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;Event&nbsp;and<br>
+add&nbsp;it&nbsp;to&nbsp;message.</tt></dd></dl>
 
 <dl><dt><a name="ServerCoreEngine-process_ChangeStateEvent"><strong>process_ChangeStateEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="ServerCoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
-The&nbsp;default&nbsp;implementation&nbsp;adds<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
+<dl><dt><a name="ServerCoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;event&nbsp;and<br>
+pass&nbsp;it&nbsp;on.</tt></dd></dl>
 
 <dl><dt><a name="ServerCoreEngine-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
@@ -110,8 +108,8 @@ structures&nbsp;and&nbsp;passes&nbsp;the&nbsp;event&nbsp;on.</tt></dd></dl>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="ServerCoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event, message)</dt><dd><tt>Notify&nbsp;the&nbsp;Entity&nbsp;and&nbsp;add<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
+<dl><dt><a name="ServerCoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;event&nbsp;and<br>
+pass&nbsp;it&nbsp;on.</tt></dd></dl>
 
 <dl><dt><a name="ServerCoreEngine-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
@@ -137,8 +135,8 @@ the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="ServerCoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event, message)</dt><dd><tt>If&nbsp;not&nbsp;already&nbsp;present,&nbsp;add&nbsp;the&nbsp;Entity&nbsp;given&nbsp;to<br>
-the&nbsp;entity_dict&nbsp;and&nbsp;pass&nbsp;the&nbsp;SpawnEvent&nbsp;on.</tt></dd></dl>
+<dl><dt><a name="ServerCoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;event&nbsp;and<br>
+pass&nbsp;it&nbsp;on.</tt></dd></dl>
 
 <dl><dt><a name="ServerCoreEngine-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
@@ -169,9 +167,9 @@ logging.Logger&nbsp;for,&nbsp;eh,&nbsp;logging&nbsp;purposes.&nbsp;;-)</tt></dd>
 
 <hr>
 Methods inherited from <a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>:<br>
-<dl><dt><a name="ServerCoreEngine-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;a&nbsp;dictionary&nbsp;that&nbsp;maps&nbsp;event&nbsp;classes<br>
-to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for&nbsp;the&nbsp;respective<br>
-event.</tt></dd></dl>
+<dl><dt><a name="ServerCoreEngine-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;EventProcessor.event_dict&nbsp;which&nbsp;maps<br>
+event&nbsp;classes&nbsp;to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for<br>
+the&nbsp;respective&nbsp;event.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>

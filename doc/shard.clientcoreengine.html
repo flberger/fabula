@@ -45,8 +45,7 @@
 <td colspan=2><tt>An&nbsp;instance&nbsp;of&nbsp;this&nbsp;class&nbsp;is&nbsp;the&nbsp;main&nbsp;engine&nbsp;in&nbsp;every<br>
 Shard&nbsp;client.&nbsp;It&nbsp;connects&nbsp;to&nbsp;the&nbsp;Client&nbsp;Interface&nbsp;and<br>
 to&nbsp;the&nbsp;PresentationEngine,&nbsp;passes&nbsp;events&nbsp;and&nbsp;keeps&nbsp;track<br>
-of&nbsp;Entities.&nbsp;It&nbsp;is&nbsp;normally&nbsp;instantiated&nbsp;in&nbsp;a&nbsp;small<br>
-setup&nbsp;script&nbsp;"run_shard.py".<br>&nbsp;</tt></td></tr>
+of&nbsp;Entities.&nbsp;It&nbsp;is&nbsp;normally&nbsp;instantiated&nbsp;in&nbsp;shard.run.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="shard.clientcoreengine.html#ClientCoreEngine">ClientCoreEngine</a></dd>
@@ -63,15 +62,10 @@ which&nbsp;presents&nbsp;the&nbsp;game&nbsp;action.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event, message)</dt><dd><tt>Unset&nbsp;await_confirmation&nbsp;flag.</tt></dd></dl>
 
-<dl><dt><a name="ClientCoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event, message)</dt><dd><tt>Store&nbsp;the&nbsp;tile&nbsp;given&nbsp;in&nbsp;self.<strong>map</strong>,&nbsp;<br>
-a&nbsp;dict&nbsp;of&nbsp;dicts&nbsp;with&nbsp;x-&nbsp;and<br>
-y-coordinates&nbsp;as&nbsp;keys.&nbsp;Also&nbsp;save<br>
-it&nbsp;for&nbsp;the&nbsp;PresentationEngine.</tt></dd></dl>
-
 <dl><dt><a name="ClientCoreEngine-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event, message)</dt><dd><tt>Save&nbsp;the&nbsp;Entity&nbsp;to&nbsp;be&nbsp;deleted&nbsp;in&nbsp;the<br>
 deleted_entities_dict&nbsp;for&nbsp;the&nbsp;<br>
-PresentationEngine,&nbsp;then&nbsp;remove&nbsp;it&nbsp;from&nbsp;the<br>
-entity_dict.</tt></dd></dl>
+PresentationEngine,&nbsp;then&nbsp;let&nbsp;self.<strong>room</strong><br>
+process&nbsp;the&nbsp;Event.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event, message)</dt><dd><tt>An&nbsp;EnterRoomEvent&nbsp;means&nbsp;the&nbsp;server&nbsp;is<br>
 about&nbsp;to&nbsp;send&nbsp;a&nbsp;new&nbsp;map,&nbsp;respawn&nbsp;the<br>
@@ -80,8 +74,7 @@ this&nbsp;method&nbsp;empties&nbsp;all&nbsp;data&nbsp;<br>
 structures&nbsp;and&nbsp;passes&nbsp;the&nbsp;event&nbsp;on&nbsp;to&nbsp;<br>
 the&nbsp;PresentationEngine.</tt></dd></dl>
 
-<dl><dt><a name="ClientCoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event, message)</dt><dd><tt>Notify&nbsp;the&nbsp;Entity&nbsp;and&nbsp;add<br>
-the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
+<dl><dt><a name="ClientCoreEngine-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event, message)</dt><dd><tt>Notify&nbsp;the&nbsp;Room&nbsp;and&nbsp;add&nbsp;the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event, message)</dt><dd><tt>RoomCompleteEvent&nbsp;notifies&nbsp;the&nbsp;client&nbsp;that<br>
 the&nbsp;player,&nbsp;all&nbsp;map&nbsp;elements,&nbsp;items&nbsp;and<br>
@@ -92,14 +85,18 @@ structures.&nbsp;So&nbsp;the&nbsp;event&nbsp;is&nbsp;queued&nbsp;for<br>
 the&nbsp;PresentationEngine&nbsp;here.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-run"><strong>run</strong></a>(self)</dt><dd><tt>Main&nbsp;loop&nbsp;of&nbsp;the&nbsp;<a href="#ClientCoreEngine">ClientCoreEngine</a>.&nbsp;This&nbsp;is<br>
-a&nbsp;blocking&nbsp;method.&nbsp;It&nbsp;calls&nbsp;all&nbsp;the&nbsp;process&nbsp;methods<br>
-to&nbsp;process&nbsp;events.</tt></dd></dl>
+a&nbsp;blocking&nbsp;method.&nbsp;It&nbsp;calls&nbsp;all&nbsp;the&nbsp;process<br>
+methods&nbsp;to&nbsp;process&nbsp;events.</tt></dd></dl>
 
 <hr>
 Methods inherited from <a href="shard.coreengine.html#CoreEngine">shard.coreengine.CoreEngine</a>:<br>
 <dl><dt><a name="ClientCoreEngine-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="ClientCoreEngine-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;the&nbsp;shard.Room&nbsp;instance&nbsp;in<br>
+self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;Event&nbsp;and<br>
+add&nbsp;it&nbsp;to&nbsp;message.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-process_ChangeStateEvent"><strong>process_ChangeStateEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
@@ -141,8 +138,8 @@ the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
 the&nbsp;event&nbsp;to&nbsp;the&nbsp;message.</tt></dd></dl>
 
-<dl><dt><a name="ClientCoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event, message)</dt><dd><tt>If&nbsp;not&nbsp;already&nbsp;present,&nbsp;add&nbsp;the&nbsp;Entity&nbsp;given&nbsp;to<br>
-the&nbsp;entity_dict&nbsp;and&nbsp;pass&nbsp;the&nbsp;SpawnEvent&nbsp;on.</tt></dd></dl>
+<dl><dt><a name="ClientCoreEngine-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event, message)</dt><dd><tt>Let&nbsp;self.<strong>room</strong>&nbsp;process&nbsp;the&nbsp;event&nbsp;and<br>
+pass&nbsp;it&nbsp;on.</tt></dd></dl>
 
 <dl><dt><a name="ClientCoreEngine-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event, message)</dt><dd><tt>Process&nbsp;the&nbsp;Event.<br>
 The&nbsp;default&nbsp;implementation&nbsp;adds<br>
@@ -177,9 +174,9 @@ logging.Logger&nbsp;for,&nbsp;eh,&nbsp;logging&nbsp;purposes.&nbsp;;-)</tt></dd>
 
 <hr>
 Methods inherited from <a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>:<br>
-<dl><dt><a name="ClientCoreEngine-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;a&nbsp;dictionary&nbsp;that&nbsp;maps&nbsp;event&nbsp;classes<br>
-to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for&nbsp;the&nbsp;respective<br>
-event.</tt></dd></dl>
+<dl><dt><a name="ClientCoreEngine-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;EventProcessor.event_dict&nbsp;which&nbsp;maps<br>
+event&nbsp;classes&nbsp;to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for<br>
+the&nbsp;respective&nbsp;event.</tt></dd></dl>
 
 </td></tr></table></td></tr></table>
 </body></html>

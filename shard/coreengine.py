@@ -67,20 +67,9 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         #
         self.message_for_remote = shard.Message([])
         
-        # self.entity_dict keeps track of all active Entites.
-        # It uses the identifier as a key, assuming that it
-        # is unique.
+        # self.room keeps track of the map and active Entites.
         #
-        self.entity_dict = {}
-
-        # self.map is an attempt of an efficient storage of
-        # an arbitrary two-dimensional map. To save space, 
-        # only explicitly defined elements are stored. This
-        # is done in a dict whose keys are tuples. Access the
-        # elemty using self.map[(x, y)]. The upper left element
-        # is self.map[(0, 0)].
-        #
-        self.map = {}
+        self.room = shard.Room()
 
         self.logger.info("complete")
 
@@ -176,17 +165,19 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         message.event_list.append(event)
 
     def process_MovesToEvent(self, event, message):
-        """Notify the Entity and add
-           the event to the message.
+        """Let self.room process the event and
+           pass it on.
         """
 
-        self.logger.debug("entity location before call: "
-                          + str(self.entity_dict[event.identifier].location))
+        self.logger.debug("%s location before: %s "
+                          % (event.identifier,
+                             self.room.entity_locations[event.identifier]))
 
-        self.entity_dict[event.identifier].process_MovesToEvent(event)
+        self.room.process_MovesToEvent(event)
 
-        self.logger.debug("entity location after call: "
-                          + str(self.entity_dict[event.identifier].location))
+        self.logger.debug("%s location after: %s "
+                          % (event.identifier,
+                             self.room.entity_locations[event.identifier]))
 
         message.event_list.append(event)
 
@@ -251,12 +242,6 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         message.event_list.append(event)
 
     def process_ChangeStateEvent(self, event, message):
-        """The new state
-           is just passed on to the Entity."""
-
-        self.entity_dict[event.identifier].change_state(event.state)
-
-    def process_ChangeStateEvent(self, event, message):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -264,6 +249,9 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
+        # A CoreEngine should not talk to the Entiy
+        # directly - rather, the Plugin should do.
+        #
         message.event_list.append(event)
 
     def process_PassedEvent(self, event, message):
@@ -307,30 +295,27 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         message.event_list.append(event)
 
     def process_SpawnEvent(self, event, message):
-        """If not already present, add the Entity given to
-           the entity_dict and pass the SpawnEvent on.
+        """Let self.room process the event and
+           pass it on.
         """
 
-        if event.entity.identifier in self.entity_dict:
-            self.logger.debug("entity already in entity_dict: %s" % event.entity.identifier)
+        self.logger.debug("spawning entity '%s', type %s, location %s"
+                          % (event.entity.identifier,
+                             event.entity.entity_type,
+                             event.location))
 
-        else:
-            self.logger.debug("spawning entity '%s', type %s, location %s" %
-                              (event.entity.identifier,
-                               event.entity.entity_type,
-                               event.entity.location))
+        self.room.process_SpawnEvent(event)
 
-            self.entity_dict[event.entity.identifier] = event.entity
-
-            message.event_list.append(event)
+        message.event_list.append(event)
 
     def process_DeleteEvent(self, event, message):
-        """Process the Event.
-           The default implementation adds
-           the event to the message.
+        """Let self.room process the event and
+           pass it on.
         """
 
         self.logger.debug("called")
+
+        self.room.process_DeleteEvent(event)
 
         message.event_list.append(event)
 
@@ -344,15 +329,7 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        # All Entities in this room have to be sent.
-        # No use keeping old ones around, expecially with old
-        # locations.
-        #
-        self.entity_dict = {}
-
-        # Awaiting a new map!
-        #
-        self.map = {}
+        self.room = shard.Room()
 
         message.event_list.append(event)
 
@@ -367,17 +344,14 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         message.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event, message):
-        """Store the tile given in self.map, 
-           a dict of dicts with x- and
-           y-coordinates as keys. Also save
-           it in the message.
+        """Let the shard.Room instance in
+           self.room process the Event and
+           add it to message.
         """
 
         self.logger.debug("called")
 
-        # possibly overwrite existing tile
-        #
-        self.map[event.location] = event.tile
+        self.room.process_ChangeMapElementEvent(event)
 
         message.event_list.append(event)
 

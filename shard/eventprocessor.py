@@ -18,9 +18,9 @@ class EventProcessor:
         self.setup_eventprocessor()
 
     def setup_eventprocessor(self):
-        """Set up a dictionary that maps event classes
-           to functions to be called for the respective
-           event.
+        """Set up EventProcessor.event_dict which maps
+           event classes to functions to be called for
+           the respective event.
         """
         # I just love to use dicts to avoid endless
         # if... elif... clauses. :-)
@@ -157,6 +157,9 @@ class EventProcessor:
         """Process the Event.
            The default implementation does nothing.
         """
+
+        # ChangeState is based on a concept by Alexander Marbach.
+
         pass
 
     def process_PassedEvent(self, event):
