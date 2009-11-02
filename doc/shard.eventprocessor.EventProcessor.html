@@ -1,0 +1,672 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;shard.eventprocessor.EventProcessor&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class s.e.EventProcessor:</h1>
+    <p>
+      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.eventprocessor.html">eventprocessor</a></span>
+      
+      <a href="classIndex.html#shard.eventprocessor.EventProcessor">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></p>
+    </div>
+    <pre>This is the base class for all
+Shard objects that process events.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id38">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__init__">__init__</a></td>
+    <td><tt>You can override this, but make sure</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#setup_eventprocessor">setup_eventprocessor</a></td>
+    <td><tt>Set up EventProcessor.event_dict which maps</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="shard.eventprocessor.EventProcessor.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <pre>You can override this, but make sure
+to call self.setup_eventprocessor()
+like the default implementation does.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.setup_eventprocessor">
+    
+  </a>
+  <a name="setup_eventprocessor">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    setup_eventprocessor(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Set up EventProcessor.event_dict which maps
+event classes to functions to be called for
+the respective event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToMoveEvent">
+    
+  </a>
+  <a name="process_TriesToMoveEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToMoveEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToLookAtEvent">
+    
+  </a>
+  <a name="process_TriesToLookAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToLookAtEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToManipulateEvent">
+    
+  </a>
+  <a name="process_TriesToManipulateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToManipulateEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_TriesToTalkToEvent">
+    
+  </a>
+  <a name="process_TriesToTalkToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToTalkToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_CanSpeakEvent">
+    
+  </a>
+  <a name="process_CanSpeakEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_CanSpeakEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_PassedEvent">
+    
+  </a>
+  <a name="process_PassedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PassedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_LookedAtEvent">
+    
+  </a>
+  <a name="process_LookedAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_LookedAtEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_PickedUpEvent">
+    
+  </a>
+  <a name="process_PickedUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PickedUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_DroppedEvent">
+    
+  </a>
+  <a name="process_DroppedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DroppedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.process_InitEvent">
+    
+  </a>
+  <a name="process_InitEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_InitEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-02 11:35:36.
+    </address>
+  </body>
+</html>

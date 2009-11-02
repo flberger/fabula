@@ -1,1167 +1,343 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: package shard</title>
-</head><body bgcolor="#f0f0f8">
-
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
-<tr bgcolor="#7799ee">
-<td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>shard</strong></big></big></font></td
-><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/__init__.py">/home/florian/doktorarbeit/projekte/shard/shard-bzr-repo/main/shard/__init__.py</a></font></td></tr></table>
-    <p><tt>Shard&nbsp;-&nbsp;A&nbsp;Client-Server&nbsp;System&nbsp;for&nbsp;Interactive&nbsp;<br>
-Storytelling&nbsp;by&nbsp;means&nbsp;of&nbsp;an&nbsp;Adventure&nbsp;Game&nbsp;Environment<br>
-&nbsp;<br>
-"Stories&nbsp;On&nbsp;A&nbsp;Grid"<br>
-&nbsp;<br>
-(c)&nbsp;Florian&nbsp;Berger&nbsp;&lt;fberger@fbmd.de&gt;</tt></p>
-<p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#aa55cc">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;shard&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
-<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="shard.assetengine.html">assetengine</a><br>
-<a href="shard.clientcoreengine.html">clientcoreengine</a><br>
-<a href="shard.coreengine.html">coreengine</a><br>
-</td><td width="25%" valign=top><a href="shard.eventprocessor.html">eventprocessor</a><br>
-<a href="shard.interfaces.html">interfaces</a><br>
-<a href="shard.plugin.html">plugin</a><br>
-</td><td width="25%" valign=top><a href="shard.presentationengine.html">presentationengine</a><br>
-<a href="shard.run.html">run</a><br>
-<a href="shard.servercoreengine.html">servercoreengine</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ee77aa">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
     
-<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="shard.html#Event">Event</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#AttemptEvent">AttemptEvent</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#TriesToDropEvent">TriesToDropEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToLookAtEvent">TriesToLookAtEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToManipulateEvent">TriesToManipulateEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToMoveEvent">TriesToMoveEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToPickUpEvent">TriesToPickUpEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#TriesToTalkToEvent">TriesToTalkToEvent</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="shard.html#ChangeStateEvent">ChangeStateEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#ConfirmEvent">ConfirmEvent</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#AttemptFailedEvent">AttemptFailedEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#CanSpeakEvent">CanSpeakEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#DropsEvent">DropsEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#MovesToEvent">MovesToEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PerceptionEvent">PerceptionEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PicksUpEvent">PicksUpEvent</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="shard.html#InitEvent">InitEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PassiveEvent">PassiveEvent</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#DroppedEvent">DroppedEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#LookedAtEvent">LookedAtEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PassedEvent">PassedEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#PickedUpEvent">PickedUpEvent</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="shard.html#SaysEvent">SaysEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#ServerEvent">ServerEvent</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#ChangeMapElementEvent">ChangeMapElementEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#DeleteEvent">DeleteEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#EnterRoomEvent">EnterRoomEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#RoomCompleteEvent">RoomCompleteEvent</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#SpawnEvent">SpawnEvent</a>
-</font></dt></dl>
-</dd>
-</dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="shard.html#FloorPlanElement">FloorPlanElement</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#Message">Message</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#ShardException">ShardException</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#Tile">Tile</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="shard.html#Entity">Entity</a>
-</font></dt><dt><font face="helvetica, arial"><a href="shard.html#Room">Room</a>
-</font></dt></dl>
-</dd>
-</dl>
- <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="AttemptEvent">class <strong>AttemptEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+  </head>
+  <body>
+    <h1 class="package">Package shard</h1>
+    <p>
+      <span id="part"></span>
+      
+      
+    </p>
+    <div>
+      
+    </div>
+    <pre>Shard - A Client-Server System for Interactive 
+Storytelling by means of an Adventure Game Environment
+
+"Stories On A Grid"
+
+(c) Florian Berger &lt;fberger@fbmd.de&gt;</pre>
+
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;attempt&nbsp;events<br>
-by&nbsp;the&nbsp;player&nbsp;or&nbsp;NPCs.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="AttemptEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="AttemptFailedEvent">class <strong>AttemptFailedEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;actually&nbsp;not&nbsp;a&nbsp;confirmation,&nbsp;but&nbsp;the<br>
-server&nbsp;announcement&nbsp;that&nbsp;the&nbsp;last&nbsp;<a href="#AttemptEvent">AttemptEvent</a><br>
-sent&nbsp;by&nbsp;the&nbsp;entity&nbsp;identified&nbsp;by&nbsp;identifier<br>
-failed.&nbsp;This&nbsp;should&nbsp;unblock&nbsp;the&nbsp;entity&nbsp;and<br>
-allow&nbsp;new&nbsp;attempts.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#AttemptFailedEvent">AttemptFailedEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#Event">Event</a>:<br>
-<dl><dt><a name="AttemptFailedEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
-an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
-(player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
-by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="CanSpeakEvent">class <strong>CanSpeakEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
+    <div id="splitTables">
+      <table class="children sortable" id="id1">
+  
+  
+<tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;server&nbsp;invitation&nbsp;for&nbsp;the&nbsp;player&nbsp;or<br>
-an&nbsp;NPC&nbsp;to&nbsp;speak.&nbsp;Since&nbsp;this&nbsp;event&nbsp;requires<br>
-immediate&nbsp;user&nbsp;input,&nbsp;it&nbsp;is&nbsp;always&nbsp;executed<br>
-as&nbsp;the&nbsp;last&nbsp;event&nbsp;of&nbsp;a&nbsp;<a href="#Message">Message</a>&nbsp;by&nbsp;the&nbsp;<br>
-PresentationEngine.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#CanSpeakEvent">CanSpeakEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="CanSpeakEvent-__init__"><strong>__init__</strong></a>(self, identifier, sentences)</dt><dd><tt>sentences&nbsp;is&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;for&nbsp;the<br>
-player&nbsp;or&nbsp;NPC&nbsp;to&nbsp;choose&nbsp;from.&nbsp;If&nbsp;this&nbsp;list<br>
-is&nbsp;empty,&nbsp;the&nbsp;client&nbsp;should&nbsp;offer&nbsp;a&nbsp;free-form<br>
-text&nbsp;input.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ChangeMapElementEvent">class <strong>ChangeMapElementEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;changes&nbsp;a&nbsp;single&nbsp;element&nbsp;of&nbsp;the&nbsp;<br>
-two-dimensional&nbsp;map.&nbsp;When&nbsp;sent&nbsp;in&nbsp;a&nbsp;<a href="#Message">Message</a>,&nbsp;<br>
-these&nbsp;events&nbsp;are&nbsp;executed&nbsp;immediately&nbsp;and<br>
-in&nbsp;parallel&nbsp;upon&nbsp;the&nbsp;rendering&nbsp;of&nbsp;the<br>
-<a href="#Message">Message</a>&nbsp;by&nbsp;the&nbsp;PresentationEngine.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#ChangeMapElementEvent">ChangeMapElementEvent</a></dd>
-<dd><a href="shard.html#ServerEvent">ServerEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="ChangeMapElementEvent-__init__"><strong>__init__</strong></a>(self, tile, location)</dt><dd><tt>tile&nbsp;is&nbsp;a&nbsp;shard&nbsp;map&nbsp;object&nbsp;having&nbsp;a&nbsp;type&nbsp;<br>
-(obstacle&nbsp;or&nbsp;floor)&nbsp;and&nbsp;an&nbsp;asset.<br>
-location&nbsp;is&nbsp;an&nbsp;object&nbsp;describing&nbsp;the<br>
-location&nbsp;of&nbsp;the&nbsp;tile&nbsp;in&nbsp;the&nbsp;game&nbsp;world,&nbsp;<br>
-most&nbsp;probably&nbsp;a&nbsp;tuple&nbsp;of&nbsp;coordinates,&nbsp;but<br>
-possibly&nbsp;only&nbsp;a&nbsp;string&nbsp;like&nbsp;"lobby".<br>
-The&nbsp;server&nbsp;stores&nbsp;the&nbsp;relevant<br>
-information&nbsp;and&nbsp;passes&nbsp;the&nbsp;tile&nbsp;and&nbsp;the<br>
-location&nbsp;on&nbsp;to&nbsp;the&nbsp;client.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ChangeStateEvent">class <strong>ChangeStateEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.assetengine.html">assetengine</a></td>
+    <td><tt>Shard Asset Engine</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Each&nbsp;instance&nbsp;of&nbsp;shard.<a href="#Entity">Entity</a>&nbsp;has&nbsp;a&nbsp;state.<br>
-This&nbsp;<a href="#Event">Event</a>&nbsp;is&nbsp;issued&nbsp;to&nbsp;trigger&nbsp;a&nbsp;state<br>
-change.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="ChangeStateEvent-__init__"><strong>__init__</strong></a>(self, identifier, state)</dt><dd><tt>state&nbsp;is&nbsp;the&nbsp;new&nbsp;state&nbsp;for&nbsp;the&nbsp;<a href="#Entity">Entity</a><br>
-identified&nbsp;by&nbsp;identifier.&nbsp;In&nbsp;the&nbsp;simplest<br>
-case&nbsp;state&nbsp;may&nbsp;be&nbsp;a&nbsp;number&nbsp;or&nbsp;a&nbsp;verbose<br>
-string.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ConfirmEvent">class <strong>ConfirmEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;for&nbsp;server&nbsp;confirmations<br>
-of&nbsp;attempt&nbsp;events.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods inherited from <a href="shard.html#Event">Event</a>:<br>
-<dl><dt><a name="ConfirmEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
-an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
-(player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
-by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="DeleteEvent">class <strong>DeleteEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.clientcoreengine.html">clientcoreengine</a></td>
+    <td><tt>Shard Client Core Engine</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;deletes&nbsp;an&nbsp;item&nbsp;or&nbsp;NPC&nbsp;from&nbsp;the&nbsp;map.<br>
-Note&nbsp;that&nbsp;items&nbsp;may&nbsp;still&nbsp;persist&nbsp;in&nbsp;the&nbsp;players<br>
-posessions.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#DeleteEvent">DeleteEvent</a></dd>
-<dd><a href="shard.html#ServerEvent">ServerEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#Event">Event</a>:<br>
-<dl><dt><a name="DeleteEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
-an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
-(player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
-by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="DroppedEvent">class <strong>DroppedEvent</strong></a>(<a href="shard.html#PassiveEvent">PassiveEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;by&nbsp;the&nbsp;server&nbsp;when&nbsp;an&nbsp;item&nbsp;is&nbsp;being<br>
-dropped&nbsp;by&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#DroppedEvent">DroppedEvent</a></dd>
-<dd><a href="shard.html#PassiveEvent">PassiveEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#PassiveEvent">PassiveEvent</a>:<br>
-<dl><dt><a name="DroppedEvent-__init__"><strong>__init__</strong></a>(self, identifier, trigger_identifier)</dt><dd><tt>The&nbsp;trigger_identifier&nbsp;identifies&nbsp;the<br>
-entity&nbsp;that&nbsp;triggered&nbsp;the&nbsp;event.&nbsp;This&nbsp;makes&nbsp;it<br>
-possible&nbsp;to&nbsp;react&nbsp;differently&nbsp;to&nbsp;several<br>
-entities.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="DropsEvent">class <strong>DropsEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.coreengine.html">coreengine</a></td>
+    <td><tt>Shard Core Engine Base Class</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;server&nbsp;confirmation&nbsp;for&nbsp;an<br>
-attempt&nbsp;to&nbsp;drop&nbsp;an&nbsp;item&nbsp;by&nbsp;the&nbsp;player<br>
-or&nbsp;an&nbsp;NPC.<br>
-This&nbsp;event&nbsp;does&nbsp;normally&nbsp;not&nbsp;occur&nbsp;when&nbsp;the<br>
-drop&nbsp;action&nbsp;evaluates&nbsp;to&nbsp;a&nbsp;"use&nbsp;with"&nbsp;action,&nbsp;<br>
-as&nbsp;described&nbsp;in&nbsp;<a href="#TriesToDropEvent">TriesToDropEvent</a>.&nbsp;In&nbsp;that&nbsp;case<br>
-the&nbsp;item&nbsp;stays&nbsp;in&nbsp;the&nbsp;posession&nbsp;of&nbsp;its&nbsp;owner,&nbsp;<br>
-and&nbsp;some&nbsp;other&nbsp;events&nbsp;are&nbsp;issued.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#DropsEvent">DropsEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="DropsEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, location)</dt><dd><tt>item_identifier&nbsp;identifies&nbsp;the&nbsp;item&nbsp;to&nbsp;be&nbsp;<br>
-dropped&nbsp;on&nbsp;the&nbsp;map.&nbsp;location&nbsp;is&nbsp;a&nbsp;<br>
-description&nbsp;as&nbsp;in&nbsp;the&nbsp;<a href="#TriesToMoveEvent">TriesToMoveEvent</a>.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="EnterRoomEvent">class <strong>EnterRoomEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;announces&nbsp;that&nbsp;the&nbsp;player&nbsp;enters&nbsp;a&nbsp;new<br>
-room.&nbsp;Events&nbsp;building&nbsp;the&nbsp;map&nbsp;and&nbsp;spawning&nbsp;the<br>
-player,&nbsp;items&nbsp;and&nbsp;NPCs&nbsp;should&nbsp;follow.&nbsp;The&nbsp;room&nbsp;<br>
-is&nbsp;done&nbsp;and&nbsp;can&nbsp;be&nbsp;used&nbsp;when&nbsp;the&nbsp;server&nbsp;issues&nbsp;<br>
-<a href="#RoomCompleteEvent">RoomCompleteEvent</a>.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#EnterRoomEvent">EnterRoomEvent</a></dd>
-<dd><a href="shard.html#ServerEvent">ServerEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="EnterRoomEvent-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>This&nbsp;event&nbsp;has&nbsp;no&nbsp;parameters.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Entity">class <strong>Entity</strong></a>(<a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.eventprocessor.html">eventprocessor</a></td>
+    <td><tt>Shard Event Processor Base Class</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>An&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;a&nbsp;Shard&nbsp;game&nbsp;object.&nbsp;This&nbsp;is&nbsp;the&nbsp;base<br>
-class&nbsp;for&nbsp;the&nbsp;player,&nbsp;NPCs&nbsp;and&nbsp;items.&nbsp;An&nbsp;<a href="#Entity">Entity</a><br>
-holds&nbsp;information&nbsp;used&nbsp;by&nbsp;the&nbsp;Shard&nbsp;game&nbsp;logic:<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.entity_type<br>
-<a href="#Entity">Entity</a>.identifier<br>
-<a href="#Entity">Entity</a>.asset<br>
-<a href="#Entity">Entity</a>.direction<br>
-<a href="#Entity">Entity</a>.state<br>
-&nbsp;<br>
-In&nbsp;addition,<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.presentation_engine<br>
-&nbsp;<br>
-is&nbsp;added&nbsp;by&nbsp;and&nbsp;points&nbsp;to&nbsp;the&nbsp;PresentationEngine.<br>
-&nbsp;<br>
-A&nbsp;Shard&nbsp;Client&nbsp;should&nbsp;use&nbsp;subclasses&nbsp;(possibly<br>
-with&nbsp;multiple&nbsp;inheritance)&nbsp;or&nbsp;custom&nbsp;attachements<br>
-to&nbsp;instances&nbsp;of&nbsp;this&nbsp;class&nbsp;to&nbsp;implement&nbsp;the<br>
-game&nbsp;objects&nbsp;used&nbsp;by&nbsp;the&nbsp;rendering&nbsp;engine&nbsp;(2D<br>
-sprites,&nbsp;3D&nbsp;models).&nbsp;Usually&nbsp;the&nbsp;ClientCoreEngine<br>
-manages&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#Entity">Entity</a>&nbsp;instances.&nbsp;Everything<br>
-concernig&nbsp;the&nbsp;actual&nbsp;graphical&nbsp;representation&nbsp;is<br>
-done&nbsp;by&nbsp;the&nbsp;PresentationEngine.&nbsp;Since&nbsp;this&nbsp;is&nbsp;very<br>
-application&nbsp;dependent&nbsp;it&nbsp;is&nbsp;not&nbsp;covered&nbsp;in&nbsp;the<br>
-base&nbsp;class.&nbsp;Check&nbsp;the&nbsp;documentation&nbsp;and&nbsp;source&nbsp;of&nbsp;<br>
-the&nbsp;PresentationEngine&nbsp;for&nbsp;further&nbsp;insight&nbsp;on&nbsp;how&nbsp;it&nbsp;<br>
-handles&nbsp;game&nbsp;objects.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="Entity-__init__"><strong>__init__</strong></a>(self, entity_type, identifier, asset)</dt><dd><tt>You&nbsp;are&nbsp;welcome&nbsp;to&nbsp;override&nbsp;this&nbsp;method,&nbsp;but<br>
-be&nbsp;sure&nbsp;to&nbsp;call&nbsp;<a href="#Entity-setup_eventprocessor">setup_eventprocessor</a>()&nbsp;and<br>
-<a href="#Entity-setup_entity">setup_entity</a>()&nbsp;as&nbsp;done&nbsp;by&nbsp;the&nbsp;default<br>
-implementation&nbsp;of&nbsp;this&nbsp;method.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_ChangeStateEvent"><strong>process_ChangeStateEvent</strong></a>(self, event)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the<br>
-PresentationEngine.&nbsp;The&nbsp;<a href="#Entity">Entity</a><br>
-representation&nbsp;has&nbsp;to&nbsp;execute&nbsp;the<br>
-according&nbsp;action&nbsp;over&nbsp;the&nbsp;course<br>
-of&nbsp;<a href="#Entity">Entity</a>.action_frames&nbsp;frames.<br>
-But&nbsp;it&nbsp;must&nbsp;du&nbsp;so&nbsp;in&nbsp;an&nbsp;non-blocking<br>
-fashion&nbsp;-&nbsp;this&nbsp;method&nbsp;must&nbsp;return<br>
-as&nbsp;soon&nbsp;as&nbsp;possible.&nbsp;So&nbsp;do&nbsp;set&nbsp;up<br>
-counters&nbsp;or&nbsp;frame&nbsp;queues&nbsp;here.<br>
-Your&nbsp;implementation&nbsp;may&nbsp;call<br>
-another&nbsp;method&nbsp;once&nbsp;per&nbsp;frame,&nbsp;do<br>
-the&nbsp;actual&nbsp;work&nbsp;there.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_DropsEvent"><strong>process_DropsEvent</strong></a>(self, event)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the<br>
-PresentationEngine.&nbsp;The&nbsp;<a href="#Entity">Entity</a><br>
-representation&nbsp;has&nbsp;to&nbsp;execute&nbsp;the<br>
-according&nbsp;action&nbsp;over&nbsp;the&nbsp;course<br>
-of&nbsp;<a href="#Entity">Entity</a>.action_frames&nbsp;frames.<br>
-But&nbsp;it&nbsp;must&nbsp;du&nbsp;so&nbsp;in&nbsp;an&nbsp;non-blocking<br>
-fashion&nbsp;-&nbsp;this&nbsp;method&nbsp;must&nbsp;return<br>
-as&nbsp;soon&nbsp;as&nbsp;possible.&nbsp;So&nbsp;do&nbsp;set&nbsp;up<br>
-counters&nbsp;or&nbsp;frame&nbsp;queues&nbsp;here.<br>
-Your&nbsp;implementation&nbsp;may&nbsp;call<br>
-another&nbsp;method&nbsp;once&nbsp;per&nbsp;frame,&nbsp;do<br>
-the&nbsp;actual&nbsp;work&nbsp;there.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the<br>
-PresentationEngine.&nbsp;The&nbsp;<a href="#Entity">Entity</a><br>
-representation&nbsp;has&nbsp;to&nbsp;execute&nbsp;the<br>
-according&nbsp;action&nbsp;over&nbsp;the&nbsp;course<br>
-of&nbsp;<a href="#Entity">Entity</a>.action_frames&nbsp;frames.<br>
-But&nbsp;it&nbsp;must&nbsp;du&nbsp;so&nbsp;in&nbsp;an&nbsp;non-blocking<br>
-fashion&nbsp;-&nbsp;this&nbsp;method&nbsp;must&nbsp;return<br>
-as&nbsp;soon&nbsp;as&nbsp;possible.&nbsp;So&nbsp;do&nbsp;set&nbsp;up<br>
-counters&nbsp;or&nbsp;frame&nbsp;queues&nbsp;here.<br>
-Your&nbsp;implementation&nbsp;may&nbsp;call<br>
-another&nbsp;method&nbsp;once&nbsp;per&nbsp;frame,&nbsp;do<br>
-the&nbsp;actual&nbsp;work&nbsp;there.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_PicksUpEvent"><strong>process_PicksUpEvent</strong></a>(self, event)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the<br>
-PresentationEngine.&nbsp;The&nbsp;<a href="#Entity">Entity</a><br>
-representation&nbsp;has&nbsp;to&nbsp;execute&nbsp;the<br>
-according&nbsp;action&nbsp;over&nbsp;the&nbsp;course<br>
-of&nbsp;<a href="#Entity">Entity</a>.action_frames&nbsp;frames.<br>
-But&nbsp;it&nbsp;must&nbsp;du&nbsp;so&nbsp;in&nbsp;an&nbsp;non-blocking<br>
-fashion&nbsp;-&nbsp;this&nbsp;method&nbsp;must&nbsp;return<br>
-as&nbsp;soon&nbsp;as&nbsp;possible.&nbsp;So&nbsp;do&nbsp;set&nbsp;up<br>
-counters&nbsp;or&nbsp;frame&nbsp;queues&nbsp;here.<br>
-Your&nbsp;implementation&nbsp;may&nbsp;call<br>
-another&nbsp;method&nbsp;once&nbsp;per&nbsp;frame,&nbsp;do<br>
-the&nbsp;actual&nbsp;work&nbsp;there.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_SaysEvent"><strong>process_SaysEvent</strong></a>(self, event)</dt><dd><tt>This&nbsp;method&nbsp;is&nbsp;called&nbsp;by&nbsp;the<br>
-PresentationEngine.&nbsp;The&nbsp;<a href="#Entity">Entity</a><br>
-representation&nbsp;has&nbsp;to&nbsp;execute&nbsp;the<br>
-according&nbsp;action&nbsp;over&nbsp;the&nbsp;course<br>
-of&nbsp;<a href="#Entity">Entity</a>.action_frames&nbsp;frames.<br>
-But&nbsp;it&nbsp;must&nbsp;du&nbsp;so&nbsp;in&nbsp;an&nbsp;non-blocking<br>
-fashion&nbsp;-&nbsp;this&nbsp;method&nbsp;must&nbsp;return<br>
-as&nbsp;soon&nbsp;as&nbsp;possible.&nbsp;So&nbsp;do&nbsp;set&nbsp;up<br>
-counters&nbsp;or&nbsp;frame&nbsp;queues&nbsp;here.<br>
-Your&nbsp;implementation&nbsp;may&nbsp;call<br>
-another&nbsp;method&nbsp;once&nbsp;per&nbsp;frame,&nbsp;do<br>
-the&nbsp;actual&nbsp;work&nbsp;there.</tt></dd></dl>
-
-<dl><dt><a name="Entity-setup_entity"><strong>setup_entity</strong></a>(self, entity_type, identifier, asset)</dt><dd><tt>This&nbsp;method&nbsp;sets&nbsp;up&nbsp;the&nbsp;following&nbsp;attributes<br>
-from&nbsp;the&nbsp;values&nbsp;givens:<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.entity_type<br>
-One&nbsp;of&nbsp;the&nbsp;strings&nbsp;"PLAYER",&nbsp;"NPC",&nbsp;"ITEM".<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.identifier<br>
-Must&nbsp;be&nbsp;an&nbsp;object&nbsp;whose&nbsp;string&nbsp;representation<br>
-yields&nbsp;an&nbsp;unique&nbsp;identification.<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.asset<br>
-Preferably&nbsp;a&nbsp;string&nbsp;with&nbsp;a&nbsp;file&nbsp;name&nbsp;or&nbsp;an&nbsp;URI<br>
-of&nbsp;a&nbsp;media&nbsp;file&nbsp;containing&nbsp;the&nbsp;data&nbsp;for&nbsp;visualizing<br>
-the&nbsp;<a href="#Entity">Entity</a>.&nbsp;Do&nbsp;not&nbsp;put&nbsp;large&nbsp;objects&nbsp;here&nbsp;since<br>
-Entities&nbsp;are&nbsp;pushed&nbsp;around&nbsp;quite&nbsp;a&nbsp;bit&nbsp;and<br>
-transfered&nbsp;across&nbsp;the&nbsp;network.<br>
-The&nbsp;PresentationEngine&nbsp;may&nbsp;fetch&nbsp;the&nbsp;asset&nbsp;and<br>
-attach&nbsp;it&nbsp;to&nbsp;the&nbsp;instance&nbsp;of&nbsp;the&nbsp;<a href="#Entity">Entity</a>.<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.direction<br>
-One&nbsp;of&nbsp;the&nbsp;strings&nbsp;"&lt;",&nbsp;"^",&nbsp;"&gt;",&nbsp;"v",&nbsp;initially<br>
-"v",&nbsp;facing&nbsp;the&nbsp;user&nbsp;in&nbsp;most&nbsp;implementations.<br>
-&nbsp;<br>
-<a href="#Entity">Entity</a>.state<br>
-The&nbsp;state&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;is&nbsp;in.&nbsp;Defaults&nbsp;to&nbsp;None.</tt></dd></dl>
-
-<hr>
-Methods inherited from <a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>:<br>
-<dl><dt><a name="Entity-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_InitEvent"><strong>process_InitEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_LookedAtEvent"><strong>process_LookedAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_PerceptionEvent"><strong>process_PerceptionEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_PickedUpEvent"><strong>process_PickedUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToLookAtEvent"><strong>process_TriesToLookAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToManipulateEvent"><strong>process_TriesToManipulateEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToMoveEvent"><strong>process_TriesToMoveEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToPickUpEvent"><strong>process_TriesToPickUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-process_TriesToTalkToEvent"><strong>process_TriesToTalkToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Entity-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;<a href="shard.eventprocessor.html#EventProcessor">EventProcessor</a>.event_dict&nbsp;which&nbsp;maps<br>
-event&nbsp;classes&nbsp;to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for<br>
-the&nbsp;respective&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Event">class <strong>Event</strong></a></font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Shard&nbsp;event&nbsp;base&nbsp;class.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="Event-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
-an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
-(player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
-by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="FloorPlanElement">class <strong>FloorPlanElement</strong></a></font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.interfaces.html">interfaces</a></td>
+    <td><tt>Shard Interface Classes</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Convenience&nbsp;class&nbsp;for&nbsp;floor&nbsp;plan&nbsp;elements.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="FloorPlanElement-__init__"><strong>__init__</strong></a>(self, tile)</dt><dd><tt><a href="#FloorPlanElement">FloorPlanElement</a>.tile&nbsp;=&nbsp;shard.<a href="#Tile">Tile</a>()<br>
-<a href="#FloorPlanElement">FloorPlanElement</a>.entities&nbsp;=&nbsp;[]</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="InitEvent">class <strong>InitEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;is&nbsp;sent&nbsp;once&nbsp;by&nbsp;the&nbsp;client&nbsp;upon&nbsp;startup.<br>
-It&nbsp;asks&nbsp;the&nbsp;server&nbsp;to&nbsp;supply&nbsp;anything&nbsp;that&nbsp;is&nbsp;needed<br>
-to&nbsp;update&nbsp;the&nbsp;client&nbsp;to&nbsp;the&nbsp;current&nbsp;game&nbsp;state&nbsp;-<br>
-usually&nbsp;a&nbsp;number&nbsp;of&nbsp;ChangeMapElementEvents&nbsp;and&nbsp;SpawnEvents.<br>
-The&nbsp;client&nbsp;interface&nbsp;may&nbsp;decide&nbsp;to&nbsp;issue&nbsp;this&nbsp;event<br>
-again&nbsp;in&nbsp;case&nbsp;there&nbsp;has&nbsp;been&nbsp;a&nbsp;connection&nbsp;failure.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="InitEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>identifier&nbsp;must&nbsp;be&nbsp;unique&nbsp;for&nbsp;each&nbsp;client.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="LookedAtEvent">class <strong>LookedAtEvent</strong></a>(<a href="shard.html#PassiveEvent">PassiveEvent</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.plugin.html">plugin</a></td>
+    <td><tt>Shard Core Engine Plugin Base Class</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;by&nbsp;the&nbsp;server&nbsp;when&nbsp;an&nbsp;item&nbsp;or&nbsp;NPC&nbsp;is<br>
-being&nbsp;looked&nbsp;at&nbsp;by&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#LookedAtEvent">LookedAtEvent</a></dd>
-<dd><a href="shard.html#PassiveEvent">PassiveEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#PassiveEvent">PassiveEvent</a>:<br>
-<dl><dt><a name="LookedAtEvent-__init__"><strong>__init__</strong></a>(self, identifier, trigger_identifier)</dt><dd><tt>The&nbsp;trigger_identifier&nbsp;identifies&nbsp;the<br>
-entity&nbsp;that&nbsp;triggered&nbsp;the&nbsp;event.&nbsp;This&nbsp;makes&nbsp;it<br>
-possible&nbsp;to&nbsp;react&nbsp;differently&nbsp;to&nbsp;several<br>
-entities.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Message">class <strong>Message</strong></a></font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>A&nbsp;<a href="#Message">Message</a>&nbsp;manages&nbsp;an&nbsp;ordered&nbsp;list&nbsp;of&nbsp;shard&nbsp;events.<br>
-Messages&nbsp;sent&nbsp;by&nbsp;the&nbsp;server&nbsp;describe&nbsp;the&nbsp;action<br>
-of&nbsp;a&nbsp;certain&nbsp;time&nbsp;frame.&nbsp;The&nbsp;PresentationEngine&nbsp;has&nbsp;to<br>
-decide&nbsp;which&nbsp;events&nbsp;happen&nbsp;in&nbsp;parallel&nbsp;and&nbsp;which&nbsp;<br>
-ones&nbsp;happen&nbsp;sequential.&nbsp;Instances&nbsp;of&nbsp;<a href="#Message">Message</a>&nbsp;<br>
-expose&nbsp;a&nbsp;single&nbsp;Python&nbsp;list&nbsp;object&nbsp;as&nbsp;<a href="#Message">Message</a>.event_list.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="Message-__init__"><strong>__init__</strong></a>(self, event_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;<a href="#Message">Message</a>&nbsp;with&nbsp;a&nbsp;list&nbsp;of&nbsp;objects<br>
-derived&nbsp;from&nbsp;shard.<a href="#Event">Event</a>.&nbsp;An&nbsp;empty&nbsp;list&nbsp;may<br>
-be&nbsp;supplied.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="MovesToEvent">class <strong>MovesToEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.presentationengine.html">presentationengine</a></td>
+    <td><tt>Shard Presentation Engine</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;server&nbsp;confirmation&nbsp;of&nbsp;a&nbsp;movement.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#MovesToEvent">MovesToEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="MovesToEvent-__init__"><strong>__init__</strong></a>(self, identifier, location)</dt><dd><tt>location&nbsp;is&nbsp;a&nbsp;description&nbsp;as&nbsp;in<br>
-the&nbsp;<a href="#TriesToMoveEvent">TriesToMoveEvent</a>.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PassedEvent">class <strong>PassedEvent</strong></a>(<a href="shard.html#PassiveEvent">PassiveEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;by&nbsp;the&nbsp;server&nbsp;when&nbsp;an&nbsp;item&nbsp;or&nbsp;an&nbsp;NPC&nbsp;is<br>
-being&nbsp;passed&nbsp;by&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#PassedEvent">PassedEvent</a></dd>
-<dd><a href="shard.html#PassiveEvent">PassiveEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#PassiveEvent">PassiveEvent</a>:<br>
-<dl><dt><a name="PassedEvent-__init__"><strong>__init__</strong></a>(self, identifier, trigger_identifier)</dt><dd><tt>The&nbsp;trigger_identifier&nbsp;identifies&nbsp;the<br>
-entity&nbsp;that&nbsp;triggered&nbsp;the&nbsp;event.&nbsp;This&nbsp;makes&nbsp;it<br>
-possible&nbsp;to&nbsp;react&nbsp;differently&nbsp;to&nbsp;several<br>
-entities.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PassiveEvent">class <strong>PassiveEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.run.html">run</a></td>
+    <td><tt>shard.run - Initialize and run Shard client and server</tt></td>
+  </tr><tr class="module">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;base&nbsp;class&nbsp;for&nbsp;events&nbsp;concerning&nbsp;items<br>
-ot&nbsp;NPCs&nbsp;when&nbsp;they&nbsp;are&nbsp;being&nbsp;passed,&nbsp;looked&nbsp;at,&nbsp;<br>
-picked&nbsp;up&nbsp;and&nbsp;the&nbsp;like.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="PassiveEvent-__init__"><strong>__init__</strong></a>(self, identifier, trigger_identifier)</dt><dd><tt>The&nbsp;trigger_identifier&nbsp;identifies&nbsp;the<br>
-entity&nbsp;that&nbsp;triggered&nbsp;the&nbsp;event.&nbsp;This&nbsp;makes&nbsp;it<br>
-possible&nbsp;to&nbsp;react&nbsp;differently&nbsp;to&nbsp;several<br>
-entities.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PerceptionEvent">class <strong>PerceptionEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;perception&nbsp;for&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC<br>
-issued&nbsp;by&nbsp;the&nbsp;server,&nbsp;usually&nbsp;the&nbsp;result&nbsp;of&nbsp;<br>
-a&nbsp;<a href="#TriesToLookAtEvent">TriesToLookAtEvent</a>.&nbsp;Note&nbsp;that&nbsp;a&nbsp;<a href="#PerceptionEvent">PerceptionEvent</a><br>
-may&nbsp;be&nbsp;issued&nbsp;by&nbsp;the&nbsp;server&nbsp;without&nbsp;any&nbsp;previous<br>
-attempts&nbsp;by&nbsp;the&nbsp;<a href="#Entity">Entity</a>&nbsp;affected.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#PerceptionEvent">PerceptionEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="PerceptionEvent-__init__"><strong>__init__</strong></a>(self, identifier, perception)</dt><dd><tt>perception&nbsp;is&nbsp;a&nbsp;string&nbsp;to&nbsp;be&nbsp;displayed<br>
-by&nbsp;the&nbsp;client.&nbsp;Note:&nbsp;When&nbsp;used&nbsp;with&nbsp;an&nbsp;NPC,<br>
-this&nbsp;could&nbsp;feed&nbsp;a&nbsp;memory&nbsp;database.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PickedUpEvent">class <strong>PickedUpEvent</strong></a>(<a href="shard.html#PassiveEvent">PassiveEvent</a>)</font></td></tr>
+    <td>Module</td>
+    <td><a href="shard.servercoreengine.html">servercoreengine</a></td>
+    <td><tt>Shard Server Core Engine</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;by&nbsp;the&nbsp;server&nbsp;when&nbsp;an&nbsp;item&nbsp;is&nbsp;being<br>
-picked&nbsp;up&nbsp;by&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#PickedUpEvent">PickedUpEvent</a></dd>
-<dd><a href="shard.html#PassiveEvent">PassiveEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#PassiveEvent">PassiveEvent</a>:<br>
-<dl><dt><a name="PickedUpEvent-__init__"><strong>__init__</strong></a>(self, identifier, trigger_identifier)</dt><dd><tt>The&nbsp;trigger_identifier&nbsp;identifies&nbsp;the<br>
-entity&nbsp;that&nbsp;triggered&nbsp;the&nbsp;event.&nbsp;This&nbsp;makes&nbsp;it<br>
-possible&nbsp;to&nbsp;react&nbsp;differently&nbsp;to&nbsp;several<br>
-entities.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="PicksUpEvent">class <strong>PicksUpEvent</strong></a>(<a href="shard.html#ConfirmEvent">ConfirmEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;server&nbsp;confirmation&nbsp;of&nbsp;a<br>
-<a href="#TriesToPickUpEvent">TriesToPickUpEvent</a>&nbsp;issued&nbsp;by&nbsp;the&nbsp;player<br>
-or&nbsp;an&nbsp;NPC.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#PicksUpEvent">PicksUpEvent</a></dd>
-<dd><a href="shard.html#ConfirmEvent">ConfirmEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="PicksUpEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier)</dt><dd><tt>item_identifier&nbsp;identifies&nbsp;the&nbsp;item&nbsp;to<br>
-pick&nbsp;up.&nbsp;This&nbsp;item&nbsp;should&nbsp;be&nbsp;known&nbsp;to<br>
-the&nbsp;client.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Room">class <strong>Room</strong></a>(<a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>)</font></td></tr>
+    <p>From the __init__.py module:</p><table class="children sortable" id="id2">
+  
+  
+<tr class="class">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>An&nbsp;instance&nbsp;of&nbsp;this&nbsp;class&nbsp;is&nbsp;maintained&nbsp;for<br>
-the&nbsp;current&nbsp;room&nbsp;in&nbsp;the&nbsp;ClientCoreEngine&nbsp;and<br>
-for&nbsp;all&nbsp;active&nbsp;rooms&nbsp;in&nbsp;the&nbsp;ServerCoreEngine.<br>
-It&nbsp;saves&nbsp;the&nbsp;map&nbsp;as&nbsp;well&nbsp;as&nbsp;Entities&nbsp;and<br>
-their&nbsp;locations.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="Room-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Initialize&nbsp;a&nbsp;room.<br>
-&nbsp;<br>
-<a href="#Room">Room</a>.entity_dict<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;dict&nbsp;of&nbsp;all&nbsp;Entities&nbsp;in&nbsp;this&nbsp;room,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;mapping&nbsp;<a href="#Entity">Entity</a>&nbsp;identifiers&nbsp;to&nbsp;<a href="#Entity">Entity</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;instances.<br>
-&nbsp;<br>
-<a href="#Room">Room</a>.floor_plan<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;dict&nbsp;mapping&nbsp;2D&nbsp;coordinate&nbsp;tuples<br>
-&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;a&nbsp;<a href="#FloorPlanElement">FloorPlanElement</a>&nbsp;instance.<br>
-&nbsp;<br>
-<a href="#Room">Room</a>.entity_locations<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;dict&nbsp;mapping&nbsp;<a href="#Entity">Entity</a>&nbsp;identifiers&nbsp;to&nbsp;a<br>
-&nbsp;&nbsp;&nbsp;&nbsp;2D&nbsp;coordinate&nbsp;tuple.<br>
-&nbsp;<br>
-<a href="#Room">Room</a>.tile_list<br>
-&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;tiles&nbsp;for&nbsp;the&nbsp;current&nbsp;room,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;easy&nbsp;asset&nbsp;fetching.<br>
-&nbsp;<br>
-Note&nbsp;that&nbsp;all&nbsp;these&nbsp;dicts&nbsp;assume&nbsp;that<br>
-<a href="#Entity">Entity</a>&nbsp;identifiers&nbsp;are&nbsp;unique.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_ChangeMapElementEvent"><strong>process_ChangeMapElementEvent</strong></a>(self, event)</dt><dd><tt>Update&nbsp;all&nbsp;affected&nbsp;dicts.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_DeleteEvent"><strong>process_DeleteEvent</strong></a>(self, event)</dt><dd><tt>Update&nbsp;all&nbsp;affected&nbsp;dicts.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_MovesToEvent"><strong>process_MovesToEvent</strong></a>(self, event)</dt><dd><tt>Update&nbsp;all&nbsp;affected&nbsp;dicts.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_SpawnEvent"><strong>process_SpawnEvent</strong></a>(self, event)</dt><dd><tt>Update&nbsp;all&nbsp;affected&nbsp;dicts.</tt></dd></dl>
-
-<hr>
-Methods inherited from <a href="shard.eventprocessor.html#EventProcessor">shard.eventprocessor.EventProcessor</a>:<br>
-<dl><dt><a name="Room-process_AttemptFailedEvent"><strong>process_AttemptFailedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_CanSpeakEvent"><strong>process_CanSpeakEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_ChangeStateEvent"><strong>process_ChangeStateEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_DroppedEvent"><strong>process_DroppedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_DropsEvent"><strong>process_DropsEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_EnterRoomEvent"><strong>process_EnterRoomEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_InitEvent"><strong>process_InitEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_LookedAtEvent"><strong>process_LookedAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_PassedEvent"><strong>process_PassedEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_PerceptionEvent"><strong>process_PerceptionEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_PickedUpEvent"><strong>process_PickedUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_PicksUpEvent"><strong>process_PicksUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_RoomCompleteEvent"><strong>process_RoomCompleteEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_SaysEvent"><strong>process_SaysEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToDropEvent"><strong>process_TriesToDropEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToLookAtEvent"><strong>process_TriesToLookAtEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToManipulateEvent"><strong>process_TriesToManipulateEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToMoveEvent"><strong>process_TriesToMoveEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToPickUpEvent"><strong>process_TriesToPickUpEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-process_TriesToTalkToEvent"><strong>process_TriesToTalkToEvent</strong></a>(self, event)</dt><dd><tt>Process&nbsp;the&nbsp;<a href="#Event">Event</a>.<br>
-The&nbsp;default&nbsp;implementation&nbsp;does&nbsp;nothing.</tt></dd></dl>
-
-<dl><dt><a name="Room-setup_eventprocessor"><strong>setup_eventprocessor</strong></a>(self)</dt><dd><tt>Set&nbsp;up&nbsp;<a href="shard.eventprocessor.html#EventProcessor">EventProcessor</a>.event_dict&nbsp;which&nbsp;maps<br>
-event&nbsp;classes&nbsp;to&nbsp;functions&nbsp;to&nbsp;be&nbsp;called&nbsp;for<br>
-the&nbsp;respective&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="RoomCompleteEvent">class <strong>RoomCompleteEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;by&nbsp;the&nbsp;server&nbsp;after&nbsp;an&nbsp;<a href="#EnterRoomEvent">EnterRoomEvent</a>&nbsp;when<br>
-the&nbsp;room&nbsp;is&nbsp;populated&nbsp;with&nbsp;a&nbsp;map,&nbsp;items&nbsp;and&nbsp;NPCs.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#RoomCompleteEvent">RoomCompleteEvent</a></dd>
-<dd><a href="shard.html#ServerEvent">ServerEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="RoomCompleteEvent-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>This&nbsp;event&nbsp;has&nbsp;no&nbsp;parameters.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="SaysEvent">class <strong>SaysEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
+    <td>Class</td>
+    <td><a href="shard.AttemptEvent.html">AttemptEvent</a></td>
+    <td><tt>This is the base class for attempt events</tt></td>
+  </tr><tr class="class">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;normally&nbsp;is&nbsp;a&nbsp;reaction&nbsp;to&nbsp;the&nbsp;<a href="#CanSpeakEvent">CanSpeakEvent</a>,&nbsp;<br>
-to&nbsp;be&nbsp;sent&nbsp;by&nbsp;the&nbsp;player.&nbsp;NPCs&nbsp;can&nbsp;speak&nbsp;spontanously,&nbsp;<br>
-in&nbsp;that&nbsp;case&nbsp;a&nbsp;<a href="#SaysEvent">SaysEvent</a>&nbsp;is&nbsp;issued&nbsp;by&nbsp;he&nbsp;Story&nbsp;<br>
-Engine.&nbsp;Players&nbsp;usually&nbsp;have&nbsp;to&nbsp;send&nbsp;an&nbsp;<br>
-<a href="#TriesToTalkToEvent">TriesToTalkToEvent</a>&nbsp;before&nbsp;they&nbsp;are&nbsp;allowed&nbsp;to<br>
-speak.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="SaysEvent-__init__"><strong>__init__</strong></a>(self, identifier, text)</dt><dd><tt>text&nbsp;is&nbsp;a&nbsp;string&nbsp;to&nbsp;be&nbsp;spoken&nbsp;by&nbsp;the&nbsp;entity.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ServerEvent">class <strong>ServerEvent</strong></a>(<a href="shard.html#Event">Event</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;various&nbsp;events&nbsp;issued&nbsp;by&nbsp;the<br>
-server&nbsp;that&nbsp;are&nbsp;no&nbsp;ConfirmEvents,&nbsp;including<br>
-map&nbsp;and&nbsp;room&nbsp;events.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods inherited from <a href="shard.html#Event">Event</a>:<br>
-<dl><dt><a name="ServerEvent-__init__"><strong>__init__</strong></a>(self, identifier)</dt><dd><tt>This&nbsp;constructor&nbsp;must&nbsp;be&nbsp;called&nbsp;with<br>
-an&nbsp;unique&nbsp;identifier&nbsp;for&nbsp;the&nbsp;object<br>
-(player,&nbsp;item,&nbsp;NPC)&nbsp;which&nbsp;is&nbsp;affected<br>
-by&nbsp;this&nbsp;event.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ShardException">class <strong>ShardException</strong></a></font></td></tr>
+    <td>Class</td>
+    <td><a href="shard.AttemptFailedEvent.html">AttemptFailedEvent</a></td>
+    <td><tt>This is actually not a confirmation, but the</tt></td>
+  </tr><tr class="class">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;base&nbsp;class&nbsp;of&nbsp;Shard-related<br>
-exceptions.&nbsp;Shard&nbsp;Implementations&nbsp;should<br>
-raise&nbsp;an&nbsp;instance&nbsp;of&nbsp;this&nbsp;class&nbsp;when&nbsp;<br>
-appropriate,&nbsp;providing&nbsp;an&nbsp;error&nbsp;description.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="ShardException-__init__"><strong>__init__</strong></a>(self, error_description)</dt></dl>
-
-<dl><dt><a name="ShardException-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="SpawnEvent">class <strong>SpawnEvent</strong></a>(<a href="shard.html#ServerEvent">ServerEvent</a>)</font></td></tr>
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;event&nbsp;creates&nbsp;the&nbsp;player&nbsp;/&nbsp;new&nbsp;item&nbsp;/&nbsp;NPC&nbsp;on&nbsp;the&nbsp;map.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#SpawnEvent">SpawnEvent</a></dd>
-<dd><a href="shard.html#ServerEvent">ServerEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="SpawnEvent-__init__"><strong>__init__</strong></a>(self, entity, location)</dt><dd><tt>entity&nbsp;is&nbsp;an&nbsp;instance&nbsp;of&nbsp;shard.<a href="#Entity">Entity</a>,&nbsp;<br>
-having&nbsp;a&nbsp;type,&nbsp;identifier&nbsp;and&nbsp;asset.<br>
-location&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of&nbsp;2D&nbsp;integer<br>
-coordinates.<br>
-The&nbsp;server&nbsp;stores&nbsp;the&nbsp;relevant<br>
-information&nbsp;and&nbsp;passes&nbsp;the&nbsp;entity&nbsp;on&nbsp;to<br>
-the&nbsp;client.</tt></dd></dl>
+    <td>Class</td>
+    <td><a href="shard.CanSpeakEvent.html">CanSpeakEvent</a></td>
+    <td><tt>This is a server invitation for the player or</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.ChangeMapElementEvent.html">ChangeMapElementEvent</a></td>
+    <td><tt>This event changes a single element of the </tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.ChangeStateEvent.html">ChangeStateEvent</a></td>
+    <td><tt>Each instance of shard.Entity has a state.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.ConfirmEvent.html">ConfirmEvent</a></td>
+    <td><tt>This is the base class for server confirmations</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.DeleteEvent.html">DeleteEvent</a></td>
+    <td><tt>This event deletes an item or NPC from the map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.DroppedEvent.html">DroppedEvent</a></td>
+    <td><tt>Issued by the server when an item is being</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.DropsEvent.html">DropsEvent</a></td>
+    <td><tt>This is the server confirmation for an</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.EnterRoomEvent.html">EnterRoomEvent</a></td>
+    <td><tt>This event announces that the player enters a new</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.Entity.html">Entity</a></td>
+    <td><tt>An Entity is a Shard game object. This is the base</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.Event.html">Event</a></td>
+    <td><tt>Shard event base class.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.FloorPlanElement.html">FloorPlanElement</a></td>
+    <td><tt>Convenience class for floor plan elements.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.InitEvent.html">InitEvent</a></td>
+    <td><tt>This event is sent once by the client upon startup.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.LookedAtEvent.html">LookedAtEvent</a></td>
+    <td><tt>Issued by the server when an item or NPC is</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.Message.html">Message</a></td>
+    <td><tt>A Message manages an ordered list of shard events.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.MovesToEvent.html">MovesToEvent</a></td>
+    <td><tt>This is the server confirmation of a movement.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.PassedEvent.html">PassedEvent</a></td>
+    <td><tt>Issued by the server when an item or an NPC is</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.PassiveEvent.html">PassiveEvent</a></td>
+    <td><tt>The base class for events concerning items</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.PerceptionEvent.html">PerceptionEvent</a></td>
+    <td><tt>This is a perception for the player or an NPC</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.PickedUpEvent.html">PickedUpEvent</a></td>
+    <td><tt>Issued by the server when an item is being</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.PicksUpEvent.html">PicksUpEvent</a></td>
+    <td><tt>This is a server confirmation of a</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.Room.html">Room</a></td>
+    <td><tt>An instance of this class is maintained for</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.RoomCompleteEvent.html">RoomCompleteEvent</a></td>
+    <td><tt>Issued by the server after an EnterRoomEvent when</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.SaysEvent.html">SaysEvent</a></td>
+    <td><tt>This normally is a reaction to the CanSpeakEvent, </tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.ServerEvent.html">ServerEvent</a></td>
+    <td><tt>Base class for various events issued by the</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.ShardException.html">ShardException</a></td>
+    <td><tt>This is the base class of Shard-related</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.SpawnEvent.html">SpawnEvent</a></td>
+    <td><tt>This event creates the player / new item / NPC on the map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.Tile.html">Tile</a></td>
+    <td><tt>A Tile is an element of a two-dimensional map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToDropEvent.html">TriesToDropEvent</a></td>
+    <td><tt>The player or NPC tries to drop an item.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToLookAtEvent.html">TriesToLookAtEvent</a></td>
+    <td><tt>Issued when the player or an NPC looks at a map </tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToManipulateEvent.html">TriesToManipulateEvent</a></td>
+    <td><tt>Issued when the player or an NPC tries to</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToMoveEvent.html">TriesToMoveEvent</a></td>
+    <td><tt>Issued when the player or an NPC wants to move, </tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToPickUpEvent.html">TriesToPickUpEvent</a></td>
+    <td><tt>Issued when the player or an NPC tries to pick up</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="shard.TriesToTalkToEvent.html">TriesToTalkToEvent</a></td>
+    <td><tt>Issued when the player or an NPC wants to start </tt></td>
+  </tr><tr class="function">
+    
+    
+    <td>Function</td>
+    <td><a href="shard.html#difference_2d">difference_2d</a></td>
+    <td><tt>Return the difference vector between</tt></td>
+  </tr>
+  
+</table>
 
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Tile">class <strong>Tile</strong></a></font></td></tr>
+    <div class="function">
+  <a name="shard.difference_2d">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>A&nbsp;<a href="#Tile">Tile</a>&nbsp;is&nbsp;an&nbsp;element&nbsp;of&nbsp;a&nbsp;two-dimensional&nbsp;map.<br>
-It&nbsp;is&nbsp;never&nbsp;meant&nbsp;to&nbsp;perform&nbsp;any&nbsp;active&nbsp;logic,&nbsp;<br>
-so&nbsp;its&nbsp;only&nbsp;property&nbsp;is&nbsp;a&nbsp;type&nbsp;and&nbsp;an&nbsp;asset.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="Tile-__init__"><strong>__init__</strong></a>(self, tile_type, asset)</dt><dd><tt>tile_type&nbsp;must&nbsp;be&nbsp;a&nbsp;string&nbsp;describing&nbsp;the&nbsp;tile<br>
-type.&nbsp;Currently&nbsp;supported&nbsp;are&nbsp;"OBSTACLE"<br>
-and&nbsp;"FLOOR",&nbsp;describing&nbsp;whether&nbsp;the&nbsp;player<br>
-or&nbsp;NPCs&nbsp;can&nbsp;move&nbsp;across&nbsp;the&nbsp;tile.<br>
-&nbsp;<br>
-asset&nbsp;is&nbsp;preferably&nbsp;a&nbsp;string&nbsp;with&nbsp;a&nbsp;file&nbsp;<br>
-name&nbsp;or&nbsp;an&nbsp;URI&nbsp;of&nbsp;a&nbsp;media&nbsp;file&nbsp;containing&nbsp;<br>
-the&nbsp;data&nbsp;for&nbsp;visualizing&nbsp;the&nbsp;tile.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToDropEvent">class <strong>TriesToDropEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
+  </a>
+  <a name="difference_2d">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;player&nbsp;or&nbsp;NPC&nbsp;tries&nbsp;to&nbsp;drop&nbsp;an&nbsp;item.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToDropEvent">TriesToDropEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="TriesToDropEvent-__init__"><strong>__init__</strong></a>(self, identifier, item_identifier, target_identifier)</dt><dd><tt>An&nbsp;attempt&nbsp;to&nbsp;drop&nbsp;the&nbsp;item&nbsp;identified&nbsp;by<br>
-item_identifier.&nbsp;When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;<br>
-target_identifier&nbsp;must&nbsp;describe&nbsp;the&nbsp;<br>
-desired&nbsp;location.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-Note&nbsp;that&nbsp;this&nbsp;attempt&nbsp;can&nbsp;turn&nbsp;out&nbsp;as&nbsp;a<br>
-"use"&nbsp;action,&nbsp;for&nbsp;example&nbsp;when&nbsp;dropping<br>
-a&nbsp;key&nbsp;on&nbsp;a&nbsp;padlock.&nbsp;In&nbsp;this&nbsp;case,&nbsp;the<br>
-server&nbsp;replaces&nbsp;the&nbsp;location&nbsp;with&nbsp;an&nbsp;item&nbsp;<br>
-identifier&nbsp;and&nbsp;passes&nbsp;that&nbsp;on&nbsp;to&nbsp;the<br>
-story&nbsp;engine.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToLookAtEvent">class <strong>TriesToLookAtEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
+  </a>
+  <div class="functionHeader">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;looks&nbsp;at&nbsp;a&nbsp;map&nbsp;<br>
-element&nbsp;or&nbsp;an&nbsp;item.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToLookAtEvent">TriesToLookAtEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
-<dl><dt><a name="TriesToLookAtEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToManipulateEvent">class <strong>TriesToManipulateEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
+    def
+    difference_2d(start_tuple, end_tuple):
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;tries&nbsp;to<br>
-manipulate&nbsp;an&nbsp;item.&nbsp;NPCs&nbsp;cannot&nbsp;be&nbsp;manipulated.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToManipulateEvent">TriesToManipulateEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
-<dl><dt><a name="TriesToManipulateEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToMoveEvent">class <strong>TriesToMoveEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
+  </div>
+  <div class="functionBody">
     
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;wants&nbsp;to&nbsp;move,&nbsp;<br>
-awaiting&nbsp;server&nbsp;confirmation.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToMoveEvent">TriesToMoveEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
-<dl><dt><a name="TriesToMoveEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToPickUpEvent">class <strong>TriesToPickUpEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;tries&nbsp;to&nbsp;pick&nbsp;up<br>
-an&nbsp;item.&nbsp;Attempts&nbsp;to&nbsp;pick&nbsp;up&nbsp;NPCs&nbsp;are&nbsp;discarded&nbsp;<br>
-or&nbsp;answered&nbsp;with&nbsp;an&nbsp;error.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToPickUpEvent">TriesToPickUpEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
-<dl><dt><a name="TriesToPickUpEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="TriesToTalkToEvent">class <strong>TriesToTalkToEvent</strong></a>(<a href="shard.html#AttemptEvent">AttemptEvent</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Issued&nbsp;when&nbsp;the&nbsp;player&nbsp;or&nbsp;an&nbsp;NPC&nbsp;wants&nbsp;to&nbsp;start&nbsp;<br>
-a&nbsp;conversation&nbsp;with&nbsp;another&nbsp;entity.<br>
-It&nbsp;is&nbsp;not&nbsp;possible&nbsp;to&nbsp;talk&nbsp;to&nbsp;items.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="shard.html#TriesToTalkToEvent">TriesToTalkToEvent</a></dd>
-<dd><a href="shard.html#AttemptEvent">AttemptEvent</a></dd>
-<dd><a href="shard.html#Event">Event</a></dd>
-</dl>
-<hr>
-Methods inherited from <a href="shard.html#AttemptEvent">AttemptEvent</a>:<br>
-<dl><dt><a name="TriesToTalkToEvent-__init__"><strong>__init__</strong></a>(self, identifier, target_identifier)</dt><dd><tt>When&nbsp;sent&nbsp;by&nbsp;the&nbsp;client,&nbsp;target_identifier<br>
-must&nbsp;describe&nbsp;the&nbsp;target&nbsp;location&nbsp;of&nbsp;the<br>
-attempt.<br>
-On&nbsp;a&nbsp;two-dimensional&nbsp;map&nbsp;with&nbsp;rectangular<br>
-elements&nbsp;target_identifier&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of<br>
-(x,&nbsp;y)&nbsp;integer&nbsp;coordinates,&nbsp;with&nbsp;(0,&nbsp;0)&nbsp;being<br>
-the&nbsp;upper&nbsp;left&nbsp;corner.<br>
-The&nbsp;server&nbsp;determines&nbsp;what&nbsp;is&nbsp;being&nbsp;<br>
-looked&nbsp;at&nbsp;/&nbsp;picked&nbsp;up&nbsp;/&nbsp;manipulated&nbsp;/&nbsp;<br>
-talked&nbsp;to&nbsp;at&nbsp;that&nbsp;location,&nbsp;and&nbsp;<br>
-replaces&nbsp;the&nbsp;location&nbsp;string&nbsp;with&nbsp;an&nbsp;item,&nbsp;<br>
-NPC&nbsp;or&nbsp;player&nbsp;identifier&nbsp;if&nbsp;appropriate.</tt></dd></dl>
-
-</td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#eeaa77">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-difference_2d"><strong>difference_2d</strong></a>(start_tuple, end_tuple)</dt><dd><tt>Return&nbsp;the&nbsp;difference&nbsp;vector&nbsp;between<br>
-a&nbsp;2D&nbsp;start&nbsp;and&nbsp;end&nbsp;position.</tt></dd></dl>
-</td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#55aa55">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>direction_vector_dict</strong> = {'&lt;': (-1, 0), '&gt;': (1, 0), '^': (0, -1), 'v': (0, 1), (-1, 0): '&lt;', (0, -1): '^', (0, 1): 'v', (1, 0): '&gt;'}</td></tr></table>
-</body></html>
+    <pre>Return the difference vector between
+a 2D start and end position.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-02 11:35:36.
+    </address>
+  </body>
+</html>
