@@ -12,13 +12,20 @@
 # Transformed into a package on 22. September 2009.
 
 # TODO: reasonable package docstring above: what is where :)
+#
 # TODO: "%s" % s instead of "s" + "s" in the whole package!
-# TODO: use map() instead of "for" loops
+#
+# TODO: use map() instead of "for" loops where applicable
+#
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
 # TODO: most prominently: message.event_list.append -> message.append
+#
 # TODO: readable __repr__ of Events and Messages
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
+#
 # TODO: fix docstrings for pydoctor documentation (first line -> complete sentence)
+# TODO: state method return vallue in docstring
+# TODO: attribute description in class docstring, not in __init__()
 
 import eventprocessor
 
@@ -497,7 +504,8 @@ class Entity(eventprocessor.EventProcessor):
            from the values givens:
 
            Entity.entity_type
-           One of the strings "PLAYER", "NPC", "ITEM".
+           One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
+           or shard.ITEM_NOBLOCK.
 
            Entity.identifier
            Must be an object whose string representation
@@ -612,6 +620,21 @@ class Entity(eventprocessor.EventProcessor):
         """
         pass
 
+
+############################################################
+# Entity And Tile Types
+
+# Currently values are strings, but they are subject
+# to change without notice.
+
+PLAYER = "PLAYER"
+NPC = "NPC"
+ITEM_BLOCK = "ITEM_BLOCK"
+ITEM_NOBLOCK = "ITEM_NOBLOCK"
+
+FLOOR = "FLOOR"
+OBSTACLE = "OBSTACLE"
+
 ############################################################
 # Tiles
 
@@ -621,10 +644,9 @@ class Tile:
        so its only property is a type and an asset."""
 
     def __init__(self, tile_type, asset):
-        """tile_type must be a string describing the tile
-           type. Currently supported are "OBSTACLE"
-           and "FLOOR", describing whether the player
-           or NPCs can move across the tile.
+        """tile_type must be shard.FLOOR or shard.OBSTACLE,
+           describing whether the player or NPCs can move
+           across the tile.
            
            asset is preferably a string with a file 
            name or an URI of a media file containing 

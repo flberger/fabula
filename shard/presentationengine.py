@@ -7,10 +7,9 @@
 
 import shard
 import shard.plugin
-import shard.eventprocessor
 import time
 
-class PresentationEngine(shard.plugin.Plugin, shard.eventprocessor.EventProcessor):
+class PresentationEngine(shard.plugin.Plugin):
     """This is the base class for a PresentationEngine for the
        Shard Client. Subclasses should override the
        appropriate methods of this class and implement a 
@@ -19,7 +18,8 @@ class PresentationEngine(shard.plugin.Plugin, shard.eventprocessor.EventProcesso
        but apart from that it makes very few assumptions 
        about the graphical rendering. Thus it is 
        possible to write 2D and 3D PresentationEngines and 
-       even a text interface."""
+       even a text interface.
+    """
 
     ####################
     # Initialization
@@ -38,8 +38,6 @@ class PresentationEngine(shard.plugin.Plugin, shard.eventprocessor.EventProcesso
         # First set up the plugin
         #
         self.setup_plugin(logger)
-
-        self.setup_eventprocessor()
 
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.

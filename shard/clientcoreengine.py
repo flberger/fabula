@@ -233,6 +233,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                             #
                             # Convert from vector to symbol
                             #
+                            # TODO: catch invalid direction!
+                            #
                             direction = shard.direction_vector_dict[difference]
 
                             # TODO: external Entity attribute access. Probably replace by a method call.
@@ -259,8 +261,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                 # entity location to the new location
                                 # on the map is possible
                                 #
-                                # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
-                                #
                                 # We queue the event in self.message_for_plugin,
                                 # so it will be rendered upon next call. That
                                 # way it bypasses the ClientCoreEngine; its status
@@ -270,21 +270,45 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                 # by the server in very short time.
                                 #
                                 try:
+                                    # Check tile type
+                                    #
                                     tile = self.room.floor_plan[event.target_identifier].tile 
 
-                                    if tile.tile_type == "FLOOR":
+                                    if tile.tile_type == shard.FLOOR:
 
-                                        moves_to_event = shard.MovesToEvent(event.identifier,
-                                                                            event.target_identifier)
+                                        # Check if this field is occupied
+                                        #
+                                        occupied = False
+
+                                        for entity in self.room.floor_plan[event.target_identifier].entities:
+
+                                            if entity.entity_type == shard.ITEM_BLOCK:
+
+                                                occupied = True
+
+                                        if occupied:
+
+                                            # Instead of
+                                            #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                                            # we wait for the server to respond with
+                                            # AttemptFailedEvent
+                                            #
+                                            pass
+
+                                        else:
+                                            # All clear. Go!
+                                            #
+                                            moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                                event.target_identifier)
      
-                                        # Update room, needed for PresentationEngine
-                                        #
-                                        self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
+                                            # Update room, needed for PresentationEngine
+                                            #
+                                            self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
 
-                                        # Remember event for crosscheck with
-                                        # event from ServerCoreEngine
-                                        #
-                                        self.local_moves_to_event = moves_to_event
+                                            # Remember event for crosscheck with
+                                            # event from ServerCoreEngine
+                                            #
+                                            self.local_moves_to_event = moves_to_event
 
                                     else:
                                         # Instead of

@@ -309,6 +309,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             #
             # Convert from vector to symbol
             #
+            # TODO: catch invalid direction!
+            #
             direction = shard.direction_vector_dict[difference]
 
             # TODO: external Entity attribute access. Probably replace by a method call.
@@ -324,15 +326,33 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # entity location to the new location
             # on the map is possible
             #
-            # TODO: Entities should be able to make a map element an obstacle. But not all entities, so an attribute might be needed.
-            #
             try:
+                # Check tile type
+                #
                 tile = self.room.floor_plan[event.target_identifier].tile 
 
-                if tile.tile_type == "FLOOR":
+                if tile.tile_type == shard.FLOOR:
 
-                    message.event_list.append(shard.MovesToEvent(event.identifier,
-                                                                 event.target_identifier))
+                    # Check if this field is occupied
+                    #
+                    occupied = False
+
+                    for entity in self.room.floor_plan[event.target_identifier].entities:
+
+                        if entity.entity_type == shard.ITEM_BLOCK:
+
+                            occupied = True
+
+                    if occupied:
+
+                        message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+                    else:
+                        # All clear. Go!
+                        #
+                        message.event_list.append(shard.MovesToEvent(event.identifier,
+                                                                     event.target_identifier))
+
                 else:
 
                     message.event_list.append(shard.AttemptFailedEvent(event.identifier))

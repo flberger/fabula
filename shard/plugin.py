@@ -4,8 +4,9 @@
 # Work started on 30. Sep 2009
 
 import shard           
+import shard.eventprocessor
 
-class Plugin:
+class Plugin(shard.eventprocessor.EventProcessor):
     """This is the base class for plugins
        to be used by an instance of
        shard.coreengine.CoreEngine.
@@ -23,6 +24,8 @@ class Plugin:
            logger is an instance of logging.Logger.
            The default implementation does nothing.
         """
+
+        self.setup_eventprocessor()
 
         self.logger = logger
 
