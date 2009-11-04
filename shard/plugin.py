@@ -17,6 +17,7 @@ class Plugin(shard.eventprocessor.EventProcessor):
            call setup_plugin() like the default
            implementation does.
         """
+
         self.setup_plugin(logger)
 
     def setup_plugin(self, logger):
@@ -33,6 +34,7 @@ class Plugin(shard.eventprocessor.EventProcessor):
 
     def process_message(self, message):
         """This is the main method of a plugin.
+
            It is called with an instance of
            shard.Message. This method does
            not run in a thread. It should
@@ -41,6 +43,9 @@ class Plugin(shard.eventprocessor.EventProcessor):
            to be processed by the host object
            and possibly to be sent to the
            remote host.
+
+           The host is accessible as Plugin.host
+
            The default implementation returns
            an empty message.
         """

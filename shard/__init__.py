@@ -756,10 +756,16 @@ class Room(eventprocessor.EventProcessor):
     def process_MovesToEvent(self, event):
         """Update all affected dicts.
         """
+
         if event.identifier not in self.entity_dict:
 
             raise ShardException("cannot move unknown entity %s"
                                  % event.identifier)
+
+        if event.location not in self.floor_plan:
+
+            raise ShardException("cannot move entity %s to undefined location %s"
+                                 % (event.identifier, event.location))
 
         # Only process changed locations
         #

@@ -225,15 +225,15 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                         difference = shard.difference_2d(location,
                                                          event.target_identifier)
 
-                        if difference != (0, 0):
+                        # Only allow vectors listed in dict
+                        #
+                        if difference in shard.direction_vector_dict:
 
                             # In case of an AttemptEvent, make the
                             # affected entity turn into the direction
                             # of the event
                             #
                             # Convert from vector to symbol
-                            #
-                            # TODO: catch invalid direction!
                             #
                             direction = shard.direction_vector_dict[difference]
 
@@ -381,14 +381,14 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             vector = shard.direction_vector_dict[entity.direction]
 
-            new_x = location[0] - vector[0]
-            new_y = location[1] - vector[1]
+            restored_x = location[0] - vector[0]
+            restored_y = location[1] - vector[1]
 
             self.room.process_MovesToEvent(shard.MovesToEvent(event.identifier,
-                                                              (new_x, new_y)))
+                                                              (restored_x, restored_y)))
 
             self.logger.debug("%s now reverted to %s" % (event.identifier,
-                                                         (new_x, new_y)))
+                                                         (restored_x, restored_y)))
 
         self.await_confirmation = False
 
@@ -469,17 +469,18 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #
     #    pass
 
-    #def process_PerceptionEvent(self, event, message):
-    #    """A perception must be displayed by the 
-    #       PresentationEngine, so it is queued in a Message passed
-    #       from the ClientCoreEngine."""
-    #    #    CoreEngine: if there was a Confirmation
-    #    #    (here: for LookAt, Manipulate)
-    #    #    and it has been applied
-    #    #    or if there was an AttemptFailedEvent: unset
-    #    #    "AwaitConfirmation" flag
-    #    #
-    #    message.event_list.append(event)
+    def process_PerceptionEvent(self, event, message):
+        """A perception must be displayed by the 
+           PresentationEngine, so it is queued in a Message passed
+           from the ClientCoreEngine."""
+
+        # That is a confirmation
+        #
+        self.await_confirmation = False
+
+        # Call default implementation
+        #
+        shard.coreengine.CoreEngine.process_PerceptionEvent(self, event, message)
 
     #def process_SaysEvent(self, event, message):
     #    """The PresentationEngine usually must display the 

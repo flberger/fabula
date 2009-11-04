@@ -53,6 +53,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.plugin = plugin_instance
 
+        # Attach reference to this CoreEngine
+        # to the Plugin.
+        #
+        self.plugin.host = self
+
         # The CoreEngine examines the events of a received
         # Message and applies them. Events for special
         # consideration for the PluginEngine are collected

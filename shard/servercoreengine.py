@@ -301,15 +301,19 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         difference = shard.difference_2d(location,
                                          event.target_identifier)
 
-        if difference != (0, 0):
+        # Only allow vectors listed in dict
+        #
+        if difference not in shard.direction_vector_dict:
+
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        else:
 
             # In case of an AttemptEvent, make the
             # affected entity turn into the direction
             # of the event
             #
             # Convert from vector to symbol
-            #
-            # TODO: catch invalid direction!
             #
             direction = shard.direction_vector_dict[difference]
 
@@ -402,3 +406,64 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # new player entity.
         #
         message.event_list.append(event)
+
+    def process_TriesToLookAtEvent(self, event, message):
+        """Check what is being looked at and
+           issue an according LookedAtEvent.
+        """
+
+        new_event = None
+
+        # TODO: contracts...
+        #
+        if event.target_identifier in self.room.floor_plan:
+
+            for entity in self.room.floor_plan[event.target_identifier].entities:
+
+                if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
+
+                    new_event = shard.LookedAtEvent(entity.identifier,
+                                                    event.identifier)
+
+        if new_event == None:
+
+            # Nothing to look at.
+            # Issue AttemptFailed to unblock client.
+            #
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        else:
+            message.event_list.append(new_event)
+
+    def process_TriesToManipulateEvent(self, event, message):
+        """Check what is being manipulated,
+           replace event.target_identifier
+           with the identifier of the Entity
+           to be manipulated, then let the
+           Plugin handle the Event.
+        """
+
+        # TODO: duplicate from / similar to process_TriesToLookAtEvent
+
+        new_event = None
+
+        # TODO: contracts...
+        #
+        if event.target_identifier in self.room.floor_plan:
+
+            for entity in self.room.floor_plan[event.target_identifier].entities:
+
+                if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
+
+                    new_event = shard.TriesToManipulateEvent(event.identifier,
+                                                             entity.identifier)
+
+        if new_event == None:
+
+            # Nothing to manipulate.
+            # Issue AttemptFailed to unblock client.
+            #
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        else:
+            message.event_list.append(new_event)
