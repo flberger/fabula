@@ -20,6 +20,7 @@ import logging
 
 def run(mode,
         address_port_tuple,
+        player_id,
         framerate,
         plugin_class,
         asset_engine_class,
@@ -81,7 +82,10 @@ def run(mode,
 
         plugin = plugin_class(asset_engine, framerate, logger)
 
-        core_engine_class = shard.clientcoreengine.ClientCoreEngine
+        core_engine_instance = shard.clientcoreengine.ClientCoreEngine(player_id,
+                                                                       interface,
+                                                                       plugin,
+                                                                       logger)
 
     elif mode == "server":
 
@@ -94,11 +98,11 @@ def run(mode,
 
         plugin = plugin_class(logger)
 
-        core_engine_class = shard.servercoreengine.ServerCoreEngine
+        core_engine_instance = shard.servercoreengine.ServerCoreEngine(interface,
+                                                                       plugin,
+                                                                       logger)
 
-    core_engine_instance = core_engine_class(interface,
-                                             plugin,
-                                             logger)
+    # endif :-)
 
     thread.start_new_thread(interface.handle_messages, ())
 

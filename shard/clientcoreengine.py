@@ -5,7 +5,6 @@
 
 import shard
 import shard.coreengine
-import random
 import time
 
 class ClientCoreEngine(shard.coreengine.CoreEngine):
@@ -18,13 +17,18 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     ####################
     # Init
 
-    def __init__(self, interface_instance, presentation_engine_instance, logger):
+    def __init__(self, player_id, interface_instance, presentation_engine_instance, logger):
         """The ClientCoreEngine must be instantiated with an
            instance of a subclass of shard.interfaces.Interface
            which handles the connection to the server or supplies
            events in some other way, and an instance of PresentationEngine
            which presents the game action.
         """
+
+        # Save the player id for ServerCoreEngine
+        # and PresentationEngine.
+        #
+        self.player_id = player_id
 
         # First setup base class
         #
@@ -71,10 +75,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.deleted_entities_dict = {}
 
-        # Save the player id for the PresentationEngine.
-        #
-        self.player_id = ""
-
         self.got_empty_message = False
 
         self.logger.info("complete")
@@ -104,15 +104,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.logger.info("starting")
 
-        # Send InitEvent to trigger a complete update
-        # from the server. Use a random number as id.
-        #
-        id = random.randint(10000,99999)
-
-        # This is also the player id.
-        #
-        self.player_id = id
-
         self.logger.info("waiting for interface to connect")
 
         while not self.interface.connections:
@@ -128,7 +119,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.message_buffer = self.interface.connections.values()[0] 
 
-        self.message_buffer.send_message(shard.Message([shard.InitEvent(id)]))
+        self.message_buffer.send_message(shard.Message([shard.InitEvent(self.player_id)]))
 
         while not self.plugin.exit_requested:
 
