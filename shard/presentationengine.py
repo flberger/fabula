@@ -78,7 +78,6 @@ class PresentationEngine(shard.plugin.Plugin):
         # before each call to process_message()
         #
         self.room = shard.Room()
-        self.deleted_entities_dict = {}
 
         # Are we waiting for a RoomCompleteEvent after
         # an EnterRoomEvent? Upon initialization this
@@ -97,7 +96,6 @@ class PresentationEngine(shard.plugin.Plugin):
     def process_message(self,
                         message,
                         room,
-                        deleted_entities_dict,
                         player_id):
         """This is the main method of the PresentationEngine.
            It is called regularly by the ClientCoreEngine
@@ -121,6 +119,8 @@ class PresentationEngine(shard.plugin.Plugin):
            details.
         """
 
+        # TODO: do we still need to give room and player_id? The should be accessible via Plugin.host, and we can set up proxies here for faster access
+
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
         # checks, like for duplicate RoomCompleteEvents, 
@@ -134,7 +134,6 @@ class PresentationEngine(shard.plugin.Plugin):
         # Initialize
 
         self.room = room
-        self.deleted_entities_dict = deleted_entities_dict
 
         # TODO: Do we need to transfer player_id on every call?
         #
@@ -194,6 +193,8 @@ class PresentationEngine(shard.plugin.Plugin):
             # our convenience.
             #
             if message.has_RoomCompleteEvent:
+
+                # TODO: That original design - handling Events before RoomComplete here or not at all, then deleting - can probably be discarded and replaced by an ordinary Plugin behaviour: process all Events with the according methods.
 
                 # By the time the event arrives the 
                 # ControlEngine has gathered all important
@@ -455,20 +456,6 @@ class PresentationEngine(shard.plugin.Plugin):
     #        i = i - 1
     #    return
 
-    def update_inventory(self):
-        """We do not have to care about the object of
-           a DropsEvent and PicksUpEvent since the 
-           ControlEngine has generated an respective 
-           SpawnEvent and DeleteEvent, which is already 
-           rendered. All that is left is to update the 
-           inventory visualisation. You can use that
-           to enter a frame for the Entities as well.
-        """
-
-        self.display_single_frame()
-
-        return
-
     ####################
     # Event handlers affecting presentation and management
 
@@ -548,8 +535,7 @@ class PresentationEngine(shard.plugin.Plugin):
            structures and draw a frame without
            the deleted Entities.
            Note that the Entities to be removed are
-           already gone in self.room, so use
-           self.deleted_entities_dict instead.
+           already gone in self.room.
         """
 
         self.logger.info("called")
@@ -599,6 +585,8 @@ class PresentationEngine(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
+        self.logger.info("called")
+
         self.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
         self.display_single_frame()
@@ -608,6 +596,8 @@ class PresentationEngine(shard.plugin.Plugin):
     def process_ChangeStateEvent(self, event):
         """Let the Entity handle the Event.
         """
+
+        self.logger.info("called")
 
         self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
 
@@ -619,6 +609,8 @@ class PresentationEngine(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
+        self.logger.info("called")
+
         self.room.entity_dict[event.identifier].process_DropsEvent(event)
 
         self.display_single_frame()
@@ -626,8 +618,13 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_PicksUpEvent(self, event):
-        """Let the Entity handle the Event.
+        """Remove the target from all data
+           structures, then let the Entity
+           handle the Event. Possibly update
+           an inventory display.
         """
+
+        self.logger.info("called")
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 

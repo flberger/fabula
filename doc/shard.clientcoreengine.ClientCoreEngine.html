@@ -27,7 +27,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id34">
+      <table class="children sortable" id="id33">
   
   
 <tr class="method">
@@ -52,14 +52,32 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     
     <td>Method</td>
+    <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Remove affected Entity from rack,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_MovesToEvent">process_MovesToEvent</a></td>
     <td><tt>Notify the Room and add the event to the message.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
+    <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>The entity is deleted from the</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>A perception must be displayed by the </tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Save the Entity to be deleted in the</tt></td>
+    <td><tt>Sanity check, then let self.room process the Event.</tt></td>
   </tr><tr class="method">
     
     
@@ -79,7 +97,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
         <p>
           Inherited from <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>:
         </p>
-        <table class="children sortable" id="id35">
+        <table class="children sortable" id="id34">
   
   
 <tr class="basemethod">
@@ -87,7 +105,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#setup_core_engine">setup_core_engine</a></td>
-    <td><tt>CoreEngines need an instance of a subclass</tt></td>
+    <td><tt>Set up CoreEngine attributes.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -128,25 +146,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     
     <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
     <td><tt>Process the Event.</tt></td>
   </tr><tr class="basemethod">
     
@@ -209,7 +209,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>):
         </p>
-        <table class="children sortable" id="id36">
+        <table class="children sortable" id="id35">
   
   
 <tr class="basemethod">
@@ -238,7 +238,7 @@ of Entities. It is normally instantiated in shard.run.</pre>
   <div class="functionHeader">
     
     def
-    __init__(self, interface_instance, presentation_engine_instance, logger):
+    __init__(self, player_id, interface_instance, presentation_engine_instance, logger):
     
   </div>
   <div class="functionBody">
@@ -287,6 +287,25 @@ methods to process events.</pre>
         </pre>
   </div>
 </div><div class="function">
+  <a name="shard.clientcoreengine.ClientCoreEngine.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_DropsEvent">shard.coreengine.CoreEngine.process_DropsEvent</a></div>
+    <pre>Remove affected Entity from rack,
+queue SpawnEvent for room and Plugin,
+and pass on the DropsEvent.</pre>
+  </div>
+</div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_MovesToEvent">
     
   </a>
@@ -305,6 +324,43 @@ methods to process events.</pre>
         </pre>
   </div>
 </div><div class="function">
+  <a name="shard.clientcoreengine.ClientCoreEngine.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_PicksUpEvent">shard.coreengine.CoreEngine.process_PicksUpEvent</a></div>
+    <pre>The entity is deleted from the
+Room and added to ClientCoreEngine.rack </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.clientcoreengine.ClientCoreEngine.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_PerceptionEvent">shard.coreengine.CoreEngine.process_PerceptionEvent</a></div>
+    <pre>A perception must be displayed by the 
+PresentationEngine, so it is queued in a Message passed
+from the ClientCoreEngine.</pre>
+  </div>
+</div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_DeleteEvent">
     
   </a>
@@ -319,10 +375,8 @@ methods to process events.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_DeleteEvent">shard.coreengine.CoreEngine.process_DeleteEvent</a></div>
-    <pre>Save the Entity to be deleted in the
-deleted_entities_dict for the 
-PresentationEngine, then let self.room
-process the Event.</pre>
+    <pre>Sanity check, then let self.room process the Event.
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_EnterRoomEvent">
@@ -371,7 +425,7 @@ the PresentationEngine here.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-03 13:40:49.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
     </address>
   </body>
 </html>

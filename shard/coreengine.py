@@ -10,13 +10,20 @@ import shard
 import shard.eventprocessor
 
 class CoreEngine(shard.eventprocessor.EventProcessor):
-    """This is the common base class for Shard
-       server and client core engines. They define
-       a main method run() and some auxiliary
-       methods. Most likely you want to override
-       all of them when subclassing CoreEngine,
-       so the use of this class is providing
-       a structure for CoreEngines.
+    """Common base class for Shard server and client core engines.
+       Most likely you will want to override all of the methods
+       when subclassing CoreEngine, so the use of this class is
+       providing a structure for CoreEngines.
+
+       Attributes:
+
+       CoreEngine.logger
+       CoreEngine.interface
+       CoreEngine.plugin
+       CoreEngine.message_for_plugin
+       CoreEngine.message_for_remote
+       CoreEngine.room
+       CoreEngine.rack
     """
 
     def __init__(self, interface_instance, plugin_instance, logger):
@@ -36,13 +43,24 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
                                plugin_instance,
                                logger)
 
+        return
+
     def setup_core_engine(self, interface_instance, plugin_instance, logger):
-        """CoreEngines need an instance of a subclass
-           of shard.interfaces.Interface to communicate
-           with the remote host. Most CoreEngines will
-           deploy a plugin engine to control or present
-           the game. Finally, logger is an instance of
-           logging.Logger for, eh, logging purposes. ;-)
+        """Set up CoreEngine attributes.
+
+           Arguments:
+
+           interface_instance
+               An instance of a subclass of
+               shard.interfaces.Interface to communicate
+               with the remote host.
+
+           plugin_instance
+               Most CoreEngines will deploy a plugin
+               engine to control or present the game.
+
+           logger
+               An instance of logging.Logger.
         """
 
         # Attach logger
@@ -76,7 +94,14 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         #
         self.room = shard.Room()
 
+        # self.rack serves as a storage for deleted Entities
+        # because there may be the need to respawn them.
+        #
+        self.rack = shard.Rack()
+
         self.logger.info("complete")
+
+        return
 
     def run(self):
         """This is the main loop of a CoreEngine.
@@ -119,6 +144,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_TriesToLookAtEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -128,6 +155,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_TriesToPickUpEvent(self, event, message):
         """Process the Event.
@@ -139,6 +168,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_TriesToDropEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -148,6 +179,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_TriesToManipulateEvent(self, event, message):
         """Process the Event.
@@ -159,6 +192,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_TriesToTalkToEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -168,6 +203,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_MovesToEvent(self, event, message):
         """Let self.room process the event and
@@ -186,25 +223,60 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_PicksUpEvent(self, event, message):
-        """Process the Event.
-           The default implementation adds
-           the event to the message.
+        """Save the Entity to be picked up in CoreEngine.rack,
+           delete the it from CoreEngine.room and pass the
+           PicksUpEvent on.
         """
 
         self.logger.debug("called")
 
+        # Save the Entity to be picked up in CoreEngine.rack
+        #
+        picked_entity = self.room.entity_dict[event.item_identifier]
+
+        self.rack.store(picked_entity, event.identifier)
+
+        # Delete it from CoreEngine.room
+        #
+        # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
+        #
+        delete_event = shard.DeleteEvent(event.item_identifier)
+
+        self.room.process_DeleteEvent(delete_event)
+
+        # and pass the PicksUpEvent on
+        #
         message.event_list.append(event)
+
+        return
 
     def process_DropsEvent(self, event, message):
-        """Process the Event.
-           The default implementation adds
-           the event to the message.
+        """Respawn the Entity to be dropped in CoreEngine.room,
+           delete it from CoreEngine.rack
+           and pass the PicksUpEvent on.
         """
 
         self.logger.debug("called")
 
+        # Respawn the Entity to be dropped in CoreEngine.room
+        # Delete it from CoreEngine.rack
+        #
+        # TODO: !!! fails when Entity not in rack
+        #
+        dropped_entity = self.rack.retrieve(event.item_identifier)
+
+        spawn_event = shard.SpawnEvent(dropped_entity, event.location)
+
+        self.room.process_SpawnEvent(spawn_event)
+
+        # and pass the PicksUpEvent on
+        #
         message.event_list.append(event)
+
+        return
 
     def process_CanSpeakEvent(self, event, message):
         """Process the Event.
@@ -216,6 +288,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_AttemptFailedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -225,6 +299,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_PerceptionEvent(self, event, message):
         """Process the Event.
@@ -236,6 +312,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_SaysEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -245,6 +323,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_ChangeStateEvent(self, event, message):
         """Process the Event.
@@ -259,6 +339,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         #
         message.event_list.append(event)
 
+        return
+
     def process_PassedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -268,6 +350,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_LookedAtEvent(self, event, message):
         """Process the Event.
@@ -279,6 +363,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_PickedUpEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -289,6 +375,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_DroppedEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -298,6 +386,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_SpawnEvent(self, event, message):
         """Let self.room process the event and
@@ -313,6 +403,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_DeleteEvent(self, event, message):
         """Let self.room process the event and
            pass it on.
@@ -323,6 +415,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.room.process_DeleteEvent(event)
 
         message.event_list.append(event)
+
+        return
 
     def process_EnterRoomEvent(self, event, message):
         """An EnterRoomEvent means the server is
@@ -338,6 +432,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_RoomCompleteEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -347,6 +443,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return
 
     def process_ChangeMapElementEvent(self, event, message):
         """Let the shard.Room instance in
@@ -360,6 +458,8 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         message.event_list.append(event)
 
+        return
+
     def process_InitEvent(self, event, message):
         """Process the Event.
            The default implementation adds
@@ -369,3 +469,5 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         message.event_list.append(event)
+
+        return

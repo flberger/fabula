@@ -19,18 +19,25 @@
     <div>
       <p>Known subclasses: <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a>, <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></p>
     </div>
-    <pre>This is the common base class for Shard
-server and client core engines. They define
-a main method run() and some auxiliary
-methods. Most likely you want to override
-all of them when subclassing CoreEngine,
-so the use of this class is providing
-a structure for CoreEngines.</pre>
+    <pre>Common base class for Shard server and client core engines.
+Most likely you will want to override all of the methods
+when subclassing CoreEngine, so the use of this class is
+providing a structure for CoreEngines.
+
+Attributes:
+
+CoreEngine.logger
+CoreEngine.interface
+CoreEngine.plugin
+CoreEngine.message_for_plugin
+CoreEngine.message_for_remote
+CoreEngine.room
+CoreEngine.rack</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id31">
+      <table class="children sortable" id="id30">
   
   
 <tr class="method">
@@ -44,7 +51,7 @@ a structure for CoreEngines.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#setup_core_engine">setup_core_engine</a></td>
-    <td><tt>CoreEngines need an instance of a subclass</tt></td>
+    <td><tt>Set up CoreEngine attributes.</tt></td>
   </tr><tr class="method">
     
     
@@ -98,13 +105,13 @@ a structure for CoreEngines.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Save the Entity to be picked up in CoreEngine.rack,</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Respawn the Entity to be dropped in CoreEngine.room,</tt></td>
   </tr><tr class="method">
     
     
@@ -202,7 +209,7 @@ a structure for CoreEngines.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
         </p>
-        <table class="children sortable" id="id32">
+        <table class="children sortable" id="id31">
   
   
 <tr class="basemethod">
@@ -258,12 +265,21 @@ default implementation.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>CoreEngines need an instance of a subclass
-of shard.interfaces.Interface to communicate
-with the remote host. Most CoreEngines will
-deploy a plugin engine to control or present
-the game. Finally, logger is an instance of
-logging.Logger for, eh, logging purposes. ;-)</pre>
+    <pre>Set up CoreEngine attributes.
+
+Arguments:
+
+interface_instance
+    An instance of a subclass of
+    shard.interfaces.Interface to communicate
+    with the remote host.
+
+plugin_instance
+    Most CoreEngines will deploy a plugin
+    engine to control or present the game.
+
+logger
+    An instance of logging.Logger.</pre>
   </div>
 </div><div class="function">
   <a name="shard.coreengine.CoreEngine.run">
@@ -318,7 +334,7 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">shard.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">shard.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></div>
     <pre>Process the Event.
 The default implementation adds
 the event to the message.</pre>
@@ -337,7 +353,7 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></div>
     <pre>Process the Event.
 The default implementation adds
 the event to the message.</pre>
@@ -356,7 +372,7 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">shard.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">shard.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></div>
     <pre>Process the Event.
 The default implementation adds
 the event to the message.</pre>
@@ -375,7 +391,7 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">shard.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">shard.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></div>
     <pre>Process the Event.
 The default implementation adds
 the event to the message.</pre>
@@ -431,10 +447,10 @@ pass it on.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
-    <pre>Process the Event.
-The default implementation adds
-the event to the message.</pre>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a></div>
+    <pre>Save the Entity to be picked up in CoreEngine.rack,
+delete the it from CoreEngine.room and pass the
+PicksUpEvent on.</pre>
   </div>
 </div><div class="function">
   <a name="shard.coreengine.CoreEngine.process_DropsEvent">
@@ -450,10 +466,10 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
-    <pre>Process the Event.
-The default implementation adds
-the event to the message.</pre>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a></div>
+    <pre>Respawn the Entity to be dropped in CoreEngine.room,
+delete it from CoreEngine.rack
+and pass the PicksUpEvent on.</pre>
   </div>
 </div><div class="function">
   <a name="shard.coreengine.CoreEngine.process_CanSpeakEvent">
@@ -507,7 +523,7 @@ the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">shard.eventprocessor.EventProcessor.process_PerceptionEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">shard.eventprocessor.EventProcessor.process_PerceptionEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a></div>
     <pre>Process the Event.
 The default implementation adds
 the event to the message.</pre>
@@ -742,7 +758,7 @@ the event to the message.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-03 13:40:49.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
     </address>
   </body>
 </html>

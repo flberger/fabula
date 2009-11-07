@@ -56,6 +56,11 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #     self.room.entity_locations
         #         A dict mapping Entity identifiers to a
         #         2D coordinate tuple.
+        #
+        # self.rack
+        #
+        #     self.rack serves as a storage for deleted Entities
+        #     because there may be the need to respawn them.
 
         # We attach custom flags to the Message created in
         # setup() to notify the PresentationEngine whether
@@ -69,12 +74,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.await_confirmation = False
 
-        # A dict for Entites which have been deleted, for
-        # the convenience of the PresentationEngine. Usually it
-        # should be cleared after each processing.
-        #
-        self.deleted_entities_dict = {}
-
         self.got_empty_message = False
 
         self.logger.info("complete")
@@ -82,8 +81,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # Remember the latest local MovesToEvent
         #
         self.local_moves_to_event = shard.MovesToEvent(None, None)
-
-        # TODO: set up the inventory
 
     ####################
     # Main Loop
@@ -172,14 +169,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             #
             message_from_plugin = self.plugin.process_message(self.message_for_plugin,
                                                               self.room,
-                                                              self.deleted_entities_dict,
                                                               self.player_id)
 
             # The PresentationEngine returned, the Server Message has
             # been applied and processed. Clean up.
             #
             self.message_for_plugin = shard.Message([])
-            self.deleted_entities_dict = {}
             self.message_for_plugin.has_EnterRoomEvent = False
             self.message_for_plugin.has_RoomCompleteEvent = False
 
@@ -392,21 +387,21 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #
     #    message.event_list.append(event)
 
-    #def process_DropsEvent(self, event, message):
-    #    """Currently not implemented."""
-    #    # Remove the Entity from the Inventory
-    #    #
-    #    # Add it to the entity_dict, setting the
-    #    # coordinates from direction
-    #    #
-    #    # Queue the DropsEvent (for Animation) and
-    #    # a SpawnEvent for the PresentationEngine
-    #    #
-    #    #    CoreEngine: if there was a Confirmation and
-    #    #    it has been applied or if there was an
-    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-    #    #
-    #    pass
+    def process_DropsEvent(self, event, message):
+        """Remove affected Entity from rack,
+           queue SpawnEvent for room and Plugin,
+           and pass on the DropsEvent.
+        """
+
+        # TODO: the DropsEvent and PicksUpEvent handling in ClientCoreEngine and Plugin are asymmetrical. This is ugly. Unify.
+
+        # Call default.
+        #
+        shard.coreengine.CoreEngine.process_DropsEvent(self, event, message)
+
+        # Drop confirmed
+        #
+        self.await_confirmation = False
 
     def process_MovesToEvent(self, event, message):
         """Notify the Room and add the event to the message.
@@ -430,6 +425,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.await_confirmation = False
 
         else:
+
             # Call default implementation
             #
             shard.coreengine.CoreEngine.process_MovesToEvent(self, event, message)
@@ -443,22 +439,18 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 #
                 self.await_confirmation = False
 
-    #def process_PicksUpEvent(self, event, message):
-    #    """Currently not implemented."""
-    #    # Remove from the entity_dict
-    #    #
-    #    # Save in deleted_entities_dict
-    #    #
-    #    # Move the Entity to the Inventory
-    #    #
-    #    # Queue the PicksUpEvent (for Animation) and
-    #    # a DeleteEvent for the PresentationEngine
-    #    #
-    #    #    CoreEngine: if there was a Confirmation and
-    #    #    it has been applied or if there was an
-    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-    #    #
-    #    pass
+    def process_PicksUpEvent(self, event, message):
+        """The entity is deleted from the
+           Room and added to ClientCoreEngine.rack 
+        """
+
+        # Call default
+        #
+        shard.coreengine.CoreEngine.process_PicksUpEvent(self, event, message)
+
+        # picking up confirmed
+        #
+        self.await_confirmation = False
 
     def process_PerceptionEvent(self, event, message):
         """A perception must be displayed by the 
@@ -484,20 +476,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    message.event_list.append(event)
 
     def process_DeleteEvent(self, event, message):
-        """Save the Entity to be deleted in the
-           deleted_entities_dict for the 
-           PresentationEngine, then let self.room
-           process the Event.
+        """Sanity check, then let self.room process the Event.
         """
 
         # TODO: This is just a hack, see TODO for run() for details
         #
         if event.identifier in self.room.entity_dict:
-
-            # Save the Entity in the deleted_entities_dict
-            # to notify the PresentationEngine
-            #
-            self.deleted_entities_dict[event.identifier] = self.room.entity_dict[event.identifier]
 
             # Now call default implementation which
             # lets self.room process the Event and
@@ -514,7 +498,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            player and send items and NPCs. So
            this method empties all data 
            structures and passes the event on to 
-           the PresentationEngine."""
+           the PresentationEngine.
+        """
 
         # Call default implementation
         #

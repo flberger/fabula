@@ -26,7 +26,7 @@ on the ServerInterface and the StoryEngine.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id60">
+      <table class="children sortable" id="id59">
   
   
 <tr class="method">
@@ -59,6 +59,30 @@ on the ServerInterface and the StoryEngine.</pre>
     <td>Method</td>
     <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Check if we already have a room and</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Check what is being looked at and</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Check what is being manipulated,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Check what is being picked up,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>If event.identifier does not own</tt></td>
   </tr>
   
 </table>
@@ -66,7 +90,7 @@ on the ServerInterface and the StoryEngine.</pre>
         <p>
           Inherited from <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>:
         </p>
-        <table class="children sortable" id="id61">
+        <table class="children sortable" id="id60">
   
   
 <tr class="basemethod">
@@ -74,31 +98,7 @@ on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#setup_core_engine">setup_core_engine</a></td>
-    <td><tt>CoreEngines need an instance of a subclass</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Set up CoreEngine attributes.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -116,13 +116,13 @@ on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Save the Entity to be picked up in CoreEngine.rack,</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Respawn the Entity to be dropped in CoreEngine.room,</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -214,7 +214,7 @@ on the ServerInterface and the StoryEngine.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>):
         </p>
-        <table class="children sortable" id="id62">
+        <table class="children sortable" id="id61">
   
   
 <tr class="basemethod">
@@ -325,9 +325,101 @@ according event to the message.</pre>
 entities and send the data to the
 client. If not, pass on to the plugin.</pre>
   </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.process_TriesToLookAtEvent">
+    
+  </a>
+  <a name="process_TriesToLookAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToLookAtEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_TriesToLookAtEvent">shard.coreengine.CoreEngine.process_TriesToLookAtEvent</a></div>
+    <pre>Check what is being looked at and
+issue an according LookedAtEvent.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.process_TriesToManipulateEvent">
+    
+  </a>
+  <a name="process_TriesToManipulateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToManipulateEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_TriesToManipulateEvent">shard.coreengine.CoreEngine.process_TriesToManipulateEvent</a></div>
+    <pre>Check what is being manipulated,
+replace event.target_identifier
+with the identifier of the Entity
+to be manipulated, then let the
+Plugin handle the Event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_TriesToPickUpEvent">shard.coreengine.CoreEngine.process_TriesToPickUpEvent</a></div>
+    <pre>Check what is being picked up,
+replace event.target_identifier
+with the identifier of the Entity
+to be picked up, then let the
+Plugin handle the Event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_TriesToDropEvent">shard.coreengine.CoreEngine.process_TriesToDropEvent</a></div>
+    <pre>If event.identifier does not own
+event.item_identifier in self.rack,
+the attempt fails.
+
+If event.target_identifier is not
+shard.FLOOR, the attempt fails.
+
+If event.target_identifier is
+shard.FLOOR and there is no Entity
+on it, pass event on to the Plugin.
+
+If event.target_identifier is
+shard.FLOOR and there is an Entity
+on it, replace target_identifier with
+Entity.identifier and pass on to the
+Plugin.</pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-03 13:40:49.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
     </address>
   </body>
 </html>

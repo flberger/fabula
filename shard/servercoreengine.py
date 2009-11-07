@@ -285,6 +285,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         self.exit_requested = True
 
+        return
+
     def process_TriesToMoveEvent(self, event, message):
         """Test if the Entity is allowed to move
            to the desired location, and append an
@@ -373,15 +375,15 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
            client. If not, pass on to the plugin.
         """
 
+        # It's not very clean to write to
+        # self.message_for_remote directly
+        # since the procces_() methods are
+        # not supposed to do so.
+
         if len(self.room.floor_plan):
 
             self.logger.debug("sending existing floor_plan and entities")
 
-            # It's not very clean to write to
-            # self.message_for_remote directly
-            # since the procces_() methods are
-            # not supposed to do so.
-            #
             self.message_for_remote.event_list.append(shard.EnterRoomEvent())
 
             for tuple in self.room.floor_plan:
@@ -401,11 +403,35 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
             self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
 
+        if len(self.rack.entity_dict):
+
+            self.logger.debug("sending Spawn and PickUpEvents from existing rack")
+
+            for identifier in self.rack.entity_dict:
+
+                # We must spawn at a valid location.
+                # Spawning at the first coordinate
+                # tuple in the room. Doesn't matter,
+                # it will be picked up in an instant
+                # anyway.
+                #
+                spawn_event = shard.SpawnEvent(self.rack.entity_dict[identifier],
+                                               self.room.floor_plan.keys()[0])
+
+                self.message_for_remote.event_list.append(spawn_event)
+
+                picks_up_event = shard.PicksUpEvent(self.rack.owner_dict[identifier],
+                                                    identifier)
+
+                self.message_for_remote.event_list.append(picks_up_event)
+
         # If a room has already been sent,
         # the plugin should only spawn a
         # new player entity.
         #
         message.event_list.append(event)
+
+        return
 
     def process_TriesToLookAtEvent(self, event, message):
         """Check what is being looked at and
@@ -434,6 +460,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         else:
             message.event_list.append(new_event)
+
+        return
 
     def process_TriesToManipulateEvent(self, event, message):
         """Check what is being manipulated,
@@ -467,3 +495,107 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         else:
             message.event_list.append(new_event)
+
+        return
+
+    def process_TriesToPickUpEvent(self, event, message):
+        """Check what is being picked up,
+           replace event.target_identifier
+           with the identifier of the Entity
+           to be picked up, then let the
+           Plugin handle the Event.
+        """
+
+        # TODO: duplicate from TriesToManipulateEvent
+
+        new_event = None
+
+        # TODO: contracts...
+        #
+        if event.target_identifier in self.room.floor_plan:
+
+            # TODO: This only tries to pick up the very last Entity encountered.
+            #
+            for entity in self.room.floor_plan[event.target_identifier].entities:
+
+                if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
+
+                    new_event = shard.TriesToPickUpEvent(event.identifier,
+                                                         entity.identifier)
+
+        if new_event == None:
+
+            # Nothing to pick up.
+            # Issue AttemptFailed to unblock client.
+            #
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        else:
+            message.event_list.append(new_event)
+
+        return
+
+    def process_TriesToDropEvent(self, event, message):
+        """If event.identifier does not own
+           event.item_identifier in self.rack,
+           the attempt fails.
+
+           If event.target_identifier is not
+           shard.FLOOR, the attempt fails.
+
+           If event.target_identifier is
+           shard.FLOOR and there is no Entity
+           on it, pass event on to the Plugin.
+
+           If event.target_identifier is
+           shard.FLOOR and there is an Entity
+           on it, replace target_identifier with
+           Entity.identifier and pass on to the
+           Plugin.
+        """
+
+        # TODO: These checks are so fundamental that they should probably be the default in CoreEngine.process_TriesToDropEvent
+
+        self.logger.debug("called")
+
+        # If event.identifier does not own
+        # event.item_identifier in self.rack,
+        # the attempt fails.
+        #
+        if self.rack.owner_dict[event.item_identifier] != event.identifier:
+
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        
+        elif event.target_identifier not in self.room.floor_plan:
+
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        elif self.room.floor_plan[event.target_identifier].tile.tile_type != shard.FLOOR:
+
+            # If event.target_identifier is not
+            # shard.FLOOR, the attempt fails.
+            #
+            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        elif len(self.room.floor_plan[event.target_identifier].entities):
+
+            # If event.target_identifier is
+            # shard.FLOOR and there is at least one
+            # Entity on it, replace target_identifier
+            # with the first Entity's identifier and
+            # pass on to the Plugin.
+            #
+            target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
+
+            message.event_list.append(shard.TriesToDropEvent(event.identifier,
+                                                             event.item_identifier,
+                                                             target_identifier))
+
+        else:
+            # If event.target_identifier is
+            # shard.FLOOR and there is no Entity
+            # on it, pass event on to the Plugin.
+            #
+            message.event_list.append(event)
+
+        return

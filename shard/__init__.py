@@ -23,9 +23,15 @@
 # TODO: readable __repr__ of Events and Messages
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 #
-# TODO: fix docstrings for pydoctor documentation (first line -> complete sentence)
-# TODO: state method return vallue in docstring
+# TODO: fix all docstrings for pydoctor documentation (first line -> complete sentence)
+# TODO: give the method return value in docstring
 # TODO: attribute description in class docstring, not in __init__()
+#
+# TODO: unify Event attributes target_identifier, trigger_identifier, item_identifier where applicable
+#
+# TODO: per-player inventories in server... -.-
+#
+# TODO: Idea while reading pylint output: probably put setup_xxx() stuff back into __init__() and let subclasses call that method (that's what pylint points out as missing)
 
 import eventprocessor
 
@@ -800,7 +806,7 @@ class Room(eventprocessor.EventProcessor):
 
         entity = self.entity_dict[event.identifier]
 
-        self.floor_plan[event.location].entities.remove(entity)
+        self.floor_plan[self.entity_locations[event.identifier]].entities.remove(entity)
 
         del self.entity_dict[event.identifier]
 
@@ -817,6 +823,81 @@ class FloorPlanElement:
         """
         self.tile = tile
         self.entities = []
+
+############################################################
+# Rack
+
+class Rack:
+    """A Rack stores Entities removed from a room.
+       An instance of Rack is used by each
+       CoreEngine.
+
+       Rack.entity_list
+           Maps identifiers to Entities.
+
+       Rack.owner_dict
+           Maps item identifiers to owner identifier.
+           Each item has exactly one owner.
+    """
+
+    def __init__(self):
+        """Initialize.
+        """
+
+        # entity_dict maps identifiers
+        # to Entities.
+        #
+        self.entity_dict = {}
+
+        # owner_dict maps item identifiers
+        # to owner identifier.
+        # Each item has exactly one owner.
+        #
+        self.owner_dict = {}
+
+        return
+
+    def store(self, entity, owner):
+        """Store the Entity in the Rack.
+
+           entity
+               A shard.Entity instance
+
+           owner
+               Identifier of the Entity that
+               issued the PicksUpEvent
+        """
+
+        self.entity_dict[entity.identifier] = entity
+
+        self.owner_dict[entity.identifier] = owner
+
+        return
+
+    def items_of(self, identifier):
+        """Return a list of Entities owned by identifier.
+        """
+        item_list = []
+
+        for item in self.owner_dict:
+
+            if self.owner_dict[item] == identifier:
+
+                item_list.append(item)
+
+        return item_list
+
+    def retrieve(self, identifier):
+        """Return and remove the Entity identified by identifier.
+        """
+
+        entity = self.entity_dict[identifier]
+
+        del self.entity_dict[identifier]
+
+        del self.owner_dict[identifier]
+
+        return entity
 
 ############################################################
 # Utilities
