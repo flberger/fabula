@@ -264,7 +264,7 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         # Respawn the Entity to be dropped in CoreEngine.room
         # Delete it from CoreEngine.rack
         #
-        # TODO: !!! fails when Entity not in rack
+        # TODO: Fails when Entity not in rack. Contracts.
         #
         dropped_entity = self.rack.retrieve(event.item_identifier)
 

@@ -16,11 +16,13 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
        on the ServerInterface and the StoryEngine.
     """
 
-    def __init__(self, interface_instance, plugin_instance, logger):
+    def __init__(self, framerate, interface_instance, plugin_instance, logger):
         """Initialize the ServerCoreEngine.
         """
 
-        # First setup base class
+        self.interval = 1.0 / framerate
+
+        # Setup base class
         #
         self.setup_eventprocessor()
 
@@ -135,122 +137,57 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 message = current_message_buffer.grab_message()
 
-                for event in message.event_list:
+                if len(message.event_list):
 
-                    # TODO: most client implementations should be allowed to send a single event per turn only!
-                    # Otherwise, a long burst of events might unfairly
-                    # block other clients. (hint by Alexander Marbach)
+                    for event in message.event_list:
 
-                    # TODO: call story engine even if client message is empty!
-                    # Probably at the end of the connections loop, treating 
-                    # the plugin as another client (idea Alexander Marbach).
+                        # TODO: most client implementations should be allowed to send a single event per turn only!
+                        # Otherwise, a long burst of events might unfairly
+                        # block other clients. (hint by Alexander Marbach)
 
-                    # This is a bit of Python magic. 
-                    # self.event_dict is a dict which maps classes to handling
-                    # functions. We use the class of the event supplied as
-                    # a key to call the appropriate handler, and hand over
-                    # the event.
-                    # These methods may add events for the plugin engine
-                    # to self.message_for_plugin
-                    #
-                    self.event_dict[event.__class__](event, self.message_for_plugin)
+                        # TODO: call story engine even if client message is empty!
+                        # Probably at the end of the connections loop, treating 
+                        # the plugin as another client (idea Alexander Marbach).
 
-                    # Contrary to the ClientCoreEngine, the
-                    # ServerCoreEngine calls its plugin engine
-                    # on an event-by-event rather than on a
-                    # message-by-message base to allow for
-                    # quick and real-time reaction.
-
-                    # First hand over / update the necessary data.
-                    #
-                    # self.plugin.data = self.data
-
-                    # Now go for it. Must not take too long
-                    # since the client is waiting.
-                    #
-                    message_from_plugin = self.plugin.process_message(self.message_for_plugin)
-
-                    # The plugin returned. Clean up.
-                    #
-                    self.message_for_plugin = shard.Message([])
-
-                    # Process events from the story engine
-                    # before returning them to the client.
-                    # We cannot just forward them since we
-                    # may be required to change maps, spawn
-                    # entities etc.
-                    # Note that this time resulting events
-                    # are queued for the remote host, not
-                    # the plugin.
-                    #
-                    # TODO: could we be required to send any new events to the story engine?
-                    #       But this could become an infinite loop!
-                    #
-                    for event in message_from_plugin.event_list:
-                        self.event_dict[event.__class__](event, self.message_for_remote)
-
-                    # If this iteration yielded any events, send them.
-                    # Message for remote host first
-                    #
-                    if self.message_for_remote.event_list:
-
-                        current_message_buffer.send_message(self.message_for_remote)
-
-                    # Build broadcast message for all clients
-                    #
-                    for event in self.message_for_remote.event_list:
-
-                        # We currently leave out ChangeMapElementEvent
-                        # since it is tightly coupled to EnterRoom.
+                        # This is a bit of Python magic. 
+                        # self.event_dict is a dict which maps classes to handling
+                        # functions. We use the class of the event supplied as
+                        # a key to call the appropriate handler, and hand over
+                        # the event.
+                        # These methods may add events for the plugin engine
+                        # to self.message_for_plugin
                         #
-                        # We also broadcast all SpawnEvents. That means
-                        # that when a new client joins, all entities
-                        # (in the current room) are respawned.
-                        # process_SpawnEvent in the core engine will
-                        # filter duplicate entities, so no harm done.
-                        # 
-                        # TODO: respawning might cause some loss of internal entity state
-                        #
-                        if event.__class__ in [shard.DropsEvent, 
-                                               shard.MovesToEvent, 
-                                               shard.PicksUpEvent,
-                                               shard.SaysEvent,
-                                               shard.SpawnEvent,
-                                               shard.DeleteEvent]:
+                        self.event_dict[event.__class__](event, self.message_for_plugin)
 
-                            self.message_for_all.event_list.append(event)
+                        # Contrary to the ClientCoreEngine, the
+                        # ServerCoreEngine calls its plugin engine
+                        # on an event-by-event rather than on a
+                        # message-by-message base to allow for
+                        # quick and real-time reaction.
 
-                    self.logger.debug("message for all clients: "
-                                      + str(self.message_for_all.event_list))
+                        self.call_plugin(current_message_buffer)
 
-                    # Only send self.message_for_all when not empty
+                        # process next event in message from this client
+
+                else:
+                    # len(message.event_list) == 0
                     #
-                    if len(self.message_for_all.event_list):
-
-                        for message_buffer in self.interface.connections.values():
-
-                            # Leave out current MessageBuffer which
-                            # already has reveived the events above.
-                            # We can compare MessageBuffer instances
-                            # right away. ;-)
-                            #
-                            if not message_buffer == current_message_buffer:
-
-                                message_buffer.send_message(self.message_for_all)
-
-                    # Clean up
+                    # Call Plugin anyway to catch
+                    # Plugin initiated Events
                     #
-                    self.message_for_remote = shard.Message([])
-                    self.message_for_all = shard.Message([])
-
-                    # process next event in message from this client
+                    # self.message_for_plugin is already set
+                    # to an empty Message
+                    #
+                    self.call_plugin(current_message_buffer)
 
                 # read from next client message_buffer
 
             # There is no need to run as fast as possible.
             # We slow it down a bit to prevent high CPU load.
+            # Interval between loops has been computed from
+            # framerate given.
             #
-            time.sleep(0.1)
+            time.sleep(self.interval)
 
             # reiterate over client connections
             #
@@ -267,6 +204,99 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         self.logger.info("shutdown confirmed")
 
         # TODO: possibly exit cleanly from the plugin here
+
+        return
+
+    def call_plugin(self, current_message_buffer):
+        """Call Plugin and process Plugin message.
+           Auxiliary method.
+        """
+
+        # Put in a method to avoid duplication.
+
+        # Must not take too long since the client
+        # is waiting.
+        #
+        # Call Plugin even is there were no Events
+        # from the client to catch Plugin-initiated
+        # Events.
+        #
+        message_from_plugin = self.plugin.process_message(self.message_for_plugin)
+
+        # The plugin returned. Clean up.
+        #
+        self.message_for_plugin = shard.Message([])
+
+        # Process events from the story engine
+        # before returning them to the client.
+        # We cannot just forward them since we
+        # may be required to change maps, spawn
+        # entities etc.
+        # Note that this time resulting events
+        # are queued for the remote host, not
+        # the plugin.
+        #
+        # TODO: could we be required to send any new events to the story engine?
+        #       But this could become an infinite loop!
+        #
+        for event in message_from_plugin.event_list:
+            self.event_dict[event.__class__](event, self.message_for_remote)
+
+        # If this iteration yielded any events, send them.
+        # Message for remote host first
+        #
+        if self.message_for_remote.event_list:
+
+            current_message_buffer.send_message(self.message_for_remote)
+
+        # Build broadcast message for all clients
+        #
+        for event in self.message_for_remote.event_list:
+
+            # We currently leave out ChangeMapElementEvent
+            # since it is tightly coupled to EnterRoom.
+            #
+            # We also broadcast all SpawnEvents. That means
+            # that when a new client joins, all entities
+            # (in the current room) are respawned.
+            # process_SpawnEvent in the core engine will
+            # filter duplicate entities, so no harm done.
+            # 
+            # TODO: respawning might cause some loss of internal entity state
+            #
+            if event.__class__ in [shard.DropsEvent, 
+                                   shard.MovesToEvent, 
+                                   shard.PicksUpEvent,
+                                   shard.SaysEvent,
+                                   shard.SpawnEvent,
+                                   shard.DeleteEvent]:
+
+                self.message_for_all.event_list.append(event)
+
+        if len(self.message_for_all.event_list):
+
+            self.logger.debug("message for all clients: %s"
+                              % self.message_for_all.event_list)
+
+        # Only send self.message_for_all when not empty
+        #
+        if len(self.message_for_all.event_list):
+
+            for message_buffer in self.interface.connections.values():
+
+                # Leave out current MessageBuffer which
+                # already has reveived the events above.
+                # We can compare MessageBuffer instances
+                # right away. ;-)
+                #
+                if not message_buffer == current_message_buffer:
+
+                    message_buffer.send_message(self.message_for_all)
+
+        # Clean up
+        #
+        self.message_for_remote = shard.Message([])
+        self.message_for_all = shard.Message([])
 
         return
 

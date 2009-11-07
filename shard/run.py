@@ -69,7 +69,7 @@ def run(mode,
 
     if mode == "client":
 
-        logger.info("using framerate %s" % framerate)
+        logger.info("running with framerate %s/s" % framerate)
 
         # TODO: hardwired TCP protocol
         #
@@ -89,6 +89,8 @@ def run(mode,
 
     elif mode == "server":
 
+        logger.info("running with interval (framerate) %s/s" % framerate)
+
         # TODO: hardwired TCP protocol
         #
         interface = shard.interfaces.TCPInterface(address_port_tuple,
@@ -98,7 +100,8 @@ def run(mode,
 
         plugin = plugin_class(logger)
 
-        core_engine_instance = shard.servercoreengine.ServerCoreEngine(interface,
+        core_engine_instance = shard.servercoreengine.ServerCoreEngine(framerate,
+                                                                       interface,
                                                                        plugin,
                                                                        logger)
 
