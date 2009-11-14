@@ -55,6 +55,46 @@ class Event:
         #
         self.identifier = identifier
 
+    def __eq__(self, other):
+        """Check if the object given has the same
+           class and the same attributes with the
+           same values.
+        """
+
+        if other.__class__ == self.__class__:
+
+            # Dicts can be compared right away (tested)
+            #
+            if other.__dict__ == self.__dict__:
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Check if the object given has a different
+           class or the different attributes with
+           different values.
+        """
+
+        if other.__class__ == self.__class__:
+
+            # Dicts can be compared right away (tested)
+            #
+            if other.__dict__ != self.__dict__:
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return True
+
 ####################
 # Attempt events
 

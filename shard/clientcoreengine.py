@@ -349,6 +349,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.logger.debug("attempt failed for %s, now at %s"
                               % (event.identifier, location))
 
+            # TODO: This still relies on direction information which has been removed from Shard core. Replace by a custom record of the old position.
+            #
             vector = self.presentation_engine.direction_vector_dict[entity.direction]
 
             restored_x = location[0] - vector[0]
