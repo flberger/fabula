@@ -79,6 +79,18 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         self.room = shard.Room()
 
+        # Convenience dict converting symbolic
+        # directions to a vector
+        #
+        self.direction_vector_dict = {"^" : (0, -1),
+                                      ">" : (1, 0),
+                                      "v" : (0, 1),
+                                      "<" : (-1, 0),
+                                      (0, -1) : "^",
+                                      (1, 0) : ">",
+                                      (0, 1) : "v",
+                                      (-1, 0) : "<"}
+
         # Are we waiting for a RoomCompleteEvent after
         # an EnterRoomEvent? Upon initialization this
         # is True, since a room has not yet been

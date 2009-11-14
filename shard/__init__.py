@@ -467,7 +467,6 @@ class Entity(eventprocessor.EventProcessor):
        Entity.entity_type
        Entity.identifier
        Entity.asset
-       Entity.direction
        Entity.state
 
        In addition,
@@ -526,10 +525,6 @@ class Entity(eventprocessor.EventProcessor):
            The PresentationEngine may fetch the asset and
            attach it to the instance of the Entity.
 
-           Entity.direction
-           One of the strings "<", "^", ">", "v", initially
-           "v", facing the user in most implementations.
-
            Entity.state
            The state the Entity is in. Defaults to None.
         """
@@ -537,7 +532,6 @@ class Entity(eventprocessor.EventProcessor):
         self.entity_type = entity_type
         self.identifier = identifier
         self.asset = asset
-        self.direction = "v"
         self.state = None
 
     # EventProcessor overrides
@@ -911,18 +905,6 @@ def difference_2d(start_tuple, end_tuple):
 
     return (end_tuple[0] - start_tuple[0],
             end_tuple[1] - start_tuple[1])
-
-# Convenience dict converting symbolic
-# directions to a vector
-#
-direction_vector_dict = {"^" : (0, -1),
-                         ">" : (1, 0),
-                         "v" : (0, 1),
-                         "<" : (-1, 0),
-                         (0, -1) : "^",
-                         (1, 0) : ">",
-                         (0, 1) : "v",
-                         (-1, 0) : "<"}
 
 ############################################################
 # Exceptions

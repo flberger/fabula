@@ -211,92 +211,53 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                         difference = shard.difference_2d(location,
                                                          event.target_identifier)
 
-                        # Only allow vectors listed in dict
+                        # In case of a TriesToMoveEvent, test and
+                        # approve the movement locally to allow
+                        # for a smooth user experience. We have
+                        # the current map information after all.
                         #
-                        if difference in shard.direction_vector_dict:
+                        # Only allow certain vectors
+                        #
+                        if (difference in ((0, 1), (0, -1), (1, 0), (-1, 0))
+                            and isinstance(event, shard.TriesToMoveEvent)):
 
-                            # In case of an AttemptEvent, make the
-                            # affected entity turn into the direction
-                            # of the event
+                            self.logger.debug("applying TriesToMoveEvent locally")
+
+                            # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
+
+                            # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
+
+                            # Test if a movement from the current
+                            # entity location to the new location
+                            # on the map is possible
                             #
-                            # Convert from vector to symbol
+                            # We queue the event in self.message_for_plugin,
+                            # so it will be rendered upon next call. That
+                            # way it bypasses the ClientCoreEngine; its status
+                            # will be updated upon server confirmation. So
+                            # we will have a difference between client state
+                            # and presentation. We trust that it will be resolved
+                            # by the server in very short time.
                             #
-                            direction = shard.direction_vector_dict[difference]
-
-                            # TODO: external Entity attribute access. Probably replace by a method call.
-                            #
-                            self.room.entity_dict[event.identifier].direction = direction
-
-                            self.logger.debug("found AttemptEvent, setting direction: %s -> '%s'"
-                                              % (event.identifier, direction))
-
-                            # In case of a TriesToMoveEvent, test and
-                            # approve the movement locally to allow
-                            # for a smooth user experience. We have
-                            # the current map information after all.
-                            #
-                            if isinstance(event, shard.TriesToMoveEvent):
-
-                                self.logger.debug("applying TriesToMoveEvent locally")
-
-                                # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
-
-                                # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
-
-                                # Test if a movement from the current
-                                # entity location to the new location
-                                # on the map is possible
+                            try:
+                                # Check tile type
                                 #
-                                # We queue the event in self.message_for_plugin,
-                                # so it will be rendered upon next call. That
-                                # way it bypasses the ClientCoreEngine; its status
-                                # will be updated upon server confirmation. So
-                                # we will have a difference between client state
-                                # and presentation. We trust that it will be resolved
-                                # by the server in very short time.
-                                #
-                                try:
-                                    # Check tile type
+                                tile = self.room.floor_plan[event.target_identifier].tile 
+
+                                if tile.tile_type == shard.FLOOR:
+
+                                    # Check if this field is occupied
                                     #
-                                    tile = self.room.floor_plan[event.target_identifier].tile 
+                                    occupied = False
 
-                                    if tile.tile_type == shard.FLOOR:
+                                    for entity in self.room.floor_plan[event.target_identifier].entities:
 
-                                        # Check if this field is occupied
-                                        #
-                                        occupied = False
+                                        if entity.entity_type == shard.ITEM_BLOCK:
 
-                                        for entity in self.room.floor_plan[event.target_identifier].entities:
+                                            occupied = True
 
-                                            if entity.entity_type == shard.ITEM_BLOCK:
+                                    if occupied:
 
-                                                occupied = True
-
-                                        if occupied:
-
-                                            # Instead of
-                                            #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
-                                            # we wait for the server to respond with
-                                            # AttemptFailedEvent
-                                            #
-                                            pass
-
-                                        else:
-                                            # All clear. Go!
-                                            #
-                                            moves_to_event = shard.MovesToEvent(event.identifier,
-                                                                                event.target_identifier)
-     
-                                            # Update room, needed for PresentationEngine
-                                            #
-                                            self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
-
-                                            # Remember event for crosscheck with
-                                            # event from ServerCoreEngine
-                                            #
-                                            self.local_moves_to_event = moves_to_event
-
-                                    else:
                                         # Instead of
                                         #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
                                         # we wait for the server to respond with
@@ -304,14 +265,37 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                         #
                                         pass
 
-                                except KeyError:
+                                    else:
+                                        # All clear. Go!
+                                        #
+                                        moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                            event.target_identifier)
+ 
+                                        # Update room, needed for PresentationEngine
+                                        #
+                                        self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
 
+                                        # Remember event for crosscheck with
+                                        # event from ServerCoreEngine
+                                        #
+                                        self.local_moves_to_event = moves_to_event
+
+                                else:
                                     # Instead of
                                     #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
                                     # we wait for the server to respond with
                                     # AttemptFailedEvent
                                     #
                                     pass
+
+                            except KeyError:
+
+                                # Instead of
+                                #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                                # we wait for the server to respond with
+                                # AttemptFailedEvent
+                                #
+                                pass
 
                 # Since we had player input, we now await confirmation
                 #
@@ -365,7 +349,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.logger.debug("attempt failed for %s, now at %s"
                               % (event.identifier, location))
 
-            vector = shard.direction_vector_dict[entity.direction]
+            vector = self.presentation_engine.direction_vector_dict[entity.direction]
 
             restored_x = location[0] - vector[0]
             restored_y = location[1] - vector[1]

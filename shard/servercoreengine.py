@@ -333,28 +333,13 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         difference = shard.difference_2d(location,
                                          event.target_identifier)
 
-        # Only allow vectors listed in dict
+        # Only allow certain vectors
         #
-        if difference not in shard.direction_vector_dict:
+        if difference not in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
             message.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
-
-            # In case of an AttemptEvent, make the
-            # affected entity turn into the direction
-            # of the event
-            #
-            # Convert from vector to symbol
-            #
-            direction = shard.direction_vector_dict[difference]
-
-            # TODO: external Entity attribute access. Probably replace by a method call.
-            #
-            self.room.entity_dict[event.identifier].direction = direction
-
-            self.logger.debug("found AttemptEvent, setting direction: %s -> '%s'"
-                              % (event.identifier, direction))
 
             # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
 
