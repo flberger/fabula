@@ -47,7 +47,7 @@ class Interface:
     """
 
     def __init__(self, address_port_tuple, logger):
-        """Most likey you will want to override
+        """Most likely you will want to override
            this method. Be sure to call
            self.setup_interface() with the
            appropriate arguments in your
@@ -461,7 +461,7 @@ class UDPServerInterface(Interface):
         raise SystemExit
 
 
-# TCP implementation uswing the Twisted framework
+# TCP implementation using the Twisted framework
 #
 # Based on a pure socket implementation done in Oct 2009
 

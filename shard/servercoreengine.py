@@ -217,9 +217,9 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # Must not take too long since the client
         # is waiting.
         #
-        # Call Plugin even is there were no Events
-        # from the client to catch Plugin-initiated
-        # Events.
+        # Call Plugin to catch Plugin-initiated
+        # Events even if there were no Events
+        # from the client.
         #
         message_from_plugin = self.plugin.process_message(self.message_for_plugin)
 
@@ -269,18 +269,17 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                                    shard.PicksUpEvent,
                                    shard.SaysEvent,
                                    shard.SpawnEvent,
-                                   shard.DeleteEvent]:
+                                   shard.DeleteEvent,
+                                   shard.ChangeStateEvent]:
 
                 self.message_for_all.event_list.append(event)
-
-        if len(self.message_for_all.event_list):
-
-            self.logger.debug("message for all clients: %s"
-                              % self.message_for_all.event_list)
 
         # Only send self.message_for_all when not empty
         #
         if len(self.message_for_all.event_list):
+
+            self.logger.debug("message for all clients: %s"
+                              % self.message_for_all.event_list)
 
             for message_buffer in self.interface.connections.values():
 

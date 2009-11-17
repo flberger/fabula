@@ -491,6 +491,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         shard.coreengine.CoreEngine.process_EnterRoomEvent(self, event, message)
 
+        # Delete old room and create new
+        #
+        self.room = shard.Room()
+
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them
         #

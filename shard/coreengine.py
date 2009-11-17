@@ -419,16 +419,23 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_EnterRoomEvent(self, event, message):
-        """An EnterRoomEvent means the server is
-           about to send a new map, respawn the
-           player and send items and NPCs. So
-           this method empties all data 
-           structures and passes the event on.
+        """On the client side, an EnterRoomEvent
+           means that the server is about to send
+           a new map, respawn the player and send
+           items and NPCs.
+           On the server side, things may be a little
+           more complicated. In a single player
+           scenario the server might replace the
+           current room or save it to be able to
+           return to it later. In a multiplayer
+           environment however the server has
+           to set up another room to manage in
+           parallel to the established rooms.
+           The default implementation simply
+           forwards the Event.
         """
 
         self.logger.debug("called")
-
-        self.room = shard.Room()
 
         message.event_list.append(event)
 
