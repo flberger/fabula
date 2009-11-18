@@ -17,7 +17,7 @@
       <a href="classIndex.html#shard.eventprocessor.EventProcessor">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a></p>
+      <p>Known subclasses: <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a>, <a href="shard.Room.html">shard.Room</a></p>
     </div>
     <pre>This is the base class for all
 Shard objects that process events.</pre>
@@ -25,7 +25,7 @@ Shard objects that process events.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id37">
+      <table class="children sortable" id="id63">
   
   
 <tr class="method">
@@ -208,7 +208,7 @@ Shard objects that process events.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a>, <a href="shard.Room.html">shard.Room</a></div>
     <pre>You can override this, but make sure
 to call self.setup_eventprocessor()
 like the default implementation does.</pre>
@@ -242,7 +242,7 @@ the respective event.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToMoveEvent(self, event):
+    process_TriesToMoveEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -260,7 +260,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToLookAtEvent(self, event):
+    process_TriesToLookAtEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -278,7 +278,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToPickUpEvent(self, event):
+    process_TriesToPickUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -296,7 +296,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToDropEvent(self, event):
+    process_TriesToDropEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -314,7 +314,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToManipulateEvent(self, event):
+    process_TriesToManipulateEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -332,7 +332,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToTalkToEvent(self, event):
+    process_TriesToTalkToEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -350,11 +350,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_MovesToEvent(self, event):
+    process_MovesToEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -368,11 +368,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_PicksUpEvent(self, event):
+    process_PicksUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -386,11 +386,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_DropsEvent(self, event):
+    process_DropsEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -404,7 +404,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_CanSpeakEvent(self, event):
+    process_CanSpeakEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -422,7 +422,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_AttemptFailedEvent(self, event):
+    process_AttemptFailedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -440,7 +440,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_PerceptionEvent(self, event):
+    process_PerceptionEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -458,11 +458,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_SaysEvent(self, event):
+    process_SaysEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -476,11 +476,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_ChangeStateEvent(self, event):
+    process_ChangeStateEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -494,7 +494,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_PassedEvent(self, event):
+    process_PassedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -512,7 +512,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_LookedAtEvent(self, event):
+    process_LookedAtEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -530,7 +530,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_PickedUpEvent(self, event):
+    process_PickedUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -548,7 +548,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_DroppedEvent(self, event):
+    process_DroppedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -566,11 +566,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_SpawnEvent(self, event):
+    process_SpawnEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -584,11 +584,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_DeleteEvent(self, event):
+    process_DeleteEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -602,7 +602,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_EnterRoomEvent(self, event):
+    process_EnterRoomEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -620,7 +620,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_RoomCompleteEvent(self, event):
+    process_RoomCompleteEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -638,11 +638,11 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_ChangeMapElementEvent(self, event):
+    process_ChangeMapElementEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.coreengine.CoreEngine.html">shard.coreengine.CoreEngine</a>, <a href="shard.presentationengine.PresentationEngine.html">shard.presentationengine.PresentationEngine</a>, <a href="shard.Room.html">shard.Room</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -656,7 +656,7 @@ The default implementation does nothing.</pre>
   <div class="functionHeader">
     
     def
-    process_InitEvent(self, event):
+    process_InitEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -666,7 +666,7 @@ The default implementation does nothing.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-18 12:35:43.
     </address>
   </body>
 </html>

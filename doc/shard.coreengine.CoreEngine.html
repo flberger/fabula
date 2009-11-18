@@ -37,7 +37,7 @@ CoreEngine.rack</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id30">
+      <table class="children sortable" id="id56">
   
   
 <tr class="method">
@@ -183,7 +183,7 @@ CoreEngine.rack</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>An EnterRoomEvent means the server is</tt></td>
+    <td><tt>On the client side, an EnterRoomEvent</tt></td>
   </tr><tr class="method">
     
     
@@ -209,7 +209,7 @@ CoreEngine.rack</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
         </p>
-        <table class="children sortable" id="id31">
+        <table class="children sortable" id="id57">
   
   
 <tr class="basemethod">
@@ -311,7 +311,7 @@ all the process methods to process events.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToMoveEvent(self, event, message):
+    process_TriesToMoveEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -330,7 +330,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToLookAtEvent(self, event, message):
+    process_TriesToLookAtEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -349,7 +349,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToPickUpEvent(self, event, message):
+    process_TriesToPickUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -368,7 +368,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToDropEvent(self, event, message):
+    process_TriesToDropEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -387,7 +387,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToManipulateEvent(self, event, message):
+    process_TriesToManipulateEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -406,7 +406,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToTalkToEvent(self, event, message):
+    process_TriesToTalkToEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -425,7 +425,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_MovesToEvent(self, event, message):
+    process_MovesToEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -443,7 +443,7 @@ pass it on.</pre>
   <div class="functionHeader">
     
     def
-    process_PicksUpEvent(self, event, message):
+    process_PicksUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -462,7 +462,7 @@ PicksUpEvent on.</pre>
   <div class="functionHeader">
     
     def
-    process_DropsEvent(self, event, message):
+    process_DropsEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -481,7 +481,7 @@ and pass the PicksUpEvent on.</pre>
   <div class="functionHeader">
     
     def
-    process_CanSpeakEvent(self, event, message):
+    process_CanSpeakEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -500,7 +500,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_AttemptFailedEvent(self, event, message):
+    process_AttemptFailedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -519,7 +519,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_PerceptionEvent(self, event, message):
+    process_PerceptionEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -538,7 +538,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_SaysEvent(self, event, message):
+    process_SaysEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -557,7 +557,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_ChangeStateEvent(self, event, message):
+    process_ChangeStateEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -576,7 +576,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_PassedEvent(self, event, message):
+    process_PassedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -595,7 +595,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_LookedAtEvent(self, event, message):
+    process_LookedAtEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -614,7 +614,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_PickedUpEvent(self, event, message):
+    process_PickedUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -633,7 +633,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_DroppedEvent(self, event, message):
+    process_DroppedEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -652,7 +652,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_SpawnEvent(self, event, message):
+    process_SpawnEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -670,7 +670,7 @@ pass it on.</pre>
   <div class="functionHeader">
     
     def
-    process_DeleteEvent(self, event, message):
+    process_DeleteEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -688,16 +688,25 @@ pass it on.</pre>
   <div class="functionHeader">
     
     def
-    process_EnterRoomEvent(self, event, message):
+    process_EnterRoomEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a></div>
-    <pre>An EnterRoomEvent means the server is
-about to send a new map, respawn the
-player and send items and NPCs. So
-this method empties all data 
-structures and passes the event on.</pre>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.clientcoreengine.ClientCoreEngine.html">shard.clientcoreengine.ClientCoreEngine</a>, <a href="shard.servercoreengine.ServerCoreEngine.html">shard.servercoreengine.ServerCoreEngine</a></div>
+    <pre>On the client side, an EnterRoomEvent
+means that the server is about to send
+a new map, respawn the player and send
+items and NPCs.
+On the server side, things may be a little
+more complicated. In a single player
+scenario the server might replace the
+current room or save it to be able to
+return to it later. In a multiplayer
+environment however the server has
+to set up another room to manage in
+parallel to the established rooms.
+The default implementation simply
+forwards the Event.</pre>
   </div>
 </div><div class="function">
   <a name="shard.coreengine.CoreEngine.process_RoomCompleteEvent">
@@ -709,7 +718,7 @@ structures and passes the event on.</pre>
   <div class="functionHeader">
     
     def
-    process_RoomCompleteEvent(self, event, message):
+    process_RoomCompleteEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -728,7 +737,7 @@ the event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_ChangeMapElementEvent(self, event, message):
+    process_ChangeMapElementEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -747,7 +756,7 @@ add it to message.</pre>
   <div class="functionHeader">
     
     def
-    process_InitEvent(self, event, message):
+    process_InitEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -758,7 +767,7 @@ the event to the message.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-18 12:35:43.
     </address>
   </body>
 </html>

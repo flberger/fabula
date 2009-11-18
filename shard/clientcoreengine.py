@@ -155,7 +155,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 # to self.message_for_plugin
                 #
                 self.event_dict[current_event.__class__](current_event,
-                                                         self.message_for_plugin)
+                                                         message = self.message_for_plugin)
 
             # Now that everything is set and stored, call
             # the PresentationEngine to process the messages.
@@ -273,7 +273,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
  
                                         # Update room, needed for PresentationEngine
                                         #
-                                        self.process_MovesToEvent(moves_to_event, self.message_for_plugin)
+                                        self.process_MovesToEvent(moves_to_event,
+                                                                  message = self.message_for_plugin)
 
                                         # Remember event for crosscheck with
                                         # event from ServerCoreEngine
@@ -333,7 +334,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     ####################
     # Auxiliary Methods
 
-    def process_AttemptFailedEvent(self, event, message):
+    def process_AttemptFailedEvent(self, event, **kwargs):
         """Unset await_confirmation flag.
         """
 
@@ -364,7 +365,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.await_confirmation = False
 
-    #def process_CanSpeakEvent(self, event, message):
+    #def process_CanSpeakEvent(self, event, **kwargs):
     #    """Currently not implemented."""
     #    #    CoreEngine: if there was a Confirmation and
     #    #    it has been applied or if there was an
@@ -373,7 +374,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #    #
     #    message.event_list.append(event)
 
-    def process_DropsEvent(self, event, message):
+    def process_DropsEvent(self, event, **kwargs):
         """Remove affected Entity from rack,
            queue SpawnEvent for room and Plugin,
            and pass on the DropsEvent.
@@ -383,13 +384,15 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default.
         #
-        shard.coreengine.CoreEngine.process_DropsEvent(self, event, message)
+        shard.coreengine.CoreEngine.process_DropsEvent(self,
+                                                       event,
+                                                       message = kwargs["message"])
 
         # Drop confirmed
         #
         self.await_confirmation = False
 
-    def process_MovesToEvent(self, event, message):
+    def process_MovesToEvent(self, event, **kwargs):
         """Notify the Room and add the event to the message.
         """
 
@@ -414,7 +417,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             # Call default implementation
             #
-            shard.coreengine.CoreEngine.process_MovesToEvent(self, event, message)
+            shard.coreengine.CoreEngine.process_MovesToEvent(self,
+                                                             event,
+                                                             message = kwargs["message"])
 
             # Only allow new input if the last
             # MovesToEvent has been confirmed.
@@ -425,20 +430,22 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 #
                 self.await_confirmation = False
 
-    def process_PicksUpEvent(self, event, message):
+    def process_PicksUpEvent(self, event, **kwargs):
         """The entity is deleted from the
            Room and added to ClientCoreEngine.rack 
         """
 
         # Call default
         #
-        shard.coreengine.CoreEngine.process_PicksUpEvent(self, event, message)
+        shard.coreengine.CoreEngine.process_PicksUpEvent(self,
+                                                         event,
+                                                         message = kwargs["message"])
 
         # picking up confirmed
         #
         self.await_confirmation = False
 
-    def process_PerceptionEvent(self, event, message):
+    def process_PerceptionEvent(self, event, **kwargs):
         """A perception must be displayed by the 
            PresentationEngine, so it is queued in a Message passed
            from the ClientCoreEngine."""
@@ -449,9 +456,11 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_PerceptionEvent(self, event, message)
+        shard.coreengine.CoreEngine.process_PerceptionEvent(self,
+                                                            event, 
+                                                            message = kwargs["message"])
 
-    #def process_SaysEvent(self, event, message):
+    #def process_SaysEvent(self, event, **kwargs):
     #    """The PresentationEngine usually must display the 
     #       spoken text. Thus the event is put in the
     #       event queue for the PresentationEngine.
@@ -461,7 +470,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     #
     #    message.event_list.append(event)
 
-    def process_DeleteEvent(self, event, message):
+    def process_DeleteEvent(self, event, **kwargs):
         """Sanity check, then let self.room process the Event.
         """
 
@@ -473,12 +482,14 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # lets self.room process the Event and
             # queues it in the Message given
             #
-            shard.coreengine.CoreEngine.process_DeleteEvent(self, event, message)
+            shard.coreengine.CoreEngine.process_DeleteEvent(self,
+                                                            event,
+                                                            message = kwargs["message"])
 
         else:
             self.logger.warn("Entity to delete does not exist.")
 
-    def process_EnterRoomEvent(self, event, message):
+    def process_EnterRoomEvent(self, event, **kwargs):
         """An EnterRoomEvent means the server is
            about to send a new map, respawn the
            player and send items and NPCs. So
@@ -486,10 +497,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            structures and passes the event on to 
            the PresentationEngine.
         """
-
-        # Call default implementation
-        #
-        shard.coreengine.CoreEngine.process_EnterRoomEvent(self, event, message)
 
         # Delete old room and create new
         #
@@ -505,13 +512,17 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         self.deleted_entities_dict = {}
 
         # Finally set the flag in the Message
-        # for the PresentationEngine and queue the event
-        # so the PresentationEngine knows what happend after
-        # that.
+        # for the PresentationEngine.
         #
-        message.has_EnterRoomEvent = True
+        kwargs["message"].has_EnterRoomEvent = True
 
-    def process_RoomCompleteEvent(self, event, message):
+        # Call default implementation
+        #
+        shard.coreengine.CoreEngine.process_EnterRoomEvent(self,
+                                                           event,
+                                                           message = kwargs["message"])
+
+    def process_RoomCompleteEvent(self, event, **kwargs):
         """RoomCompleteEvent notifies the client that
            the player, all map elements, items and
            NPCs have been transfered. By the time the
@@ -523,8 +534,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # This is a convenience flag so the PresentationEngine
         # does not have to scan the event_list.
         #
-        message.has_RoomCompleteEvent = True
+        kwargs["message"].has_RoomCompleteEvent = True
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_RoomCompleteEvent(self, event, message)
+        shard.coreengine.CoreEngine.process_RoomCompleteEvent(self,
+                                                              event,
+                                                              message = kwargs["message"])

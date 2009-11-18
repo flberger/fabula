@@ -726,6 +726,10 @@ class Room(eventprocessor.EventProcessor):
                A list of tiles for the current room,
                for easy asset fetching.
 
+           Room.active_clients
+               A list of client identifiers whose
+               player entities are in this room.
+
            Note that all these dicts assume that
            Entity identifiers are unique.
         """
@@ -752,6 +756,8 @@ class Room(eventprocessor.EventProcessor):
 
         self.entity_dict = {}
         self.entity_locations = {}
+
+        self.active_clients = []
 
         return
 

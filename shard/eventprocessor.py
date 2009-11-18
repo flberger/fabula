@@ -75,85 +75,85 @@ class EventProcessor:
                                self.process_InitEvent,
                           }
 
-    def process_TriesToMoveEvent(self, event):
+    def process_TriesToMoveEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_TriesToLookAtEvent(self, event):
+    def process_TriesToLookAtEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_TriesToPickUpEvent(self, event):
+    def process_TriesToPickUpEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_TriesToDropEvent(self, event):
+    def process_TriesToDropEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_TriesToManipulateEvent(self, event):
+    def process_TriesToManipulateEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_TriesToTalkToEvent(self, event):
+    def process_TriesToTalkToEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_MovesToEvent(self, event):
+    def process_MovesToEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_PicksUpEvent(self, event):
+    def process_PicksUpEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_DropsEvent(self, event):
+    def process_DropsEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_CanSpeakEvent(self, event):
+    def process_CanSpeakEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_AttemptFailedEvent(self, event):
+    def process_AttemptFailedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_PerceptionEvent(self, event):
+    def process_PerceptionEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_SaysEvent(self, event):
+    def process_SaysEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangeStateEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
@@ -162,61 +162,61 @@ class EventProcessor:
 
         pass
 
-    def process_PassedEvent(self, event):
+    def process_PassedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_LookedAtEvent(self, event):
+    def process_LookedAtEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_PickedUpEvent(self, event):
+    def process_PickedUpEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_DroppedEvent(self, event):
+    def process_DroppedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_SpawnEvent(self, event):
+    def process_SpawnEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_DeleteEvent(self, event):
+    def process_DeleteEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_EnterRoomEvent(self, event):
+    def process_EnterRoomEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_RoomCompleteEvent(self, event):
+    def process_RoomCompleteEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_ChangeMapElementEvent(self, event):
+    def process_ChangeMapElementEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
         pass
 
-    def process_InitEvent(self, event):
+    def process_InitEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """

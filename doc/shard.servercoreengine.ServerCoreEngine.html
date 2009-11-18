@@ -26,7 +26,7 @@ on the ServerInterface and the StoryEngine.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id59">
+      <table class="children sortable" id="id85">
   
   
 <tr class="method">
@@ -41,6 +41,12 @@ on the ServerInterface and the StoryEngine.</pre>
     <td>Method</td>
     <td><a href="shard.servercoreengine.ServerCoreEngine.html#run">run</a></td>
     <td><tt>ServerCoreEngine main method, calling</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#call_plugin">call_plugin</a></td>
+    <td><tt>Call Plugin and process Plugin message.</tt></td>
   </tr><tr class="method">
     
     
@@ -83,6 +89,12 @@ on the ServerInterface and the StoryEngine.</pre>
     <td>Method</td>
     <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
     <td><tt>If event.identifier does not own</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.servercoreengine.ServerCoreEngine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Register the client in the room and </tt></td>
   </tr>
   
 </table>
@@ -90,7 +102,7 @@ on the ServerInterface and the StoryEngine.</pre>
         <p>
           Inherited from <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>:
         </p>
-        <table class="children sortable" id="id60">
+        <table class="children sortable" id="id86">
   
   
 <tr class="basemethod">
@@ -193,12 +205,6 @@ on the ServerInterface and the StoryEngine.</pre>
     
     
     <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>An EnterRoomEvent means the server is</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
     <td><tt>Process the Event.</tt></td>
   </tr><tr class="basemethod">
@@ -214,7 +220,7 @@ on the ServerInterface and the StoryEngine.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>):
         </p>
-        <table class="children sortable" id="id61">
+        <table class="children sortable" id="id87">
   
   
 <tr class="basemethod">
@@ -243,7 +249,7 @@ on the ServerInterface and the StoryEngine.</pre>
   <div class="functionHeader">
     
     def
-    __init__(self, interface_instance, plugin_instance, logger):
+    __init__(self, framerate, interface_instance, plugin_instance, logger):
     
   </div>
   <div class="functionBody">
@@ -268,6 +274,24 @@ on the ServerInterface and the StoryEngine.</pre>
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#run">shard.coreengine.CoreEngine.run</a></div>
     <pre>ServerCoreEngine main method, calling
 the StoryEngine in the process.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.call_plugin">
+    
+  </a>
+  <a name="call_plugin">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    call_plugin(self, address_port_tuple):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call Plugin and process Plugin message.
+Auxiliary method.</pre>
   </div>
 </div><div class="function">
   <a name="shard.servercoreengine.ServerCoreEngine.handle_exit">
@@ -297,7 +321,7 @@ according OS signal is received.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToMoveEvent(self, event, message):
+    process_TriesToMoveEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -316,14 +340,14 @@ according event to the message.</pre>
   <div class="functionHeader">
     
     def
-    process_InitEvent(self, event, message):
+    process_InitEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_InitEvent">shard.coreengine.CoreEngine.process_InitEvent</a></div>
     <pre>Check if we already have a room and
-entities and send the data to the
-client. If not, pass on to the plugin.</pre>
+entities. If yes, send the data
+If not, pass on to the plugin.</pre>
   </div>
 </div><div class="function">
   <a name="shard.servercoreengine.ServerCoreEngine.process_TriesToLookAtEvent">
@@ -335,7 +359,7 @@ client. If not, pass on to the plugin.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToLookAtEvent(self, event, message):
+    process_TriesToLookAtEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -353,7 +377,7 @@ issue an according LookedAtEvent.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToManipulateEvent(self, event, message):
+    process_TriesToManipulateEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -374,7 +398,7 @@ Plugin handle the Event.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToPickUpEvent(self, event, message):
+    process_TriesToPickUpEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -395,7 +419,7 @@ Plugin handle the Event.</pre>
   <div class="functionHeader">
     
     def
-    process_TriesToDropEvent(self, event, message):
+    process_TriesToDropEvent(self, event, **kwargs):
     
   </div>
   <div class="functionBody">
@@ -417,9 +441,27 @@ on it, replace target_identifier with
 Entity.identifier and pass on to the
 Plugin.</pre>
   </div>
+</div><div class="function">
+  <a name="shard.servercoreengine.ServerCoreEngine.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_EnterRoomEvent">shard.coreengine.CoreEngine.process_EnterRoomEvent</a></div>
+    <pre>Register the client in the room and 
+forward the Event.</pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-06 21:44:45.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-11-18 12:35:43.
     </address>
   </body>
 </html>

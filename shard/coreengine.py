@@ -130,11 +130,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.info("shutdown confirmed.")
 
-        # TODO: possibly exit cleanly from the PluginEngine here
+        # TODO: possibly exit cleanly from the Plugin here
 
         return
 
-    def process_TriesToMoveEvent(self, event, message):
+    def process_TriesToMoveEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -142,11 +142,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToLookAtEvent(self, event, message):
+    def process_TriesToLookAtEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -154,11 +154,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToPickUpEvent(self, event, message):
+    def process_TriesToPickUpEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -166,11 +166,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToDropEvent(self, event, message):
+    def process_TriesToDropEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -178,11 +178,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToManipulateEvent(self, event, message):
+    def process_TriesToManipulateEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -190,11 +190,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToTalkToEvent(self, event, message):
+    def process_TriesToTalkToEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -202,11 +202,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_MovesToEvent(self, event, message):
+    def process_MovesToEvent(self, event, **kwargs):
         """Let self.room process the event and
            pass it on.
         """
@@ -221,11 +221,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
                           % (event.identifier,
                              self.room.entity_locations[event.identifier]))
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_PicksUpEvent(self, event, message):
+    def process_PicksUpEvent(self, event, **kwargs):
         """Save the Entity to be picked up in CoreEngine.rack,
            delete the it from CoreEngine.room and pass the
            PicksUpEvent on.
@@ -249,11 +249,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         # and pass the PicksUpEvent on
         #
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_DropsEvent(self, event, message):
+    def process_DropsEvent(self, event, **kwargs):
         """Respawn the Entity to be dropped in CoreEngine.room,
            delete it from CoreEngine.rack
            and pass the PicksUpEvent on.
@@ -274,11 +274,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         # and pass the PicksUpEvent on
         #
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_CanSpeakEvent(self, event, message):
+    def process_CanSpeakEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -286,11 +286,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_AttemptFailedEvent(self, event, message):
+    def process_AttemptFailedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -298,11 +298,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_PerceptionEvent(self, event, message):
+    def process_PerceptionEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -310,11 +310,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_SaysEvent(self, event, message):
+    def process_SaysEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -322,11 +322,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_ChangeStateEvent(self, event, message):
+    def process_ChangeStateEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -337,11 +337,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         # A CoreEngine should not talk to the Entiy
         # directly - rather, the Plugin should do.
         #
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_PassedEvent(self, event, message):
+    def process_PassedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -349,11 +349,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_LookedAtEvent(self, event, message):
+    def process_LookedAtEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -361,11 +361,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_PickedUpEvent(self, event, message):
+    def process_PickedUpEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -373,11 +373,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_DroppedEvent(self, event, message):
+    def process_DroppedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -385,11 +385,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_SpawnEvent(self, event, message):
+    def process_SpawnEvent(self, event, **kwargs):
         """Let self.room process the event and
            pass it on.
         """
@@ -401,11 +401,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.room.process_SpawnEvent(event)
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_DeleteEvent(self, event, message):
+    def process_DeleteEvent(self, event, **kwargs):
         """Let self.room process the event and
            pass it on.
         """
@@ -414,11 +414,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.room.process_DeleteEvent(event)
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_EnterRoomEvent(self, event, message):
+    def process_EnterRoomEvent(self, event, **kwargs):
         """On the client side, an EnterRoomEvent
            means that the server is about to send
            a new map, respawn the player and send
@@ -437,11 +437,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_RoomCompleteEvent(self, event, message):
+    def process_RoomCompleteEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -449,11 +449,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_ChangeMapElementEvent(self, event, message):
+    def process_ChangeMapElementEvent(self, event, **kwargs):
         """Let the shard.Room instance in
            self.room process the Event and
            add it to message.
@@ -463,11 +463,11 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.room.process_ChangeMapElementEvent(event)
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_InitEvent(self, event, message):
+    def process_InitEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
            the event to the message.
@@ -475,6 +475,6 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.logger.debug("called")
 
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return

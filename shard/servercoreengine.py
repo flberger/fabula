@@ -133,9 +133,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
             for address_port_tuple in self.interface.connections:
 
-                current_message_buffer = self.interface.connections[address_port_tuple]
-
-                message = current_message_buffer.grab_message()
+                message = self.interface.connections[address_port_tuple].grab_message()
 
                 if len(message.event_list):
 
@@ -157,7 +155,13 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                         # These methods may add events for the plugin engine
                         # to self.message_for_plugin
                         #
-                        self.event_dict[event.__class__](event, self.message_for_plugin)
+                        # client_key is really only needed
+                        # by process_InitEvent, but to avoid splitting
+                        # this beautiful call we submit it to all methods.
+                        #
+                        self.event_dict[event.__class__](event,
+                                                         message = self.message_for_plugin,
+                                                         client_key = address_port_tuple)
 
                         # Contrary to the ClientCoreEngine, the
                         # ServerCoreEngine calls its plugin engine
@@ -165,7 +169,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                         # message-by-message base to allow for
                         # quick and real-time reaction.
 
-                        self.call_plugin(current_message_buffer)
+                        self.call_plugin(address_port_tuple)
 
                         # process next event in message from this client
 
@@ -178,7 +182,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                     # self.message_for_plugin is already set
                     # to an empty Message
                     #
-                    self.call_plugin(current_message_buffer)
+                    self.call_plugin(address_port_tuple)
 
                 # read from next client message_buffer
 
@@ -207,7 +211,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         return
 
-    def call_plugin(self, current_message_buffer):
+    def call_plugin(self, address_port_tuple):
         """Call Plugin and process Plugin message.
            Auxiliary method.
         """
@@ -240,14 +244,16 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #       But this could become an infinite loop!
         #
         for event in message_from_plugin.event_list:
-            self.event_dict[event.__class__](event, self.message_for_remote)
+            self.event_dict[event.__class__](event,
+                                             message = self.message_for_remote,
+                                             client_key = address_port_tuple)
 
         # If this iteration yielded any events, send them.
         # Message for remote host first
         #
         if self.message_for_remote.event_list:
 
-            current_message_buffer.send_message(self.message_for_remote)
+            self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
         # Build broadcast message for all clients
         #
@@ -278,19 +284,19 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #
         if len(self.message_for_all.event_list):
 
-            self.logger.debug("message for all clients: %s"
+            self.logger.debug("message for all clients in current room: %s"
                               % self.message_for_all.event_list)
 
-            for message_buffer in self.interface.connections.values():
+            for client_key in self.room.active_clients:
 
                 # Leave out current MessageBuffer which
                 # already has reveived the events above.
                 # We can compare MessageBuffer instances
                 # right away. ;-)
                 #
-                if not message_buffer == current_message_buffer:
+                if not client_key == address_port_tuple:
 
-                    message_buffer.send_message(self.message_for_all)
+                    self.interface.connections[client_key].send_message(self.message_for_all)
 
         # Clean up
         #
@@ -316,7 +322,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         return
 
-    def process_TriesToMoveEvent(self, event, message):
+    def process_TriesToMoveEvent(self, event, **kwargs):
         """Test if the Entity is allowed to move
            to the desired location, and append an
            according event to the message.
@@ -336,7 +342,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #
         if difference not in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
 
@@ -365,40 +371,42 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                     if occupied:
 
-                        message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                        kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
                     else:
                         # All clear. Go!
                         #
-                        message.event_list.append(shard.MovesToEvent(event.identifier,
+                        kwargs["message"].event_list.append(shard.MovesToEvent(event.identifier,
                                                                      event.target_identifier))
 
                 else:
 
-                    message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                    kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             except KeyError:
 
-                message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         return
 
-    def process_InitEvent(self, event, message):
+    def process_InitEvent(self, event, **kwargs):
         """Check if we already have a room and
-           entities and send the data to the
-           client. If not, pass on to the plugin.
+           entities. If yes, send the data
+           If not, pass on to the plugin.
         """
-
-        # It's not very clean to write to
-        # self.message_for_remote directly
-        # since the procces_() methods are
-        # not supposed to do so.
 
         if len(self.room.floor_plan):
 
             self.logger.debug("sending existing floor_plan and entities")
 
-            self.message_for_remote.event_list.append(shard.EnterRoomEvent())
+            # TODO: The following is even worse in terms on consistency. :-) Replace with a clean, room-oriented design.
+            #
+            # This will register the client in the room and forward
+            # the Event.
+            #
+            self.process_EnterRoomEvent(shard.EnterRoomEvent(),
+                                        message = self.message_for_remote,
+                                        client_key = kwargs["client_key"])
 
             for tuple in self.room.floor_plan:
 
@@ -406,6 +414,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 change_map_element_event = shard.ChangeMapElementEvent(tile, tuple)
 
+                # TODO: It's not very clean to write to self.message_for_remote directly since the procces_() methods are not supposed to do so.
+                #
                 self.message_for_remote.event_list.append(change_map_element_event)
 
             for identifier in self.room.entity_locations:
@@ -443,11 +453,11 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # the plugin should only spawn a
         # new player entity.
         #
-        message.event_list.append(event)
+        kwargs["message"].event_list.append(event)
 
         return
 
-    def process_TriesToLookAtEvent(self, event, message):
+    def process_TriesToLookAtEvent(self, event, **kwargs):
         """Check what is being looked at and
            issue an according LookedAtEvent.
         """
@@ -470,14 +480,14 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # Nothing to look at.
             # Issue AttemptFailed to unblock client.
             #
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
-            message.event_list.append(new_event)
+            kwargs["message"].event_list.append(new_event)
 
         return
 
-    def process_TriesToManipulateEvent(self, event, message):
+    def process_TriesToManipulateEvent(self, event, **kwargs):
         """Check what is being manipulated,
            replace event.target_identifier
            with the identifier of the Entity
@@ -505,14 +515,14 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # Nothing to manipulate.
             # Issue AttemptFailed to unblock client.
             #
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
-            message.event_list.append(new_event)
+            kwargs["message"].event_list.append(new_event)
 
         return
 
-    def process_TriesToPickUpEvent(self, event, message):
+    def process_TriesToPickUpEvent(self, event, **kwargs):
         """Check what is being picked up,
            replace event.target_identifier
            with the identifier of the Entity
@@ -542,14 +552,14 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # Nothing to pick up.
             # Issue AttemptFailed to unblock client.
             #
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
-            message.event_list.append(new_event)
+            kwargs["message"].event_list.append(new_event)
 
         return
 
-    def process_TriesToDropEvent(self, event, message):
+    def process_TriesToDropEvent(self, event, **kwargs):
         """If event.identifier does not own
            event.item_identifier in self.rack,
            the attempt fails.
@@ -578,18 +588,18 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #
         if self.rack.owner_dict[event.item_identifier] != event.identifier:
 
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
         
         elif event.target_identifier not in self.room.floor_plan:
 
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         elif self.room.floor_plan[event.target_identifier].tile.tile_type != shard.FLOOR:
 
             # If event.target_identifier is not
             # shard.FLOOR, the attempt fails.
             #
-            message.event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         elif len(self.room.floor_plan[event.target_identifier].entities):
 
@@ -601,7 +611,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             #
             target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
 
-            message.event_list.append(shard.TriesToDropEvent(event.identifier,
+            kwargs["message"].event_list.append(shard.TriesToDropEvent(event.identifier,
                                                              event.item_identifier,
                                                              target_identifier))
 
@@ -610,6 +620,31 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # shard.FLOOR and there is no Entity
             # on it, pass event on to the Plugin.
             #
-            message.event_list.append(event)
+            kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_EnterRoomEvent(self, event, **kwargs):
+        """Register the client in the room and 
+           forward the Event.
+        """
+
+        # TODO: This is a hack. Implement correct handling of multiple rooms.
+        #
+        if kwargs["client_key"] in self.room.active_clients:
+
+            self.logger.debug("client %s already in current room, deregistering"
+                              % str(kwargs["client_key"]))
+
+            self.room.active_clients.remove(kwargs["client_key"])
+
+        else:
+
+            self.logger.debug("registering client %s in current room"
+                              % str(kwargs["client_key"]))
+
+            self.room.active_clients.append(kwargs["client_key"])
+
+        kwargs["message"].event_list.append(event)
 
         return
