@@ -62,14 +62,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #     self.rack serves as a storage for deleted Entities
         #     because there may be the need to respawn them.
 
-        # We attach custom flags to the Message created in
-        # setup() to notify the PresentationEngine whether
-        # an EnterRoomEvent or RoomCompleteEvent occured,
-        # so it does not have to scan the events.
-        #
-        self.message_for_plugin.has_EnterRoomEvent = False
-        self.message_for_plugin.has_RoomCompleteEvent = False
-
         # Set up flags used by self.run()
         #
         self.await_confirmation = False
@@ -301,6 +293,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 # Since we had player input, we now await confirmation
                 #
                 self.logger.debug("awaiting confirmation, discarding further user input")
+
                 self.await_confirmation = True
 
             # If this iteration yielded any events, send them.
@@ -333,6 +326,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
     ####################
     # Auxiliary Methods
+
+    # TODO: unset await_confirmation only if the player identity is affected!
 
     def process_AttemptFailedEvent(self, event, **kwargs):
         """Unset await_confirmation flag.

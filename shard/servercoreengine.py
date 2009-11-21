@@ -244,6 +244,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #       But this could become an infinite loop!
         #
         for event in message_from_plugin.event_list:
+
             self.event_dict[event.__class__](event,
                                              message = self.message_for_remote,
                                              client_key = address_port_tuple)
@@ -257,11 +258,18 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         # Build broadcast message for all clients
         #
+        # TODO: this of course has to be refactored thoroughly for multiple room handling
+        #
+        skip_events = False
+
+        if self.message_for_remote.has_RoomCompleteEvent:
+
+            self.logger.debug("has_RoomCompleteEvent == True, skipping")
+
+            skip_events = True
+
         for event in self.message_for_remote.event_list:
 
-            # We currently leave out ChangeMapElementEvent
-            # since it is tightly coupled to EnterRoom.
-            #
             # We also broadcast all SpawnEvents. That means
             # that when a new client joins, all entities
             # (in the current room) are respawned.
@@ -270,13 +278,22 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # 
             # TODO: respawning might cause some loss of internal entity state
             #
-            if event.__class__ in [shard.DropsEvent, 
-                                   shard.MovesToEvent, 
-                                   shard.PicksUpEvent,
-                                   shard.SaysEvent,
-                                   shard.SpawnEvent,
-                                   shard.DeleteEvent,
-                                   shard.ChangeStateEvent]:
+            if skip_events and isinstance(event, shard.RoomCompleteEvent):
+
+                self.logger.debug("RoomCompleteEvent found, stopping to skip")
+
+                skip_events = False
+
+            elif (not skip_events
+                  and
+                  event.__class__ in [shard.DropsEvent, 
+                                      shard.MovesToEvent, 
+                                      shard.PicksUpEvent,
+                                      shard.SaysEvent,
+                                      shard.SpawnEvent,
+                                      shard.DeleteEvent,
+                                      shard.ChangeStateEvent,
+                                      shard.ChangeMapElementEvent]):
 
                 self.message_for_all.event_list.append(event)
 
@@ -426,6 +443,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
                 self.message_for_remote.event_list.append(spawn_event)
 
             self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
+
+            self.message_for_remote.has_RoomCompleteEvent = True
 
         if len(self.rack.entity_dict):
 

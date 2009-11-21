@@ -32,6 +32,8 @@
 # TODO: per-player inventories in server... -.-
 #
 # TODO: Idea while reading pylint output: probably put setup_xxx() stuff back into __init__() and let subclasses call that method (that's what pylint points out as missing)
+#
+# TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 
 import eventprocessor
 
@@ -478,6 +480,17 @@ class Message:
        decide which events happen in parallel and which 
        ones happen sequential. Instances of Message 
        expose a single Python list object as Message.event_list.
+
+       Attributes:
+
+       Message.event_list
+
+           A list of shard.Events
+
+       Message.has_EnterRoomEvent
+       Message.has_RoomCompleteEvent
+
+           Convenience flags, initially False
     """
 
     def __init__(self, event_list):
@@ -486,9 +499,17 @@ class Message:
            be supplied.
         """
 
-        #CHECKME: check the list elements for being
-        #         instances of shard.Event here?
+        # TODO: check the list elements for being instances of shard.Event here?
+        #
         self.event_list = event_list
+
+        # We attach custom flags to the Message created in
+        # setup() to notify the PresentationEngine whether
+        # an EnterRoomEvent or RoomCompleteEvent occured,
+        # so it does not have to scan the events.
+        #
+        self.has_EnterRoomEvent = False
+        self.has_RoomCompleteEvent = False
 
 #    def queueAsFirstEvent(self, event):
 #        """This is a convenience method. Queue the event 
