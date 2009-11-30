@@ -256,17 +256,28 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
-        # Build broadcast message for all clients
+        ### Build broadcast message for all clients
         #
         # TODO: this of course has to be refactored thoroughly for multiple room handling
-        #
-        skip_events = False
 
+        # Triple flag:
+        # True: skip on EnterRoomEvent
+        # "now": now skip all events
+        # False: stop skipping
+        #
+        skip_room_events = False
+
+        # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
+        #
         if self.message_for_remote.has_RoomCompleteEvent:
 
-            self.logger.debug("has_RoomCompleteEvent == True, skipping")
+            self.logger.debug("has_RoomCompleteEvent set, skipping room events")
 
-            skip_events = True
+            skip_room_events = True
+
+        elif len(self.message_for_remote.event_list):
+
+            self.logger.debug("has_RoomCompleteEvent not set, broadcasting all events")
 
         for event in self.message_for_remote.event_list:
 
@@ -278,13 +289,23 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
             # 
             # TODO: respawning might cause some loss of internal entity state
             #
-            if skip_events and isinstance(event, shard.RoomCompleteEvent):
+            if (skip_room_events
+                and
+                isinstance(event, shard.EnterRoomEvent)):
+
+                self.logger.debug("EnterRoomEvent found, starting to skip")
+
+                skip_room_events = "now"
+
+            elif (skip_room_events == "now"
+                  and
+                  isinstance(event, shard.RoomCompleteEvent)):
 
                 self.logger.debug("RoomCompleteEvent found, stopping to skip")
 
-                skip_events = False
+                skip_room_events = False
 
-            elif (not skip_events
+            elif (not skip_room_events == "now"
                   and
                   event.__class__ in [shard.DropsEvent, 
                                       shard.MovesToEvent, 

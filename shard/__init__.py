@@ -34,6 +34,8 @@
 # TODO: Idea while reading pylint output: probably put setup_xxx() stuff back into __init__() and let subclasses call that method (that's what pylint points out as missing)
 #
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
+#
+# TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
 
 import eventprocessor
 
@@ -552,16 +554,9 @@ class Entity(eventprocessor.EventProcessor):
 
     def __init__(self, entity_type, identifier, asset):
         """You are welcome to override this method, but
-           be sure to call setup_eventprocessor() and
-           setup_entity() as done by the default
-           implementation of this method.
+           be sure to call setup_entity() as done by the
+           default implementation of this method.
         """
-
-        self.setup_eventprocessor()
-
-        # Now we have:
-        # self.event_dict
-        # which maps Event classes to handler methods
 
         self.setup_entity(entity_type, identifier, asset)
 
@@ -589,6 +584,12 @@ class Entity(eventprocessor.EventProcessor):
            Entity.state
            The state the Entity is in. Defaults to None.
         """
+
+        self.setup_eventprocessor()
+
+        # Now we have:
+        # self.event_dict
+        # which maps Event classes to handler methods
 
         self.entity_type = entity_type
         self.identifier = identifier
@@ -893,7 +894,7 @@ class Rack:
        An instance of Rack is used by each
        CoreEngine.
 
-       Rack.entity_list
+       Rack.entity_dict
            Maps identifiers to Entities.
 
        Rack.owner_dict
@@ -972,6 +973,68 @@ def difference_2d(start_tuple, end_tuple):
 
     return (end_tuple[0] - start_tuple[0],
             end_tuple[1] - start_tuple[1])
+
+def join_lists(first_list, second_list):
+    """Returns a list which is made up of
+       the lists given following this scheme:
+
+       >>> join_lists([1, 2], [3, 4])
+       [[3, 1], [4, 2]]
+
+       >>> join_lists([1, 2], [[3, 4], 5])
+       [[3, 4, 1], [5, 2]]
+
+       >>> join_lists([[1, 2], 3], [[4, 5], 6])
+       [[4, 5, 1, 2], [6, 3]]
+    """
+
+    if len(first_list) > len(second_list):
+
+        longer_list = first_list
+        shorter_list = second_list
+
+    else:
+
+        # second longer or equal
+        #
+        longer_list = second_list
+        shorter_list = first_list
+
+    new_list = []
+    index = 0
+
+    while index < len(shorter_list):
+
+        if (isinstance(longer_list[index], list)
+            and
+            isinstance(shorter_list[index], list)):
+
+            new_list.append(longer_list[index] + shorter_list[index])
+
+        elif (isinstance(longer_list[index], list)
+              and
+              not isinstance(shorter_list[index], list)):
+
+            new_list.append(longer_list[index] + [shorter_list[index]])
+
+        elif (not isinstance(longer_list[index], list)
+              and
+              isinstance(shorter_list[index], list)):
+
+            new_list.append([longer_list[index]] + shorter_list[index])
+
+        else:
+
+            new_list.append([longer_list[index], shorter_list[index]])
+
+        index = index + 1
+
+    # now index >= len(shorter_list)
+    # Append remaining items
+    #
+    new_list = new_list + longer_list[index:]
+
+    return new_list
 
 ############################################################
 # Exceptions

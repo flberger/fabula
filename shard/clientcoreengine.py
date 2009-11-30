@@ -174,13 +174,21 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # If there has been a Confirmation for a LookAt or
             # TriesToManipulate, unset "AwaitConfirmation" flag
 
-            # If we do not await a Confirmation anymore, 
-            # we evaluate the player input if any.
             # The PresentationEngine might have collected some
             # player input and converted it to events.
             #
-            if (message_from_plugin.event_list
-                and not self.await_confirmation):
+            if message_from_plugin.event_list:
+
+                if self.await_confirmation:
+
+                    # Player input, but we still await confirmation.
+                    #
+                    pass
+
+                else:
+
+                # If we do not await a Confirmation anymore, 
+                # we evaluate the player input if any.
 
                 # We queue player triggered events before 
                 # possible events from the ClientCoreEngine.
@@ -327,7 +335,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     ####################
     # Auxiliary Methods
 
-    # TODO: unset await_confirmation only if the player identity is affected!
+    # TODO: unset await_confirmation only if the player (id) is affected!
 
     def process_AttemptFailedEvent(self, event, **kwargs):
         """Unset await_confirmation flag.

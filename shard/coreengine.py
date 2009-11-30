@@ -406,14 +406,29 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_DeleteEvent(self, event, **kwargs):
-        """Let self.room process the event and
-           pass it on.
+        """Save the Entity to be deleted in CoreEngine.rack,
+           delete the it from CoreEngine.room and pass the
+           DeleteEvent on.
         """
+
+        # TODO: very similar to PicksUpEvent
 
         self.logger.debug("called")
 
+        # Save the Entity to be deleted in CoreEngine.rack
+        #
+        deleted_entity = self.room.entity_dict[event.identifier]
+
+        # Entities stored by CoreEngine are owned by None
+        #
+        self.rack.store(deleted_entity, None)
+
+        # Delete it from CoreEngine.room
+        #
         self.room.process_DeleteEvent(event)
 
+        # and pass the PicksUpEvent on
+        #
         kwargs["message"].event_list.append(event)
 
         return
@@ -450,6 +465,10 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         kwargs["message"].event_list.append(event)
+
+        # Set flag
+        #
+        kwargs["message"].has_RoomCompleteEvent = True
 
         return
 

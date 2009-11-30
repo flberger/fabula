@@ -24,11 +24,9 @@ def run(mode,
         framerate,
         plugin_class,
         asset_engine_class,
-        loglevel,
-        log_time,
-        log_name):
+        loglevel):
 
-    # Set up logging
+    ### Set up logging
 
     logger = logging.getLogger()
 
@@ -40,28 +38,53 @@ def run(mode,
 
     logger.setLevel(leveldict[loglevel])
 
+    # STDERR console handler
+    #
+    # Creating an instance without arguments
+    # defaults to STDERR.
+    # 
     stderr_handler = logging.StreamHandler()
+
     stderr_handler.setLevel(logging.DEBUG)
 
-    if log_time:
-        timestring = "%(asctime)s "
+    stderr_formatter = logging.Formatter("\x1b\x5b\x33\x32\x6d"
+                                         + "%(levelname)-5s "
+                                         + "\x1b\x5b\x33\x39\x6d"
+                                         + "\x1b\x5b\x33\x36\x6d"
+                                         + "%(funcName)s() "
+                                         + "\x1b\x5b\x33\x39\x6d"
+                                         + "%(message)s")
+
+    stderr_handler.setFormatter(stderr_formatter)
+
+    # File handler
+    #
+    if player_id != None:
+
+        file_name = "%s-%s.log" % (mode, player_id)
+
     else:
-        timestring = ""
 
-    if log_name:
-        namestring = "%(filename)s l.%(lineno)s: "
-    else:
-        namestring = ""
+        file_name = "%s.log" % mode
 
-    formatter = logging.Formatter(timestring
-                                  + "%(levelname)s "
-                                  + namestring
-                                  + "%(funcName)s(): %(message)s",
-                                  "%Y-%m-%d %H:%M:%S")
+    file_handler = logging.FileHandler(filename = file_name,
+                                       mode = "w")
 
-    stderr_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.DEBUG)
 
+    file_formatter = logging.Formatter("%(asctime)s "
+                                       + "%(levelname)-5s "
+                                       + "%(filename)s [%(lineno)s] %(funcName)s() : %(message)s"
+                                       ,
+                                       "%Y-%m-%d %H:%M:%S")
+
+    file_handler.setFormatter(file_formatter)
+
+    # Add handlers
+    #
     logger.addHandler(stderr_handler)
+
+    logger.addHandler(file_handler)
 
     logger.info("running in %s mode" % mode)
 
@@ -118,3 +141,8 @@ def run(mode,
     # to True
     #
     core_engine_instance.run()
+
+    # CoreEngine returned.
+    # Close logger.
+    #
+    logging.shutdown()

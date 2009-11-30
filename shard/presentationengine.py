@@ -66,6 +66,18 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         self.action_frames = int(self.action_time * self.framerate)
 
+        # A copy to count down.
+        # Creates a copy since action_frames is immutable.
+        # 
+        self.action_countdown = self.action_frames
+
+        # A queue for Events of a Message to be
+        # rendered later. self.action_countdown
+        # will be counted down between processing
+        # the Events.
+        #
+        self.event_queue = []
+
         # Since it represents the GUI, the PresentationEngine
         # is responsible for catching an
         # exit request by the user. This value is
@@ -173,7 +185,7 @@ class PresentationEngine(shard.plugin.Plugin):
 
             # When this arrives here all data scructures
             # have already been cleared and possibly
-            # populated with new Entites and a new map.
+            # populated with new Entities and a new map.
             # So we have to ignore everything before
             # an EnterRoomEvent.
 
@@ -293,6 +305,31 @@ class PresentationEngine(shard.plugin.Plugin):
                 return self.message_for_host
 
         ####################
+        # Countdown and rendering waiting Events
+
+        self.action_countdown = self.action_countdown - 1
+
+        if self.action_countdown == 0:
+
+            if len(self.event_queue):
+
+                self.logger.debug("countdown passed, event_queue now: %s" % self.event_queue)
+
+                list_item = self.event_queue.pop(0)
+
+                if isinstance(list_item, list):
+
+                    for event in list_item:
+
+                        self.event_dict[event.__class__](event)
+
+                else:
+
+                    self.event_dict[list_item.__class__](list_item)
+
+            self.action_countdown = self.action_frames
+
+        ####################
         # Render Events
 
         # Now it's no good, we finally have to render some
@@ -310,18 +347,71 @@ class PresentationEngine(shard.plugin.Plugin):
             #
             self.display_single_frame()
 
-            # Any player input?
-            # See the method for explaination.
+        elif len(event_list) == 1:
+
+            # We have exacly one event.
+            # Process at once.
             #
-            self.collect_player_input()
+            self.event_dict[event_list[0].__class__](event_list[0])
 
-            return self.message_for_host
+        else:
 
-        # We have at least one event.
+            # More than one Event.
+            #
+            self.logger.debug("queueing %s events for later rendering"
+                              % len(event_list))
 
-        for event in event_list:
+            # Parallelize subsequent ChangeMapElementEvents
+            #
+            event_list_parallel = []
+            change_map_list = []
 
-            self.event_dict[event.__class__](event)
+            for event in event_list:
+
+                if isinstance(event, shard.ChangeMapElementEvent):
+
+                    change_map_list.append(event)
+
+                else:
+
+                    # If a change_map_list has been built,
+                    # the sequence is broken now. Append
+                    # the list and the event.
+                    #
+                    if len(change_map_list) == 1:
+
+                        # Append the single event as-is.
+                        #
+                        event_list_parallel.append(change_map_list[0])
+
+                        change_map_list = []
+
+                    elif len(change_map_list) > 1:
+
+                        event_list_parallel.append(change_map_list)
+
+                        change_map_list = []
+
+                    event_list_parallel.append(event)
+
+            # Join with event_queue
+            #
+            self.event_queue = shard.join_lists(self.event_queue,
+                                                event_list_parallel)
+
+            # Render first Event at once
+            #
+            list_item = self.event_queue.pop(0)
+
+            if isinstance(list_item, list):
+
+                for event in list_item:
+
+                    self.event_dict[event.__class__](event)
+
+            else:
+
+                self.event_dict[list_item.__class__](list_item)
 
         # All Events are rendered now.
 
@@ -418,7 +508,7 @@ class PresentationEngine(shard.plugin.Plugin):
            user input from the console.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         user_input = raw_input("Quit? (y/n):")
 
@@ -446,7 +536,7 @@ class PresentationEngine(shard.plugin.Plugin):
     #       screen coordinates and calling 
     #       self.display_single_frame()."""
     #
-    #    self.logger.info("called")
+    #    self.logger.debug("called")
     #
     #    # Compute start and end position and movement per
     #    # frame for all moving Entities
@@ -480,7 +570,7 @@ class PresentationEngine(shard.plugin.Plugin):
            RoomCompleteEvent.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.display_single_frame()
 
@@ -494,7 +584,7 @@ class PresentationEngine(shard.plugin.Plugin):
            some Map elements and Entities.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.display_single_frame()
 
@@ -512,7 +602,7 @@ class PresentationEngine(shard.plugin.Plugin):
 
         # TODO: Make sure that this is the last event rendered before returning to the ControlEngine?
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         event = shard.SaysEvent(self.player_id, "blah")
 
@@ -532,7 +622,7 @@ class PresentationEngine(shard.plugin.Plugin):
            might have set up and render a static frame.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         event.entity.presentation_engine = self
 
@@ -550,7 +640,7 @@ class PresentationEngine(shard.plugin.Plugin):
            already gone in self.room.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.display_single_frame()
 
@@ -565,7 +655,7 @@ class PresentationEngine(shard.plugin.Plugin):
            This is only a single frame though.
            Note that event_list may be empty."""
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.display_single_frame()
 
@@ -584,7 +674,7 @@ class PresentationEngine(shard.plugin.Plugin):
            which may pass unnoticed.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.display_single_frame()
 
@@ -597,7 +687,7 @@ class PresentationEngine(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
@@ -609,7 +699,7 @@ class PresentationEngine(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
 
@@ -621,7 +711,7 @@ class PresentationEngine(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.room.entity_dict[event.identifier].process_DropsEvent(event)
 
@@ -636,7 +726,7 @@ class PresentationEngine(shard.plugin.Plugin):
            an inventory display.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
@@ -645,7 +735,7 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_SaysEvent(self, event):
-        """This method is called with an instances
+        """This method is called with an instance
            of SaysEvent when the PresentationEngine
            is ready to display what Entities say.
            In this method you have to compute a
@@ -660,9 +750,21 @@ class PresentationEngine(shard.plugin.Plugin):
            pass unnoticed.
         """
 
-        self.logger.info("called")
+        try:
+            self.room.entity_dict[event.identifier].process_SaysEvent(event)
 
-        self.room.entity_dict[event.identifier].process_SaysEvent(event)
+            self.logger.debug("forwarded SaysEvent(%s, '%s')"
+                             % (event.identifier, event.text))
+
+        except KeyError:
+
+            # Entity has been deleted by an
+            # upcoming DeleteEvent
+            #
+            self.host.rack.entity_dict[event.identifier].process_SaysEvent(event)
+
+            self.logger.debug("forwarded SaysEvent(%s, '%s') to deleted entity"
+                             % (event.identifier, event.text))
 
         self.display_single_frame()
 
