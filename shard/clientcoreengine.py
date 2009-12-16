@@ -7,6 +7,7 @@ import shard
 import shard.coreengine
 import time
 import datetime
+import cPickle
 
 class ClientCoreEngine(shard.coreengine.CoreEngine):
     """An instance of this class is the main engine in every
@@ -77,6 +78,15 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.timestamp = None
 
+        # Timestamp for Message log
+        #
+        self.message_timestamp = None
+
+        # The message log file records
+        # is a list of Messages and time intervals
+        #
+        self.message_log_file = open("messages-%s.log" % player_id, "w")
+
         # Remember the latest local MovesToEvent
         #
         self.local_moves_to_event = shard.MovesToEvent(None, None)
@@ -119,6 +129,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.message_buffer.send_message(shard.Message([shard.InitEvent(self.player_id)]))
 
+        # Start Message log timer upon InitEvent
+        #
+        self.message_timestamp = datetime.datetime.today()
+
         while not self.plugin.exit_requested:
 
             # grab_message must and will return a Message, but
@@ -128,9 +142,29 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             if server_message.event_list:
 
-                self.logger.info("got server_message: %s"
-                                 % server_message.event_list)
+                self.logger.info("server incoming: %s"
+                                 % server_message)
 
+                # Loggin a tuple of time difference
+                # in seconds and message
+                #
+                timedifference = datetime.datetime.today() - self.message_timestamp
+
+                # timedifference as seconds + tenth of a second
+                #
+                # Add double newline as separator
+                #
+                self.message_log_file.write(cPickle.dumps((timedifference.seconds
+                                                          + timedifference.microseconds / 1000000.0,
+                                                          server_message),
+                                                         0) + "\n\n")
+
+                # Renew timestamp
+                #
+                self.message_timestamp = datetime.datetime.today()
+
+                # Message was not empty
+                #
                 self.got_empty_message = False
 
             elif not self.got_empty_message:
@@ -204,10 +238,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
                         if timedifference.seconds >= 1:
 
-                            self.logger.debug("1s waiting but no confirmation - "
-                                              + "resending and resetting timer")
-
-                            self.message_buffer.send_message(self.last_message)
+                            self.logger.warn("waited 1s, still no confirmation, resetting timer")
 
                             self.timestamp = None
 
@@ -228,6 +259,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                                           + self.message_for_remote.event_list)
 
                     # Local movement tests
+                    #
+                    # TODO: Can't this be handled much easier by simply processing a MovesToEvent in PresentationEngine.collect_player_input? But then again, a PresentationEngine isn't supposed to check maps etc.
                     #
                     for event in message_from_plugin.event_list:
 
@@ -342,6 +375,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             #
             if self.message_for_remote.event_list:
 
+                self.logger.debug("server outgoing: %s" % self.message_for_remote)
+
                 self.message_buffer.send_message(self.message_for_remote)
 
                 # Save for possible re-send on dropout
@@ -364,6 +399,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         #
         self.interface.shutdown()
 
+        self.logger.info("closing message log file")
+
+        self.message_log_file.close()
+
         self.logger.info("shutdown confirmed.")
 
         # TODO: possibly exit cleanly from the PresentationEngine here
@@ -372,8 +411,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
     ####################
     # Auxiliary Methods
-
-    # TODO: unset await_confirmation only if the player (id) is affected!
 
     def process_AttemptFailedEvent(self, event, **kwargs):
         """Unset await_confirmation flag.
@@ -403,8 +440,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             self.logger.debug("%s now reverted to %s" % (event.identifier,
                                                          (restored_x, restored_y)))
+        if event.identifier == self.player_id:
 
-        self.await_confirmation = False
+            self.await_confirmation = False
 
     #def process_CanSpeakEvent(self, event, **kwargs):
     #    """Currently not implemented."""
@@ -431,7 +469,37 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Drop confirmed
         #
-        self.await_confirmation = False
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
+
+    def process_ChangeStateEvent(self, event, **kwargs):
+        """Call default and unblock client.
+        """
+
+        # Call default.
+        #
+        shard.coreengine.CoreEngine.process_ChangeStateEvent(self,
+                                                             event,
+                                                             message = kwargs["message"])
+
+        # ChangeState confirmed
+        #
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
+
+    def process_ManipulatesEvent(self, event, **kwargs):
+        """Unset await confirmation flag.
+        """
+
+        # TODO: ManipulatesEvent is currently not passed to the PresentationEngine
+
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
+
+        self.logger.debug("await_confirmation unset")
 
     def process_MovesToEvent(self, event, **kwargs):
         """Notify the Room and add the event to the message.
@@ -452,7 +520,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             #
             self.local_moves_to_event = shard.MovesToEvent(None, None)
 
-            self.await_confirmation = False
+            if event.identifier == self.player_id:
+
+                self.await_confirmation = False
 
         else:
 
@@ -469,7 +539,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
                 # TODO: check location == None as well?
                 #
-                self.await_confirmation = False
+                if event.identifier == self.player_id:
+
+                    self.await_confirmation = False
 
     def process_PicksUpEvent(self, event, **kwargs):
         """The entity is deleted from the
@@ -484,7 +556,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # picking up confirmed
         #
-        self.await_confirmation = False
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
 
     def process_PerceptionEvent(self, event, **kwargs):
         """A perception must be displayed by the 
@@ -493,7 +567,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # That is a confirmation
         #
-        self.await_confirmation = False
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
 
         # Call default implementation
         #

@@ -137,6 +137,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 if len(message.event_list):
 
+                    self.logger.debug("%s incoming: %s" % (address_port_tuple, message))
+
                     for event in message.event_list:
 
                         # TODO: most client implementations should be allowed to send a single event per turn only!
@@ -253,6 +255,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # Message for remote host first
         #
         if self.message_for_remote.event_list:
+
+            self.logger.debug("%s outgoing: %s" % (address_port_tuple, self.message_for_remote))
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
@@ -373,6 +377,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # Do we need to move / turn at all?
         #
         location = self.room.entity_locations[event.identifier]
+
         difference = shard.difference_2d(location,
                                          event.target_identifier)
 
@@ -381,6 +386,11 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         if difference not in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            # TODO: we exit here to hunt bugs
+            #
+            raise shard.ShardException("invalid difference in TriesToMoveEvent: %s"
+                                       % (difference,))
 
         else:
 
@@ -397,6 +407,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 if tile.tile_type == shard.FLOOR:
 
+                    self.logger.debug("tile_type == shard.FLOOR")
+
                     # Check if this field is occupied
                     #
                     occupied = False
@@ -409,6 +421,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                     if occupied:
 
+                        self.logger.debug("occupied by shard.ITEM_BLOCK")
+
                         kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
                     else:
@@ -419,9 +433,13 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
                 else:
 
+                    self.logger.debug("tile_type != shard.FLOOR")
+
                     kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             except KeyError:
+
+                self.logger.debug("KeyError")
 
                 kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
@@ -619,6 +637,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         """
 
         # TODO: These checks are so fundamental that they should probably be the default in CoreEngine.process_TriesToDropEvent
+        # TODO: What about Entities in walls?
 
         self.logger.debug("called")
 

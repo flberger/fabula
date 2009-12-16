@@ -394,10 +394,35 @@ class PresentationEngine(shard.plugin.Plugin):
 
                     event_list_parallel.append(event)
 
+            # In case the last Event was an
+            # ChangeMapElementEvent: append
+            #
+            # TODO: Exact duplicate
+            #
+            if len(change_map_list) == 1:
+
+                # Append the single event as-is.
+                #
+                event_list_parallel.append(change_map_list[0])
+
+                change_map_list = []
+
+            elif len(change_map_list) > 1:
+
+                event_list_parallel.append(change_map_list)
+
+                change_map_list = []
+
+            self.logger.debug("event queue: %s, parallel events: %s"
+                              % (self.event_queue, event_list_parallel))
+
             # Join with event_queue
             #
             self.event_queue = shard.join_lists(self.event_queue,
                                                 event_list_parallel)
+
+            self.logger.debug("joined event queue: %s"
+                              % self.event_queue)
 
             # Render first Event at once
             #
@@ -696,12 +721,12 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_ChangeStateEvent(self, event):
-        """Let the Entity handle the Event.
+        """Entity has already handled the Event.
+           Display a single frame to show the
+           result.
         """
 
         self.logger.debug("called")
-
-        self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
 
         self.display_single_frame()
 

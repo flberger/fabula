@@ -292,7 +292,7 @@ class UDPClientInterface(MessageBuffer, Interface):
 
                 # -1 = use highest available pickle protocol
                 #
-                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft(), 0), 
+                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft(), -1), 
                                  self.address_port_tuple)
 
             # Now listen for incoming server
@@ -518,30 +518,39 @@ class ProtocolMessageBuffer(MessageBuffer,
 
         self.logger.debug("received message: %s characters" % len(data))
 
-        # Keep buffering data until we end up with a
-        # double newline terminated message.
-        #
-        # TODO: This of course only works if some time passes between messages. Otherwise there might already be new data after the double newline.
+        # Keep buffering data until we find a
+        # dot (the pickle STOP opcode) followed
+        # by a double newline in a message.
         #
         self.data_buffer = self.data_buffer + data
 
-        if self.data_buffer.endswith("\n\n"):
+        double_newline_index = self.data_buffer.find(".\n\n")
 
-            # Now we have double newline terminated
-            # data in self.data_buffer.
+        # There actually may be more than one
+        # ".\n\n" separator in a message. Catch
+        # them all!
+        #
+        while double_newline_index > -1:
 
-            self.logger.debug("message complete: %s characters"
-                               % len(self.data_buffer))
+            # Found!
 
-            # Remove newlines and unpickle
-            #
-            message = cPickle.loads(self.data_buffer.rstrip("\n"))
+            message = self.data_buffer[:double_newline_index] + "."
+
+            self.data_buffer = self.data_buffer[double_newline_index + 3:]
+
+            self.logger.debug("message complete at %s characters, %s left in buffer"
+                               % (len(message),
+                                  len(self.data_buffer)))
+
+            message = cPickle.loads(message)
 
             self.messages_for_local.append(message)
 
-            self.data_buffer = ""
+            # Next
+            #
+            double_newline_index = self.data_buffer.find(".\n\n")
 
-    def send_queued_message(self):
+    def send_queued_message(self, address_port_tuple):
         """Actually send messages queued
            with MessageBuffer.send_message()
            across the network.
@@ -549,7 +558,9 @@ class ProtocolMessageBuffer(MessageBuffer,
 
         if self.connection_made and self.messages_for_remote:
 
-            self.logger.debug("sending 1 message of %s" % len(self.messages_for_remote))
+            self.logger.debug("sending 1 message of %s to %s"
+                              % (len(self.messages_for_remote),
+                                 address_port_tuple))
 
             # -1 = use highest available pickle protocol
             #
@@ -558,10 +569,9 @@ class ProtocolMessageBuffer(MessageBuffer,
             #
             # TODO: Check that double newlines are illegal in pickled data.
             #
-            pickled_message = (cPickle.dumps(self.messages_for_remote.popleft(), -1)
-                               + "\n\n")
+            pickled_message = cPickle.dumps(self.messages_for_remote.popleft(), -1)
 
-            self.transport.write(pickled_message)
+            self.transport.write(pickled_message + "\n\n")
 
             self.logger.debug("sent %s characters" % len(pickled_message))
 
@@ -676,9 +686,11 @@ class TCPInterface(Interface):
 
         def send_all_queued_messages():
 
-            for protocol_message_buffer in self.connections.values():
+            for address_port_tuple in self.connections:
 
-                protocol_message_buffer.send_queued_message()
+                # TODO: that's a very round-the-corner way supply address and port to the method
+                #
+                self.connections[address_port_tuple].send_queued_message(address_port_tuple)
 
             # End of send_all_queued_messages()
 

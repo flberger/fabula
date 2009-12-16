@@ -20,7 +20,8 @@
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
 # TODO: most prominently: message.event_list.append -> message.append
 #
-# TODO: readable __repr__ of Events and Messages
+# TODO: readable __repr__ of all shard objects: Room, Tile, ...
+#
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 #
 # TODO: fix all docstrings for pydoctor documentation (first line -> complete sentence)
@@ -98,6 +99,21 @@ class Event:
 
         else:
             return True
+
+    def __repr__(self):
+        """Readable and informative
+           string representation.
+        """
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "%s = %s, " % (key, self.__dict__[key])
+
+        arguments = arguments[:-2]
+
+        return "<%s(%s)>" % (self.__class__, arguments)
 
 ####################
 # Attempt events
@@ -284,6 +300,25 @@ class PerceptionEvent(ConfirmEvent):
         self.identifier = identifier
 
         self.perception = perception
+
+class ManipulatesEvent(ConfirmEvent):
+    """This is a server confirmation of an
+       item manipulation. This Event normally
+       has no visible effect; effects of
+       a ManipulateEvent are usually
+       MovesToEvents, ChangeMapElementEvents,
+       SpawnEvents etc. The ManipulatesEvent
+       simply confirms that a manipulation
+       has happened.
+    """
+
+    def __init__(self, identifier, item_identifier):
+        """item_identifier identifies the item
+           that is being manipulated.
+        """
+        self.identifier = identifier
+
+        self.item_identifier = item_identifier
 
 ####################
 # Unclassified events without a special base class
@@ -513,6 +548,13 @@ class Message:
         self.has_EnterRoomEvent = False
         self.has_RoomCompleteEvent = False
 
+    def __repr__(self):
+        """Readable and informative
+           string representation.
+        """
+
+        return str(self.event_list)
+
 #    def queueAsFirstEvent(self, event):
 #        """This is a convenience method. Queue the event 
 #           given as the first event to be processed, 
@@ -632,7 +674,7 @@ class Entity(eventprocessor.EventProcessor):
            another method once per frame, do
            the actual work there.
         """
-        pass
+        self.state = event.state
 
     def process_DropsEvent(self, event):
         """This method is called by the

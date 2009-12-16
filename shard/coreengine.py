@@ -278,6 +278,18 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         return
 
+    def process_ManipulatesEvent(self, event, **kwargs):
+        """Process the Event.
+           The default implementation adds
+           the event to the message.
+        """
+
+        self.logger.debug("called")
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
     def process_CanSpeakEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds
@@ -327,16 +339,14 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_ChangeStateEvent(self, event, **kwargs):
-        """Process the Event.
-           The default implementation adds
-           the event to the message.
+        """Let the Entity handle the Event.
+           Then add the event to the message.
         """
 
         self.logger.debug("called")
 
-        # A CoreEngine should not talk to the Entiy
-        # directly - rather, the Plugin should do.
-        #
+        self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
+
         kwargs["message"].event_list.append(event)
 
         return

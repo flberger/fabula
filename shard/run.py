@@ -47,10 +47,12 @@ def run(mode,
 
     stderr_handler.setLevel(logging.DEBUG)
 
-    stderr_formatter = logging.Formatter("\x1b\x5b\x33\x32\x6d"
-                                         + "%(levelname)-5s "
-                                         + "\x1b\x5b\x33\x39\x6d"
-                                         + "\x1b\x5b\x33\x36\x6d"
+    # Loglevel:
+    # "\x1b\x5b\x33\x32\x6d"
+    # + "%(levelname)-5s "
+    # + "\x1b\x5b\x33\x39\x6d"
+
+    stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
                                          + "%(funcName)s() "
                                          + "\x1b\x5b\x33\x39\x6d"
                                          + "%(message)s")
@@ -72,8 +74,10 @@ def run(mode,
 
     file_handler.setLevel(logging.DEBUG)
 
+    # Loglevel:
+    # + "%(levelname)-5s "
+
     file_formatter = logging.Formatter("%(asctime)s "
-                                       + "%(levelname)-5s "
                                        + "%(filename)s [%(lineno)s] %(funcName)s() : %(message)s"
                                        ,
                                        "%Y-%m-%d %H:%M:%S")
@@ -93,6 +97,8 @@ def run(mode,
     if mode == "client":
 
         logger.info("running with framerate %s/s" % framerate)
+
+        logger.info("player_id: %s" % player_id)
 
         # TODO: hardwired TCP protocol
         #

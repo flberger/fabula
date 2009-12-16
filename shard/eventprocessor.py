@@ -43,6 +43,8 @@ class EventProcessor:
                                self.process_PicksUpEvent,
                            shard.DropsEvent :
                                self.process_DropsEvent,
+                           shard.ManipulatesEvent :
+                               self.process_ManipulatesEvent,
                            shard.CanSpeakEvent :
                                self.process_CanSpeakEvent,
                            shard.AttemptFailedEvent :
@@ -124,6 +126,12 @@ class EventProcessor:
         pass
 
     def process_DropsEvent(self, event, **kwargs):
+        """Process the Event.
+           The default implementation does nothing.
+        """
+        pass
+
+    def process_ManipulatesEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
