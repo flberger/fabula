@@ -1,6 +1,6 @@
 """shard.run - Initialize and run Shard client and server
 
-   (c) Florian Berger <fberger@fbmd.de>
+   (c) Florian Berger <fberger@florian-berger.de>
 """
 
 # Work started on 27. May 2008

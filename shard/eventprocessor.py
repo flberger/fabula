@@ -6,20 +6,12 @@
 import shard
 
 class EventProcessor:
-    """This is the base class for all
-       Shard objects that process events.
+    """This is the base class for all Shard objects that process events.
     """
 
     def __init__(self):
-        """You can override this, but make sure
-           to call self.setup_eventprocessor()
-           like the default implementation does.
-        """
-        self.setup_eventprocessor()
-
-    def setup_eventprocessor(self):
-        """Set up EventProcessor.event_dict which maps
-           event classes to functions to be called for
+        """Set up EventProcessor.event_dict
+           which maps event classes to functions to be called for
            the respective event.
         """
         # I just love to use dicts to avoid endless

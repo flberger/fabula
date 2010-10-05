@@ -19,16 +19,14 @@
     <div>
       <p>Known subclasses: <a href="shard.interfaces.TCPInterface.html">shard.interfaces.TCPInterface</a>, <a href="shard.interfaces.UDPClientInterface.html">shard.interfaces.UDPClientInterface</a>, <a href="shard.interfaces.UDPServerInterface.html">shard.interfaces.UDPServerInterface</a></p>
     </div>
-    <pre>This is a base class for Shard interfaces
-which handle all the network traffic. A
-custom implementation using Shard will
-likely have an client- and a server side
-interface.</pre>
+    <pre>This is a base class for Shard interfaces which handle all the network traffic.
+A custom implementation using Shard will likely have an client- and
+a server side interface.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id67">
+      <table class="children sortable" id="id65">
   
   
 <tr class="method">
@@ -36,25 +34,19 @@ interface.</pre>
     
     <td>Method</td>
     <td><a href="shard.interfaces.Interface.html#__init__">__init__</a></td>
-    <td><tt>Most likely you will want to override</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.interfaces.Interface.html#setup_interface">setup_interface</a></td>
     <td><tt>This method sets up:</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.interfaces.Interface.html#handle_messages">handle_messages</a></td>
-    <td><tt>This is the main method of an interface</tt></td>
+    <td><tt>This is the main method of an interface class.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.interfaces.Interface.html#shutdown">shutdown</a></td>
-    <td><tt>This method is called when the engine is</tt></td>
+    <td><tt>This method is called when the engine is about to exit.</tt></td>
   </tr>
   
 </table>
@@ -80,46 +72,23 @@ interface.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <a href="shard.interfaces.TCPInterface.html">shard.interfaces.TCPInterface</a>, <a href="shard.interfaces.UDPClientInterface.html">shard.interfaces.UDPClientInterface</a>, <a href="shard.interfaces.UDPServerInterface.html">shard.interfaces.UDPServerInterface</a></div>
-    <pre>Most likely you will want to override
-this method. Be sure to call
-self.setup_interface() with the
-appropriate arguments in your
-implementation. This is also what
-the default implementation does.</pre>
-  </div>
-</div><div class="function">
-  <a name="shard.interfaces.Interface.setup_interface">
-    
-  </a>
-  <a name="setup_interface">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    setup_interface(self, address_port_tuple, logger):
-    
-  </div>
-  <div class="functionBody">
-    
     <pre>This method sets up:
 
 Interface.address_port_tuple
-(from address_port_tuple)
+    (from address_port_tuple)
 
 Interface.logger
-(from logger)
+    (from logger)
 
 Interface.connections
-(a dict of (address, port) tuples
-mapping to MessageBuffer instances)
+    (a dict of (address, port) tuples
+    mapping to MessageBuffer instances)
 
 Interface.shutdown_flag
 Interface.shutdown_confirmed
-(flags for shutdown handling)
+    (flags for shutdown handling)
 
-Be sure to call this method from
-__init__() when subclassing.</pre>
+Be sure to call this method from __init__() when subclassing.</pre>
   </div>
 </div><div class="function">
   <a name="shard.interfaces.Interface.handle_messages">
@@ -136,20 +105,17 @@ __init__() when subclassing.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <a href="shard.interfaces.TCPInterface.html">shard.interfaces.TCPInterface</a>, <a href="shard.interfaces.UDPClientInterface.html">shard.interfaces.UDPClientInterface</a>, <a href="shard.interfaces.UDPServerInterface.html">shard.interfaces.UDPServerInterface</a></div>
-    <pre>This is the main method of an interface
-class. It must transfer all the messages
-between local and remote host. This
-method is put in a background thread by
-the startup script, so your implementation
-can do all sorts of polling or blocking IO.
-It should regularly check whether shutdown()
-has been called (checking self.shutdown_flag),
-and if so, it should notify shutdown() by
-setting self.shutdown_confirmed to true (so
-that method can return True itself), and then
-raise SystemExit to stop the thread.
-The default implementation does nothing, but
-will handle the shutdown as described.</pre>
+    <pre>This is the main method of an interface class.
+It must transfer all the messages between local and remote host.
+This method is put in a background thread by the startup script,
+so your implementation can do all sorts of polling or blocking IO.
+It should regularly check whether shutdown() has been called
+(checking self.shutdown_flag), and if so, it should notify
+shutdown() by setting self.shutdown_confirmed to true (so that
+method can return True itself), and then raise SystemExit to stop
+the thread.
+The default implementation does nothing, but will handle the
+shutdown as described.</pre>
   </div>
 </div><div class="function">
   <a name="shard.interfaces.Interface.shutdown">
@@ -166,17 +132,15 @@ will handle the shutdown as described.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>This method is called when the engine is
-about to exit. It notifies handle_messages()
-to raise SystemExit to stop the thread
+    <pre>This method is called when the engine is about to exit.
+It notifies handle_messages() to raise SystemExit to stop the thread
 properly by setting self.shutdown_flag.
-shutdown() will return True when
-handle_messages() received the notification
-and is about to exit.</pre>
+shutdown() will return True when handle_messages() received the
+notification and is about to exit.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-12-16 14:25:33.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-05 21:19:34.
     </address>
   </body>
 </html>

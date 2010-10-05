@@ -19,15 +19,15 @@
     <div>
       
     </div>
-    <pre>An instance of this class is the main engine in every
-Shard client. It connects to the Client Interface and
-to the PresentationEngine, passes events and keeps track
-of Entities. It is normally instantiated in shard.run.</pre>
+    <pre>An instance of this class is the main engine in every Shard client.
+It connects to the Client Interface and to the PresentationEngine,
+passes events and keeps track of Entities.
+It is normally instantiated in shard.run.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id61">
+      <table class="children sortable" id="id60">
   
   
 <tr class="method">
@@ -35,13 +35,13 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#__init__">__init__</a></td>
-    <td><tt>The ClientCoreEngine must be instantiated with an</tt></td>
+    <td><tt>Initalisation.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#run">run</a></td>
-    <td><tt>Main loop of the ClientCoreEngine. This is</tt></td>
+    <td><tt>Main loop of the ClientCoreEngine.</tt></td>
   </tr><tr class="method">
     
     
@@ -77,13 +77,13 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>The entity is deleted from the</tt></td>
+    <td><tt>The entity is deleted from the Room and added to ClientCoreEngine.rack </tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>A perception must be displayed by the </tt></td>
+    <td><tt>A perception must be displayed by the PresentationEngine,</tt></td>
   </tr><tr class="method">
     
     
@@ -95,13 +95,13 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>An EnterRoomEvent means the server is</tt></td>
+    <td><tt>This method empties all data structures and passes the event on</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.clientcoreengine.ClientCoreEngine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>RoomCompleteEvent notifies the client that</tt></td>
+    <td><tt>The event is queued for the PresentationEngine here.</tt></td>
   </tr>
   
 </table>
@@ -109,16 +109,10 @@ of Entities. It is normally instantiated in shard.run.</pre>
         <p>
           Inherited from <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>:
         </p>
-        <table class="children sortable" id="id62">
+        <table class="children sortable" id="id61">
   
   
 <tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.coreengine.CoreEngine.html#setup_core_engine">setup_core_engine</a></td>
-    <td><tt>Set up CoreEngine attributes.</tt></td>
-  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -195,35 +189,19 @@ of Entities. It is normally instantiated in shard.run.</pre>
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Let self.room process the event and</tt></td>
+    <td><tt>Let self.room process the event and pass it on.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Let the shard.Room instance in</tt></td>
+    <td><tt>Let the shard.Room instance in self.room process the Event</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="shard.coreengine.CoreEngine.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Process the Event.</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.coreengine.CoreEngine.html">CoreEngine</a>):
-        </p>
-        <table class="children sortable" id="id63">
-  
-  
-<tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#setup_eventprocessor">setup_eventprocessor</a></td>
-    <td><tt>Set up EventProcessor.event_dict which maps</tt></td>
   </tr>
   
 </table>
@@ -249,7 +227,8 @@ of Entities. It is normally instantiated in shard.run.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#__init__">shard.coreengine.CoreEngine.__init__</a></div>
-    <pre>The ClientCoreEngine must be instantiated with an
+    <pre>Initalisation.
+The ClientCoreEngine must be instantiated with an
 instance of a subclass of shard.interfaces.Interface
 which handles the connection to the server or supplies
 events in some other way, and an instance of PresentationEngine
@@ -270,8 +249,8 @@ which presents the game action.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#run">shard.coreengine.CoreEngine.run</a></div>
-    <pre>Main loop of the ClientCoreEngine. This is
-a blocking method. It calls all the process
+    <pre>Main loop of the ClientCoreEngine.
+This is a blocking method. It calls all the process
 methods to process events.</pre>
   </div>
 </div><div class="function">
@@ -380,8 +359,8 @@ and pass on the DropsEvent.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_PicksUpEvent">shard.coreengine.CoreEngine.process_PicksUpEvent</a></div>
-    <pre>The entity is deleted from the
-Room and added to ClientCoreEngine.rack </pre>
+    <pre>The entity is deleted from the Room and added to ClientCoreEngine.rack 
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_PerceptionEvent">
@@ -398,9 +377,8 @@ Room and added to ClientCoreEngine.rack </pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_PerceptionEvent">shard.coreengine.CoreEngine.process_PerceptionEvent</a></div>
-    <pre>A perception must be displayed by the 
-PresentationEngine, so it is queued in a Message passed
-from the ClientCoreEngine.</pre>
+    <pre>A perception must be displayed by the PresentationEngine,
+so it is queued in a Message passed from the ClientCoreEngine.</pre>
   </div>
 </div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_DeleteEvent">
@@ -435,12 +413,10 @@ from the ClientCoreEngine.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_EnterRoomEvent">shard.coreengine.CoreEngine.process_EnterRoomEvent</a></div>
-    <pre>An EnterRoomEvent means the server is
-about to send a new map, respawn the
-player and send items and NPCs. So
-this method empties all data 
-structures and passes the event on to 
-the PresentationEngine.</pre>
+    <pre>This method empties all data structures and passes the event on
+to the PresentationEngine since an EnterRoomEvent means the server
+is about to send a new map, respawn the player and send items and
+NPCs.</pre>
   </div>
 </div><div class="function">
   <a name="shard.clientcoreengine.ClientCoreEngine.process_RoomCompleteEvent">
@@ -457,17 +433,15 @@ the PresentationEngine.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.coreengine.CoreEngine.html#process_RoomCompleteEvent">shard.coreengine.CoreEngine.process_RoomCompleteEvent</a></div>
-    <pre>RoomCompleteEvent notifies the client that
-the player, all map elements, items and
-NPCs have been transfered. By the time the
-event arrives the ClientCoreEngine should
-have saved all important data in data
-structures. So the event is queued for
-the PresentationEngine here.</pre>
+    <pre>The event is queued for the PresentationEngine here.
+RoomCompleteEvent notifies the client that the player,
+all map elements, items and NPCs have been transfered.
+By the time the event arrives the ClientCoreEngine
+should have saved all important data in data structures.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-12-16 14:25:33.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-05 21:19:34.
     </address>
   </body>
 </html>

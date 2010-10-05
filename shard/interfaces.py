@@ -1,7 +1,6 @@
 """Shard Interface Classes
 
-   Based on former client- and server
-   interface implementations
+   Based on former client- and server interface implementations
 """
 
 # Work started on 28. Sep 2009
@@ -39,45 +38,29 @@ import time
 # Base and helper classes
 
 class Interface:
-    """This is a base class for Shard interfaces
-       which handle all the network traffic. A
-       custom implementation using Shard will
-       likely have an client- and a server side
-       interface.
+    """This is a base class for Shard interfaces which handle all the network traffic.
+       A custom implementation using Shard will likely have an client- and
+       a server side interface.
     """
 
     def __init__(self, address_port_tuple, logger):
-        """Most likely you will want to override
-           this method. Be sure to call
-           self.setup_interface() with the
-           appropriate arguments in your
-           implementation. This is also what
-           the default implementation does.
-        """
-
-        self.setup_interface(address_port_tuple, logger)
-
-        self.logger.debug("complete")
-
-    def setup_interface(self, address_port_tuple, logger):
         """This method sets up:
 
            Interface.address_port_tuple
-           (from address_port_tuple)
+               (from address_port_tuple)
 
            Interface.logger
-           (from logger)
+               (from logger)
 
            Interface.connections
-           (a dict of (address, port) tuples
-           mapping to MessageBuffer instances)
+               (a dict of (address, port) tuples
+               mapping to MessageBuffer instances)
 
            Interface.shutdown_flag
            Interface.shutdown_confirmed
-           (flags for shutdown handling)
+               (flags for shutdown handling)
 
-           Be sure to call this method from
-           __init__() when subclassing.
+           Be sure to call this method from __init__() when subclassing.
         """
 
         self.address_port_tuple = address_port_tuple
@@ -103,20 +86,17 @@ class Interface:
         self.logger.debug("complete")
 
     def handle_messages(self):
-        """This is the main method of an interface
-           class. It must transfer all the messages
-           between local and remote host. This
-           method is put in a background thread by
-           the startup script, so your implementation
-           can do all sorts of polling or blocking IO.
-           It should regularly check whether shutdown()
-           has been called (checking self.shutdown_flag),
-           and if so, it should notify shutdown() by
-           setting self.shutdown_confirmed to true (so
-           that method can return True itself), and then
-           raise SystemExit to stop the thread.
-           The default implementation does nothing, but
-           will handle the shutdown as described.
+        """This is the main method of an interface class.
+           It must transfer all the messages between local and remote host.
+           This method is put in a background thread by the startup script,
+           so your implementation can do all sorts of polling or blocking IO.
+           It should regularly check whether shutdown() has been called
+           (checking self.shutdown_flag), and if so, it should notify
+           shutdown() by setting self.shutdown_confirmed to true (so that
+           method can return True itself), and then raise SystemExit to stop
+           the thread.
+           The default implementation does nothing, but will handle the
+           shutdown as described.
         """
 
         self.logger.debug("starting up")
@@ -135,13 +115,11 @@ class Interface:
         raise SystemExit
 
     def shutdown(self):
-        """This method is called when the engine is
-           about to exit. It notifies handle_messages()
-           to raise SystemExit to stop the thread
+        """This method is called when the engine is about to exit.
+           It notifies handle_messages() to raise SystemExit to stop the thread
            properly by setting self.shutdown_flag.
-           shutdown() will return True when
-           handle_messages() received the notification
-           and is about to exit.
+           shutdown() will return True when handle_messages() received the
+           notification and is about to exit.
         """
 
         self.logger.info("called")
@@ -159,25 +137,12 @@ class Interface:
 
 
 class MessageBuffer:
-    """Buffer messages received and to be sent
-       over the network.
+    """Buffer messages received and to be sent over the network.
     """
 
     def __init__(self):
-        """This is meant to be a base class
-           to be inherited from. This default
-           __init__() method simply calls
-           self.setup_message_buffer(). You
-           should do so, too, when subclassing
-           this with a custom implementation.
-        """
-
-        self.setup_message_buffer()
-
-    def setup_message_buffer(self):
-        """This method sets up the internal
-           queues (in this case instances
-           of collections.deque)
+        """This method sets up the internal queues
+           (in this case instances of collections.deque)
         """
 
         # A hint from the Python documentation:
@@ -189,11 +154,9 @@ class MessageBuffer:
         self.messages_for_remote = deque()
 
     def send_message(self, message):
-        """This method is called by the local
-           engine with a message ready to be sent to
-           the remote host. The Message object given
-           is an instance of shard.Message. This method
-           must return immediately to avoid blocking.
+        """Called by the local engine with a message ready to be sent to the remote host.
+           The Message object given is an instance of shard.Message.
+           This method must return immediately to avoid blocking.
         """
 
         self.messages_for_remote.append(message)
@@ -201,13 +164,10 @@ class MessageBuffer:
         return
 
     def grab_message(self):
-        """This method is called by the local
-           engine to obtain a new buffered message
-           from the remote host. It must return an
-           instance of shard.Message, and it must
-           do so immediately to avoid blocking. If
-           there is no new message from remote, it
-           must return an empty message.
+        """Called by the local engine to obtain a new buffered message from the remote host.
+           It must return an instance of shard.Message, and it must
+           do so immediately to avoid blocking. If there is no new
+           message from remote, it must return an empty message.
         """
 
         if self.messages_for_local:
@@ -235,16 +195,15 @@ class UDPClientInterface(MessageBuffer, Interface):
         """Interface initialization.
         """
 
-        # First call setup_interface() from the
-        # base class
+        # First call __init__() from the base class
         #
-        self.setup_interface(address_port_tuple, logger)
+        Interface.__init__(self, address_port_tuple, logger)
 
         # This is a subclass of MessageBuffer, but
         # since we override __init__(), we have to
-        # call setup_message_buffer().
+        # call the original method.
         #
-        self.setup_message_buffer()
+        MessageBuffer.__init__(self)
 
         # Set up UDP socket
         # It wouldn't be unreasonable to also use
@@ -264,20 +223,14 @@ class UDPClientInterface(MessageBuffer, Interface):
         self.logger.info("complete")
 
     def handle_messages(self):
-        """The task of this method is to do whatever is
-           necessary to send client messages and obtain 
-           server messages. It is meant to be the back end 
-           of send_message() and grab_message(). Put some 
-           networking code, a GUI or a random generator 
-           here. 
-           This method is put in a background thread 
-           automatically, so it can do all sorts of 
-           polling or blocking IO.
-           It should regularly check whether shutdown()
-           has been called, and if so, it should notify
-           shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop 
-           the thread.
+        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
+           It is meant to be the back end of send_message() and grab_message().
+           Put some networking code, a GUI or a random generator here. 
+           This method is put in a background thread automatically, so it can
+           do all sorts of polling or blocking IO.
+           It should regularly check whether shutdown() has been called, and
+           if so, it should notify shutdown() in some way (so that it can return
+           True), and then raise SystemExit to stop the thread.
         """
 
         self.logger.debug("starting up")
@@ -344,10 +297,9 @@ class UDPServerInterface(Interface):
     def __init__(self, address_port_tuple, logger):
         """Interface initialization."""
 
-        # First call setup_interface() from the
-        # base class
+        # First call __init__() from the base class
         #
-        self.setup_interface(address_port_tuple, logger)
+        Interface.__init__(self, address_port_tuple, logger)
 
         # client_connections is a dict of MessageBuffer
         # instances, indexed by (address, port) tuples.
@@ -357,20 +309,14 @@ class UDPServerInterface(Interface):
         self.logger.debug("complete")
 
     def handle_messages(self):
-        """The task of this method is to do whatever is
-           necessary to send server messages and obtain 
-           client messages. It is meant to be the back end 
-           of send_message() and grab_message(). Put some 
-           networking code, a GUI or a random generator 
-           here. 
-           This method is put in a background thread 
-           automatically, so it can do all sorts of 
-           polling or blocking IO.
-           It should regularly check whether shutdown()
-           has been called, and if so, it should notify
-           shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop 
-           the thread.
+        """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
+           It is meant to be the back end of send_message() and grab_message().
+           Put some networking code, a GUI or a random generator here. 
+           This method is put in a background thread automatically, so it can
+           do all sorts of polling or blocking IO.
+           It should regularly check whether shutdown() has been called, and if
+           so, it should notify shutdown() in some way (so that it can return
+           True), and then raise SystemExit to stop the thread.
         """
 
         self.logger.debug("starting up")
@@ -467,19 +413,16 @@ class UDPServerInterface(Interface):
 
 class ProtocolMessageBuffer(MessageBuffer,
                             twisted.internet.protocol.Protocol):
-    """Buffer messages received and to be sent
-       over the network.
-       An instance of this class is created by
-       a Twisted Factory every time a connection
-       is made.
+    """Buffer messages received and to be sent over the network.
+       An instance of this class is created by a Twisted Factory
+       every time a connection is made.
     """
 
     def __init__(self, logger):
-        """Set up the MessageBuffer attributes,
-           the logger, buffer, flags.
+        """Set up the MessageBuffer attributes, the logger, buffer, flags.
         """
 
-        self.setup_message_buffer()
+        MessageBuffer.__init__(self)
 
         # Now we have:
         #
@@ -496,8 +439,7 @@ class ProtocolMessageBuffer(MessageBuffer,
 
     def connectionMade(self):
         """Standard Twisted Protocol method.
-           Now ProtocolMessageBuffer.transport
-           is ready to be used.
+           Now ProtocolMessageBuffer.transport is ready to be used.
         """
 
         self.logger.debug("called")
@@ -505,8 +447,7 @@ class ProtocolMessageBuffer(MessageBuffer,
         self.connection_made = True
 
     def dataReceived(self, data):
-        """Twisted Protocol standard method:
-           handle received data.
+        """Twisted Protocol standard method: handle received data.
         """
         # From the Twisted documentation:
         #  "Please keep in mind that you will probably need
@@ -551,8 +492,7 @@ class ProtocolMessageBuffer(MessageBuffer,
             double_newline_index = self.data_buffer.find(".\n\n")
 
     def send_queued_message(self, address_port_tuple):
-        """Actually send messages queued
-           with MessageBuffer.send_message()
+        """Actually send messages queued with MessageBuffer.send_message()
            across the network.
         """
 
@@ -576,20 +516,17 @@ class ProtocolMessageBuffer(MessageBuffer,
             self.logger.debug("sent %s characters" % len(pickled_message))
 
 class TCPInterface(Interface):
-    """A generic Shard Interface using TCP,
-       built upon the Twisted framework.
+    """A generic Shard Interface using TCP, built upon the Twisted framework.
     """
 
     def __init__(self, address_port_tuple, logger, interface_type, send_interval):
-        """addres_port_tuple and logger are
-           arguments for setup_interface.
-           interface_type is either "client"
-           or "server". send_interval is the
-           interval of sending queued messages
-           in seconds (float).
+        """Initialisation.
+           addres_port_tuple and logger are arguments for Interface.__init__.
+           interface_type is either "client" or "server". send_interval is the
+           interval of sending queued messages in seconds (float).
         """
 
-        self.setup_interface(address_port_tuple, logger)
+        Interface.__init__(self, address_port_tuple, logger)
 
         self.interface_type = interface_type
 
@@ -598,20 +535,14 @@ class TCPInterface(Interface):
         self.logger.debug("complete")
 
     def handle_messages(self):
-        """The task of this method is to do whatever is
-           necessary to send client messages and obtain 
-           server messages. It is meant to be the back end 
-           of send_message() and grab_message(). Put some 
-           networking code, a GUI or a random generator 
-           here. 
-           This method is put in a background thread 
-           automatically, so it can do all sorts of 
-           polling or blocking IO.
-           It should regularly check whether shutdown()
-           has been called, and if so, it should notify
-           shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop 
-           the thread.
+        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
+           It is meant to be the back end of send_message() and grab_message().
+           Put some networking code, a GUI or a random generator here. 
+           This method is put in a background thread automatically, so it can
+           do all sorts of polling or blocking IO.
+           It should regularly check whether shutdown() has been called, and
+           if so, it should notify shutdown() in some way (so that it can return
+           True), and then raise SystemExit to stop the thread.
         """
 
         # TODO: remove connections that caused an error?
@@ -629,14 +560,12 @@ class TCPInterface(Interface):
 
         class MessageProtocolFactory(twisted.internet.protocol.ClientFactory):
             """Twisted ClientFactory implementation,
-               producing a ProtocolMessageBuffer instance
-               for every connection.
+               producing a ProtocolMessageBuffer instance for every connection.
             """
 
             def buildProtocol(self, addr):
-                """Standard Twisted Factory method which
-                   creates an returns an instance of
-                   ProtocolMessageBuffer.
+                """Standard Twisted Factory method
+                   which creates an returns an instance of ProtocolMessageBuffer.
                 """
 
                 protocol_message_buffer = ProtocolMessageBuffer(logger_proxy)

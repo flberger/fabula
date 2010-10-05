@@ -10,7 +10,7 @@
     
   </head>
   <body>
-    <h1 class="class">Class s.Entity(<a href="shard.eventprocessor.EventProcessor.html">eventprocessor.EventProcessor</a>):</h1>
+    <h1 class="class">Class s.Entity(<a href="shard.eventprocessor.EventProcessor.html">shard.eventprocessor.EventProcessor</a>):</h1>
     <p>
       <span id="part">Part of <a href="shard.html">shard</a></span>
       
@@ -19,9 +19,9 @@
     <div>
       
     </div>
-    <pre>An Entity is a Shard game object. This is the base
-class for the player, NPCs and items. An Entity
-holds information used by the Shard game logic:
+    <pre>An Entity is a Shard game object.
+This is the base class for the player, NPCs and items.
+An Entity holds information used by the Shard game logic:
 
 Entity.entity_type
 Entity.identifier
@@ -58,43 +58,37 @@ handles game objects.</pre>
     
     <td>Method</td>
     <td><a href="shard.Entity.html#__init__">__init__</a></td>
-    <td><tt>You are welcome to override this method, but</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.Entity.html#setup_entity">setup_entity</a></td>
-    <td><tt>This method sets up the following attributes</tt></td>
+    <td><tt>This method sets up the following attributes from the values given:</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>This method is called by the</tt></td>
+    <td><tt>This method is called by the PresentationEngine.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>This method is called by the</tt></td>
+    <td><tt>This method is called by the PresentationEngine.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>This method is called by the</tt></td>
+    <td><tt>This method is called by the PresentationEngine.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>This method is called by the</tt></td>
+    <td><tt>This method is called by the PresentationEngine.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>This method is called by the</tt></td>
+    <td><tt>This method is called by the PresentationEngine.</tt></td>
   </tr>
   
 </table>
@@ -106,12 +100,6 @@ handles game objects.</pre>
   
   
 <tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#setup_eventprocessor">setup_eventprocessor</a></td>
-    <td><tt>Set up EventProcessor.event_dict which maps</tt></td>
-  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -256,47 +244,27 @@ handles game objects.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#__init__">shard.eventprocessor.EventProcessor.__init__</a></div>
-    <pre>You are welcome to override this method, but
-be sure to call setup_entity() as done by the
-default implementation of this method.</pre>
-  </div>
-</div><div class="function">
-  <a name="shard.Entity.setup_entity">
-    
-  </a>
-  <a name="setup_entity">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    setup_entity(self, entity_type, identifier, asset):
-    
-  </div>
-  <div class="functionBody">
-    
-    <pre>This method sets up the following attributes
-from the values givens:
+    <pre>This method sets up the following attributes from the values given:
 
 Entity.entity_type
-One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
-or shard.ITEM_NOBLOCK.
+    One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
+    or shard.ITEM_NOBLOCK.
 
 Entity.identifier
-Must be an object whose string representation
-yields an unique identification.
+    Must be an object whose string representation
+    yields an unique identification.
 
 Entity.asset
-Preferably a string with a file name or an URI
-of a media file containing the data for visualizing
-the Entity. Do not put large objects here since
-Entities are pushed around quite a bit and
-transfered across the network.
-The PresentationEngine may fetch the asset and
-attach it to the instance of the Entity.
+    Preferably a string with a file name or an URI
+    of a media file containing the data for visualizing
+    the Entity. Do not put large objects here since
+    Entities are pushed around quite a bit and
+    transfered across the network.
+    The PresentationEngine may fetch the asset and
+    attach it to the instance of the Entity.
 
 Entity.state
-The state the Entity is in. Defaults to None.</pre>
+    The state the Entity is in. Defaults to None.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_MovesToEvent">
@@ -313,18 +281,14 @@ The state the Entity is in. Defaults to None.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
-    <pre>This method is called by the
-PresentationEngine. The Entity
-representation has to execute the
-according action over the course
-of Entity.action_frames frames.
-But it must du so in an non-blocking
-fashion - this method must return
-as soon as possible. So do set up
-counters or frame queues here.
-Your implementation may call
-another method once per frame, do
-the actual work there.</pre>
+    <pre>This method is called by the PresentationEngine.
+The Entity representation has to execute the
+according action over the course of Entity.action_frames frames.
+But it must du so in an non-blocking fashion -
+this method must return as soon as possible.
+So do set up counters or frame queues here.
+Your implementation may call another method
+once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_ChangeStateEvent">
@@ -341,18 +305,14 @@ the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
-    <pre>This method is called by the
-PresentationEngine. The Entity
-representation has to execute the
-according action over the course
-of Entity.action_frames frames.
-But it must du so in an non-blocking
-fashion - this method must return
-as soon as possible. So do set up
-counters or frame queues here.
-Your implementation may call
-another method once per frame, do
-the actual work there.</pre>
+    <pre>This method is called by the PresentationEngine.
+The Entity representation has to execute the
+according action over the course of Entity.action_frames frames.
+But it must du so in an non-blocking fashion -
+this method must return as soon as possible.
+So do set up counters or frame queues here.
+Your implementation may call another method
+once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_DropsEvent">
@@ -369,18 +329,14 @@ the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
-    <pre>This method is called by the
-PresentationEngine. The Entity
-representation has to execute the
-according action over the course
-of Entity.action_frames frames.
-But it must du so in an non-blocking
-fashion - this method must return
-as soon as possible. So do set up
-counters or frame queues here.
-Your implementation may call
-another method once per frame, do
-the actual work there.</pre>
+    <pre>This method is called by the PresentationEngine.
+The Entity representation has to execute the
+according action over the course of Entity.action_frames frames.
+But it must du so in an non-blocking fashion -
+this method must return as soon as possible.
+So do set up counters or frame queues here.
+Your implementation may call another method
+once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_PicksUpEvent">
@@ -397,18 +353,14 @@ the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
-    <pre>This method is called by the
-PresentationEngine. The Entity
-representation has to execute the
-according action over the course
-of Entity.action_frames frames.
-But it must du so in an non-blocking
-fashion - this method must return
-as soon as possible. So do set up
-counters or frame queues here.
-Your implementation may call
-another method once per frame, do
-the actual work there.</pre>
+    <pre>This method is called by the PresentationEngine.
+The Entity representation has to execute the
+according action over the course of Entity.action_frames frames.
+But it must du so in an non-blocking fashion -
+this method must return as soon as possible.
+So do set up counters or frame queues here.
+Your implementation may call another method
+once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_SaysEvent">
@@ -425,22 +377,18 @@ the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
-    <pre>This method is called by the
-PresentationEngine. The Entity
-representation has to execute the
-according action over the course
-of Entity.action_frames frames.
-But it must du so in an non-blocking
-fashion - this method must return
-as soon as possible. So do set up
-counters or frame queues here.
-Your implementation may call
-another method once per frame, do
-the actual work there.</pre>
+    <pre>This method is called by the PresentationEngine.
+The Entity representation has to execute the
+according action over the course of Entity.action_frames frames.
+But it must du so in an non-blocking fashion -
+this method must return as soon as possible.
+So do set up counters or frame queues here.
+Your implementation may call another method
+once per frame, do the actual work there.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-12-16 14:25:33.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-05 21:19:34.
     </address>
   </body>
 </html>

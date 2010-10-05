@@ -19,20 +19,18 @@
     <div>
       
     </div>
-    <pre>This is the base class for a PresentationEngine for the
-Shard Client. Subclasses should override the
-appropriate methods of this class and implement a 
-graphical representation of the game and the 
-action. Shard is based on a two-dimensional map, 
-but apart from that it makes very few assumptions 
-about the graphical rendering. Thus it is 
-possible to write 2D and 3D PresentationEngines and 
+    <pre>This is the base class for a PresentationEngine for the Shard Client.
+Subclasses should override the appropriate methods of this class
+and implement a graphical representation of the game and the 
+action. Shard is based on a two-dimensional map, but apart from
+that it makes very few assumptions about the graphical rendering.
+Thus it is possible to write 2D and 3D PresentationEngines and 
 even a text interface.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id83">
+      <table class="children sortable" id="id81">
   
   
 <tr class="method">
@@ -40,12 +38,6 @@ even a text interface.</pre>
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#__init__">__init__</a></td>
-    <td><tt>Initialize the PresentationEngine. You are</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.presentationengine.PresentationEngine.html#setup_presentation_engine">setup_presentation_engine</a></td>
     <td><tt>This method initializes the PresentationEngine.</tt></td>
   </tr><tr class="method">
     
@@ -58,67 +50,67 @@ even a text interface.</pre>
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#display_asset_exception">display_asset_exception</a></td>
-    <td><tt>This method is called when the asset_engine</tt></td>
+    <td><tt>Called when the asset_engine is unable to retrieve the asset.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#update_frame_timer">update_frame_timer</a></td>
-    <td><tt>Your graphics module might provide a</tt></td>
+    <td><tt>You might have to notify a timer once per frame.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#display_single_frame">display_single_frame</a></td>
-    <td><tt>This method is called when the PresentationEngine</tt></td>
+    <td><tt>Called when the PresentationEngine needs to render a single frame</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#collect_player_input">collect_player_input</a></td>
-    <td><tt>The module you use for actual graphics</tt></td>
+    <td><tt>Called when the PresentationEngine wants to capture the user's reaction.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>This method is called when the PresentationEngine</tt></td>
+    <td><tt>Called when the PresentationEngine has encoutered an EnterRoomEvent.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>This method is called when everything</tt></td>
+    <td><tt>Called when everything is fetched and ready after a RoomCompleteEvent.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>This method is called when the PresentationEngine</tt></td>
+    <td><tt>Called when the PresentationEngine needs to render a CanSpeakEvent.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>This method is called with an instance</tt></td>
+    <td><tt>This method is called with an instance of SpawnEvent to be displayed.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>This method is called with an instance</tt></td>
+    <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>This method is called with a list of</tt></td>
+    <td><tt>Called with a list of instances of ChangeMapElementEvent.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>This method is called with a list of</tt></td>
+    <td><tt>Called with a list of instances of PerceptionEvent.</tt></td>
   </tr><tr class="method">
     
     
@@ -142,35 +134,19 @@ even a text interface.</pre>
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Remove the target from all data</tt></td>
+    <td><tt>Remove the target from all data structures,</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>This method is called with an instance</tt></td>
+    <td><tt>Called with an instance of SaysEvent</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.presentationengine.PresentationEngine.html#group_events">group_events</a></td>
-    <td><tt>This method takes a shard.Message as</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="shard.plugin.Plugin.html">Plugin</a>:
-        </p>
-        <table class="children sortable" id="id84">
-  
-  
-<tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugin.Plugin.html#setup_plugin">setup_plugin</a></td>
-    <td><tt>Initialize the plugin.</tt></td>
+    <td><tt>Returns a list of lists of parallel events.</tt></td>
   </tr>
   
 </table>
@@ -178,16 +154,10 @@ even a text interface.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugin.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id85">
+        <table class="children sortable" id="id82">
   
   
 <tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#setup_eventprocessor">setup_eventprocessor</a></td>
-    <td><tt>Set up EventProcessor.event_dict which maps</tt></td>
-  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -290,30 +260,6 @@ even a text interface.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.plugin.Plugin.html#__init__">shard.plugin.Plugin.__init__</a></div>
-    <pre>Initialize the PresentationEngine. You are
-welcome to override this method, but make
-sure to call self.setup_presentation_engine()
-with the appropriate arguments to properly
-initialize internals.
-This is what the default implementation does.
-This method must not block, it has to 
-return once everything is set up.</pre>
-  </div>
-</div><div class="function">
-  <a name="shard.presentationengine.PresentationEngine.setup_presentation_engine">
-    
-  </a>
-  <a name="setup_presentation_engine">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    setup_presentation_engine(self, asset_engine, framerate):
-    
-  </div>
-  <div class="functionBody">
-    
     <pre>This method initializes the PresentationEngine.
 asset_engine must be an instance of
 shard.AssetEngine or a subclass.
@@ -372,13 +318,10 @@ details.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>This method is called when the asset_engine
-is unable to retrieve the asset. This is a 
-serious error which usually prohibits
-continuation.
-The user should be asked to check his
-installation, file system or network
-connection.</pre>
+    <pre>Called when the asset_engine is unable to retrieve the asset.
+This is a serious error which usually prohibits continuation.
+The user should be asked to check his installation, file system
+or network connection.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.update_frame_timer">
@@ -395,15 +338,11 @@ connection.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>Your graphics module might provide a
-timer which must be notified once per
-frame. Do this here and use this method
-wherever you need it. It is also called
-from process_message() when appropriate.
-This method may block execution to slow
-the PresentationEngine down to a certain
-frame rate.
-The default implementation waits
+    <pre>You might have to notify a timer once per frame.
+Do this here and use this method wherever you need it.
+It is also called from process_message() when appropriate.
+This method may block execution to slow the PresentationEngine
+down to a certain frame rate. The default implementation waits
 1.0/self.framerate seconds.</pre>
   </div>
 </div><div class="function">
@@ -421,13 +360,11 @@ The default implementation waits
   </div>
   <div class="functionBody">
     
-    <pre>This method is called when the PresentationEngine
-decides that it needs to render a single frame
-of the current game state. There is nothing
-special going on here, so you should notify the
-Entities that there is a next frame to be
-displayed (whichever way that is done in your 
-implementation) and update their graphics.</pre>
+    <pre>Called when the PresentationEngine needs to render a single frame
+of the current game state. There is nothing special going on here,
+so you should notify the Entities that there is a next frame to be
+displayed (whichever way that is done in your implementation) and
+update their graphics.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.collect_player_input">
@@ -444,31 +381,21 @@ implementation) and update their graphics.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>The module you use for actual graphics
-rendering most probably has a way to
-capture user input. This method is called
-when the PresentationEngine has displayed a
-series of events and wants to capture
-the user's reaction. When overriding this
-method, you have to convert the data
-provided by your module into Shard 
-events, most probably instances of 
-shard.AttemptEvent. You must append them
-to self.message_for_host which is
-evaluated by the ControlEngine.
-Note that your module might provide you
-with numerous user actions if the user
-clicked and typed a lot during the
-rendering. You should create a 
-reasonable subset of those actions, 
-e.g. select only the very last user
-input action.
-The PresentationEngine should only ever
-collect and send one single client event
-to prevent cheating and blocking other
+    <pre>Called when the PresentationEngine wants to capture the user's reaction.
+The module you use for actual graphics rendering most probably
+has a way to capture user input. When overriding this method,
+you have to convert the data provided by your module into Shard 
+events, most probably instances of shard.AttemptEvent. You must
+append them to self.message_for_host which is evaluated by the
+ControlEngine.
+Note that your module might provide you with numerous user
+actions if the user clicked and typed a lot during the rendering.
+You should create a reasonable subset of those actions, e.g.
+select only the very last user input action.
+The PresentationEngine should only ever collect and send one
+single client event to prevent cheating and blocking other
 clients in the server. (hint by Alexander Marbach)
-The default implementation reads
-user input from the console.</pre>
+The default implementation reads user input from the console.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_EnterRoomEvent">
@@ -485,12 +412,10 @@ user input from the console.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div>
-    <pre>This method is called when the PresentationEngine
-has encoutered an EnterRoomEvent. You should
-override it, blank the screen here and display
-a waiting message since the PresentationEngine is
-going to twiddle thumbs until it receives a 
-RoomCompleteEvent.</pre>
+    <pre>Called when the PresentationEngine has encoutered an EnterRoomEvent.
+You should override it, blank the screen here and display a waiting
+message since the PresentationEngine is going to twiddle thumbs until
+it receives a RoomCompleteEvent.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_RoomCompleteEvent">
@@ -507,11 +432,9 @@ RoomCompleteEvent.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div>
-    <pre>This method is called when everything
-is fetched and ready after a
-RoomCompleteEvent. Here you should 
-set up the main screen and display 
-some Map elements and Entities.</pre>
+    <pre>Called when everything is fetched and ready after a RoomCompleteEvent.
+Here you should set up the main screen and display some Map
+elements and Entities.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_CanSpeakEvent">
@@ -528,12 +451,10 @@ some Map elements and Entities.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">shard.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div>
-    <pre>This method is called when the PresentationEngine
-needs to render a CanSpeakEvent. You have to
-prompt for appropriate user input here and
-add a corresponding SaysEvent to
-self.message_for_host, which is evaluated by
-the ControlEngine. The default implementation
+    <pre>Called when the PresentationEngine needs to render a CanSpeakEvent.
+You have to prompt for appropriate user input here and add a
+corresponding SaysEvent to self.message_for_host, which is
+evaluated by the ControlEngine. The default implementation
 makes the player say "blah". </pre>
   </div>
 </div><div class="function">
@@ -551,13 +472,10 @@ makes the player say "blah". </pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">shard.eventprocessor.EventProcessor.process_SpawnEvent</a></div>
-    <pre>This method is called with an instance
-of SpawnEvent to be displayed.
-You should supply the Entity with
-self.presentation_engine as done in the
-default implementation. Then add the new
-Enties to a list of visible Entities you
-might have set up and render a static frame.</pre>
+    <pre>This method is called with an instance of SpawnEvent to be displayed.
+You should supply the Entity with self.presentation_engine as done
+in the default implementation. Then add the new Enties to a list of
+visible Entities you might have set up and render a static frame.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_DeleteEvent">
@@ -574,13 +492,11 @@ might have set up and render a static frame.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">shard.eventprocessor.EventProcessor.process_DeleteEvent</a></div>
-    <pre>This method is called with an instance
-of DeleteEvent. You need to remove the
-Entites affected from your data
-structures and draw a frame without
-the deleted Entities.
-Note that the Entities to be removed are
-already gone in self.room.</pre>
+    <pre>This method is called with an instance of DeleteEvent.
+You need to remove the Entites affected from your data
+structures and draw a frame without the deleted Entities.
+Note that the Entities to be removed are already gone
+in self.room.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_ChangeMapElementEvent">
@@ -597,11 +513,9 @@ already gone in self.room.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div>
-    <pre>This method is called with a list of
-instances of ChangeMapElementEvent.
-In this method you must implement a
-major redraw of the display, updating all
-Map elements and after that all Entities.
+    <pre>Called with a list of instances of ChangeMapElementEvent.
+In this method you must implement a major redraw of the display,
+updating all Map elements and after that all Entities.
 This is only a single frame though.
 Note that event_list may be empty.</pre>
   </div>
@@ -620,16 +534,12 @@ Note that event_list may be empty.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">shard.eventprocessor.EventProcessor.process_PerceptionEvent</a></div>
-    <pre>This method is called with a list of
-instances of PerceptionEvent. You
-have to provide an implementation
-whicht displays them one by one, 
-possibly awaiting user confirmation.
-event_list may be empty. Please do
-not continue animation of other
-Entities during the perception so
-there are no background actions 
-which may pass unnoticed.</pre>
+    <pre>Called with a list of instances of PerceptionEvent.
+You have to provide an implementation whicht displays them
+one by one, possibly awaiting user confirmation.
+event_list may be empty. Please do not continue animation
+of other Entities during the perception so there are no
+background actions which may pass unnoticed.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_MovesToEvent">
@@ -665,8 +575,7 @@ which may pass unnoticed.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
     <pre>Entity has already handled the Event.
-Display a single frame to show the
-result.</pre>
+Display a single frame to show the result.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_DropsEvent">
@@ -701,10 +610,9 @@ result.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
-    <pre>Remove the target from all data
-structures, then let the Entity
-handle the Event. Possibly update
-an inventory display.</pre>
+    <pre>Remove the target from all data structures,
+then let the Entity handle the Event.
+Possibly update an inventory display.</pre>
   </div>
 </div><div class="function">
   <a name="shard.presentationengine.PresentationEngine.process_SaysEvent">
@@ -721,18 +629,14 @@ an inventory display.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
-    <pre>This method is called with an instance
-of SaysEvent when the PresentationEngine
-is ready to display what Entities say.
-In this method you have to compute a
-number of frames for displaying text and
-animation for each SaysEvent depending
-on how long the text is. Once you start
-displaying the text, you have to notify
-the affected Entity. You should catch
-some user confirmation. Consider not to
-continue  animation of other Entities so
-there are no background actions which may
+    <pre>Called with an instance of SaysEvent
+when the PresentationEngine is ready to display what Entities say.
+In this method you have to compute a number of frames for
+displaying text and animation for each SaysEvent depending
+on how long the text is. Once you start displaying the text,
+you have to notify the affected Entity. You should catch
+some user confirmation. Consider not to continue  animation
+of other Entities so there are no background actions which may
 pass unnoticed.</pre>
   </div>
 </div><div class="function">
@@ -750,15 +654,13 @@ pass unnoticed.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>This method takes a shard.Message as
-argument and returns a list of lists
-of parallel events. The division is
-simple: group all subsequent events
+    <pre>Returns a list of lists of parallel events.
+The division is simple: group all subsequent events
 that do not affect the same identifier.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2009-12-16 14:25:33.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-05 21:19:34.
     </address>
   </body>
 </html>

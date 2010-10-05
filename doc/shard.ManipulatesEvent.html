@@ -3,45 +3,49 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;shard.PassiveEvent&rdquo;</title>
+    <title>API docs for &ldquo;shard.ManipulatesEvent&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class s.PassiveEvent(<a href="shard.Event.html">Event</a>):</h1>
+    <h1 class="class">Class s.ManipulatesEvent(<a href="shard.ConfirmEvent.html">ConfirmEvent</a>):</h1>
     <p>
       <span id="part">Part of <a href="shard.html">shard</a></span>
       
-      <a href="classIndex.html#shard.PassiveEvent">View In Hierarchy</a>
+      <a href="classIndex.html#shard.ManipulatesEvent">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="shard.DroppedEvent.html">shard.DroppedEvent</a>, <a href="shard.LookedAtEvent.html">shard.LookedAtEvent</a>, <a href="shard.PassedEvent.html">shard.PassedEvent</a>, <a href="shard.PickedUpEvent.html">shard.PickedUpEvent</a></p>
+      
     </div>
-    <pre>The base class for events when items or NPCs are being passed, looked at, 
-picked up and the like.</pre>
+    <pre>This is a server confirmation of an item manipulation.
+This Event normally has no visible effect; effects of
+a ManipulateEvent are usually MovesToEvents,
+ChangeMapElementEvents, SpawnEvents etc. The
+ManipulatesEvent simply confirms that a manipulation
+has happened.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id30">
+      <table class="children sortable" id="id24">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="shard.PassiveEvent.html#__init__">__init__</a></td>
+    <td><a href="shard.ManipulatesEvent.html#__init__">__init__</a></td>
     <td><tt>Event initialisation.</tt></td>
   </tr>
   
 </table>
       
         <p>
-          Inherited from <a href="shard.Event.html">Event</a>:
+          Inherited from <a href="shard.Event.html">Event</a> (via <a href="shard.ConfirmEvent.html">ConfirmEvent</a>):
         </p>
-        <table class="children sortable" id="id31">
+        <table class="children sortable" id="id25">
   
   
 <tr class="basemethod">
@@ -73,7 +77,7 @@ picked up and the like.</pre>
     
 
     <div class="function">
-  <a name="shard.PassiveEvent.__init__">
+  <a name="shard.ManipulatesEvent.__init__">
     
   </a>
   <a name="__init__">
@@ -82,16 +86,14 @@ picked up and the like.</pre>
   <div class="functionHeader">
     
     def
-    __init__(self, identifier, trigger_identifier):
+    __init__(self, identifier, item_identifier):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.Event.html#__init__">shard.Event.__init__</a></div>
     <pre>Event initialisation.
-The trigger_identifier identifies the
-entity that triggered the event. This makes it
-possible to react differently to several
-entities.</pre>
+item_identifier identifies the item
+that is being manipulated.</pre>
   </div>
 </div>
     <address>

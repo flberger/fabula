@@ -10,14 +10,12 @@ import shard.plugin
 import time
 
 class PresentationEngine(shard.plugin.Plugin):
-    """This is the base class for a PresentationEngine for the
-       Shard Client. Subclasses should override the
-       appropriate methods of this class and implement a 
-       graphical representation of the game and the 
-       action. Shard is based on a two-dimensional map, 
-       but apart from that it makes very few assumptions 
-       about the graphical rendering. Thus it is 
-       possible to write 2D and 3D PresentationEngines and 
+    """This is the base class for a PresentationEngine for the Shard Client.
+       Subclasses should override the appropriate methods of this class
+       and implement a graphical representation of the game and the 
+       action. Shard is based on a two-dimensional map, but apart from
+       that it makes very few assumptions about the graphical rendering.
+       Thus it is possible to write 2D and 3D PresentationEngines and 
        even a text interface.
     """
 
@@ -25,29 +23,6 @@ class PresentationEngine(shard.plugin.Plugin):
     # Initialization
 
     def __init__(self, asset_engine, framerate, logger):
-        """Initialize the PresentationEngine. You are
-           welcome to override this method, but make
-           sure to call self.setup_presentation_engine()
-           with the appropriate arguments to properly
-           initialize internals.
-           This is what the default implementation does.
-           This method must not block, it has to 
-           return once everything is set up.
-        """
-
-        # First set up the plugin
-        #
-        self.setup_plugin(logger)
-
-        # Set how long actions like a movement from
-        # Map element to Map element take, in seconds.
-        # Must be set before calling self.setup_presentation_engine()!
-        #
-        self.action_time = 0.5
-
-        self.setup_presentation_engine(asset_engine, framerate)
-
-    def setup_presentation_engine(self, asset_engine, framerate):
         """This method initializes the PresentationEngine.
            asset_engine must be an instance of
            shard.AssetEngine or a subclass.
@@ -56,13 +31,21 @@ class PresentationEngine(shard.plugin.Plugin):
            second the client will run in.
         """
 
+        # First set up the plugin
+        #
+        shard.plugin.Plugin.__init__(self, logger)
+
+        # Set how long actions like a movement from
+        # Map element to Map element take, in seconds.
+        #
+        self.action_time = 0.5
+
         # Get framerate and asset_engine from parameters
         #
         self.framerate = framerate
         self.asset_engine = asset_engine
 
         # Compute the number of frames per action.
-        # See __init__() for details.
         #
         self.action_frames = int(self.action_time * self.framerate)
 
@@ -455,13 +438,10 @@ class PresentationEngine(shard.plugin.Plugin):
     # TODO: Most docstrings describe 2D stuff (images). Rewrite 2D-3D-agnostic.
 
     def display_asset_exception(self, asset):
-        """This method is called when the asset_engine
-           is unable to retrieve the asset. This is a 
-           serious error which usually prohibits
-           continuation.
-           The user should be asked to check his
-           installation, file system or network
-           connection.
+        """Called when the asset_engine is unable to retrieve the asset.
+           This is a serious error which usually prohibits continuation.
+           The user should be asked to check his installation, file system
+           or network connection.
         """
 
         self.logger.critical("Asset could not be fetched: %s. Aborting."
@@ -470,15 +450,11 @@ class PresentationEngine(shard.plugin.Plugin):
         raise SystemExit
 
     def update_frame_timer(self):
-        """Your graphics module might provide a
-           timer which must be notified once per
-           frame. Do this here and use this method
-           wherever you need it. It is also called
-           from process_message() when appropriate.
-           This method may block execution to slow
-           the PresentationEngine down to a certain
-           frame rate.
-           The default implementation waits
+        """You might have to notify a timer once per frame.
+           Do this here and use this method wherever you need it.
+           It is also called from process_message() when appropriate.
+           This method may block execution to slow the PresentationEngine
+           down to a certain frame rate. The default implementation waits
            1.0/self.framerate seconds.
         """
 
@@ -487,13 +463,11 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def display_single_frame(self):
-        """This method is called when the PresentationEngine
-           decides that it needs to render a single frame
-           of the current game state. There is nothing
-           special going on here, so you should notify the
-           Entities that there is a next frame to be
-           displayed (whichever way that is done in your 
-           implementation) and update their graphics.
+        """Called when the PresentationEngine needs to render a single frame
+           of the current game state. There is nothing special going on here,
+           so you should notify the Entities that there is a next frame to be
+           displayed (whichever way that is done in your implementation) and
+           update their graphics.
         """
 
         # You might want to restrict your updates to
@@ -506,31 +480,21 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def collect_player_input(self):
-        """The module you use for actual graphics
-           rendering most probably has a way to
-           capture user input. This method is called
-           when the PresentationEngine has displayed a
-           series of events and wants to capture
-           the user's reaction. When overriding this
-           method, you have to convert the data
-           provided by your module into Shard 
-           events, most probably instances of 
-           shard.AttemptEvent. You must append them
-           to self.message_for_host which is
-           evaluated by the ControlEngine.
-           Note that your module might provide you
-           with numerous user actions if the user
-           clicked and typed a lot during the
-           rendering. You should create a 
-           reasonable subset of those actions, 
-           e.g. select only the very last user
-           input action.
-           The PresentationEngine should only ever
-           collect and send one single client event
-           to prevent cheating and blocking other
+        """Called when the PresentationEngine wants to capture the user's reaction.
+           The module you use for actual graphics rendering most probably
+           has a way to capture user input. When overriding this method,
+           you have to convert the data provided by your module into Shard 
+           events, most probably instances of shard.AttemptEvent. You must
+           append them to self.message_for_host which is evaluated by the
+           ControlEngine.
+           Note that your module might provide you with numerous user
+           actions if the user clicked and typed a lot during the rendering.
+           You should create a reasonable subset of those actions, e.g.
+           select only the very last user input action.
+           The PresentationEngine should only ever collect and send one
+           single client event to prevent cheating and blocking other
            clients in the server. (hint by Alexander Marbach)
-           The default implementation reads
-           user input from the console.
+           The default implementation reads user input from the console.
         """
 
         self.logger.debug("called")
@@ -546,9 +510,8 @@ class PresentationEngine(shard.plugin.Plugin):
     # TODO: remove following method if applicable
     #
     #def display_multiple_frame_action(self, MovesToEvent_list):
-    #    """This method is called when the PresentationEngine
-    #       is ready to render Move, Drop or PickUp
-    #       actions. All visible Entities are already
+    #    """Called when the PresentationEngine is ready to render Move, Drop or PickUp actions.
+    #       All visible Entities are already
     #       notified about their state at this point.
     #       This method must render exactly
     #       self.action_frames frames. You have to 
@@ -587,12 +550,10 @@ class PresentationEngine(shard.plugin.Plugin):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """This method is called when the PresentationEngine
-           has encoutered an EnterRoomEvent. You should
-           override it, blank the screen here and display
-           a waiting message since the PresentationEngine is
-           going to twiddle thumbs until it receives a 
-           RoomCompleteEvent.
+        """Called when the PresentationEngine has encoutered an EnterRoomEvent.
+           You should override it, blank the screen here and display a waiting
+           message since the PresentationEngine is going to twiddle thumbs until
+           it receives a RoomCompleteEvent.
         """
 
         self.logger.debug("called")
@@ -602,11 +563,9 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_RoomCompleteEvent(self, event):
-        """This method is called when everything
-           is fetched and ready after a
-           RoomCompleteEvent. Here you should 
-           set up the main screen and display 
-           some Map elements and Entities.
+        """Called when everything is fetched and ready after a RoomCompleteEvent.
+           Here you should set up the main screen and display some Map
+           elements and Entities.
         """
 
         self.logger.debug("called")
@@ -616,12 +575,10 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_CanSpeakEvent(self, event):
-        """This method is called when the PresentationEngine
-           needs to render a CanSpeakEvent. You have to
-           prompt for appropriate user input here and
-           add a corresponding SaysEvent to
-           self.message_for_host, which is evaluated by
-           the ControlEngine. The default implementation
+        """Called when the PresentationEngine needs to render a CanSpeakEvent.
+           You have to prompt for appropriate user input here and add a
+           corresponding SaysEvent to self.message_for_host, which is
+           evaluated by the ControlEngine. The default implementation
            makes the player say "blah". 
         """
 
@@ -638,13 +595,10 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_SpawnEvent(self, event):
-        """This method is called with an instance
-           of SpawnEvent to be displayed.
-           You should supply the Entity with
-           self.presentation_engine as done in the
-           default implementation. Then add the new
-           Enties to a list of visible Entities you
-           might have set up and render a static frame.
+        """This method is called with an instance of SpawnEvent to be displayed.
+           You should supply the Entity with self.presentation_engine as done
+           in the default implementation. Then add the new Enties to a list of
+           visible Entities you might have set up and render a static frame.
         """
 
         self.logger.debug("called")
@@ -656,13 +610,11 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_DeleteEvent(self, event):
-        """This method is called with an instance
-           of DeleteEvent. You need to remove the
-           Entites affected from your data
-           structures and draw a frame without
-           the deleted Entities.
-           Note that the Entities to be removed are
-           already gone in self.room.
+        """This method is called with an instance of DeleteEvent.
+           You need to remove the Entites affected from your data
+           structures and draw a frame without the deleted Entities.
+           Note that the Entities to be removed are already gone
+           in self.room.
         """
 
         self.logger.debug("called")
@@ -672,13 +624,12 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_ChangeMapElementEvent(self, event):
-        """This method is called with a list of
-           instances of ChangeMapElementEvent.
-           In this method you must implement a
-           major redraw of the display, updating all
-           Map elements and after that all Entities.
+        """Called with a list of instances of ChangeMapElementEvent.
+           In this method you must implement a major redraw of the display,
+           updating all Map elements and after that all Entities.
            This is only a single frame though.
-           Note that event_list may be empty."""
+           Note that event_list may be empty.
+        """
 
         self.logger.debug("called")
 
@@ -687,16 +638,12 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_PerceptionEvent(self, event):
-        """This method is called with a list of
-           instances of PerceptionEvent. You
-           have to provide an implementation
-           whicht displays them one by one, 
-           possibly awaiting user confirmation.
-           event_list may be empty. Please do
-           not continue animation of other
-           Entities during the perception so
-           there are no background actions 
-           which may pass unnoticed.
+        """Called with a list of instances of PerceptionEvent.
+           You have to provide an implementation whicht displays them
+           one by one, possibly awaiting user confirmation.
+           event_list may be empty. Please do not continue animation
+           of other Entities during the perception so there are no
+           background actions which may pass unnoticed.
         """
 
         self.logger.debug("called")
@@ -722,8 +669,7 @@ class PresentationEngine(shard.plugin.Plugin):
 
     def process_ChangeStateEvent(self, event):
         """Entity has already handled the Event.
-           Display a single frame to show the
-           result.
+           Display a single frame to show the result.
         """
 
         self.logger.debug("called")
@@ -745,10 +691,9 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_PicksUpEvent(self, event):
-        """Remove the target from all data
-           structures, then let the Entity
-           handle the Event. Possibly update
-           an inventory display.
+        """Remove the target from all data structures,
+           then let the Entity handle the Event.
+           Possibly update an inventory display.
         """
 
         self.logger.debug("called")
@@ -760,18 +705,14 @@ class PresentationEngine(shard.plugin.Plugin):
         return           
 
     def process_SaysEvent(self, event):
-        """This method is called with an instance
-           of SaysEvent when the PresentationEngine
-           is ready to display what Entities say.
-           In this method you have to compute a
-           number of frames for displaying text and
-           animation for each SaysEvent depending
-           on how long the text is. Once you start
-           displaying the text, you have to notify
-           the affected Entity. You should catch
-           some user confirmation. Consider not to
-           continue  animation of other Entities so
-           there are no background actions which may
+        """Called with an instance of SaysEvent
+           when the PresentationEngine is ready to display what Entities say.
+           In this method you have to compute a number of frames for
+           displaying text and animation for each SaysEvent depending
+           on how long the text is. Once you start displaying the text,
+           you have to notify the affected Entity. You should catch
+           some user confirmation. Consider not to continue  animation
+           of other Entities so there are no background actions which may
            pass unnoticed.
         """
 
@@ -799,10 +740,8 @@ class PresentationEngine(shard.plugin.Plugin):
     # Auxiliary methods
 
     def group_events(self, message):
-        """This method takes a shard.Message as
-           argument and returns a list of lists
-           of parallel events. The division is
-           simple: group all subsequent events
+        """Returns a list of lists of parallel events.
+           The division is simple: group all subsequent events
            that do not affect the same identifier.
         """
 

@@ -7,26 +7,16 @@ import shard
 import shard.eventprocessor
 
 class Plugin(shard.eventprocessor.EventProcessor):
-    """This is the base class for plugins
-       to be used by an instance of
-       shard.coreengine.CoreEngine.
+    """Base class for plugins to be used by a shard.coreengine.CoreEngine.
     """
 
     def __init__(self, logger):
-        """You can override this. Be sure to
-           call setup_plugin() like the default
-           implementation does.
-        """
-
-        self.setup_plugin(logger)
-
-    def setup_plugin(self, logger):
         """Initialize the plugin.
            logger is an instance of logging.Logger.
            The default implementation does nothing.
         """
 
-        self.setup_eventprocessor()
+        shard.eventprocessor.EventProcessor.__init__(self)
 
         self.logger = logger
 

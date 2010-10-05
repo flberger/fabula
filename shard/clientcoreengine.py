@@ -10,17 +10,18 @@ import datetime
 import cPickle
 
 class ClientCoreEngine(shard.coreengine.CoreEngine):
-    """An instance of this class is the main engine in every
-       Shard client. It connects to the Client Interface and
-       to the PresentationEngine, passes events and keeps track
-       of Entities. It is normally instantiated in shard.run.
+    """An instance of this class is the main engine in every Shard client.
+       It connects to the Client Interface and to the PresentationEngine,
+       passes events and keeps track of Entities.
+       It is normally instantiated in shard.run.
     """
 
     ####################
     # Init
 
     def __init__(self, player_id, interface_instance, presentation_engine_instance, logger):
-        """The ClientCoreEngine must be instantiated with an
+        """Initalisation.
+           The ClientCoreEngine must be instantiated with an
            instance of a subclass of shard.interfaces.Interface
            which handles the connection to the server or supplies
            events in some other way, and an instance of PresentationEngine
@@ -34,13 +35,13 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # First setup base class
         #
-        self.setup_eventprocessor()
+        shard.coreengine.shard.eventprocessor.EventProcessor.__init__(self)
 
         # Then setup CoreEngine internals
         #
-        self.setup_core_engine(interface_instance,
-                               presentation_engine_instance,
-                               logger)
+        shard.coreengine.CoreEngine.__init__(interface_instance,
+                                             presentation_engine_instance,
+                                             logger)
 
         # Now we have:
         #
@@ -97,8 +98,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     # Main Loop
 
     def run(self):
-        """Main loop of the ClientCoreEngine. This is
-           a blocking method. It calls all the process
+        """Main loop of the ClientCoreEngine.
+           This is a blocking method. It calls all the process
            methods to process events.
         """
 
@@ -544,8 +545,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                     self.await_confirmation = False
 
     def process_PicksUpEvent(self, event, **kwargs):
-        """The entity is deleted from the
-           Room and added to ClientCoreEngine.rack 
+        """The entity is deleted from the Room and added to ClientCoreEngine.rack 
         """
 
         # Call default
@@ -561,9 +561,9 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.await_confirmation = False
 
     def process_PerceptionEvent(self, event, **kwargs):
-        """A perception must be displayed by the 
-           PresentationEngine, so it is queued in a Message passed
-           from the ClientCoreEngine."""
+        """A perception must be displayed by the PresentationEngine,
+           so it is queued in a Message passed from the ClientCoreEngine.
+        """
 
         # That is a confirmation
         #
@@ -607,12 +607,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.logger.warn("Entity to delete does not exist.")
 
     def process_EnterRoomEvent(self, event, **kwargs):
-        """An EnterRoomEvent means the server is
-           about to send a new map, respawn the
-           player and send items and NPCs. So
-           this method empties all data 
-           structures and passes the event on to 
-           the PresentationEngine.
+        """This method empties all data structures and passes the event on
+           to the PresentationEngine since an EnterRoomEvent means the server
+           is about to send a new map, respawn the player and send items and
+           NPCs.
         """
 
         # Delete old room and create new
@@ -640,13 +638,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                                            message = kwargs["message"])
 
     def process_RoomCompleteEvent(self, event, **kwargs):
-        """RoomCompleteEvent notifies the client that
-           the player, all map elements, items and
-           NPCs have been transfered. By the time the
-           event arrives the ClientCoreEngine should
-           have saved all important data in data
-           structures. So the event is queued for
-           the PresentationEngine here."""
+        """The event is queued for the PresentationEngine here.
+           RoomCompleteEvent notifies the client that the player,
+           all map elements, items and NPCs have been transfered.
+           By the time the event arrives the ClientCoreEngine
+           should have saved all important data in data structures.
+        """
 
         # This is a convenience flag so the PresentationEngine
         # does not have to scan the event_list.

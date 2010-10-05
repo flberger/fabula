@@ -1,0 +1,4 @@
+*.pyc
+.bzrignore
+examples/shard
+commit.txt

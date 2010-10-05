@@ -11,9 +11,8 @@ import signal
 import time
 
 class ServerCoreEngine(shard.coreengine.CoreEngine):
-    """The ServerCoreEngine is the central management
-       and control authority in Shard. It relies
-       on the ServerInterface and the StoryEngine.
+    """The ServerCoreEngine is the central management and control authority in Shard.
+       It relies on the ServerInterface and the StoryEngine.
     """
 
     def __init__(self, framerate, interface_instance, plugin_instance, logger):
@@ -24,7 +23,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         # Setup base class
         #
-        self.setup_eventprocessor()
+        shard.coreengine.shard.eventprocessor.EventProcessor.__init__(self)
 
         # Now we have:
         #
@@ -34,9 +33,9 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     functions to be called for the respective
         #     event
 
-        self.setup_core_engine(interface_instance,
-                               plugin_instance,
-                               logger)
+        shard.coreengine.CoreEngine.__init__(interface_instance,
+                                             plugin_instance,
+                                             logger)
 
         # Now we have:
         #
@@ -121,8 +120,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         # TODO: restart plugin when SIGHUP is received
 
     def run(self):
-        """ServerCoreEngine main method, calling
-           the StoryEngine in the process.
+        """ServerCoreEngine main method, calling the StoryEngine in the process.
         """
 
         self.logger.info("starting")
@@ -348,8 +346,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         return
 
     def handle_exit(self, signalnum, frame):
-        """Stop the ServerCoreEngine when an
-           according OS signal is received.
+        """Stop the ServerCoreEngine when an according OS signal is received.
         """
 
         signal_dict = {2 : "SIGINT",
@@ -365,9 +362,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         return
 
     def process_TriesToMoveEvent(self, event, **kwargs):
-        """Test if the Entity is allowed to move
-           to the desired location, and append an
-           according event to the message.
+        """Test if the Entity is allowed to move to the desired location,
+           and append an according event to the message.
         """
 
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
@@ -516,8 +512,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         return
 
     def process_TriesToLookAtEvent(self, event, **kwargs):
-        """Check what is being looked at and
-           issue an according LookedAtEvent.
+        """Check what is being looked at and issue an according LookedAtEvent.
         """
 
         new_event = None
@@ -547,10 +542,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
     def process_TriesToManipulateEvent(self, event, **kwargs):
         """Check what is being manipulated,
-           replace event.target_identifier
-           with the identifier of the Entity
-           to be manipulated, then let the
-           Plugin handle the Event.
+           replace event.target_identifier with the identifier of the Entity
+           to be manipulated, then let the Plugin handle the Event.
         """
 
         # TODO: duplicate from / similar to process_TriesToLookAtEvent
@@ -582,10 +575,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
     def process_TriesToPickUpEvent(self, event, **kwargs):
         """Check what is being picked up,
-           replace event.target_identifier
-           with the identifier of the Entity
-           to be picked up, then let the
-           Plugin handle the Event.
+           replace event.target_identifier with the identifier of the Entity
+           to be picked up, then let the Plugin handle the Event.
         """
 
         # TODO: duplicate from TriesToManipulateEvent
@@ -684,8 +675,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         return
 
     def process_EnterRoomEvent(self, event, **kwargs):
-        """Register the client in the room and 
-           forward the Event.
+        """Register the client in the room and forward the Event.
         """
 
         # TODO: This is a hack. Implement correct handling of multiple rooms.
