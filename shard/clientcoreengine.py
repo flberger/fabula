@@ -7,7 +7,7 @@ import shard
 import shard.coreengine
 import time
 import datetime
-import cPickle
+import pickle
 
 class ClientCoreEngine(shard.coreengine.CoreEngine):
     """An instance of this class is the main engine in every Shard client.
@@ -155,7 +155,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                 #
                 # Add double newline as separator
                 #
-                self.message_log_file.write(cPickle.dumps((timedifference.seconds
+                self.message_log_file.write(pickle.dumps((timedifference.seconds
                                                           + timedifference.microseconds / 1000000.0,
                                                           server_message),
                                                          0) + "\n\n")

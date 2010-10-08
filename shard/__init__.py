@@ -1,5 +1,4 @@
-"""Shard - A Client-Server System for Interactive 
-   Storytelling by means of an Adventure Game Environment
+"""Shard - A Client-Server System for Interactive Storytelling by means of an Adventure Game Environment
 
    "Stories On A Grid"
 
@@ -11,7 +10,12 @@
 #
 # Transformed into a package on 22. September 2009.
 
-# TODO: reasonable package docstring above: what is where :)
+# TODO: reasonable package docstring above: what is where :) PEP 257: The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each.
+#
+# TODO: PEP 8: Comparisons to singletons like None should always be done with 'is' or 'is not', never the equality operators.
+# TODO: PEP 8: Don't compare boolean values to True or False using ==
+#
+# TODO: import shard.xyz also imports shard - so get rid of redundant imports
 #
 # TODO: "%s" % s instead of "s" + "s" in the whole package!
 #

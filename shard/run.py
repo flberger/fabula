@@ -1,4 +1,4 @@
-"""shard.run - Initialize and run Shard client and server
+"""Initialize and run Shard client and server
 
    (c) Florian Berger <fberger@florian-berger.de>
 """

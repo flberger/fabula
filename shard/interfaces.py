@@ -20,7 +20,7 @@ import shard
 from collections import deque
 
 import socket
-import SocketServer
+import socketserver
 
 # Importing the Twisted base module for executable makers
 #
@@ -31,7 +31,7 @@ import twisted.internet.protocol
 import twisted.internet.reactor
 import twisted.internet.task
 
-import cPickle
+import pickle
 
 import time
 
@@ -207,7 +207,7 @@ class UDPClientInterface(MessageBuffer, Interface):
 
         # Set up UDP socket
         # It wouldn't be unreasonable to also use
-        # a SocketServer on the client side. But
+        # a socketserver on the client side. But
         # since the client is only ever supposed
         # to handle one connection, direct socket
         # handling may be just right.
@@ -245,7 +245,7 @@ class UDPClientInterface(MessageBuffer, Interface):
 
                 # -1 = use highest available pickle protocol
                 #
-                self.sock.sendto(cPickle.dumps(self.messages_for_remote.popleft(), -1), 
+                self.sock.sendto(pickle.dumps(self.messages_for_remote.popleft(), -1), 
                                  self.address_port_tuple)
 
             # Now listen for incoming server
@@ -277,7 +277,7 @@ class UDPClientInterface(MessageBuffer, Interface):
                                   + str(len(data_received))
                                   + "/16384 bytes)")
 
-                self.messages_for_local.append(cPickle.loads(data_received))
+                self.messages_for_local.append(pickle.loads(data_received))
 
         # Caught shutdown notification, stopping thread
         #
@@ -328,7 +328,7 @@ class UDPServerInterface(Interface):
         # to access variables of the ServerInterface
         # instance.
         #
-        class ShardRequestHandler(SocketServer.BaseRequestHandler):
+        class ShardRequestHandler(socketserver.BaseRequestHandler):
 
             def handle(self):
 
@@ -350,7 +350,7 @@ class UDPServerInterface(Interface):
                 # Append the message.
                 # (inbetween steps to avoid a long line ;-) )
                 #
-                message = cPickle.loads(self.request[0])
+                message = pickle.loads(self.request[0])
 
                 message_buffer = client_connections_proxy[self.client_address]
 
@@ -360,7 +360,7 @@ class UDPServerInterface(Interface):
 
         # End of class.
 
-        server = SocketServer.UDPServer(self.address_port_tuple, ShardRequestHandler)
+        server = socketserver.UDPServer(self.address_port_tuple, ShardRequestHandler)
 
         # Server timeout, so server.handle_request()
         # doesn't wait forever, which would prevent
@@ -395,7 +395,7 @@ class UDPServerInterface(Interface):
 
                     # -1 = use highest available pickle protocol
                     #
-                    server.socket.sendto(cPickle.dumps(message_buffer.messages_for_remote.popleft(), -1),
+                    server.socket.sendto(pickle.dumps(message_buffer.messages_for_remote.popleft(), -1),
                                          address_port_tuple)
 
         # Caught shutdown notification, stopping thread
@@ -483,7 +483,7 @@ class ProtocolMessageBuffer(MessageBuffer,
                                % (len(message),
                                   len(self.data_buffer)))
 
-            message = cPickle.loads(message)
+            message = pickle.loads(message)
 
             self.messages_for_local.append(message)
 
@@ -509,7 +509,7 @@ class ProtocolMessageBuffer(MessageBuffer,
             #
             # TODO: Check that double newlines are illegal in pickled data.
             #
-            pickled_message = cPickle.dumps(self.messages_for_remote.popleft(), -1)
+            pickled_message = pickle.dumps(self.messages_for_remote.popleft(), -1)
 
             self.transport.write(pickled_message + "\n\n")
 

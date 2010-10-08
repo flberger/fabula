@@ -1,0 +1,19 @@
+Doctests for the Shard Package
+==============================
+
+Core Modules and Imports
+------------------------
+
+First, make sure all core modules import fine:
+
+    >>> import shard
+    >>> import shard.assetengine
+    >>> import shard.coreengine
+    >>> import shard.clientcoreengine
+    >>> import shard.servercoreengine
+    >>> import shard.eventprocessor
+    >>> import shard.interfaces
+    >>> import shard.plugin
+    >>> import shard.presentationengine
+    >>> import shard.run
+    >>>
