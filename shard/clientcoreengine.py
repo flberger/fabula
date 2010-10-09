@@ -19,7 +19,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     ####################
     # Init
 
-    def __init__(self, player_id, interface_instance, presentation_engine_instance, logger):
+    def __init__(self, interface_instance, presentation_engine_instance, logger, player_id):
         """Initalisation.
            The ClientCoreEngine must be instantiated with an
            instance of a subclass of shard.interfaces.Interface
@@ -39,7 +39,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Then setup CoreEngine internals
         #
-        shard.coreengine.CoreEngine.__init__(interface_instance,
+        shard.coreengine.CoreEngine.__init__(self,
+                                             interface_instance,
                                              presentation_engine_instance,
                                              logger)
 
@@ -123,10 +124,10 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.logger.info("connection found, sending InitEvent")
 
-        # There is only one connection in the
-        # ClientInterface, so use the first one
+        # There is only one connection in the ClientInterface
         #
-        self.message_buffer = self.interface.connections.values()[0] 
+        for message_buffer in self.interface.connections.values():
+            self.message_buffer = message_buffer
 
         self.message_buffer.send_message(shard.Message([shard.InitEvent(self.player_id)]))
 

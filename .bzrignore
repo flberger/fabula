@@ -2,3 +2,4 @@
 .bzrignore
 examples/shard
 commit.txt
+*.log

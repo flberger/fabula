@@ -15,7 +15,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
        It relies on the ServerInterface and the StoryEngine.
     """
 
-    def __init__(self, framerate, interface_instance, plugin_instance, logger):
+    def __init__(self, interface_instance, plugin_instance, logger, framerate):
         """Initialize the ServerCoreEngine.
         """
 
@@ -33,7 +33,8 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     functions to be called for the respective
         #     event
 
-        shard.coreengine.CoreEngine.__init__(interface_instance,
+        shard.coreengine.CoreEngine.__init__(self,
+                                             interface_instance,
                                              plugin_instance,
                                              logger)
 

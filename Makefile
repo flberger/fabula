@@ -20,9 +20,11 @@ docs:
 	                                                --html-output doc/
 
 check:
+	@echo WARNING: using pylint for Python 2.x instead of 3.x.
 	pylint shard
 
 errors:
+	@echo WARNING: using pylint for Python 2.x instead of 3.x.
 	pylint --errors-only shard
 
 doctest:

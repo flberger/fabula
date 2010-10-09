@@ -17,7 +17,7 @@
 #
 # TODO: import shard.xyz also imports shard - so get rid of redundant imports
 #
-# TODO: "%s" % s instead of "s" + "s" in the whole package!
+# TODO: string.format() instead of "%s" % s or "s" + "s" in the whole package!
 #
 # TODO: use map() instead of "for" loops where applicable
 #
