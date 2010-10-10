@@ -16,6 +16,7 @@ import shard.presentationengine
 import shard.clientcoreengine
 import shard.plugin
 import shard.servercoreengine
+import shard.interfaces
 
 import _thread
 import logging
@@ -71,9 +72,9 @@ class App:
         #
         # Creating an instance without arguments defaults to STDERR.
         # 
-        stderr_handler = logging.StreamHandler()
+        self.stderr_handler = logging.StreamHandler()
 
-        stderr_handler.setLevel(logging.DEBUG)
+        self.stderr_handler.setLevel(logging.DEBUG)
 
         # Loglevel:
         # "\x1b\x5b\x33\x32\x6d"
@@ -85,16 +86,16 @@ class App:
                                              + "\x1b\x5b\x33\x39\x6d"
                                              + "%(message)s")
 
-        stderr_handler.setFormatter(stderr_formatter)
+        self.stderr_handler.setFormatter(stderr_formatter)
 
         # File handler
         # TODO: Different file names for client and server?
         # TODO: Checking for existing file, creating a new one?
         #
-        file_handler = logging.FileHandler(filename = "shard.log",
+        self.file_handler = logging.FileHandler(filename = "shard.log",
                                            mode = "w")
 
-        file_handler.setLevel(logging.DEBUG)
+        self.file_handler.setLevel(logging.DEBUG)
 
         # Loglevel:
         # + "%(levelname)-5s "
@@ -104,13 +105,12 @@ class App:
                                            ,
                                            "%Y-%m-%d %H:%M:%S")
 
-        file_handler.setFormatter(file_formatter)
+        self.file_handler.setFormatter(file_formatter)
 
         # Add handlers
         #
-        self.logger.addHandler(stderr_handler)
-
-        self.logger.addHandler(file_handler)
+        self.logger.addHandler(self.stderr_handler)
+        self.logger.addHandler(self.file_handler)
 
         # Done with logging setup.
 
@@ -140,9 +140,8 @@ class App:
                                                          player_id)
 
         def exit():
-            from shard.interfaces import MessageBuffer
             sleep(3)
-            client.interface.connections["server"] = MessageBuffer()
+            client.interface.connections["server"] = shard.interfaces.MessageBuffer()
             plugin.exit_requested = True
 
         self.run(interface, client, exit)
@@ -186,5 +185,112 @@ class App:
         core_engine_instance.run()
 
         # CoreEngine returned. Close logger.
+        # Explicitly remove handlers to avoid multiple handlers
+        # when recreating the instance.
         #
+        self.logger.removeHandler(self.stderr_handler)
+        self.logger.removeHandler(self.file_handler)
+        logging.shutdown()
+
+    def run_standalone(self, framerate, player_id):
+        """Run Shard client and server on the local machine.
+        """
+
+        # Setting up interfaces
+        #
+        server_interface = shard.interfaces.Interface(None, self.logger)
+        server_message_buffer = shard.interfaces.MessageBuffer()
+        server_interface.connections["client_connection"] = server_message_buffer
+
+        client_interface = shard.interfaces.Interface(None, self.logger)
+        client_message_buffer = shard.interfaces.MessageBuffer()
+        client_interface.connections["server_connection"] = client_message_buffer
+
+        # Proxy for function
+        #
+        logger = self.logger
+
+        def handle_messages():
+            logger.debug("starting up")
+
+            # Run thread as long as no shutdown is requested
+            #
+            while not (server_interface.shutdown_flag
+                       or server_interface.shutdown_flag):
+
+                if len(server_message_buffer.messages_for_remote):
+                    message = server_message_buffer.messages_for_remote.popleft()
+                    client_message_buffer.messages_for_local.append(message)
+
+                if len(client_message_buffer.messages_for_remote):
+                    message = client_message_buffer.messages_for_remote.popleft()
+                    server_message_buffer.messages_for_local.append(message)
+
+            # Caught shutdown notification, stopping thread
+            #
+            logger.info("shutting down")
+
+            server_interface.shutdown_confirmed = True
+            client_interface.shutdown_confirmed = True
+
+            raise SystemExit
+
+        self.logger.info("running in standalone mode, logging client and server")
+        self.logger.info("running with framerate {}/s".format(framerate))
+        self.logger.info("player_id: {}".format(player_id))
+
+        # Setting up client
+        #
+        asset_engine = self.asset_engine_class(self.logger)
+
+        presentation_engine = self.presentation_engine_class(asset_engine,
+                                                             framerate,
+                                                             self.logger)
+
+        client = shard.clientcoreengine.ClientCoreEngine(client_interface,
+                                                         presentation_engine,
+                                                         self.logger,
+                                                         player_id)
+        # Setting up server
+        #
+        server_plugin = self.server_plugin_class(self.logger)
+
+        server = shard.servercoreengine.ServerCoreEngine(server_interface,
+                                                         server_plugin,
+                                                         self.logger,
+                                                         framerate)
+
+        # exit function for testing
+        #
+        def exit():
+            sleep(3)
+            presentation_engine.exit_requested = True
+            server.handle_exit(2, None)
+
+        # Starting threads
+        #
+        _thread.start_new_thread(handle_messages, ())
+
+        _thread.start_new_thread(client.run, ())
+
+        # Exit trigger for non-interactive unit tests
+        #
+        if self.test:
+            _thread.start_new_thread(exit, ())
+
+        # This method will block until the server exits.
+        # Cannot be put in a thread since the server installs signal handlers.
+        #
+        server.run()
+
+        # Just to be sure
+        #
+        sleep(3)
+
+        # CoreEngine returned. Close logger.
+        # Explicitly remove handlers to avoid multiple handlers
+        # when recreating the instance.
+        #
+        self.logger.removeHandler(self.stderr_handler)
+        self.logger.removeHandler(self.file_handler)
         logging.shutdown()

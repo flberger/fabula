@@ -25,6 +25,7 @@
 # TODO: most prominently: message.event_list.append -> message.append
 #
 # TODO: readable __repr__ of all shard objects: Room, Tile, ...
+# TODO: use instance.__class__.__name__ and __module__ in repr
 #
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 #
