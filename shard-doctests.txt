@@ -7,14 +7,14 @@ Core Modules and Imports
 First, make sure all core modules import fine:
 
     >>> import shard
-    >>> import shard.assetengine
-    >>> import shard.coreengine
-    >>> import shard.clientcoreengine
-    >>> import shard.servercoreengine
+    >>> import shard.assets
+    >>> import shard.core
+    >>> import shard.core.client
+    >>> import shard.core.server
     >>> import shard.eventprocessor
     >>> import shard.interfaces
     >>> import shard.plugin
-    >>> import shard.presentationengine
+    >>> import shard.user
     >>> import shard.run
     >>>
 

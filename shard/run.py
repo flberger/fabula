@@ -11,11 +11,11 @@
 #
 # Converted from run_shard.py on 06. Oct 2009
 
-import shard.assetengine
-import shard.presentationengine
-import shard.clientcoreengine
+import shard.assets
+import shard.user
+import shard.core.client
 import shard.plugin
-import shard.servercoreengine
+import shard.core.server
 import shard.interfaces
 
 import _thread
@@ -116,8 +116,8 @@ class App:
 
         self.test = test
 
-        self.asset_engine_class = shard.assetengine.AssetEngine
-        self.presentation_engine_class = shard.presentationengine.PresentationEngine
+        self.asset_engine_class = shard.assets.AssetEngine
+        self.presentation_engine_class = shard.user.PresentationEngine
         self.server_plugin_class = shard.plugin.Plugin
 
     def run_client(self, framerate, interface, player_id):
@@ -134,7 +134,7 @@ class App:
                                                 framerate,
                                                 self.logger)
 
-        client = shard.clientcoreengine.ClientCoreEngine(interface,
+        client = shard.core.client.ClientCoreEngine(interface,
                                                          plugin,
                                                          self.logger,
                                                          player_id)
@@ -155,7 +155,7 @@ class App:
 
         plugin = self.server_plugin_class(self.logger)
 
-        server = shard.servercoreengine.ServerCoreEngine(interface,
+        server = shard.core.server.ServerCoreEngine(interface,
                                                          plugin,
                                                          self.logger,
                                                          framerate)
@@ -247,7 +247,7 @@ class App:
                                                              framerate,
                                                              self.logger)
 
-        client = shard.clientcoreengine.ClientCoreEngine(client_interface,
+        client = shard.core.client.ClientCoreEngine(client_interface,
                                                          presentation_engine,
                                                          self.logger,
                                                          player_id)
@@ -255,7 +255,7 @@ class App:
         #
         server_plugin = self.server_plugin_class(self.logger)
 
-        server = shard.servercoreengine.ServerCoreEngine(server_interface,
+        server = shard.core.server.ServerCoreEngine(server_interface,
                                                          server_plugin,
                                                          self.logger,
                                                          framerate)

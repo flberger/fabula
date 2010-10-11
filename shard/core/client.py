@@ -4,12 +4,12 @@
 # Extracted from shard.py on 22. Sep 2009
 
 import shard
-import shard.coreengine
+import shard.core
 import time
 import datetime
 import pickle
 
-class ClientCoreEngine(shard.coreengine.CoreEngine):
+class ClientCoreEngine(shard.core.CoreEngine):
     """An instance of this class is the main engine in every Shard client.
        It connects to the Client Interface and to the PresentationEngine,
        passes events and keeps track of Entities.
@@ -35,11 +35,11 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # First setup base class
         #
-        shard.coreengine.shard.eventprocessor.EventProcessor.__init__(self)
+        shard.core.shard.eventprocessor.EventProcessor.__init__(self)
 
         # Then setup CoreEngine internals
         #
-        shard.coreengine.CoreEngine.__init__(self,
+        shard.core.CoreEngine.__init__(self,
                                              interface_instance,
                                              presentation_engine_instance,
                                              logger)
@@ -465,7 +465,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default.
         #
-        shard.coreengine.CoreEngine.process_DropsEvent(self,
+        shard.core.CoreEngine.process_DropsEvent(self,
                                                        event,
                                                        message = kwargs["message"])
 
@@ -481,7 +481,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default.
         #
-        shard.coreengine.CoreEngine.process_ChangeStateEvent(self,
+        shard.core.CoreEngine.process_ChangeStateEvent(self,
                                                              event,
                                                              message = kwargs["message"])
 
@@ -530,7 +530,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             # Call default implementation
             #
-            shard.coreengine.CoreEngine.process_MovesToEvent(self,
+            shard.core.CoreEngine.process_MovesToEvent(self,
                                                              event,
                                                              message = kwargs["message"])
 
@@ -551,7 +551,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default
         #
-        shard.coreengine.CoreEngine.process_PicksUpEvent(self,
+        shard.core.CoreEngine.process_PicksUpEvent(self,
                                                          event,
                                                          message = kwargs["message"])
 
@@ -574,7 +574,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_PerceptionEvent(self,
+        shard.core.CoreEngine.process_PerceptionEvent(self,
                                                             event, 
                                                             message = kwargs["message"])
 
@@ -600,7 +600,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # lets self.room process the Event and
             # queues it in the Message given
             #
-            shard.coreengine.CoreEngine.process_DeleteEvent(self,
+            shard.core.CoreEngine.process_DeleteEvent(self,
                                                             event,
                                                             message = kwargs["message"])
 
@@ -634,7 +634,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_EnterRoomEvent(self,
+        shard.core.CoreEngine.process_EnterRoomEvent(self,
                                                            event,
                                                            message = kwargs["message"])
 
@@ -653,6 +653,6 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_RoomCompleteEvent(self,
+        shard.core.CoreEngine.process_RoomCompleteEvent(self,
                                                               event,
                                                               message = kwargs["message"])

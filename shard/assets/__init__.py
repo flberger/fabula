@@ -3,7 +3,7 @@
 
 # Extracted from shard.py on 22. Sep 2009
 
-from . import ShardException
+from shard import ShardException
 
 class AssetEngine:
     '''This is the base class for an AssetEngine.

@@ -6,11 +6,11 @@
 # Detailed work started on 30. Sep 2009
 
 import shard
-import shard.coreengine
+import shard.core
 import signal
 import time
 
-class ServerCoreEngine(shard.coreengine.CoreEngine):
+class ServerCoreEngine(shard.core.CoreEngine):
     """The ServerCoreEngine is the central management and control authority in Shard.
        It relies on the ServerInterface and the StoryEngine.
     """
@@ -23,7 +23,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
 
         # Setup base class
         #
-        shard.coreengine.shard.eventprocessor.EventProcessor.__init__(self)
+        shard.core.shard.eventprocessor.EventProcessor.__init__(self)
 
         # Now we have:
         #
@@ -33,7 +33,7 @@ class ServerCoreEngine(shard.coreengine.CoreEngine):
         #     functions to be called for the respective
         #     event
 
-        shard.coreengine.CoreEngine.__init__(self,
+        shard.core.CoreEngine.__init__(self,
                                              interface_instance,
                                              plugin_instance,
                                              logger)

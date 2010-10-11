@@ -7,7 +7,7 @@ import shard
 import shard.eventprocessor
 
 class Plugin(shard.eventprocessor.EventProcessor):
-    """Base class for plugins to be used by a shard.coreengine.CoreEngine.
+    """Base class for plugins to be used by a shard.core.CoreEngine.
     """
 
     def __init__(self, logger):
