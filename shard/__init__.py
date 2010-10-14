@@ -259,7 +259,7 @@ class DropsEvent(ConfirmEvent):
 class CanSpeakEvent(ConfirmEvent):
     """This is a server invitation for the player or an NPC to speak.
        Since this event requires immediate user input, it is always
-       executed as the last event of a Message by the PresentationEngine.
+       executed as the last event of a Message by the UserInterface.
     """
 
     def __init__(self, identifier, sentences):
@@ -454,7 +454,7 @@ class ChangeMapElementEvent(ServerEvent):
     """This event changes a single element of the two-dimensional map.
        When sent in a Message, these events are executed immediately and
        in parallel upon the rendering of the
-       Message by the PresentationEngine.
+       Message by the UserInterface.
     """
     
     def __init__(self, tile, location):
@@ -507,7 +507,7 @@ class InitEvent(Event):
 class Message:
     """A Message manages an ordered list of shard events.
        Messages sent by the server describe the action
-       of a certain time frame. The PresentationEngine has to
+       of a certain time frame. The UserInterface has to
        decide which events happen in parallel and which 
        ones happen sequential. Instances of Message 
        expose a single Python list object as Message.event_list.
@@ -523,7 +523,7 @@ class Message:
     """
 
     def __init__(self, event_list):
-        """Initialize the Message with a list of objects derived from shard.Event.
+        """Initialise the Message with a list of objects derived from shard.Event.
            An empty list may be supplied.
         """
 
@@ -532,7 +532,7 @@ class Message:
         self.event_list = event_list
 
         # We attach custom flags to the Message created in
-        # setup() to notify the PresentationEngine whether
+        # setup() to notify the UserInterface whether
         # an EnterRoomEvent or RoomCompleteEvent occured,
         # so it does not have to scan the events.
         #
@@ -566,21 +566,21 @@ class Entity(shard.eventprocessor.EventProcessor):
 
        In addition,
 
-       Entity.presentation_engine
+       Entity.user_interface
 
-       is added by and points to the PresentationEngine.
+       is added by and points to the UserInterface.
 
        A Shard Client should use subclasses (possibly
        with multiple inheritance) or custom attachements
        to instances of this class to implement the
        game objects used by the rendering engine (2D
-       sprites, 3D models). Usually the ClientCoreEngine
+       sprites, 3D models). Usually the Client
        manages a list of Entity instances. Everything
        concernig the actual graphical representation is
-       done by the PresentationEngine. Since this is very
+       done by the UserInterface. Since this is very
        application dependent it is not covered in the
        base class. Check the documentation and source of 
-       the PresentationEngine for further insight on how it 
+       the UserInterface for further insight on how it 
        handles game objects.
     """
 
@@ -601,7 +601,7 @@ class Entity(shard.eventprocessor.EventProcessor):
                the Entity. Do not put large objects here since
                Entities are pushed around quite a bit and
                transfered across the network.
-               The PresentationEngine may fetch the asset and
+               The UserInterface may fetch the asset and
                attach it to the instance of the Entity.
 
            Entity.state
@@ -621,12 +621,12 @@ class Entity(shard.eventprocessor.EventProcessor):
 
     # EventProcessor overrides
     #
-    # These are called by the PresentationEngine,
+    # These are called by the UserInterface,
     # which also has added the Entity.framerate
     # and Entity.action_frames attributes
 
     def process_MovesToEvent(self, event):
-        """This method is called by the PresentationEngine.
+        """This method is called by the UserInterface.
            The Entity representation has to execute the
            according action over the course of Entity.action_frames frames.
            But it must du so in an non-blocking fashion -
@@ -638,7 +638,7 @@ class Entity(shard.eventprocessor.EventProcessor):
         pass
 
     def process_ChangeStateEvent(self, event):
-        """This method is called by the PresentationEngine.
+        """This method is called by the UserInterface.
            The Entity representation has to execute the
            according action over the course of Entity.action_frames frames.
            But it must du so in an non-blocking fashion -
@@ -650,7 +650,7 @@ class Entity(shard.eventprocessor.EventProcessor):
         self.state = event.state
 
     def process_DropsEvent(self, event):
-        """This method is called by the PresentationEngine.
+        """This method is called by the UserInterface.
            The Entity representation has to execute the
            according action over the course of Entity.action_frames frames.
            But it must du so in an non-blocking fashion -
@@ -662,7 +662,7 @@ class Entity(shard.eventprocessor.EventProcessor):
         pass
 
     def process_PicksUpEvent(self, event):
-        """This method is called by the PresentationEngine.
+        """This method is called by the UserInterface.
            The Entity representation has to execute the
            according action over the course of Entity.action_frames frames.
            But it must du so in an non-blocking fashion -
@@ -674,7 +674,7 @@ class Entity(shard.eventprocessor.EventProcessor):
         pass
 
     def process_SaysEvent(self, event):
-        """This method is called by the PresentationEngine.
+        """This method is called by the UserInterface.
            The Entity representation has to execute the
            according action over the course of Entity.action_frames frames.
            But it must du so in an non-blocking fashion -
@@ -725,8 +725,8 @@ class Tile:
 
 class Room(shard.eventprocessor.EventProcessor):
     """A Room instance saves the map as well as Entities and their locations.
-       It is maintained for the current room in the ClientCoreEngine
-       and for all active rooms in the ServerCoreEngine.
+       It is maintained for the current room in the Client
+       and for all active rooms in the Server.
 
        Room.entity_dict
            A dict of all Entities in this room,
@@ -754,7 +754,7 @@ class Room(shard.eventprocessor.EventProcessor):
     """
 
     def __init__(self):
-        """Initialize a room.
+        """Initialise a room.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
@@ -894,7 +894,7 @@ class FloorPlanElement:
 
 class Rack:
     """A Rack stores Entities removed from a room.
-       An instance of Rack is used by each CoreEngine.
+       An instance of Rack is used by each Engine.
 
        Rack.entity_dict
            Maps identifiers to Entities.

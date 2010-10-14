@@ -30,21 +30,21 @@ Entity.state
 
 In addition,
 
-Entity.presentation_engine
+Entity.user_interface
 
-is added by and points to the PresentationEngine.
+is added by and points to the UserInterface.
 
 A Shard Client should use subclasses (possibly
 with multiple inheritance) or custom attachements
 to instances of this class to implement the
 game objects used by the rendering engine (2D
-sprites, 3D models). Usually the ClientCoreEngine
+sprites, 3D models). Usually the Client
 manages a list of Entity instances. Everything
 concernig the actual graphical representation is
-done by the PresentationEngine. Since this is very
+done by the UserInterface. Since this is very
 application dependent it is not covered in the
 base class. Check the documentation and source of 
-the PresentationEngine for further insight on how it 
+the UserInterface for further insight on how it 
 handles game objects.</pre>
 
     
@@ -64,31 +64,31 @@ handles game objects.</pre>
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>This method is called by the PresentationEngine.</tt></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>This method is called by the PresentationEngine.</tt></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>This method is called by the PresentationEngine.</tt></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>This method is called by the PresentationEngine.</tt></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.Entity.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>This method is called by the PresentationEngine.</tt></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
   </tr>
   
 </table>
@@ -260,7 +260,7 @@ Entity.asset
     the Entity. Do not put large objects here since
     Entities are pushed around quite a bit and
     transfered across the network.
-    The PresentationEngine may fetch the asset and
+    The UserInterface may fetch the asset and
     attach it to the instance of the Entity.
 
 Entity.state
@@ -281,7 +281,7 @@ Entity.state
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
-    <pre>This method is called by the PresentationEngine.
+    <pre>This method is called by the UserInterface.
 The Entity representation has to execute the
 according action over the course of Entity.action_frames frames.
 But it must du so in an non-blocking fashion -
@@ -305,7 +305,7 @@ once per frame, do the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
-    <pre>This method is called by the PresentationEngine.
+    <pre>This method is called by the UserInterface.
 The Entity representation has to execute the
 according action over the course of Entity.action_frames frames.
 But it must du so in an non-blocking fashion -
@@ -329,7 +329,7 @@ once per frame, do the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
-    <pre>This method is called by the PresentationEngine.
+    <pre>This method is called by the UserInterface.
 The Entity representation has to execute the
 according action over the course of Entity.action_frames frames.
 But it must du so in an non-blocking fashion -
@@ -353,7 +353,7 @@ once per frame, do the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
-    <pre>This method is called by the PresentationEngine.
+    <pre>This method is called by the UserInterface.
 The Entity representation has to execute the
 according action over the course of Entity.action_frames frames.
 But it must du so in an non-blocking fashion -
@@ -377,7 +377,7 @@ once per frame, do the actual work there.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
-    <pre>This method is called by the PresentationEngine.
+    <pre>This method is called by the UserInterface.
 The Entity representation has to execute the
 according action over the course of Entity.action_frames frames.
 But it must du so in an non-blocking fashion -
@@ -388,7 +388,7 @@ once per frame, do the actual work there.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-10 02:11:13.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-14 20:40:01.
     </address>
   </body>
 </html>

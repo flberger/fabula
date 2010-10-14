@@ -1,4 +1,4 @@
-"""Shard Server Core Engine
+"""Shard Server Engine
 """
 
 # Started with a dummy implementation on 25. Sep 2009
@@ -10,13 +10,13 @@ import shard.core
 import signal
 import time
 
-class ServerCoreEngine(shard.core.CoreEngine):
-    """The ServerCoreEngine is the central management and control authority in Shard.
+class Server(shard.core.Engine):
+    """The Server is the central management and control authority in Shard.
        It relies on the ServerInterface and the StoryEngine.
     """
 
     def __init__(self, interface_instance, plugin_instance, logger, framerate):
-        """Initialize the ServerCoreEngine.
+        """Initialise the Server.
         """
 
         self.interval = 1.0 / framerate
@@ -33,10 +33,10 @@ class ServerCoreEngine(shard.core.CoreEngine):
         #     functions to be called for the respective
         #     event
 
-        shard.core.CoreEngine.__init__(self,
-                                             interface_instance,
-                                             plugin_instance,
-                                             logger)
+        shard.core.Engine.__init__(self,
+                                   interface_instance,
+                                   plugin_instance,
+                                   logger)
 
         # Now we have:
         #
@@ -121,7 +121,7 @@ class ServerCoreEngine(shard.core.CoreEngine):
         # TODO: restart plugin when SIGHUP is received
 
     def run(self):
-        """ServerCoreEngine main method, calling the StoryEngine in the process.
+        """Server main method, calling the StoryEngine in the process.
         """
 
         self.logger.info("starting")
@@ -164,8 +164,8 @@ class ServerCoreEngine(shard.core.CoreEngine):
                                                          message = self.message_for_plugin,
                                                          client_key = address_port_tuple)
 
-                        # Contrary to the ClientCoreEngine, the
-                        # ServerCoreEngine calls its plugin engine
+                        # Contrary to the Client, the
+                        # Server calls its plugin engine
                         # on an event-by-event rather than on a
                         # message-by-message base to allow for
                         # quick and real-time reaction.
@@ -241,8 +241,7 @@ class ServerCoreEngine(shard.core.CoreEngine):
         # are queued for the remote host, not
         # the plugin.
         #
-        # TODO: could we be required to send any new events to the story engine?
-        #       But this could become an infinite loop!
+        # TODO: could we be required to send any new events to the story engine? But this could become an infinite loop!
         #
         for event in message_from_plugin.event_list:
 
@@ -287,7 +286,7 @@ class ServerCoreEngine(shard.core.CoreEngine):
             # We also broadcast all SpawnEvents. That means
             # that when a new client joins, all entities
             # (in the current room) are respawned.
-            # process_SpawnEvent in the core engine will
+            # process_SpawnEvent in the engine will
             # filter duplicate entities, so no harm done.
             # 
             # TODO: respawning might cause some loss of internal entity state
@@ -347,7 +346,7 @@ class ServerCoreEngine(shard.core.CoreEngine):
         return
 
     def handle_exit(self, signalnum, frame):
-        """Stop the ServerCoreEngine when an according OS signal is received.
+        """Stop the Server when an according OS signal is received.
         """
 
         signal_dict = {2 : "SIGINT",
@@ -628,7 +627,7 @@ class ServerCoreEngine(shard.core.CoreEngine):
            Plugin.
         """
 
-        # TODO: These checks are so fundamental that they should probably be the default in CoreEngine.process_TriesToDropEvent
+        # TODO: These checks are so fundamental that they should probably be the default in Engine.process_TriesToDropEvent
         # TODO: What about Entities in walls?
 
         self.logger.debug("called")

@@ -1,4 +1,4 @@
-"""Initialize and run Shard client and server
+"""Initialise and run Shard client and server
 
    (c) Florian Berger <fberger@florian-berger.de>
 """
@@ -30,13 +30,13 @@ class App:
        App.logger
            Supply this to other instances of Shard classes.
 
-       App.asset_engine_class
+       App.assets_class
            Class of the asset engine to be used.
            This should be adjusted from the outside after creating
            an App instance.
 
-       App.presentation_engine_class
-           Class of the presentation engine to be used.
+       App.user_interface_class
+           Class of the user interface to be used.
            This should be adjusted from the outside after creating
            an App instance.
 
@@ -52,7 +52,7 @@ class App:
            loglevel is one of "d" (DEBUG), "i" (INFO), "w" (WARNING),
            "e" (ERROR), "c" (CRITICAL).
 
-           When called with test = True, the core engine will receive an
+           When called with test = True, the engine will receive an
            exit signal after some seconds. This feature is meant for unit tests.
         """
 
@@ -116,8 +116,8 @@ class App:
 
         self.test = test
 
-        self.asset_engine_class = shard.assets.AssetEngine
-        self.presentation_engine_class = shard.user.PresentationEngine
+        self.assets_class = shard.assets.Assets
+        self.user_interface_class = shard.user.UserInterface
         self.server_plugin_class = shard.plugin.Plugin
 
     def run_client(self, framerate, interface, player_id):
@@ -128,16 +128,16 @@ class App:
         self.logger.info("running with framerate {}/s".format(framerate))
         self.logger.info("player_id: {}".format(player_id))
 
-        asset_engine = self.asset_engine_class(self.logger)
+        assets = self.assets_class(self.logger)
 
-        plugin = self.presentation_engine_class(asset_engine,
-                                                framerate,
-                                                self.logger)
+        plugin = self.user_interface_class(assets,
+                                           framerate,
+                                           self.logger)
 
-        client = shard.core.client.ClientCoreEngine(interface,
-                                                         plugin,
-                                                         self.logger,
-                                                         player_id)
+        client = shard.core.client.Client(interface,
+                                          plugin,
+                                          self.logger,
+                                          player_id)
 
         def exit():
             sleep(3)
@@ -155,17 +155,17 @@ class App:
 
         plugin = self.server_plugin_class(self.logger)
 
-        server = shard.core.server.ServerCoreEngine(interface,
-                                                         plugin,
-                                                         self.logger,
-                                                         framerate)
+        server = shard.core.server.Server(interface,
+                                          plugin,
+                                          self.logger,
+                                          framerate)
         def exit():
             sleep(3)
             server.handle_exit(2, None)
 
         self.run(interface, server, exit)
 
-    def run(self, interface, core_engine_instance, exit_function):
+    def run(self, interface, engine_instance, exit_function):
         """Helper method to be called from run_client() or run_server().
         """
 
@@ -180,11 +180,11 @@ class App:
         if self.test and exit_function is not None:
             _thread.start_new_thread(exit_function, ())
 
-        # This method will block until the CoreEngine exits
+        # This method will block until the Engine exits
         #
-        core_engine_instance.run()
+        engine_instance.run()
 
-        # CoreEngine returned. Close logger.
+        # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
         # when recreating the instance.
         #
@@ -241,21 +241,21 @@ class App:
 
         # Setting up client
         #
-        asset_engine = self.asset_engine_class(self.logger)
+        assets = self.assets_class(self.logger)
 
-        presentation_engine = self.presentation_engine_class(asset_engine,
+        user_interface = self.user_interface_class(assets,
                                                              framerate,
                                                              self.logger)
 
-        client = shard.core.client.ClientCoreEngine(client_interface,
-                                                         presentation_engine,
+        client = shard.core.client.Client(client_interface,
+                                                         user_interface,
                                                          self.logger,
                                                          player_id)
         # Setting up server
         #
         server_plugin = self.server_plugin_class(self.logger)
 
-        server = shard.core.server.ServerCoreEngine(server_interface,
+        server = shard.core.server.Server(server_interface,
                                                          server_plugin,
                                                          self.logger,
                                                          framerate)
@@ -264,7 +264,7 @@ class App:
         #
         def exit():
             sleep(3)
-            presentation_engine.exit_requested = True
+            user_interface.exit_requested = True
             server.handle_exit(2, None)
 
         # Starting threads
@@ -287,7 +287,7 @@ class App:
         #
         sleep(3)
 
-        # CoreEngine returned. Close logger.
+        # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
         # when recreating the instance.
         #

@@ -1,4 +1,4 @@
-"""Shard Core Engine Plugin Base Class
+"""Shard Engine Plugin Base Class
 """
 
 # Work started on 30. Sep 2009
@@ -7,11 +7,11 @@ import shard
 import shard.eventprocessor
 
 class Plugin(shard.eventprocessor.EventProcessor):
-    """Base class for plugins to be used by a shard.core.CoreEngine.
+    """Base class for plugins to be used by a shard.core.Engine.
     """
 
     def __init__(self, logger):
-        """Initialize the plugin.
+        """Initialise the plugin.
            logger is an instance of logging.Logger.
            The default implementation does nothing.
         """

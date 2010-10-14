@@ -1,0 +1,445 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;shard.core.server.Server&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class s.c.s.Server(<a href="shard.core.Engine.html">shard.core.Engine</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.core.html">core</a>.<a href="shard.core.server.html">server</a></span>
+      
+      <a href="classIndex.html#shard.core.server.Server">View In Hierarchy</a>
+    </p>
+    <div>
+      
+    </div>
+    <pre>The Server is the central management and control authority in Shard.
+It relies on the ServerInterface and the StoryEngine.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id83">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#__init__">__init__</a></td>
+    <td><tt>Initialise the Server.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#run">run</a></td>
+    <td><tt>Server main method, calling the StoryEngine in the process.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#call_plugin">call_plugin</a></td>
+    <td><tt>Call Plugin and process Plugin message.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#handle_exit">handle_exit</a></td>
+    <td><tt>Stop the Server when an according OS signal is received.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Test if the Entity is allowed to move to the desired location,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Check if we already have a room and</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Check what is being looked at and issue an according LookedAtEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Check what is being manipulated,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Check what is being picked up,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>If event.identifier does not own</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.server.Server.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Register the client in the room and forward the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.core.Engine.html">Engine</a>:
+        </p>
+        <table class="children sortable" id="id84">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Let self.room process the event and pass it on.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Save the Entity to be picked up in Engine.rack,</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Respawn the Entity to be dropped in Engine.room,</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Let the Entity handle the Event. Then add the event to the message.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Let self.room process the event and pass it on.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Save the Entity to be deleted in Engine.rack,</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Let the shard.Room instance in self.room process the Event</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="shard.core.server.Server.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, interface_instance, plugin_instance, logger, framerate):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#__init__">shard.core.Engine.__init__</a></div>
+    <pre>Initialise the Server.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.run">
+    
+  </a>
+  <a name="run">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    run(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#run">shard.core.Engine.run</a></div>
+    <pre>Server main method, calling the StoryEngine in the process.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.call_plugin">
+    
+  </a>
+  <a name="call_plugin">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    call_plugin(self, address_port_tuple):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call Plugin and process Plugin message.
+Auxiliary method.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.handle_exit">
+    
+  </a>
+  <a name="handle_exit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    handle_exit(self, signalnum, frame):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Stop the Server when an according OS signal is received.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_TriesToMoveEvent">
+    
+  </a>
+  <a name="process_TriesToMoveEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToMoveEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToMoveEvent">shard.core.Engine.process_TriesToMoveEvent</a></div>
+    <pre>Test if the Entity is allowed to move to the desired location,
+and append an according event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_InitEvent">
+    
+  </a>
+  <a name="process_InitEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_InitEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_InitEvent">shard.core.Engine.process_InitEvent</a></div>
+    <pre>Check if we already have a room and
+entities. If yes, send the data
+If not, pass on to the plugin.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_TriesToLookAtEvent">
+    
+  </a>
+  <a name="process_TriesToLookAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToLookAtEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToLookAtEvent">shard.core.Engine.process_TriesToLookAtEvent</a></div>
+    <pre>Check what is being looked at and issue an according LookedAtEvent.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_TriesToManipulateEvent">
+    
+  </a>
+  <a name="process_TriesToManipulateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToManipulateEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToManipulateEvent">shard.core.Engine.process_TriesToManipulateEvent</a></div>
+    <pre>Check what is being manipulated,
+replace event.target_identifier with the identifier of the Entity
+to be manipulated, then let the Plugin handle the Event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToPickUpEvent">shard.core.Engine.process_TriesToPickUpEvent</a></div>
+    <pre>Check what is being picked up,
+replace event.target_identifier with the identifier of the Entity
+to be picked up, then let the Plugin handle the Event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToDropEvent">shard.core.Engine.process_TriesToDropEvent</a></div>
+    <pre>If event.identifier does not own
+event.item_identifier in self.rack,
+the attempt fails.
+
+If event.target_identifier is not
+shard.FLOOR, the attempt fails.
+
+If event.target_identifier is
+shard.FLOOR and there is no Entity
+on it, pass event on to the Plugin.
+
+If event.target_identifier is
+shard.FLOOR and there is an Entity
+on it, replace target_identifier with
+Entity.identifier and pass on to the
+Plugin.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.core.server.Server.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_EnterRoomEvent">shard.core.Engine.process_EnterRoomEvent</a></div>
+    <pre>Register the client in the room and forward the Event.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-14 20:40:01.
+    </address>
+  </body>
+</html>

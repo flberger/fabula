@@ -464,7 +464,7 @@ class UDPServerInterface(Interface):
 #        #   to buffer some data, as partial (or multiple)
 #        #   protocol messages may be received! I recommend
 #        #   that unit tests for protocols call through to
-#        #   this method with differing chunk sizes, down to
+#        #   this method with differing chunk sises, down to
 #        #   one byte at a time."
 
 #        self.logger.debug("received message: %s characters" % len(data))
