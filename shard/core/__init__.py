@@ -1,7 +1,6 @@
-"""Shard Core Engine Base Class
+"""Shard Engine Base Class
 
-   Based on former implementations of
-   the ClientControlEngine
+   Based on former implementations of the ClientControlEngine
 """
 
 # Work started on 30. Sep 2009
@@ -9,25 +8,24 @@
 import shard
 import shard.eventprocessor
 
-class CoreEngine(shard.eventprocessor.EventProcessor):
-    """Common base class for Shard server and client core engines.
-       Most likely you will want to override all of the methods
-       when subclassing CoreEngine, so the use of this class is
-       providing a structure for CoreEngines.
+class Engine(shard.eventprocessor.EventProcessor):
+    """Common base class for Shard server and client engines.
+       Most likely you will want to override all of the methods when subclassing
+       Engine, so the use of this class is providing a structure for Engines.
 
        Attributes:
 
-       CoreEngine.logger
-       CoreEngine.interface
-       CoreEngine.plugin
-       CoreEngine.message_for_plugin
-       CoreEngine.message_for_remote
-       CoreEngine.room
-       CoreEngine.rack
+       Engine.logger
+       Engine.interface
+       Engine.plugin
+       Engine.message_for_plugin
+       Engine.message_for_remote
+       Engine.room
+       Engine.rack
     """
 
     def __init__(self, interface_instance, plugin_instance, logger):
-        """Set up CoreEngine attributes.
+        """Set up Engine attributes.
 
            Arguments:
 
@@ -37,7 +35,7 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
                with the remote host.
 
            plugin_instance
-               Most CoreEngines will deploy a plugin
+               Most Engines will deploy a plugin
                engine to control or present the game.
 
            logger
@@ -56,16 +54,16 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         self.plugin = plugin_instance
 
-        # Attach reference to this CoreEngine
+        # Attach reference to this Engine
         # to the Plugin.
         #
         self.plugin.host = self
 
-        # The CoreEngine examines the events of a received
+        # The Engine examines the events of a received
         # Message and applies them. Events for special
         # consideration for the PluginEngine are collected
         # in a Message for the PluginEngine.
-        # The CoreEngine has to empty the Message once 
+        # The Engine has to empty the Message once 
         # the PluginEngine has processed all Events.
         #
         self.message_for_plugin = shard.Message([])
@@ -89,10 +87,10 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def run(self):
-        """This is the main loop of a CoreEngine.
-           Put all the business logic here. This
-           is a blocking method which should call
-           all the process methods to process events.
+        """This is the main loop of an Engine.
+           Put all the business logic here.
+           This is a blocking method which should call all the process methods
+           to process events.
         """
 
         self.logger.info("starting")
@@ -106,8 +104,7 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
 
         # exit has been requested
         
-        self.logger.info("exit requested from "
-              + "PluginEngine, shutting down interface...")
+        self.logger.info("exit requested from PluginEngine, shutting down interface...")
 
         # stop the Interface thread
         #
@@ -204,20 +201,20 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_PicksUpEvent(self, event, **kwargs):
-        """Save the Entity to be picked up in CoreEngine.rack,
-           delete the it from CoreEngine.room and pass the
+        """Save the Entity to be picked up in Engine.rack,
+           delete the it from Engine.room and pass the
            PicksUpEvent on.
         """
 
         self.logger.debug("called")
 
-        # Save the Entity to be picked up in CoreEngine.rack
+        # Save the Entity to be picked up in Engine.rack
         #
         picked_entity = self.room.entity_dict[event.item_identifier]
 
         self.rack.store(picked_entity, event.identifier)
 
-        # Delete it from CoreEngine.room
+        # Delete it from Engine.room
         #
         # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
         #
@@ -232,15 +229,15 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_DropsEvent(self, event, **kwargs):
-        """Respawn the Entity to be dropped in CoreEngine.room,
-           delete it from CoreEngine.rack
+        """Respawn the Entity to be dropped in Engine.room,
+           delete it from Engine.rack
            and pass the PicksUpEvent on.
         """
 
         self.logger.debug("called")
 
-        # Respawn the Entity to be dropped in CoreEngine.room
-        # Delete it from CoreEngine.rack
+        # Respawn the Entity to be dropped in Engine.room
+        # Delete it from Engine.rack
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
@@ -383,23 +380,23 @@ class CoreEngine(shard.eventprocessor.EventProcessor):
         return
 
     def process_DeleteEvent(self, event, **kwargs):
-        """Save the Entity to be deleted in CoreEngine.rack,
-           delete the it from CoreEngine.room and pass the DeleteEvent on.
+        """Save the Entity to be deleted in Engine.rack,
+           delete the it from Engine.room and pass the DeleteEvent on.
         """
 
         # TODO: very similar to PicksUpEvent
 
         self.logger.debug("called")
 
-        # Save the Entity to be deleted in CoreEngine.rack
+        # Save the Entity to be deleted in Engine.rack
         #
         deleted_entity = self.room.entity_dict[event.identifier]
 
-        # Entities stored by CoreEngine are owned by None
+        # Entities stored by Engine are owned by None
         #
         self.rack.store(deleted_entity, None)
 
-        # Delete it from CoreEngine.room
+        # Delete it from Engine.room
         #
         self.room.process_DeleteEvent(event)
 

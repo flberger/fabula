@@ -1,34 +1,34 @@
-"""Shard Presentation Engine
+"""Shard User Interface
 """
 
 # Extracted from shard.py on 22. Sep 2009
 #
 # Renamed from VisualEngine to PresentationEngine on 29. Sep 2009
+#
+# Renamed from PresentationEngine to UserInterface on 14. Oct 2010
 
 import shard
 import shard.plugin
 import time
 
-class PresentationEngine(shard.plugin.Plugin):
-    """This is the base class for a PresentationEngine for the Shard Client.
+class UserInterface(shard.plugin.Plugin):
+    """This is the base class for an UserInterface for the Shard Client.
        Subclasses should override the appropriate methods of this class
        and implement a graphical representation of the game and the 
        action. Shard is based on a two-dimensional map, but apart from
        that it makes very few assumptions about the graphical rendering.
-       Thus it is possible to write 2D and 3D PresentationEngines and 
+       Thus it is possible to write 2D and 3D UserInterfaces and 
        even a text interface.
     """
 
     ####################
     # Initialization
 
-    def __init__(self, asset_engine, framerate, logger):
-        """This method initializes the PresentationEngine.
-           asset_engine must be an instance of
-           shard.AssetEngine or a subclass.
-           framerate must be an integer and sets
-           the maximum (not minimum ;-)) frames per
-           second the client will run in.
+    def __init__(self, assets, framerate, logger):
+        """This method initialises the UserInterface.
+           assets must be an instance of shard.Assets or a subclass.
+           framerate must be an integer and sets the maximum (not minimum ;-))
+           frames per second the client will run in.
         """
 
         # First set up the plugin
@@ -40,10 +40,10 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         self.action_time = 0.5
 
-        # Get framerate and asset_engine from parameters
+        # Get framerate and assets from parameters
         #
         self.framerate = framerate
-        self.asset_engine = asset_engine
+        self.assets = assets
 
         # Compute the number of frames per action.
         #
@@ -61,15 +61,15 @@ class PresentationEngine(shard.plugin.Plugin):
         #
         self.event_queue = []
 
-        # Since it represents the GUI, the PresentationEngine
+        # Since it represents the GUI, the UserInterface
         # is responsible for catching an
         # exit request by the user. This value is
-        # checked in the ClientCoreEngine main loop.
+        # checked in the Client main loop.
         # TODO: maybe return self.exit_requested along with client events in a tuple
         #
         self.exit_requested = False
 
-        # Variables to be filled by the ClientCoreEngine
+        # Variables to be filled by the Client
         # before each call to process_message()
         #
         self.room = shard.Room()
@@ -98,25 +98,25 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     ####################
-    # PresentationEngine Main Method
+    # UserInterface Main Method
 
     def process_message(self,
                         message,
                         room,
                         player_id):
-        """This is the main method of the PresentationEngine.
-           It is called regularly by the ClientCoreEngine
+        """This is the main method of the UserInterface.
+           It is called regularly by the Client
            with a list of events to display (note: the
            list may be empty). It may take all the time 
            it needs to render the action, just a couple 
            or even hundreds of frames, but it must 
            return once the events have been displayed. 
            It must neither block completely nor run in 
-           a thread since the ClientCoreEngine has to 
+           a thread since the Client has to 
            grab new events and change state between 
            calls to process_message(). Put that way, 
            process_message() is simply a part of 
-           ClientCoreEngine.run().
+           Client.run().
            You should normally not override this method
            unless you have to do some really advanced
            stuff. Overriding the other methods of this
@@ -138,7 +138,7 @@ class PresentationEngine(shard.plugin.Plugin):
         # anyone?
 
         ####################
-        # Initialize
+        # Initialise
 
         self.room = room
 
@@ -209,14 +209,14 @@ class PresentationEngine(shard.plugin.Plugin):
                 # build a new screen.
 
                 # Load and store assets for tiles and 
-                # Entities using the asset_engine
+                # Entities using the assets
                 #
                 for current_entity in self.room.entity_dict.values():
 
                     asset_to_fetch = current_entity.asset
 
                     try:
-                        retrieved_asset = self.asset_engine.fetch_asset(asset_to_fetch)
+                        retrieved_asset = self.assets.fetch(asset_to_fetch)
 
                     except:
                         # See the method for explaination
@@ -227,7 +227,7 @@ class PresentationEngine(shard.plugin.Plugin):
                     # are freshly created instances. We
                     # replace the string describing the
                     # asset by the data object returned
-                    # by the asset_engine.
+                    # by the assets.
                     #
                     current_entity.asset = retrieved_asset
 
@@ -236,7 +236,7 @@ class PresentationEngine(shard.plugin.Plugin):
                     asset_to_fetch = current_tile.asset
 
                     try:
-                        retrieved_asset = self.asset_engine.fetch_asset(asset_to_fetch)
+                        retrieved_asset = self.assets.fetch(asset_to_fetch)
 
                     except:
                         # See the method for explaination
@@ -247,7 +247,7 @@ class PresentationEngine(shard.plugin.Plugin):
                     # are freshly created instances. We
                     # replace the string describing the
                     # asset by the data object returned
-                    # by the asset_engine.
+                    # by the assets.
                     #
                     current_tile.asset = retrieved_asset
 
@@ -344,7 +344,7 @@ class PresentationEngine(shard.plugin.Plugin):
             self.logger.debug("queueing %s events for later rendering"
                               % len(event_list))
 
-            # Parallelize subsequent ChangeMapElementEvents
+            # Parallelise subsequent ChangeMapElementEvents
             #
             event_list_parallel = []
             change_map_list = []
@@ -438,7 +438,7 @@ class PresentationEngine(shard.plugin.Plugin):
     # TODO: Most docstrings describe 2D stuff (images). Rewrite 2D-3D-agnostic.
 
     def display_asset_exception(self, asset):
-        """Called when the asset_engine is unable to retrieve the asset.
+        """Called when the assets is unable to retrieve the asset.
            This is a serious error which usually prohibits continuation.
            The user should be asked to check his installation, file system
            or network connection.
@@ -453,7 +453,7 @@ class PresentationEngine(shard.plugin.Plugin):
         """You might have to notify a timer once per frame.
            Do this here and use this method wherever you need it.
            It is also called from process_message() when appropriate.
-           This method may block execution to slow the PresentationEngine
+           This method may block execution to slow the UserInterface
            down to a certain frame rate. The default implementation waits
            1.0/self.framerate seconds.
         """
@@ -463,7 +463,7 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def display_single_frame(self):
-        """Called when the PresentationEngine needs to render a single frame
+        """Called when the UserInterface needs to render a single frame
            of the current game state. There is nothing special going on here,
            so you should notify the Entities that there is a next frame to be
            displayed (whichever way that is done in your implementation) and
@@ -480,7 +480,7 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def collect_player_input(self):
-        """Called when the PresentationEngine wants to capture the user's reaction.
+        """Called when the UserInterface wants to capture the user's reaction.
            The module you use for actual graphics rendering most probably
            has a way to capture user input. When overriding this method,
            you have to convert the data provided by your module into Shard 
@@ -491,7 +491,7 @@ class PresentationEngine(shard.plugin.Plugin):
            actions if the user clicked and typed a lot during the rendering.
            You should create a reasonable subset of those actions, e.g.
            select only the very last user input action.
-           The PresentationEngine should only ever collect and send one
+           The UserInterface should only ever collect and send one
            single client event to prevent cheating and blocking other
            clients in the server. (hint by Alexander Marbach)
            The default implementation reads user input from the console.
@@ -510,7 +510,7 @@ class PresentationEngine(shard.plugin.Plugin):
     # TODO: remove following method if applicable
     #
     #def display_multiple_frame_action(self, MovesToEvent_list):
-    #    """Called when the PresentationEngine is ready to render Move, Drop or PickUp actions.
+    #    """Called when the UserInterface is ready to render Move, Drop or PickUp actions.
     #       All visible Entities are already
     #       notified about their state at this point.
     #       This method must render exactly
@@ -550,9 +550,9 @@ class PresentationEngine(shard.plugin.Plugin):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """Called when the PresentationEngine has encoutered an EnterRoomEvent.
+        """Called when the UserInterface has encoutered an EnterRoomEvent.
            You should override it, blank the screen here and display a waiting
-           message since the PresentationEngine is going to twiddle thumbs until
+           message since the UserInterface is going to twiddle thumbs until
            it receives a RoomCompleteEvent.
         """
 
@@ -575,7 +575,7 @@ class PresentationEngine(shard.plugin.Plugin):
         return
 
     def process_CanSpeakEvent(self, event):
-        """Called when the PresentationEngine needs to render a CanSpeakEvent.
+        """Called when the UserInterface needs to render a CanSpeakEvent.
            You have to prompt for appropriate user input here and add a
            corresponding SaysEvent to self.message_for_host, which is
            evaluated by the ControlEngine. The default implementation
@@ -596,14 +596,14 @@ class PresentationEngine(shard.plugin.Plugin):
 
     def process_SpawnEvent(self, event):
         """This method is called with an instance of SpawnEvent to be displayed.
-           You should supply the Entity with self.presentation_engine as done
+           You should supply the Entity with self.user_interface as done
            in the default implementation. Then add the new Enties to a list of
            visible Entities you might have set up and render a static frame.
         """
 
         self.logger.debug("called")
 
-        event.entity.presentation_engine = self
+        event.entity.user_interface = self
 
         self.display_single_frame()
 
@@ -706,7 +706,7 @@ class PresentationEngine(shard.plugin.Plugin):
 
     def process_SaysEvent(self, event):
         """Called with an instance of SaysEvent
-           when the PresentationEngine is ready to display what Entities say.
+           when the UserInterface is ready to display what Entities say.
            In this method you have to compute a number of frames for
            displaying text and animation for each SaysEvent depending
            on how long the text is. Once you start displaying the text,

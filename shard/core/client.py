@@ -1,17 +1,17 @@
-""" Shard Client Core Engine
+""" Shard Client Engine
 """
 
 # Extracted from shard.py on 22. Sep 2009
 
 import shard
-import shard.coreengine
+import shard.core
 import time
 import datetime
 import pickle
 
-class ClientCoreEngine(shard.coreengine.CoreEngine):
+class Client(shard.core.Engine):
     """An instance of this class is the main engine in every Shard client.
-       It connects to the Client Interface and to the PresentationEngine,
+       It connects to the Client Interface and to the UserInterface,
        passes events and keeps track of Entities.
        It is normally instantiated in shard.run.
     """
@@ -19,30 +19,30 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     ####################
     # Init
 
-    def __init__(self, interface_instance, presentation_engine_instance, logger, player_id):
+    def __init__(self, interface_instance, user_interface_instance, logger,
+                 player_id):
         """Initalisation.
-           The ClientCoreEngine must be instantiated with an
-           instance of a subclass of shard.interfaces.Interface
-           which handles the connection to the server or supplies
-           events in some other way, and an instance of PresentationEngine
-           which presents the game action.
+           The Client must be instantiated with an instance of a subclass of
+           shard.interfaces.Interface which handles the connection to the server
+           or supplies events in some other way, and an instance of
+           UserInterface which presents the game action.
         """
 
-        # Save the player id for ServerCoreEngine
-        # and PresentationEngine.
+        # Save the player id for Server
+        # and UserInterface.
         #
         self.player_id = player_id
 
         # First setup base class
         #
-        shard.coreengine.shard.eventprocessor.EventProcessor.__init__(self)
+        shard.core.shard.eventprocessor.EventProcessor.__init__(self)
 
-        # Then setup CoreEngine internals
+        # Then setup Engine internals
         #
-        shard.coreengine.CoreEngine.__init__(self,
-                                             interface_instance,
-                                             presentation_engine_instance,
-                                             logger)
+        shard.core.Engine.__init__(self,
+                                   interface_instance,
+                                   user_interface_instance,
+                                   logger)
 
         # Now we have:
         #
@@ -99,7 +99,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
     # Main Loop
 
     def run(self):
-        """Main loop of the ClientCoreEngine.
+        """Main loop of the Client.
            This is a blocking method. It calls all the process
            methods to process events.
         """
@@ -171,15 +171,15 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             elif not self.got_empty_message:
 
-                # TODO: The PresentationEngine currently locks up when there are no answers from the server. The ClientCoreEngine should time out and exit politely if there is no initial answer from the server or there has been no answer for some time.
+                # TODO: The UserInterface currently locks up when there are no answers from the server. The Client should time out and exit politely if there is no initial answer from the server or there has been no answer for some time.
 
                 self.logger.info("got an empty server_message.")
 
                 self.got_empty_message = True
 
-            # First handle the events in the ClientCoreEngine, 
+            # First handle the events in the Client, 
             # updating the room and preparing a Message for
-            # the PresentationEngine
+            # the UserInterface
             #
             for current_event in server_message.event_list:
 
@@ -195,7 +195,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                                          message = self.message_for_plugin)
 
             # Now that everything is set and stored, call
-            # the PresentationEngine to process the messages.
+            # the UserInterface to process the messages.
 
             # Ideally we want to call process_message()
             # once per frame, but the call may take an
@@ -208,7 +208,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                                               self.room,
                                                               self.player_id)
 
-            # The PresentationEngine returned, the Server Message has
+            # The UserInterface returned, the Server Message has
             # been applied and processed. Clean up.
             #
             self.message_for_plugin = shard.Message([])
@@ -219,7 +219,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # If there has been a Confirmation for a LookAt or
             # TriesToManipulate, unset "AwaitConfirmation" flag
 
-            # The PresentationEngine might have collected some
+            # The UserInterface might have collected some
             # player input and converted it to events.
             #
             if message_from_plugin.event_list:
@@ -254,21 +254,21 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                     # we evaluate the player input if any.
 
                     # We queue player triggered events before 
-                    # possible events from the ClientCoreEngine.
-                    # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the ClientCoreEngine?
+                    # possible events from the Client.
+                    # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the Client?
                     #
                     self.message_for_remote.event_list = (message_from_plugin.event_list
                                                           + self.message_for_remote.event_list)
 
                     # Local movement tests
                     #
-                    # TODO: Can't this be handled much easier by simply processing a MovesToEvent in PresentationEngine.collect_player_input? But then again, a PresentationEngine isn't supposed to check maps etc.
+                    # TODO: Can't this be handled much easier by simply processing a MovesToEvent in UserInterface.collect_player_input? But then again, an UserInterface isn't supposed to check maps etc.
                     #
                     for event in message_from_plugin.event_list:
 
                         if isinstance(event, shard.AttemptEvent):
 
-                            # TODO: similar to ServerCoreEngine.process_TriesToMoveEvent()
+                            # TODO: similar to Server.process_TriesToMoveEvent()
 
                             # Do we need to move / turn at all?
                             #
@@ -290,7 +290,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
                                 # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
 
-                                # TODO: code duplicated from ServerCoreEngine.process_TriesToMoveEvent()
+                                # TODO: code duplicated from Server.process_TriesToMoveEvent()
 
                                 # Test if a movement from the current
                                 # entity location to the new location
@@ -298,7 +298,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                 #
                                 # We queue the event in self.message_for_plugin,
                                 # so it will be rendered upon next call. That
-                                # way it bypasses the ClientCoreEngine; its status
+                                # way it bypasses the Client; its status
                                 # will be updated upon server confirmation. So
                                 # we will have a difference between client state
                                 # and presentation. We trust that it will be resolved
@@ -336,13 +336,13 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                                             moves_to_event = shard.MovesToEvent(event.identifier,
                                                                                 event.target_identifier)
      
-                                            # Update room, needed for PresentationEngine
+                                            # Update room, needed for UserInterface
                                             #
                                             self.process_MovesToEvent(moves_to_event,
                                                                       message = self.message_for_plugin)
 
                                             # Remember event for crosscheck with
-                                            # event from ServerCoreEngine
+                                            # event from Server
                                             #
                                             self.local_moves_to_event = moves_to_event
 
@@ -395,7 +395,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         # exit has been requested
         
         self.logger.info("exit requested from "
-              + "PresentationEngine, shutting down interface...")
+              + "UserInterface, shutting down interface...")
 
         # stop the Client Interface thread
         #
@@ -407,7 +407,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         self.logger.info("shutdown confirmed.")
 
-        # TODO: possibly exit cleanly from the PresentationEngine here
+        # TODO: possibly exit cleanly from the UserInterface here
 
         return
 
@@ -448,7 +448,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
     #def process_CanSpeakEvent(self, event, **kwargs):
     #    """Currently not implemented."""
-    #    #    CoreEngine: if there was a Confirmation and
+    #    #    Engine: if there was a Confirmation and
     #    #    it has been applied or if there was an
     #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
     #    # Pass on the event.
@@ -461,11 +461,11 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
            and pass on the DropsEvent.
         """
 
-        # TODO: the DropsEvent and PicksUpEvent handling in ClientCoreEngine and Plugin are asymmetrical. This is ugly. Unify.
+        # TODO: the DropsEvent and PicksUpEvent handling in Client and Plugin are asymmetrical. This is ugly. Unify.
 
         # Call default.
         #
-        shard.coreengine.CoreEngine.process_DropsEvent(self,
+        shard.core.Engine.process_DropsEvent(self,
                                                        event,
                                                        message = kwargs["message"])
 
@@ -481,7 +481,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default.
         #
-        shard.coreengine.CoreEngine.process_ChangeStateEvent(self,
+        shard.core.Engine.process_ChangeStateEvent(self,
                                                              event,
                                                              message = kwargs["message"])
 
@@ -495,7 +495,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         """Unset await confirmation flag.
         """
 
-        # TODO: ManipulatesEvent is currently not passed to the PresentationEngine
+        # TODO: ManipulatesEvent is currently not passed to the UserInterface
 
         if event.identifier == self.player_id:
 
@@ -530,7 +530,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
             # Call default implementation
             #
-            shard.coreengine.CoreEngine.process_MovesToEvent(self,
+            shard.core.Engine.process_MovesToEvent(self,
                                                              event,
                                                              message = kwargs["message"])
 
@@ -546,12 +546,12 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
                     self.await_confirmation = False
 
     def process_PicksUpEvent(self, event, **kwargs):
-        """The entity is deleted from the Room and added to ClientCoreEngine.rack 
+        """The entity is deleted from the Room and added to Client.rack 
         """
 
         # Call default
         #
-        shard.coreengine.CoreEngine.process_PicksUpEvent(self,
+        shard.core.Engine.process_PicksUpEvent(self,
                                                          event,
                                                          message = kwargs["message"])
 
@@ -562,8 +562,8 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             self.await_confirmation = False
 
     def process_PerceptionEvent(self, event, **kwargs):
-        """A perception must be displayed by the PresentationEngine,
-           so it is queued in a Message passed from the ClientCoreEngine.
+        """A perception must be displayed by the UserInterface,
+           so it is queued in a Message passed from the Client.
         """
 
         # That is a confirmation
@@ -574,15 +574,15 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_PerceptionEvent(self,
+        shard.core.Engine.process_PerceptionEvent(self,
                                                             event, 
                                                             message = kwargs["message"])
 
     #def process_SaysEvent(self, event, **kwargs):
-    #    """The PresentationEngine usually must display the 
+    #    """The UserInterface usually must display the 
     #       spoken text. Thus the event is put in the
-    #       event queue for the PresentationEngine.
-    #       The PresentationEngine is going to notify
+    #       event queue for the UserInterface.
+    #       The UserInterface is going to notify
     #       the Entity once it starts speaking so it
     #       can provide an animation."""
     #
@@ -600,7 +600,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
             # lets self.room process the Event and
             # queues it in the Message given
             #
-            shard.coreengine.CoreEngine.process_DeleteEvent(self,
+            shard.core.Engine.process_DeleteEvent(self,
                                                             event,
                                                             message = kwargs["message"])
 
@@ -609,7 +609,7 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """This method empties all data structures and passes the event on
-           to the PresentationEngine since an EnterRoomEvent means the server
+           to the UserInterface since an EnterRoomEvent means the server
            is about to send a new map, respawn the player and send items and
            NPCs.
         """
@@ -628,31 +628,31 @@ class ClientCoreEngine(shard.coreengine.CoreEngine):
         self.deleted_entities_dict = {}
 
         # Finally set the flag in the Message
-        # for the PresentationEngine.
+        # for the UserInterface.
         #
         kwargs["message"].has_EnterRoomEvent = True
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_EnterRoomEvent(self,
+        shard.core.Engine.process_EnterRoomEvent(self,
                                                            event,
                                                            message = kwargs["message"])
 
     def process_RoomCompleteEvent(self, event, **kwargs):
-        """The event is queued for the PresentationEngine here.
+        """The event is queued for the UserInterface here.
            RoomCompleteEvent notifies the client that the player,
            all map elements, items and NPCs have been transfered.
-           By the time the event arrives the ClientCoreEngine
+           By the time the event arrives the Client
            should have saved all important data in data structures.
         """
 
-        # This is a convenience flag so the PresentationEngine
+        # This is a convenience flag so the UserInterface
         # does not have to scan the event_list.
         #
         kwargs["message"].has_RoomCompleteEvent = True
 
         # Call default implementation
         #
-        shard.coreengine.CoreEngine.process_RoomCompleteEvent(self,
+        shard.core.Engine.process_RoomCompleteEvent(self,
                                                               event,
                                                               message = kwargs["message"])
