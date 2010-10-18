@@ -15,6 +15,7 @@ First, make sure all core modules import fine:
     >>> import shard.interfaces
     >>> import shard.plugin
     >>> import shard.user
+    >>> import shard.user.pygameui
     >>> import shard.run
     >>>
 
@@ -39,4 +40,13 @@ Standalone Execution (Client and Server)
 
     >>> app = shard.run.App("d", test = True)
     >>> app.run_standalone(60, "player")
+    >>>
+
+Client with PygameUserInterface
+-------------------------------
+
+    >>> app = shard.run.App("d", test = True)
+    >>> app.user_interface_class = shard.user.pygameui.PygameUserInterface
+    >>> interface = shard.interfaces.Interface("dummy", app.logger)
+    >>> app.run_client(60, interface, "player")
     >>>
