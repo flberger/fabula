@@ -24,28 +24,38 @@ This is the base class for the player, NPCs and items.
 An Entity holds information used by the Shard game logic:
 
 Entity.entity_type
+    One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK or
+    shard.ITEM_NOBLOCK.
+
 Entity.identifier
+    Must be an object whose string representation yields an unique
+    identification.
+
 Entity.asset
+    Preferably a string with a file name or an URI of a media file
+    containing the data for visualizing the Entity. Do not put large
+    objects here since Entities are pushed around quite a bit and
+    transfered across the network.
+    The UserInterface may fetch the asset and attach it to the instance
+    of the Entity.
+
 Entity.state
+    The state the Entity is in. Defaults to None.
 
 In addition,
 
 Entity.user_interface
 
-is added by and points to the UserInterface.
+is added by and points to the UserInterface instance.
 
-A Shard Client should use subclasses (possibly
-with multiple inheritance) or custom attachements
-to instances of this class to implement the
-game objects used by the rendering engine (2D
-sprites, 3D models). Usually the Client
-manages a list of Entity instances. Everything
-concernig the actual graphical representation is
-done by the UserInterface. Since this is very
-application dependent it is not covered in the
-base class. Check the documentation and source of 
-the UserInterface for further insight on how it 
-handles game objects.</pre>
+A Shard Client should use subclasses (possibly with multiple inheritance)
+or custom attachements to instances of this class to implement the game
+objects used by the rendering engine (2D sprites, 3D models). Usually the
+Client manages a list of Entity instances. Everything concernig the
+actual graphical representation is done by the UserInterface. Since this
+is very application dependent it is not covered in the base class. Check
+the documentation and source of the UserInterface for further insight on
+how it handles game objects.</pre>
 
     
     
@@ -58,7 +68,7 @@ handles game objects.</pre>
     
     <td>Method</td>
     <td><a href="shard.Entity.html#__init__">__init__</a></td>
-    <td><tt>This method sets up the following attributes from the values given:</tt></td>
+    <td><tt>Initialise.</tt></td>
   </tr><tr class="method">
     
     
@@ -244,27 +254,13 @@ handles game objects.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#__init__">shard.eventprocessor.EventProcessor.__init__</a></div>
-    <pre>This method sets up the following attributes from the values given:
+    <pre>Initialise.
+This method sets up the following attributes from the values given:
 
 Entity.entity_type
-    One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
-    or shard.ITEM_NOBLOCK.
-
 Entity.identifier
-    Must be an object whose string representation
-    yields an unique identification.
-
 Entity.asset
-    Preferably a string with a file name or an URI
-    of a media file containing the data for visualizing
-    the Entity. Do not put large objects here since
-    Entities are pushed around quite a bit and
-    transfered across the network.
-    The UserInterface may fetch the asset and
-    attach it to the instance of the Entity.
-
-Entity.state
-    The state the Entity is in. Defaults to None.</pre>
+Entity.state</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_MovesToEvent">
@@ -282,13 +278,11 @@ Entity.state
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_ChangeStateEvent">
@@ -306,13 +300,11 @@ once per frame, do the actual work there.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_DropsEvent">
@@ -330,13 +322,11 @@ once per frame, do the actual work there.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_PicksUpEvent">
@@ -354,13 +344,11 @@ once per frame, do the actual work there.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_SaysEvent">
@@ -378,17 +366,15 @@ once per frame, do the actual work there.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-14 20:40:01.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
     </address>
   </body>
 </html>
