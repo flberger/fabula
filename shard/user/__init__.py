@@ -28,7 +28,7 @@ class UserInterface(shard.plugin.Plugin):
 
        UserInterface.framerate
        UserInterface.assets
-           Get framerate and assets manager
+           framerate and assets manager
 
        UserInterface.action_frames
            The number of frames per action.

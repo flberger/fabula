@@ -22,6 +22,55 @@ import pygame
 import clickndrag
 
 class PygameUserInterface(shard.user.UserInterface):
+    """This is a Pygame implementation of an UserInterface for the Shard Client.
+
+       Inherited from shard.user.UserInterface:
+
+       UserInterface.action_time
+           Set how long actions like a movement from Map element to Map element
+           take, in seconds.
+
+       UserInterface.framerate
+       UserInterface.assets
+           framerate and assets manager
+
+       UserInterface.action_frames
+           The number of frames per action.
+
+       UserInterface.action_countdown
+           A copy of action_frames used in UserInterface.process_message().
+
+       UserInterface.event_queue
+           A queue for Events of a Message to be rendered later.
+           UserInterface.action_countdown will be counted down between
+           processing the Events.
+
+       UserInterface.exit_requested
+           The UserInterface is responsible for catching an exit request by the
+           user. This value is checked in the Client main loop.
+
+       UserInterface.room
+           Variables to be filled by the Client before each call to
+           process_message()
+
+       UserInterface.direction_vector_dict
+           Convenience dict converting symbolic directions to a vector
+
+       UserInterface.waiting_for_RoomCompleteEvent
+           Flag, True after initialisation
+
+
+       PygameUserInterface attributes:
+
+       PygameUserInterface.clock
+           An instance of pygame.time.Clock
+
+       PygameUserInterface.window
+           An instance of clickndrag.Display
+
+       PygameUserInterface.fade_surface
+           A black pygame surface for fade effects
+    """
 
     def __init__(self, assets, framerate, logger):
         """This method initialises the PygameUserInterface.
@@ -44,7 +93,7 @@ class PygameUserInterface(shard.user.UserInterface):
         #
         self.window = clickndrag.Display((800, 600))
 
-        # Create a black pygame surface for fades
+        # Create a black pygame surface for fade effects
         # New Surfaces are black by default in Pygame 1.x
         #
         self.fade_surface = pygame.Surface((800, 600))
@@ -172,12 +221,27 @@ class PygameUserInterface(shard.user.UserInterface):
            In this method you must implement a major redraw of the display,
            updating all Map elements and after that all Entities.
            This is only a single frame though.
-           Note that event_list may be empty.
+           Note that event may be empty.
         """
 
         self.logger.debug("called")
 
-        self.display_single_frame()
+        # Assets are entirely up to the UserInterface, so we fetch the asset
+        # here
+        #
+        try:
+            #!!!
+            event.tile.asset = self.assets.fetch(event.tile.asset)
+
+        except:
+            self.display_asset_exception(event.tile.asset)
+
+        event.tile.asset = event.tile.asset.convert_alpha()
+        
+        # pygame convert surface if applicable
+        # clear tile area because of possible alpha
+        # blit/redraw
+        # self.display_single_frame()
 
         return
 
