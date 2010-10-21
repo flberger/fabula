@@ -10,7 +10,7 @@
     
   </head>
   <body>
-    <h1 class="class">Class s.Entity(<span title="shard.eventprocessor.EventProcessor">shard.eventprocessor.EventProcessor</span>):</h1>
+    <h1 class="class">Class s.Entity(<a href="shard.eventprocessor.EventProcessor.html">shard.eventprocessor.EventProcessor</a>):</h1>
     <p>
       <span id="part">Part of <a href="shard.html">shard</a></span>
       
@@ -24,33 +24,43 @@ This is the base class for the player, NPCs and items.
 An Entity holds information used by the Shard game logic:
 
 Entity.entity_type
+    One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK or
+    shard.ITEM_NOBLOCK.
+
 Entity.identifier
+    Must be an object whose string representation yields an unique
+    identification.
+
 Entity.asset
+    Preferably a string with a file name or an URI of a media file
+    containing the data for visualizing the Entity. Do not put large
+    objects here since Entities are pushed around quite a bit and
+    transfered across the network.
+    The UserInterface may fetch the asset and attach it to the instance
+    of the Entity.
+
 Entity.state
+    The state the Entity is in. Defaults to None.
 
 In addition,
 
 Entity.user_interface
 
-is added by and points to the UserInterface.
+is added by and points to the UserInterface instance.
 
-A Shard Client should use subclasses (possibly
-with multiple inheritance) or custom attachements
-to instances of this class to implement the
-game objects used by the rendering engine (2D
-sprites, 3D models). Usually the Client
-manages a list of Entity instances. Everything
-concernig the actual graphical representation is
-done by the UserInterface. Since this is very
-application dependent it is not covered in the
-base class. Check the documentation and source of 
-the UserInterface for further insight on how it 
-handles game objects.</pre>
+A Shard Client should use subclasses (possibly with multiple inheritance)
+or custom attachements to instances of this class to implement the game
+objects used by the rendering engine (2D sprites, 3D models). Usually the
+Client manages a list of Entity instances. Everything concernig the
+actual graphical representation is done by the UserInterface. Since this
+is very application dependent it is not covered in the base class. Check
+the documentation and source of the UserInterface for further insight on
+how it handles game objects.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id78">
+      <table class="children sortable" id="id75">
   
   
 <tr class="method">
@@ -58,7 +68,7 @@ handles game objects.</pre>
     
     <td>Method</td>
     <td><a href="shard.Entity.html#__init__">__init__</a></td>
-    <td><tt>This method sets up the following attributes from the values given:</tt></td>
+    <td><tt>Initialise.</tt></td>
   </tr><tr class="method">
     
     
@@ -93,6 +103,136 @@ handles game objects.</pre>
   
 </table>
       
+        <p>
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
+        </p>
+        <table class="children sortable" id="id76">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
       
     </div>
     
@@ -113,28 +253,14 @@ handles game objects.</pre>
     
   </div>
   <div class="functionBody">
-    
-    <pre>This method sets up the following attributes from the values given:
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#__init__">shard.eventprocessor.EventProcessor.__init__</a></div>
+    <pre>Initialise.
+This method sets up the following attributes from the values given:
 
 Entity.entity_type
-    One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
-    or shard.ITEM_NOBLOCK.
-
 Entity.identifier
-    Must be an object whose string representation
-    yields an unique identification.
-
 Entity.asset
-    Preferably a string with a file name or an URI
-    of a media file containing the data for visualizing
-    the Entity. Do not put large objects here since
-    Entities are pushed around quite a bit and
-    transfered across the network.
-    The UserInterface may fetch the asset and
-    attach it to the instance of the Entity.
-
-Entity.state
-    The state the Entity is in. Defaults to None.</pre>
+Entity.state</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_MovesToEvent">
@@ -150,15 +276,13 @@ Entity.state
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_ChangeStateEvent">
@@ -174,15 +298,13 @@ once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_DropsEvent">
@@ -198,15 +320,13 @@ once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_PicksUpEvent">
@@ -222,15 +342,13 @@ once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div><div class="function">
   <a name="shard.Entity.process_SaysEvent">
@@ -246,19 +364,17 @@ once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
     <pre>This method is called by the UserInterface.
-The Entity representation has to execute the
-according action over the course of Entity.action_frames frames.
-But it must du so in an non-blocking fashion -
-this method must return as soon as possible.
-So do set up counters or frame queues here.
-Your implementation may call another method
-once per frame, do the actual work there.</pre>
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:36:09.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-21 12:23:07.
     </address>
   </body>
 </html>

@@ -46,14 +46,15 @@ import shard.eventprocessor
 
 class Event:
     """Shard event base class.
+
+       Event.identifier
+           Must be unique for each object (player, item, NPC)
     """
 
     def __init__(self, identifier):
         """Event initialisation.
-           This constructor must be called with
-           an unique identifier for the object
-           (player, item, NPC) which is affected
-           by this event.
+           This constructor must be called with an unique identifier for the
+           object (player, item, NPC) which is affected by this event.
         """
         # By defining it here, the variable is
         # part of the instance object, not the
@@ -64,9 +65,8 @@ class Event:
 
     def __eq__(self, other):
         """Allow the == operator to be used on Events.
-           Check if the object given has the same
-           class and the same attributes with the
-           same values.
+           Check if the object given has the same class and the same attributes
+           with the same values.
         """
 
         if other.__class__ == self.__class__:
@@ -85,9 +85,8 @@ class Event:
 
     def __ne__(self, other):
         """Allow the != operator to be used on Events.
-           Check if the object given has a different
-           class or the different attributes with
-           different values.
+           Check if the object given has a different class or the different
+           attributes with different values.
         """
 
         if other.__class__ == self.__class__:
@@ -123,22 +122,25 @@ class Event:
 
 class AttemptEvent(Event):
     """This is the base class for attempt events by the player or NPCs.
+
+       AttemptEvent.identifier
+           identifier of the object where the attempt originates
+
+       AttemptEvent.target_identifier
+           target location of the attempt / item, NPC or player identifier
+           if appropriate after server processing
     """
 
     def __init__(self, identifier, target_identifier):
         """Event initialisation.
-           When sent by the client, target_identifier
-           must describe the target location of the
-           attempt.
-           On a two-dimensional map with rectangular
-           elements target_identifier is a tuple of
-           (x, y) integer coordinates, with (0, 0) being
-           the upper left corner.
-           The server determines what is being 
-           looked at / picked up / manipulated / 
-           talked to at that location, and 
-           replaces the location string with an item, 
-           NPC or player identifier if appropriate.
+           When sent by the client, target_identifier must describe the target
+           location of the attempt.
+           On a two-dimensional map with rectangular elements target_identifier
+           is a tuple of (x, y) integer coordinates, with (0, 0) being the upper
+           left corner.
+           The server determines what is being looked at / picked up /
+           manipulated / talked to at that location, and replaces the location
+           string with an item, NPC or player identifier if appropriate.
         """
         self.identifier = identifier
 
@@ -162,24 +164,28 @@ class TriesToPickUpEvent(AttemptEvent):
 
 class TriesToDropEvent(AttemptEvent):
     """The player or NPC tries to drop an item.
+
+       TriesToDropEvent.identifier
+           identifier of the object where the attempt originates
+
+       TriesToDropEvent.item_identifier
+           item to be dropped
+
+       TriesToDropEvent.target_identifier
+           target location / item to drop on
     """
 
     def __init__(self, identifier, item_identifier, target_identifier):
         """Event initialisation.
-           An attempt to drop the item identified by
-           item_identifier. When sent by the client, 
-           target_identifier must describe the 
-           desired location.
-           On a two-dimensional map with rectangular
-           elements target_identifier is a tuple of
-           (x, y) integer coordinates, with (0, 0) being
-           the upper left corner.
-           Note that this attempt can turn out as a
-           "use" action, for example when dropping
-           a key on a padlock. In this case, the
-           server replaces the location with an item 
-           identifier and passes that on to the
-           story engine.
+           An attempt to drop the item identified by item_identifier. When sent
+           by the client, target_identifier must describe the desired location.
+           On a two-dimensional map with rectangular elements target_identifier
+           is a tuple of (x, y) integer coordinates, with (0, 0) being the upper
+           left corner.
+           Note that this attempt can turn out as a "use" action, for example
+           when dropping a key on a padlock. In this case, the server replaces
+           the location with an item identifier and passes that on to the story
+           engine.
         """
         self.identifier = identifier
 
@@ -209,6 +215,12 @@ class ConfirmEvent(Event):
 
 class MovesToEvent(ConfirmEvent):
     """This is the server confirmation of a movement.
+
+       MovesToEvent.identifier
+           identifier of the object that moves
+
+       MovesToEvent.location
+           A description as in the TriesToMoveEvent
     """
 
     def __init__(self, identifier, location):
@@ -222,13 +234,18 @@ class MovesToEvent(ConfirmEvent):
 class PicksUpEvent(ConfirmEvent):
     """This is a server confirmation of a TriesToPickUpEvent
        issued by the player or an NPC.
+
+       PicksUpEvent.identifier
+           identifier of the Entity to pick up the item
+
+       PicksUpEvent.item_identifier
+           The item to pick up. This item should be known to the client.
     """
 
     def __init__(self, identifier, item_identifier):
         """Event initialisation.
-           item_identifier identifies the item to
-           pick up. This item should be known to
-           the client.
+           item_identifier identifies the item to pick up. This item should be
+           known to the client.
         """
         self.identifier = identifier
 
@@ -237,18 +254,25 @@ class PicksUpEvent(ConfirmEvent):
 class DropsEvent(ConfirmEvent):
     """This is the server confirmation for an attempt to drop an item
        by the player or an NPC.
-       This event does normally not occur when the
-       drop action evaluates to a "use with" action, 
-       as described in TriesToDropEvent. In that case
-       the item stays in the posession of its owner, 
-       and some other events are issued.
+       This event does normally not occur when the drop action evaluates to a
+       "use with" action, as described in TriesToDropEvent. In that case the
+       item stays in the posession of its owner, and some other events are
+       issued.
+
+       DropsEvent.identifier
+           identifier of the Entity to drop the item
+
+       DropsEvent.item_identifier
+           The item to be dropped on the map
+
+       DropsEvent.location
+           A description as in the TriesToMoveEvent
     """
 
     def __init__(self, identifier, item_identifier, location):
         """Event initialisation.
-           item_identifier identifies the item to be 
-           dropped on the map. location is a 
-           description as in the TriesToMoveEvent.
+           item_identifier identifies the item to be dropped on the map.
+           location is a description as in the TriesToMoveEvent.
         """
         self.identifier = identifier
 
@@ -258,16 +282,21 @@ class DropsEvent(ConfirmEvent):
 
 class CanSpeakEvent(ConfirmEvent):
     """This is a server invitation for the player or an NPC to speak.
-       Since this event requires immediate user input, it is always
-       executed as the last event of a Message by the UserInterface.
+       Since this event requires immediate user input, it is always executed as
+       the last event of a Message by the UserInterface.
+
+       CanSpeakEvent.identifier
+           identifier of the Entity invited to speak
+
+       CanSpeakEvent.sentences
+           A list of strings for the player or NPC to choose from.
+           Empty for free-form input.
     """
 
     def __init__(self, identifier, sentences):
         """Event initialisation.
-           sentences is a list of strings for the
-           player or NPC to choose from. If this list
-           is empty, the client should offer a free-form
-           text input.
+           sentences is a list of strings for the player or NPC to choose from.
+           If this list is empty, the client should offer a free-form text input.
         """
         self.identifier = identifier
 
@@ -286,13 +315,18 @@ class PerceptionEvent(ConfirmEvent):
        usually the result of a TriesToLookAtEvent. Note that a
        PerceptionEvent may be issued by the server without any
        previous attempts by the Entity affected.
+
+       PerceptionEvent.identifier
+           identifier of the Entity to receive the perception
+
+       PerceptionEvent.perception
+           A string to be displayed by the client
     """
 
     def __init__(self, identifier, perception):
         """Event initialisation.
-           perception is a string to be displayed
-           by the client. Note: When used with an NPC,
-           this could feed a memory database.
+           perception is a string to be displayed by the client.
+           Note: When used with an NPC, this could feed a memory database.
         """
         self.identifier = identifier
 
@@ -300,17 +334,20 @@ class PerceptionEvent(ConfirmEvent):
 
 class ManipulatesEvent(ConfirmEvent):
     """This is a server confirmation of an item manipulation.
-       This Event normally has no visible effect; effects of
-       a ManipulateEvent are usually MovesToEvents,
-       ChangeMapElementEvents, SpawnEvents etc. The
-       ManipulatesEvent simply confirms that a manipulation
-       has happened.
+       This Event normally has no visible effect; effects of a ManipulateEvent
+       are usually MovesToEvents, ChangeMapElementEvents, SpawnEvents etc. The
+       ManipulatesEvent simply confirms that a manipulation has happened.
+
+       ManipulatesEvent.identifier
+           identifier of the manipulating Entity
+
+       ManipulatesEvent.item_identifier
+           identifier of the item that is being manipulated
     """
 
     def __init__(self, identifier, item_identifier):
         """Event initialisation.
-           item_identifier identifies the item
-           that is being manipulated.
+           item_identifier identifies the item that is being manipulated.
         """
         self.identifier = identifier
 
@@ -321,9 +358,15 @@ class ManipulatesEvent(ConfirmEvent):
 
 class SaysEvent(Event):
     """This normally is a reaction to the CanSpeakEvent, to be sent by the player.
-       NPCs can speak spontanously, in that case a SaysEvent
-       is issued by he Story Engine. Players usually have to
-       send an TriesToTalkToEvent before they are allowed to speak.
+       NPCs can speak spontanously, in that case a SaysEvent is issued by he
+       Story Engine. Players usually have to send an TriesToTalkToEvent before
+       they are allowed to speak.
+
+       SaysEvent.identifier
+           identifier of the speaking Entity
+
+       SaysEvent.text
+           A string to be spoken by the entity
     """
 
     def __init__(self, identifier, text):
@@ -337,16 +380,20 @@ class SaysEvent(Event):
 class ChangeStateEvent(Event):
     """This Event is issued to trigger a state change.
        Each instance of shard.Entity has a state.
+
+       ChangeStateEvent.identifier
+           identifier of the Entity to change state
+
+       ChangeStateEvent.state
+           A number or a verbose string
     """
 
     # ChangeState is based on a concept by Alexander Marbach.
 
     def __init__(self, identifier, state):
         """Event initialisation.
-           state is the new state for the Entity
-           identified by identifier. In the simplest
-           case state may be a number or a verbose
-           string.
+           state is the new state for the Entity identified by identifier.
+           In the simplest case state may be a number or a verbose string.
         """
         self.identifier = identifier
 
@@ -356,15 +403,19 @@ class ChangeStateEvent(Event):
 # Passive events
 
 class PassiveEvent(Event):
-    """The base class for events when items or NPCs are being passed, looked at, 
-       picked up and the like.
+    """The base class for events when items or NPCs are being passed etc.
+
+       PassiveEvent.identifier
+           identifier of the Entity that has been passed etc.
+
+       PassiveEvent.trigger_identifier
+           identifier of the the entity that triggered the event
     """
 
     def __init__(self, identifier, trigger_identifier):
         """Event initialisation.
-           The trigger_identifier identifies the
-           entity that triggered the event. This makes it
-           possible to react differently to several
+           The trigger_identifier identifies the entity that triggered the
+           event. This makes it possible to react differently to several
            entities.
         """
         self.identifier = identifier
@@ -372,26 +423,22 @@ class PassiveEvent(Event):
         self.trigger_identifier = trigger_identifier
 
 class PassedEvent(PassiveEvent):
-    """Issued by the server when an item or an NPC is being passed
-       by the player or an NPC.
+    """Issued by the server when an item or an NPC is being passed by the player or an NPC.
     """
     pass
 
 class LookedAtEvent(PassiveEvent):
-    """Issued by the server when an item or NPC is being looked at
-       by the player or an NPC.
+    """Issued by the server when an item or NPC is being looked at by the player or an NPC.
     """
     pass
 
 class PickedUpEvent(PassiveEvent):
-    """Issued by the server when an item is being picked up
-       by the player or an NPC.
+    """Issued by the server when an item is being picked up by the player or an NPC.
     """
     pass
 
 class DroppedEvent(PassiveEvent):
-    """Issued by the server when an item is being dropped
-       by the player or an NPC.
+    """Issued by the server when an item is being dropped by the player or an NPC.
     """
     pass
 
@@ -406,33 +453,36 @@ class ServerEvent(Event):
 
 class SpawnEvent(ServerEvent):
     """This event creates the player / new item / NPC on the map.
+
+       SpawnEvent.entity
+           An instance of shard.Entity
+
+       SpawnEvent.location
+           A description as in the TriesToMoveEvent
     """
 
     def __init__(self, entity, location):
         """Event initialisation.
-           entity is an instance of shard.Entity, 
-           having a type, identifier and asset.
-           location is a tuple of 2D integer
-           coordinates.
-           The server stores the relevant
-           information and passes the entity on to
-           the client.
+           entity is an instance of shard.Entity, having a type, identifier and
+           asset.
+           location is a tuple of 2D integer coordinates.
+           The server stores the relevant information and passes the entity on
+           to the client.
         """
         self.entity = entity
         self.location = location
 
 class DeleteEvent(ServerEvent):
     """This event deletes an item or NPC from the map.
-       Note that items may still persist in the players
-       posessions.
+       Note that items may still persist in the players posessions.
     """
     pass
 
 class EnterRoomEvent(ServerEvent):
     """This event announces that the player enters a new room.
-       Events building the map and spawning the player, items
-       and NPCs should follow. The room is done and can be used
-       when the server issues RoomCompleteEvent.
+       Events building the map and spawning the player, items and NPCs should
+       follow. The room is done and can be used when the server issues
+       RoomCompleteEvent.
     """
 
     def __init__(self):
@@ -452,22 +502,25 @@ class RoomCompleteEvent(ServerEvent):
 
 class ChangeMapElementEvent(ServerEvent):
     """This event changes a single element of the two-dimensional map.
-       When sent in a Message, these events are executed immediately and
-       in parallel upon the rendering of the
-       Message by the UserInterface.
+       When sent in a Message, these events are executed immediately and in
+       parallel upon the rendering of the Message by the UserInterface.
+
+       ChangeMapElementEvent.tile
+           An instance of shard.Tile
+
+       ChangeMapElementEvent.location
+           A description as in the TriesToMoveEvent
     """
     
     def __init__(self, tile, location):
         """Event initialisation.
-           tile is a shard map object having a type 
-           (obstacle or floor) and an asset.
-           location is an object describing the
-           location of the tile in the game world, 
-           most probably a tuple of coordinates, but
-           possibly only a string like "lobby".
-           The server stores the relevant
-           information and passes the tile and the
-           location on to the client.
+           tile is a shard map object having a type (obstacle or floor) and an
+           asset.
+           location is an object describing the location of the tile in the game
+           world, most probably a tuple of coordinates, but possibly only a
+           string like "lobby".
+           The server stores the relevant information and passes the tile and
+           the location on to the client.
         """
         self.tile = tile
 
@@ -488,11 +541,14 @@ class ChangeMapElementEvent(ServerEvent):
 
 class InitEvent(Event):
     """This event is sent once by the client upon startup.
-       It asks the server to supply anything that is needed
-       to update the client to the current game state -
-       usually a number of ChangeMapElementEvents and SpawnEvents.
-       The client interface may decide to issue this event
-       again in case there has been a connection failure.
+       It asks the server to supply anything that is needed to update the client
+       to the current game state - usually a number of ChangeMapElementEvents
+       and SpawnEvents.
+       The client interface may decide to issue this event again in case there
+       has been a connection failure.
+
+       InitEvent.identifer
+           Client identifier. Must be unique for each client.
     """
 
     def __init__(self, identifier):
@@ -506,13 +562,10 @@ class InitEvent(Event):
 
 class Message:
     """A Message manages an ordered list of shard events.
-       Messages sent by the server describe the action
-       of a certain time frame. The UserInterface has to
-       decide which events happen in parallel and which 
-       ones happen sequential. Instances of Message 
-       expose a single Python list object as Message.event_list.
-
-       Attributes:
+       Messages sent by the server describe the action of a certain time frame.
+       The UserInterface has to decide which events happen in parallel and which 
+       ones happen sequential. Instances of Message expose a single Python list
+       object as Message.event_list.
 
        Message.event_list
            A list of shard.Events
@@ -560,52 +613,48 @@ class Entity(shard.eventprocessor.EventProcessor):
        An Entity holds information used by the Shard game logic:
 
        Entity.entity_type
+           One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK or
+           shard.ITEM_NOBLOCK.
+
        Entity.identifier
+           Must be an object whose string representation yields an unique
+           identification.
+
        Entity.asset
+           Preferably a string with a file name or an URI of a media file
+           containing the data for visualizing the Entity. Do not put large
+           objects here since Entities are pushed around quite a bit and
+           transfered across the network.
+           The UserInterface may fetch the asset and attach it to the instance
+           of the Entity.
+
        Entity.state
+           The state the Entity is in. Defaults to None.
 
        In addition,
 
        Entity.user_interface
 
-       is added by and points to the UserInterface.
+       is added by and points to the UserInterface instance.
 
-       A Shard Client should use subclasses (possibly
-       with multiple inheritance) or custom attachements
-       to instances of this class to implement the
-       game objects used by the rendering engine (2D
-       sprites, 3D models). Usually the Client
-       manages a list of Entity instances. Everything
-       concernig the actual graphical representation is
-       done by the UserInterface. Since this is very
-       application dependent it is not covered in the
-       base class. Check the documentation and source of 
-       the UserInterface for further insight on how it 
-       handles game objects.
+       A Shard Client should use subclasses (possibly with multiple inheritance)
+       or custom attachements to instances of this class to implement the game
+       objects used by the rendering engine (2D sprites, 3D models). Usually the
+       Client manages a list of Entity instances. Everything concernig the
+       actual graphical representation is done by the UserInterface. Since this
+       is very application dependent it is not covered in the base class. Check
+       the documentation and source of the UserInterface for further insight on
+       how it handles game objects.
     """
 
     def __init__(self, entity_type, identifier, asset):
-        """This method sets up the following attributes from the values given:
+        """Initialise.
+           This method sets up the following attributes from the values given:
 
            Entity.entity_type
-               One of shard.PLAYER, shard.NPC, shard.ITEM_BLOCK
-               or shard.ITEM_NOBLOCK.
-
            Entity.identifier
-               Must be an object whose string representation
-               yields an unique identification.
-
            Entity.asset
-               Preferably a string with a file name or an URI
-               of a media file containing the data for visualizing
-               the Entity. Do not put large objects here since
-               Entities are pushed around quite a bit and
-               transfered across the network.
-               The UserInterface may fetch the asset and
-               attach it to the instance of the Entity.
-
            Entity.state
-               The state the Entity is in. Defaults to None.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
@@ -627,61 +676,51 @@ class Entity(shard.eventprocessor.EventProcessor):
 
     def process_MovesToEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the
-           according action over the course of Entity.action_frames frames.
-           But it must du so in an non-blocking fashion -
-           this method must return as soon as possible.
-           So do set up counters or frame queues here.
-           Your implementation may call another method
-           once per frame, do the actual work there.
+           The Entity representation has to execute the according action over
+           the course of Entity.action_frames frames. But it must du so in an
+           non-blocking fashion - this method must return as soon as possible.
+           So do set up counters or frame queues here. Your implementation may
+           call another method once per frame, do the actual work there.
         """
         pass
 
     def process_ChangeStateEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the
-           according action over the course of Entity.action_frames frames.
-           But it must du so in an non-blocking fashion -
-           this method must return as soon as possible.
-           So do set up counters or frame queues here.
-           Your implementation may call another method
-           once per frame, do the actual work there.
+           The Entity representation has to execute the according action over
+           the course of Entity.action_frames frames. But it must du so in an
+           non-blocking fashion - this method must return as soon as possible.
+           So do set up counters or frame queues here. Your implementation may
+           call another method once per frame, do the actual work there.
         """
         self.state = event.state
 
     def process_DropsEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the
-           according action over the course of Entity.action_frames frames.
-           But it must du so in an non-blocking fashion -
-           this method must return as soon as possible.
-           So do set up counters or frame queues here.
-           Your implementation may call another method
-           once per frame, do the actual work there.
+           The Entity representation has to execute the according action over
+           the course of Entity.action_frames frames. But it must du so in an
+           non-blocking fashion - this method must return as soon as possible.
+           So do set up counters or frame queues here. Your implementation may
+           call another method once per frame, do the actual work there.
         """
         pass
 
     def process_PicksUpEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the
-           according action over the course of Entity.action_frames frames.
-           But it must du so in an non-blocking fashion -
-           this method must return as soon as possible.
-           So do set up counters or frame queues here.
-           Your implementation may call another method
-           once per frame, do the actual work there.
+           The Entity representation has to execute the according action over
+           the course of Entity.action_frames frames. But it must du so in an
+           non-blocking fashion - this method must return as soon as possible.
+           So do set up counters or frame queues here. Your implementation may
+           call another method once per frame, do the actual work there.
         """
         pass
 
     def process_SaysEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the
-           according action over the course of Entity.action_frames frames.
-           But it must du so in an non-blocking fashion -
-           this method must return as soon as possible.
-           So do set up counters or frame queues here.
-           Your implementation may call another method
-           once per frame, do the actual work there.
+           The Entity representation has to execute the according action over
+           the course of Entity.action_frames frames. But it must du so in an
+           non-blocking fashion - this method must return as soon as possible.
+           So do set up counters or frame queues here. Your implementation may
+           call another method once per frame, do the actual work there.
         """
         pass
 
@@ -705,17 +744,23 @@ OBSTACLE = "OBSTACLE"
 
 class Tile:
     """A Tile is an element of a two-dimensional map.
-       It is never meant to perform any active logic, 
-       so its only property is a type and an asset."""
+       It is never meant to perform any active logic, so its only property is a
+       type and an asset.
+
+       Tile.tile_type
+           shard.FLOOR or shard.OBSTACLE
+
+       Tile.asset
+           Preferably a string with a file name or an URI of a media file
+           containing the data for visualizing the tile
+    """
 
     def __init__(self, tile_type, asset):
         """Tile initialisation.
-           tile_type must be shard.FLOOR or shard.OBSTACLE,
-           describing whether the player or NPCs can move
-           across the tile.
-           asset is preferably a string with a file 
-           name or an URI of a media file containing 
-           the data for visualizing the tile.
+           tile_type must be shard.FLOOR or shard.OBSTACLE, describing whether
+           the player or NPCs can move across the tile.
+           asset is preferably a string with a file name or an URI of a media
+           file containing the data for visualizing the tile.
         """
         self.tile_type = tile_type
         self.asset = asset
@@ -729,28 +774,22 @@ class Room(shard.eventprocessor.EventProcessor):
        and for all active rooms in the Server.
 
        Room.entity_dict
-           A dict of all Entities in this room,
-           mapping Entity identifiers to Entity
-           instances.
+           A dict of all Entities in this room, mapping Entity identifiers to
+           Entity instances.
 
        Room.floor_plan
-           A dict mapping 2D coordinate tuples
-           to a FloorPlanElement instance.
+           A dict mapping 2D coordinate tuples to a FloorPlanElement instance.
 
        Room.entity_locations
-           A dict mapping Entity identifiers to a
-           2D coordinate tuple.
+           A dict mapping Entity identifiers to a 2D coordinate tuple.
 
        Room.tile_list
-           A list of tiles for the current room,
-           for easy asset fetching.
+           A list of tiles for the current room, for easy asset fetching.
 
        Room.active_clients
-           A list of client identifiers whose
-           player entities are in this room.
+           A list of client identifiers whose player entities are in this room.
 
-       Note that all these dicts assume that
-       Entity identifiers are unique.
+       Note that all these dicts assume that Entity identifiers are unique.
     """
 
     def __init__(self):
@@ -880,9 +919,13 @@ class Room(shard.eventprocessor.EventProcessor):
 class FloorPlanElement:
     """Convenience class for floor plan elements.
 
-       FloorPlanElement.tile = shard.Tile()
-       FloorPlanElement.entities = []
+       FloorPlanElement.tile
+           = shard.Tile()
+
+       FloorPlanElement.entities
+           = []
     """
+
     def __init__(self, tile):
         """Initialisation.
         """
@@ -1041,8 +1084,8 @@ def join_lists(first_list, second_list):
 
 class ShardException():
     """This is the base class of Shard-related exceptions.
-       Shard Implementations should raise an instance of this
-       class when appropriate, providing an error description.
+       Shard Implementations should raise an instance of this class when
+       appropriate, providing an error description.
     """
 
     def __init__(self, error_description):
@@ -1051,4 +1094,5 @@ class ShardException():
     def __repr__(self):
         # This is called and should return a
         # string representation which is shown
+        #
         return self.error_description
