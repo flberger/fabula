@@ -66,7 +66,17 @@ class PygameUserInterface(shard.user.UserInterface):
            An instance of pygame.time.Clock
 
        PygameUserInterface.window
-           An instance of clickndrag.Display
+           An instance of clickndrag.Display. By default this is 800x600px and
+           windowed.
+
+       PygameUserInterface.window.inventory
+           clickndrag Plane for the inventory. By default this is 800x100px
+           with space for 8 100x100px icons and located at the bottom of the
+           window.
+
+       PygameUserInterface.window.room
+           clickndrag Plane for the room. By default this is 800x500px with
+           space for 8x5 tiles and located at the top of the window.
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
@@ -102,6 +112,10 @@ class PygameUserInterface(shard.user.UserInterface):
         #
         self.window.sub(clickndrag.Plane("inventory",
                                          pygame.Rect((0, 500), (800, 100))))
+        # Create plane for the room.
+        #
+        self.window.sub(clickndrag.Plane("room",
+                                         pygame.Rect((0, 0), (800, 500))))
 
         self.logger.debug("complete")
 
@@ -119,10 +133,6 @@ class PygameUserInterface(shard.user.UserInterface):
         """Update and render all click'd'drag planes.
         """
 
-        # Pump the Pygame Event Queue
-        #
-        pygame.event.pump()
-
         self.window.update()
         self.window.render()
 
@@ -131,6 +141,10 @@ class PygameUserInterface(shard.user.UserInterface):
         pygame.display.flip()
 
         self.update_frame_timer()
+
+        # Pump the Pygame Event Queue
+        #
+        pygame.event.pump()
 
         return
 
@@ -159,7 +173,7 @@ class PygameUserInterface(shard.user.UserInterface):
                 #
                 pygame.quit()
 
-        screen.process(events)
+        self.window.process(events)
 
         # TODO: Must figure out Events here and set self.message_for_host.event_list.append(event)
         # TODO: This is weird. This should be returned instead in some way, shouldn't it?
@@ -170,7 +184,7 @@ class PygameUserInterface(shard.user.UserInterface):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """Fade display window to black.
+        """Fade window to black.
         """
 
         self.logger.debug("called")
@@ -187,17 +201,17 @@ class PygameUserInterface(shard.user.UserInterface):
         while frames:
             # Bypassing display_single_frame()
 
-            # Pump the Pygame Event Queue
-            #
-            pygame.event.pump()
-
-            self.window.rendersurface.blit(self.fade_surface)
+            self.window.rendersurface.blit(self.fade_surface, (0, 0))
 
             pygame.display.flip()
 
             self.update_frame_timer()
 
-            self.fade_surface.set_alpha(self.fade_surface.get_alpha + fadestep)
+            # Pump the Pygame Event Queue
+            #
+            pygame.event.pump()
+
+            self.fade_surface.set_alpha(self.fade_surface.get_alpha() + fadestep)
 
             frames = frames - 1
 
@@ -206,9 +220,92 @@ class PygameUserInterface(shard.user.UserInterface):
         self.window.rendersurface.fill((0, 0, 0))
         pygame.display.flip()
 
+        # Clear room
+        #
+        self.window.room.subplanes = {}
+
         return
 
-#    def process_RoomCompleteEvent(self, event):
+    def process_RoomCompleteEvent(self, event):
+        """Update and render the Planes of the map elements and fade in the room.
+        """
+
+        self.logger.debug("called")
+
+        # UserInterface.process_message() has already fetched the assets, but
+        # right now they are only open streams. Actually load the images here
+        # and replace the asset.
+        #
+        for tile in self.room.tile_list:
+
+            self.logger.debug("loading Surface from {0} for Tile {1}".format(tile.asset, tile))
+
+            surface = pygame.image.load(tile.asset)
+
+            tile.asset.close()
+
+            # Convert to internal format suitable for blitting
+            #
+            tile.asset = surface.convert_alpha()
+
+        for coordinates in self.room.floor_plan:
+
+            # Tiles are clickndrag subplanes of self.window.room, indexed by
+            # the string representation of their location.
+            # No need to check for existing, everything is new.
+            #
+            plane = clickndrag.Plane(str(coordinates),
+                                     pygame.Rect((coordinates[0] * 100,
+                                                  coordinates[1] * 100),
+                                                 (100, 100)))
+
+            self.window.room.sub(plane)
+
+            surface = self.room.floor_plan[coordinates].tile.asset
+
+            self.window.room.subplanes[str(coordinates)].image = surface
+
+        # Now render and fade in
+        #
+        fadestep = int(255 / self.action_frames)
+        
+        self.fade_surface.set_alpha(255)
+        
+        frames = self.action_frames
+
+        while frames:
+            # Bypassing display_single_frame()
+
+            self.window.update()
+            self.window.render()
+
+            self.window.rendersurface.blit(self.fade_surface, (0, 0))
+
+            pygame.display.flip()
+
+            self.update_frame_timer()
+
+            # Pump the Pygame Event Queue
+            #
+            pygame.event.pump()
+
+            self.fade_surface.set_alpha(self.fade_surface.get_alpha() - fadestep)
+
+            frames = frames - 1
+
+        # Make sure it's all visible now
+        #
+        self.window.update()
+        self.window.render()
+        pygame.display.flip()
+
+        self.update_frame_timer()
+
+        # Pump the Pygame Event Queue
+        #
+        pygame.event.pump()
+
+        return
 
 #    def process_CanSpeakEvent(self, event):
 
@@ -217,11 +314,7 @@ class PygameUserInterface(shard.user.UserInterface):
 #    def process_DeleteEvent(self, event):
 
     def process_ChangeMapElementEvent(self, event):
-        """Called with a list of instances of ChangeMapElementEvent.
-           In this method you must implement a major redraw of the display,
-           updating all Map elements and after that all Entities.
-           This is only a single frame though.
-           Note that event may be empty.
+        """Fetch asset and register/replace tile.
         """
 
         self.logger.debug("called")
@@ -230,18 +323,37 @@ class PygameUserInterface(shard.user.UserInterface):
         # here
         #
         try:
-            #!!!
-            event.tile.asset = self.assets.fetch(event.tile.asset)
+            # Get a file-like object from asset manager
+            #
+            file = self.assets.fetch(event.tile.asset_desc)
 
         except:
-            self.display_asset_exception(event.tile.asset)
+            self.display_asset_exception(event.tile.asset_desc)
 
-        event.tile.asset = event.tile.asset.convert_alpha()
-        
-        # pygame convert surface if applicable
-        # clear tile area because of possible alpha
-        # blit/redraw
-        # self.display_single_frame()
+        # Replace with Surface from image file
+        #
+        surface = pygame.image.load(file)
+
+        file.close()
+
+        # Convert to internal format suitable for blitting
+        #
+        surface = surface.convert_alpha()
+
+        # Do we already have a tile there?
+        # Tiles are clickndrag subplanes of self.window.room, indexed by their
+        # location as string representation.
+        #
+        if str(event.location) not in self.window.room.subplanes:
+
+            plane = clickndrag.Plane(str(event.location),
+                                     pygame.Rect((event.location[0] * 100,
+                                                  event.location[1] * 100),
+                                                 (100, 100)))
+
+            self.window.room.sub(plane)
+
+        self.window.room.subplanes[str(event.location)].image = surface
 
         return
 

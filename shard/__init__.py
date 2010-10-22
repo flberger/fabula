@@ -620,13 +620,13 @@ class Entity(shard.eventprocessor.EventProcessor):
            Must be an object whose string representation yields an unique
            identification.
 
-       Entity.asset
+       Entity.asset_desc
            Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the Entity. Do not put large
-           objects here since Entities are pushed around quite a bit and
-           transfered across the network.
-           The UserInterface may fetch the asset and attach it to the instance
-           of the Entity.
+           containing the data for visualizing the Entity.
+
+       Entity.asset
+           The actual asset, application-dependent. The UserInterface may fetch
+           the asset using Entity.asset_desc and attach it here.
 
        Entity.state
            The state the Entity is in. Defaults to None.
@@ -647,12 +647,13 @@ class Entity(shard.eventprocessor.EventProcessor):
        how it handles game objects.
     """
 
-    def __init__(self, entity_type, identifier, asset):
+    def __init__(self, entity_type, identifier, asset_desc):
         """Initialise.
            This method sets up the following attributes from the values given:
 
            Entity.entity_type
            Entity.identifier
+           Entity.asset_desc
            Entity.asset
            Entity.state
         """
@@ -665,7 +666,8 @@ class Entity(shard.eventprocessor.EventProcessor):
 
         self.entity_type = entity_type
         self.identifier = identifier
-        self.asset = asset
+        self.asset_desc = asset_desc
+        self.asset = None
         self.state = None
 
     # EventProcessor overrides
@@ -750,12 +752,16 @@ class Tile:
        Tile.tile_type
            shard.FLOOR or shard.OBSTACLE
 
-       Tile.asset
+       Tile.asset_desc
            Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the tile
+           containing the data for visualizing the Tile.
+
+       Tile.asset
+           The actual asset, application-dependent. The UserInterface may fetch
+           the asset using Entity.asset_desc and attach it here.
     """
 
-    def __init__(self, tile_type, asset):
+    def __init__(self, tile_type, asset_desc):
         """Tile initialisation.
            tile_type must be shard.FLOOR or shard.OBSTACLE, describing whether
            the player or NPCs can move across the tile.
@@ -763,7 +769,64 @@ class Tile:
            file containing the data for visualizing the tile.
         """
         self.tile_type = tile_type
-        self.asset = asset
+        self.asset_desc = asset_desc
+        self.asset = None
+
+    def __eq__(self, other):
+        """Allow the == operator to be used on Tiles.
+           Check if the object given has the same class, the same tile_type and
+           the same asset_desc.
+        """
+
+        if other.__class__ == self.__class__:
+
+            if (other.tile_type == self.tile_type
+                and other.asset_desc == self.asset_desc):
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Allow the != operator to be used on Tiles.
+           Check if the object given has a different class or a different
+           tile_type or different asset_desc.
+        """
+
+        if other.__class__ == self.__class__:
+
+            if (other.tile_type != self.tile_type
+                or other.asset_desc != self.asset_desc):
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return True
+
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ############################################################
 # Rooms
@@ -835,7 +898,11 @@ class Room(shard.eventprocessor.EventProcessor):
 
             self.floor_plan[event.location] = FloorPlanElement(event.tile)
 
-        self.tile_list.append(event.tile)
+        # Avoid duplicates
+        #
+        if event.tile not in self.tile_list:
+
+            self.tile_list.append(event.tile)
 
         return
 

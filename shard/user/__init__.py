@@ -229,59 +229,33 @@ class UserInterface(shard.plugin.Plugin):
             #
             if message.has_RoomCompleteEvent:
 
+                self.logger.debug("got RoomCompleteEvent")
+
                 # TODO: That original design - handling Events before RoomComplete here or not at all, then deleting - can probably be discarded and replaced by an ordinary Plugin behaviour: process all Events with the according methods.
 
-                # By the time the event arrives the 
-                # ControlEngine has gathered all important
-                # data and handed them over to us, so wen can
+                # By the time the event arrives the ControlEngine has gathered
+                # all important data and handed them over to us, so wen can
                 # build a new screen.
 
-                # Load and store assets for tiles and 
-                # Entities using the assets
+                # Load and store assets for Tiles and Entities using the assets
                 #
-                for current_entity in self.room.entity_dict.values():
+                entity_tile_list = list(self.room.entity_dict.values()) + list(self.room.tile_list)
 
-                    asset_to_fetch = current_entity.asset
+                for element in entity_tile_list:
 
-                    try:
-                        retrieved_asset = self.assets.fetch(asset_to_fetch)
-
-                    except:
-                        # See the method for explaination
-                        #
-                        self.display_asset_exception(asset_to_fetch)
-
-                    # After a RoomCompleteEvent all Entites
-                    # are freshly created instances. We
-                    # replace the string describing the
-                    # asset by the data object returned
-                    # by the assets.
+                    # Fetch if not already done so
                     #
-                    current_entity.asset = retrieved_asset
+                    if element.asset is None:
 
-                for current_tile in self.room.tile_list:
+                        try:
+                            retrieved_asset = self.assets.fetch(element.asset_desc)
 
-                    asset_to_fetch = current_tile.asset
+                        except:
+                            # See the method for explaination
+                            #
+                            self.display_asset_exception(element.asset_desc)
 
-                    try:
-                        retrieved_asset = self.assets.fetch(asset_to_fetch)
-
-                    except:
-                        # See the method for explaination
-                        #
-                        self.display_asset_exception(asset_to_fetch)
-
-                    # After a RoomCompleteEvent all tiles
-                    # are freshly created instances. We
-                    # replace the string describing the
-                    # asset by the data object returned
-                    # by the assets.
-                    #
-                    current_tile.asset = retrieved_asset
-
-                # See the method for explaination
-                #
-                self.process_RoomCompleteEvent()
+                        element.asset = retrieved_asset
 
                 # Delete everything in the event_list up to and
                 # including the RoomCompleteEvent
@@ -289,7 +263,11 @@ class UserInterface(shard.plugin.Plugin):
                 while not isinstance(event_list[0], shard.RoomCompleteEvent):
                     del event_list[0]
                 
-                # Arrived at RoomCompleteEvent. 
+                # Arrived at RoomCompleteEvent.
+                # See the method for explaination
+                #
+                self.process_RoomCompleteEvent(event_list[0])
+
                 # Delete it as well.
                 #
                 del event_list[0]

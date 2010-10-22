@@ -85,9 +85,9 @@ class Client(shard.core.Engine):
         self.message_timestamp = None
 
         # The message log file records
-        # is a list of Messages and time intervals
+        # a list of Messages and time intervals
         #
-        self.message_log_file = open("messages-%s.log" % player_id, "w")
+        self.message_log_file = open("messages-{}.log".format(player_id), "wb")
 
         # Remember the latest local MovesToEvent
         #
@@ -154,12 +154,14 @@ class Client(shard.core.Engine):
 
                 # timedifference as seconds + tenth of a second
                 #
-                # Add double newline as separator
-                #
                 self.message_log_file.write(pickle.dumps((timedifference.seconds
                                                           + timedifference.microseconds / 1000000.0,
                                                           server_message),
-                                                         0) + "\n\n")
+                                                         0))
+
+                # Add double newline as separator
+                #
+                self.message_log_file.write(bytes("\n\n", "utf_8"))
 
                 # Renew timestamp
                 #
