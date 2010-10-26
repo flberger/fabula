@@ -5,8 +5,8 @@ Asset Manager
 -------------
 
     >>> stream = open("temp.dat", mode="w")
-    >>> stream.write("shard\n")
-    6
+    >>> stream.write("shard")
+    5
     >>> stream.close()
     >>> import shard.assets
     >>> import shard.run
@@ -14,9 +14,8 @@ Asset Manager
     >>> assets = shard.assets.Assets(app.logger)
     >>> asset = assets.fetch("temp.dat")
     >>> asset.read()
-    b'shard\n'
+    b'shard'
     >>> asset.close()
     >>> import os
     >>> os.remove("temp.dat")
     >>>
-

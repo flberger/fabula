@@ -10,7 +10,7 @@ FILES = shard/assetengine.py \
         shard/servercoreengine.py
 
 help:
-	@echo Targets: docs, check, errors, doctest
+	@echo Targets: docs, check, errors, doctest, win2k_update
 
 docs: 
 	rm -fv shard/*.pyc
@@ -35,3 +35,11 @@ doctest:
 	python3 -m doctest tests/assets.txt
 	python3 -m doctest tests/pygame_user_interface.txt
 	python3 -m doctest tests/tiles.txt
+
+make win2k_update:
+	mount /mnt/win2k/
+	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/*
+	cp -r ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
+	cp /home/florian/programmieren/python/clickndrag/clickndrag_bzr-repo/clickndrag/clickndrag.py \
+	   /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
+	umount /mnt/win2k/
