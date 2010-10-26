@@ -24,8 +24,7 @@
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
 # TODO: most prominently: message.event_list.append -> message.append
 #
-# TODO: readable __repr__ of all shard objects: Room, Tile, ...
-# TODO: use instance.__class__.__name__ and __module__ in repr
+# TODO: readable __repr__ of more shard objects: Room, ...
 #
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 #
@@ -107,15 +106,21 @@ class Event:
         """Readable and informative string representation.
         """
 
+        # TODO: This is a duplicate of Tile.__repr__
+
         arguments = ""
 
         for key in self.__dict__:
 
-            arguments = arguments + "%s = %s, " % (key, self.__dict__[key])
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
 
+        # Chop final ", "
+        #
         arguments = arguments[:-2]
 
-        return "<%s(%s)>" % (self.__class__, arguments)
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ####################
 # Attempt events
