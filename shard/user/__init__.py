@@ -70,6 +70,8 @@ class UserInterface(shard.plugin.Plugin):
         #
         shard.plugin.Plugin.__init__(self, logger)
 
+        self.logger.debug("called")
+
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.
         #

@@ -93,9 +93,12 @@ class PygameUserInterface(shard.user.UserInterface):
         #
         shard.user.UserInterface.__init__(self, assets, framerate, logger)
 
+        self.logger.debug("called")
+
+        self.logger.debug("initialising pygame")
         pygame.init()
 
-        # Initialize the frame timing clock.
+        # Initialise the frame timing clock.
         #
         self.clock = pygame.time.Clock()
 

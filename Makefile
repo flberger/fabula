@@ -12,8 +12,7 @@ FILES = shard/assetengine.py \
 help:
 	@echo Targets: docs, check, errors, doctest, win2k_update
 
-docs: 
-	rm -fv shard/*.pyc
+docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
 	                                                --add-package shard \
 	                                                --make-html \
@@ -27,7 +26,7 @@ errors:
 	@echo WARNING: using pylint for Python 2.x instead of 3.x.
 	pylint --errors-only shard
 
-doctest:
+doctest: clean
 	python3 -m doctest tests/imports.txt
 	python3 -m doctest tests/client.txt
 	python3 -m doctest tests/server.txt
@@ -36,10 +35,15 @@ doctest:
 	python3 -m doctest tests/pygame_user_interface.txt
 	python3 -m doctest tests/tiles.txt
 
-make win2k_update:
+make win2k_update: clean
 	mount /mnt/win2k/
 	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/*
 	cp -r ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
 	cp /home/florian/programmieren/python/clickndrag/clickndrag_bzr-repo/clickndrag/clickndrag.py \
 	   /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
 	umount /mnt/win2k/
+
+clean:
+	rm -vf *pyc
+	rm -vf */*pyc
+	rm -vf */*/*pyc

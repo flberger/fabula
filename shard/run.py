@@ -81,10 +81,13 @@ class App:
         # + "%(levelname)-5s "
         # + "\x1b\x5b\x33\x39\x6d"
 
-        stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
-                                             + "%(funcName)s() "
-                                             + "\x1b\x5b\x33\x39\x6d"
-                                             + "%(message)s")
+        # Fancy coloring for Unix terminals:
+        #stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
+        #                                     + "%(funcName)s() "
+        #                                     + "\x1b\x5b\x33\x39\x6d"
+        #                                     + "%(message)s")
+        
+        stderr_formatter = logging.Formatter("%(funcName)s() %(message)s")
 
         self.stderr_handler.setFormatter(stderr_formatter)
 
