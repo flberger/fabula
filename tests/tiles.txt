@@ -1,76 +1,12 @@
 Doctests for the Shard Package
 ==============================
 
-Core Modules and Imports
-------------------------
-
-First, make sure all core modules import fine:
-
-    >>> import shard
-    >>> import shard.assets
-    >>> import shard.core
-    >>> import shard.core.client
-    >>> import shard.core.server
-    >>> import shard.eventprocessor
-    >>> import shard.interfaces
-    >>> import shard.plugin
-    >>> import shard.user
-    >>> import shard.user.pygameui
-    >>> import shard.run
-    >>>
-
-Server Execution
-----------------
-
-    >>> app = shard.run.App("d", test = True)
-    >>> interface = shard.interfaces.Interface("dummy", app.logger)
-    >>> app.run_server(60, interface)
-    >>>
-
-Client Execution
-----------------
-
-    >>> app = shard.run.App("d", test = True)
-    >>> interface = shard.interfaces.Interface("dummy", app.logger)
-    >>> app.run_client(60, interface, "player")
-    >>>
-
-Standalone Execution (Client and Server)
-----------------------------------------
-
-    >>> app = shard.run.App("d", test = True)
-    >>> app.run_standalone(60, "player")
-    >>>
-
-Asset Manager
--------------
-
-    >>> stream = open("temp.dat", mode="w")
-    >>> stream.write("shard\n")
-    6
-    >>> stream.close()
-    >>> app = shard.run.App("d", test = True)
-    >>> assets = shard.assets.Assets(app.logger)
-    >>> asset = assets.fetch("temp.dat")
-    >>> asset.read()
-    b'shard\n'
-    >>> asset.close()
-    >>> import os
-    >>> os.remove("temp.dat")
-    >>>
-
-Client with PygameUserInterface
--------------------------------
-
-    >>> app = shard.run.App("d", test = True)
-    >>> app.user_interface_class = shard.user.pygameui.PygameUserInterface
-    >>> interface = shard.interfaces.Interface("dummy", app.logger)
-    >>> app.run_client(60, interface, "player")
-    >>>
-
 Tile Fetching and Display in PygameUserInterface
 ------------------------------------------------
 
+    >>> import shard.plugin
+    >>> import shard.user.pygameui
+    >>> import shard.run
     >>> img = shard.user.pygameui.pygame.Surface((100, 100))
     >>> img.fill((255, 0, 0))
     <rect(0, 0, 100, 100)>
@@ -100,6 +36,7 @@ Tile Fetching and Display in PygameUserInterface
     >>> app.user_interface_class = shard.user.pygameui.PygameUserInterface
     >>> app.server_plugin_class = MapTest
     >>> app.run_standalone(60, "player")
+    >>> import os
     >>> os.remove("red.png")
     >>> os.remove("green.png")
     >>>

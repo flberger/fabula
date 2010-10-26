@@ -28,4 +28,10 @@ errors:
 	pylint --errors-only shard
 
 doctest:
-	python3 -m doctest shard-doctests.txt
+	python3 -m doctest tests/imports.txt
+	python3 -m doctest tests/client.txt
+	python3 -m doctest tests/server.txt
+	python3 -m doctest tests/standalone.txt
+	python3 -m doctest tests/assets.txt
+	python3 -m doctest tests/pygame_user_interface.txt
+	python3 -m doctest tests/tiles.txt
