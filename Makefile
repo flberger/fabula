@@ -26,14 +26,23 @@ errors:
 	@echo WARNING: using pylint for Python 2.x instead of 3.x.
 	pylint --errors-only shard
 
+ifdef PYTHON
+
 doctest: clean
-	python3 -m doctest tests/imports.txt
-	python3 -m doctest tests/client.txt
-	python3 -m doctest tests/server.txt
-	python3 -m doctest tests/standalone.txt
-	python3 -m doctest tests/assets.txt
-	python3 -m doctest tests/pygame_user_interface.txt
-	python3 -m doctest tests/tiles.txt
+	$(PYTHON) -m doctest tests/imports.txt
+	$(PYTHON) -m doctest tests/client.txt
+	$(PYTHON) -m doctest tests/server.txt
+	$(PYTHON) -m doctest tests/standalone.txt
+	$(PYTHON) -m doctest tests/assets.txt
+	$(PYTHON) -m doctest tests/pygame_user_interface.txt
+	$(PYTHON) -m doctest tests/tiles.txt
+
+else
+
+doctest:
+	@echo Please supply Python executable as PYTHON=executable.
+
+endif
 
 make win2k_update: clean
 	mount /mnt/win2k/

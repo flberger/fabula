@@ -18,7 +18,7 @@ import shard.plugin
 import shard.core.server
 import shard.interfaces
 
-import _thread
+import threading
 import logging
 from time import sleep
 
@@ -180,7 +180,8 @@ class App:
         """Helper method to be called from run_client() or run_server().
         """
 
-        _thread.start_new_thread(interface.handle_messages, ())
+        interface_thread = threading.Thread(target = interface.handle_messages)
+        interface_thread.start()
 
         # Or instead, for debugging:
         #
@@ -189,7 +190,8 @@ class App:
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0 and exit_function is not None:
-            _thread.start_new_thread(exit_function, ())
+            exit_thread = threading.Thread(target = exit_function)
+            exit_thread.start()
 
         # This method will block until the Engine exits
         #
@@ -286,14 +288,17 @@ class App:
 
         # Starting threads
         #
-        _thread.start_new_thread(handle_messages, ())
+        interface_thread = threading.Thread(target = handle_messages)
+        interface_thread.start()
 
-        _thread.start_new_thread(client.run, ())
+        client_thread = threading.Thread(target = client.run)
+        client_thread.start()
 
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0:
-            _thread.start_new_thread(exit, ())
+            exit_thread = threading.Thread(target = exit)
+            exit_thread.start()
 
         # This method will block until the server exits.
         # Cannot be put in a thread since the server installs signal handlers.
@@ -302,7 +307,8 @@ class App:
 
         # Just to be sure
         #
-        sleep(3)
+        self.logger.info("server exited, waiting for client thread to stop")
+        client_thread.join()
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

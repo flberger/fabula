@@ -65,6 +65,9 @@ class PygameUserInterface(shard.user.UserInterface):
        PygameUserInterface.clock
            An instance of pygame.time.Clock
 
+       PygameUserInterface.fps_log_counter
+           Counter to log actual fps every <framerate> frames
+
        PygameUserInterface.window
            An instance of clickndrag.Display. By default this is 800x600px and
            windowed.
@@ -101,6 +104,7 @@ class PygameUserInterface(shard.user.UserInterface):
         # Initialise the frame timing clock.
         #
         self.clock = pygame.time.Clock()
+        self.fps_log_counter = self.framerate
 
         # Open a click'n'drag window.
         #
@@ -129,6 +133,15 @@ class PygameUserInterface(shard.user.UserInterface):
         """
 
         self.clock.tick(self.framerate)
+
+        if self.fps_log_counter:
+
+            self.fps_log_counter = self.fps_log_counter - 1
+
+        else:
+            self.logger.debug("{0}/{1} fps".format(int(self.clock.get_fps()),
+                                                   self.framerate))
+            self.fps_log_counter = self.framerate
 
         return
 
@@ -187,38 +200,44 @@ class PygameUserInterface(shard.user.UserInterface):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """Fade window to black.
+        """Fade window to black and remove subplanes of PygameUserInterface.window.room
         """
 
         self.logger.debug("called")
 
-        fadestep = int(255 / self.action_frames)
-        
-        self.fade_surface.set_alpha(0)
-        
-        frames = self.action_frames
-
-        # This is actually an exponential fade since the original surface is
-        # not restored before blitting the fading surface
+        # Only fade out if a room is already displayed.
         #
-        while frames:
-            # Bypassing display_single_frame()
+        if self.window.room.subplanes:
 
-            self.window.rendersurface.blit(self.fade_surface, (0, 0))
+            self.logger.debug("room visible, fading out")
 
-            pygame.display.flip()
+            fadestep = int(255 / self.action_frames)
+            
+            self.fade_surface.set_alpha(0)
+            
+            frames = self.action_frames
 
-            self.update_frame_timer()
-
-            # Pump the Pygame Event Queue
+            # This is actually an exponential fade since the original surface is
+            # not restored before blitting the fading surface
             #
-            pygame.event.pump()
+            while frames:
+                # Bypassing display_single_frame()
 
-            self.fade_surface.set_alpha(self.fade_surface.get_alpha() + fadestep)
+                self.window.rendersurface.blit(self.fade_surface, (0, 0))
 
-            frames = frames - 1
+                pygame.display.flip()
 
-        # Make sure it's black now
+                self.update_frame_timer()
+
+                # Pump the Pygame Event Queue
+                #
+                pygame.event.pump()
+
+                self.fade_surface.set_alpha(self.fade_surface.get_alpha() + fadestep)
+
+                frames = frames - 1
+
+        # Make the window is black now
         #
         self.window.rendersurface.fill((0, 0, 0))
         pygame.display.flip()
@@ -251,6 +270,8 @@ class PygameUserInterface(shard.user.UserInterface):
             #
             tile.asset = surface.convert_alpha()
 
+        self.logger.debug("creating subplanes for tiles")
+
         for coordinates in self.room.floor_plan:
 
             # Tiles are clickndrag subplanes of self.window.room, indexed by
@@ -268,8 +289,8 @@ class PygameUserInterface(shard.user.UserInterface):
 
             self.window.room.subplanes[str(coordinates)].image = surface
 
-        # Now render and fade in
-        #
+        self.logger.debug("fading in")
+
         fadestep = int(255 / self.action_frames)
         
         self.fade_surface.set_alpha(255)
