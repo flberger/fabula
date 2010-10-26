@@ -46,14 +46,15 @@ class App:
            an App instance.
     """
 
-    def __init__(self, loglevel, test = False):
+    def __init__(self, loglevel, timeout = 0):
         """Initialise the application.
 
            loglevel is one of "d" (DEBUG), "i" (INFO), "w" (WARNING),
            "e" (ERROR), "c" (CRITICAL).
 
-           When called with test = True, the engine will receive an
-           exit signal after some seconds. This feature is meant for unit tests.
+           timeout is the number of seconds after which the engine will receive
+           an exit signal. This feature is meant for unit tests. timeout = 0
+           will run for an unlimited time.
         """
 
         ### Set up logging
@@ -117,7 +118,7 @@ class App:
 
         # Done with logging setup.
 
-        self.test = test
+        self.timeout = timeout
 
         self.assets_class = shard.assets.Assets
         self.user_interface_class = shard.user.UserInterface
@@ -143,7 +144,11 @@ class App:
                                           player_id)
 
         def exit():
-            sleep(3)
+            """Wait for some time given in App.__init__(), then emulate a server
+               connection, then emulate an exit request from the client plugin
+               (user interface).
+            """
+            sleep(self.timeout)
             client.interface.connections["server"] = shard.interfaces.MessageBuffer()
             plugin.exit_requested = True
 
@@ -163,7 +168,10 @@ class App:
                                           self.logger,
                                           framerate)
         def exit():
-            sleep(3)
+            """Wait for some time given in App.__init__(), then call
+               server.handle_exit().
+            """
+            sleep(self.timeout)
             server.handle_exit(2, None)
 
         self.run(interface, server, exit)
@@ -180,7 +188,7 @@ class App:
 
         # Exit trigger for non-interactive unit tests
         #
-        if self.test and exit_function is not None:
+        if self.timeout > 0 and exit_function is not None:
             _thread.start_new_thread(exit_function, ())
 
         # This method will block until the Engine exits
@@ -209,11 +217,14 @@ class App:
         client_message_buffer = shard.interfaces.MessageBuffer()
         client_interface.connections["server_connection"] = client_message_buffer
 
-        # Proxy for function
+        # Proxy for use in function
         #
         logger = self.logger
 
         def handle_messages():
+            """Interconnect client and server Interface.
+            """
+
             logger.debug("starting up")
 
             # Run thread as long as no shutdown is requested
@@ -247,26 +258,29 @@ class App:
         assets = self.assets_class(self.logger)
 
         user_interface = self.user_interface_class(assets,
-                                                             framerate,
-                                                             self.logger)
+                                                   framerate,
+                                                   self.logger)
 
         client = shard.core.client.Client(client_interface,
-                                                         user_interface,
-                                                         self.logger,
-                                                         player_id)
+                                          user_interface,
+                                          self.logger,
+                                          player_id)
         # Setting up server
         #
         server_plugin = self.server_plugin_class(self.logger)
 
         server = shard.core.server.Server(server_interface,
-                                                         server_plugin,
-                                                         self.logger,
-                                                         framerate)
+                                          server_plugin,
+                                          self.logger,
+                                          framerate)
 
         # exit function for testing
         #
         def exit():
-            sleep(3)
+            """Wait for some time given in App.__init__(), the emulate an
+               UserInterface exit request, then call server.handle_exit().
+            """
+            sleep(self.timeout)
             user_interface.exit_requested = True
             server.handle_exit(2, None)
 
@@ -278,7 +292,7 @@ class App:
 
         # Exit trigger for non-interactive unit tests
         #
-        if self.test:
+        if self.timeout > 0:
             _thread.start_new_thread(exit, ())
 
         # This method will block until the server exits.

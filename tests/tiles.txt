@@ -32,7 +32,7 @@ Tile Fetching and Display in PygameUserInterface
     ...         else:
     ...             return shard.Message([])
     ...
-    >>> app = shard.run.App("d", test = True)
+    >>> app = shard.run.App("d", timeout = 15)
     >>> app.user_interface_class = shard.user.pygameui.PygameUserInterface
     >>> app.server_plugin_class = MapTest
     >>> app.run_standalone(60, "player")

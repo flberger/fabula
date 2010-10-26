@@ -7,7 +7,7 @@ Client with PygameUserInterface
     >>> import shard.interfaces
     >>> import shard.user.pygameui
     >>> import shard.run
-    >>> app = shard.run.App("d", test = True)
+    >>> app = shard.run.App("d", timeout = 5)
     >>> app.user_interface_class = shard.user.pygameui.PygameUserInterface
     >>> interface = shard.interfaces.Interface("dummy", app.logger)
     >>> app.run_client(60, interface, "player")
