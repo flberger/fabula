@@ -395,3 +395,60 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 #    def process_PicksUpEvent(self, event):
 
 #    def process_SaysEvent(self, event):
+
+class PygameMapEditor(PygameUserInterface):
+    """A Pygame-based user interface that serves as a map editor.
+
+       Additional PygameMapEditor attributes:
+
+       PygameUserInterface.window.buttons
+           clickndrag Plane for the buttons, 100x600px and located at the left
+           border of the window.
+    """
+
+    def __init__(self, assets, framerate, logger):
+        """This is an almost verbatim copy of PygameUserInterface.__init__().
+           It sets up an additional plane with editor buttons.
+        """
+
+        # Call UserInterface.__init__()
+        #
+        shard.plugins.ui.UserInterface.__init__(self, assets, framerate, logger)
+
+        self.logger.debug("called")
+
+        self.logger.debug("initialising pygame")
+        pygame.init()
+
+        # Initialise the frame timing clock.
+        #
+        self.clock = pygame.time.Clock()
+        self.fps_log_counter = self.framerate
+
+        # Open a click'n'drag window.
+        #
+        self.window = clickndrag.Display((900, 600))
+
+        # Create a black pygame surface for fade effects
+        # New Surfaces are black by default in Pygame 1.x
+        #
+        self.fade_surface = pygame.Surface((800, 600))
+
+        # Create inventory plane at PygameUserInterface.window.inventory
+        #
+        self.window.sub(clickndrag.Plane("inventory",
+                                         pygame.Rect((100, 500), (800, 100))))
+        # Create plane for the room.
+        #
+        self.window.sub(clickndrag.Plane("room",
+                                         pygame.Rect((100, 0), (800, 500))))
+
+        # Create plane for the editor buttons.
+        #
+        self.window.sub(clickndrag.Plane("buttons",
+                                         pygame.Rect((0, 0), (100, 600))))
+        self.window.buttons.image.fill((127, 127, 127))
+
+        self.logger.debug("complete")
+
+        return
