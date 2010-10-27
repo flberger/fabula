@@ -12,10 +12,10 @@
 # Converted from run_shard.py on 06. Oct 2009
 
 import shard.assets
-import shard.user
 import shard.core.client
-import shard.plugin
 import shard.core.server
+import shard.plugins
+import shard.plugins.ui
 import shard.interfaces
 
 import threading
@@ -121,8 +121,8 @@ class App:
         self.timeout = timeout
 
         self.assets_class = shard.assets.Assets
-        self.user_interface_class = shard.user.UserInterface
-        self.server_plugin_class = shard.plugin.Plugin
+        self.user_interface_class = shard.plugins.ui.UserInterface
+        self.server_plugin_class = shard.plugins.Plugin
 
     def run_client(self, framerate, interface, player_id):
         """Run a Shard client with the parameters given.

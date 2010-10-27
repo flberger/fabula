@@ -7,14 +7,14 @@ Core Modules and Imports
 First, make sure all core modules import fine:
 
     >>> import shard
+    >>> import shard.eventprocessor
     >>> import shard.assets
     >>> import shard.core
     >>> import shard.core.client
     >>> import shard.core.server
-    >>> import shard.eventprocessor
     >>> import shard.interfaces
-    >>> import shard.plugin
-    >>> import shard.user
-    >>> import shard.user.pygameui
+    >>> import shard.plugins
+    >>> import shard.plugins.ui
+    >>> import shard.plugins.pygameui
     >>> import shard.run
     >>>

@@ -4,17 +4,17 @@ Doctests for the Shard Package
 Tile Fetching and Display in PygameUserInterface
 ------------------------------------------------
 
-    >>> import shard.plugin
-    >>> import shard.user.pygameui
+    >>> import shard.plugins
+    >>> import shard.plugins.pygameui
     >>> import shard.run
-    >>> img = shard.user.pygameui.pygame.Surface((100, 100))
+    >>> img = shard.plugins.pygameui.pygame.Surface((100, 100))
     >>> img.fill((255, 0, 0))
     <rect(0, 0, 100, 100)>
-    >>> shard.user.pygameui.pygame.image.save(img, "red.png")
+    >>> shard.plugins.pygameui.pygame.image.save(img, "red.png")
     >>> img.fill((0, 255, 0))
     <rect(0, 0, 100, 100)>
-    >>> shard.user.pygameui.pygame.image.save(img, "green.png")
-    >>> class MapTest(shard.plugin.Plugin):
+    >>> shard.plugins.pygameui.pygame.image.save(img, "green.png")
+    >>> class MapTest(shard.plugins.Plugin):
     ...     def process_message(self, message):
     ...         if len(message.event_list):
     ...             self.logger.debug("processing message {}".format(str(message.event_list)))
@@ -32,11 +32,11 @@ Tile Fetching and Display in PygameUserInterface
     ...         else:
     ...             return shard.Message([])
     ...
-    >>> class QuittingInterface(shard.user.pygameui.PygameUserInterface):
+    >>> class QuittingInterface(shard.plugins.pygameui.PygameUserInterface):
     ...     def process_RoomCompleteEvent(self, event):
-    ...         shard.user.pygameui.PygameUserInterface.process_RoomCompleteEvent(self, event)
-    ...         quit_event = shard.user.pygameui.pygame.event.Event(shard.user.pygameui.pygame.QUIT)
-    ...         shard.user.pygameui.pygame.event.post(quit_event)
+    ...         shard.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent(self, event)
+    ...         quit_event = shard.plugins.pygameui.pygame.event.Event(shard.plugins.pygameui.pygame.QUIT)
+    ...         shard.plugins.pygameui.pygame.event.post(quit_event)
     ...         return
     ...
     >>> app = shard.run.App("d", timeout = 5)

@@ -17,14 +17,14 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-import shard.user
+import shard.plugins.ui
 import pygame
 import clickndrag
 
-class PygameUserInterface(shard.user.UserInterface):
+class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
 
-       Inherited from shard.user.UserInterface:
+       Inherited from shard.plugins.ui.UserInterface:
 
        UserInterface.action_time
            Set how long actions like a movement from Map element to Map element
@@ -94,7 +94,7 @@ class PygameUserInterface(shard.user.UserInterface):
 
         # Call original __init__()
         #
-        shard.user.UserInterface.__init__(self, assets, framerate, logger)
+        shard.plugins.ui.UserInterface.__init__(self, assets, framerate, logger)
 
         self.logger.debug("called")
 

@@ -8,10 +8,10 @@
 # Renamed from PresentationEngine to UserInterface on 14. Oct 2010
 
 import shard
-import shard.plugin
+import shard.plugins
 import time
 
-class UserInterface(shard.plugin.Plugin):
+class UserInterface(shard.plugins.Plugin):
     """This is the base class for an UserInterface for the Shard Client.
        Subclasses should override the appropriate methods of this class
        and implement a graphical representation of the game and the 
@@ -68,7 +68,7 @@ class UserInterface(shard.plugin.Plugin):
 
         # First set up the plugin
         #
-        shard.plugin.Plugin.__init__(self, logger)
+        shard.plugins.Plugin.__init__(self, logger)
 
         self.logger.debug("called")
 
