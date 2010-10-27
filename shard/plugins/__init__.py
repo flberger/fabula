@@ -40,6 +40,7 @@ class Plugin(shard.eventprocessor.EventProcessor):
            an empty message.
         """
 
-        self.logger.debug("processing message " + str(message.event_list))
+        if message.event_list:
+            self.logger.debug("processing message {}".format(message.event_list))
 
         return self.message_for_host
