@@ -199,7 +199,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """Fade window to black and remove subplanes of PygameUserInterface.window.room
         """
 
-        self.logger.debug("called")
+        self.logger.debug("entering room: {}".format(event.name))
 
         # Only fade out if a room is already displayed.
         #
@@ -520,6 +520,8 @@ class PygameMapEditor(PygameUserInterface):
         if filename:
 
             self.logger.debug("save to: {}".format(filename))
+
+            self.message_for_host.event_list.append(shard.EnterRoomEvent(filename))
 
             for x in range(8):
                 for y in range(6):

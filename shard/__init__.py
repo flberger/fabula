@@ -488,12 +488,16 @@ class EnterRoomEvent(ServerEvent):
        Events building the map and spawning the player, items and NPCs should
        follow. The room is done and can be used when the server issues
        RoomCompleteEvent.
+
+       EnterRoomEvent.name
+           The name of the Room to be entered.
     """
 
-    def __init__(self):
-        """This event has no parameters.
+    def __init__(self, name):
+        """Event initialisation.
+           name is the name of the Room to be entered.
         """
-        pass
+        self.name = name
 
 class RoomCompleteEvent(ServerEvent):
     """Issued by the server after an EnterRoomEvent

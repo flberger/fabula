@@ -563,7 +563,7 @@ class UserInterface(shard.plugins.Plugin):
            it receives a RoomCompleteEvent.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("entering room: {}".format(event.name))
 
         self.display_single_frame()
 

@@ -20,7 +20,10 @@
       
     </div>
     <pre>This is the server-side Plugin for a Shard map editor.
-    </pre>
+Additional attributes:
+
+MapEditor.current_room
+    name of the current room</pre>
 
     
     
@@ -32,8 +35,32 @@
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.MapEditor.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.serverside.MapEditor.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Send a bare room, to be populated by the user.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.MapEditor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Save the name of the room to be entered.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.MapEditor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Forward the event to the Server to update the Room.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.MapEditor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the event.</tt></td>
   </tr>
   
 </table>
@@ -45,12 +72,6 @@
   
   
 <tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#__init__">__init__</a></td>
-    <td><tt>Initialise the plugin.</tt></td>
-  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -192,24 +213,6 @@
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
     <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
   </tr>
   
 </table>
@@ -221,6 +224,24 @@
     
 
     <div class="function">
+  <a name="shard.plugins.serverside.MapEditor.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, logger):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#__init__">shard.plugins.Plugin.__init__</a></div>
+    <pre>Initialise.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="shard.plugins.serverside.MapEditor.process_InitEvent">
     
   </a>
@@ -238,9 +259,63 @@
     <pre>Send a bare room, to be populated by the user.
         </pre>
   </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.MapEditor.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div>
+    <pre>Save the name of the room to be entered.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.MapEditor.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div>
+    <pre>Forward the event to the Server to update the Room.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.MapEditor.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div>
+    <pre>Process the event.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-28 19:23:57.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-28 21:02:22.
     </address>
   </body>
 </html>

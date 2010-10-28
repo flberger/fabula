@@ -679,6 +679,8 @@ class Server(shard.core.Engine):
         """Register the client in the room and forward the Event.
         """
 
+        self.logger.debug("entering room: {}".format(event.name))
+
         # TODO: This is a hack. Implement correct handling of multiple rooms.
         #
         if kwargs["client_key"] in self.room.active_clients:

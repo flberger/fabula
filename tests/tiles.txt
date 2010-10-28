@@ -20,7 +20,7 @@ Tile Fetching and Display in PygameUserInterface
     ...             self.logger.debug("processing message {}".format(str(message.event_list)))
     ...             tile_red = shard.Tile(shard.FLOOR, "red.png")
     ...             tile_green = shard.Tile(shard.FLOOR, "green.png")
-    ...             self.message_for_host.event_list.append(shard.EnterRoomEvent())
+    ...             self.message_for_host.event_list.append(shard.EnterRoomEvent("test"))
     ...             for x in range(0, 8, 2):
     ...                 for y in range(0, 5, 2):
     ...                     self.message_for_host.event_list.append(shard.ChangeMapElementEvent(tile_red, (x, y)))
