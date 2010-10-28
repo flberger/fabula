@@ -446,14 +446,13 @@ class UserInterface(shard.plugins.Plugin):
     # TODO: Most docstrings describe 2D stuff (images). Rewrite 2D-3D-agnostic.
 
     def display_asset_exception(self, asset):
-        """Called when the assets is unable to retrieve the asset.
+        """Called when assets is unable to retrieve the asset.
            This is a serious error which usually prohibits continuation.
            The user should be asked to check his installation, file system
            or network connection.
         """
 
-        self.logger.critical("Asset could not be fetched: %s. Aborting."
-                             % asset)
+        self.logger.critical("Asset could not be fetched: {}. Aborting.".format(asset))
 
         raise SystemExit
 

@@ -180,7 +180,8 @@ class App:
         """Helper method to be called from run_client() or run_server().
         """
 
-        interface_thread = threading.Thread(target = interface.handle_messages)
+        interface_thread = threading.Thread(target = interface.handle_messages,
+                                            name = "handle_messages")
         interface_thread.start()
 
         # Or instead, for debugging:
@@ -190,7 +191,8 @@ class App:
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0 and exit_function is not None:
-            exit_thread = threading.Thread(target = exit_function)
+            exit_thread = threading.Thread(target = exit_function,
+                                           name = "exit_function")
             exit_thread.start()
 
         # This method will block until the Engine exits
@@ -219,7 +221,7 @@ class App:
         client_message_buffer = shard.interfaces.MessageBuffer()
         client_interface.connections["server_connection"] = client_message_buffer
 
-        # Proxy for use in function
+        # Proxy for use in functions
         #
         logger = self.logger
 
@@ -232,7 +234,7 @@ class App:
             # Run thread as long as no shutdown is requested
             #
             while not (server_interface.shutdown_flag
-                       or server_interface.shutdown_flag):
+                       or client_interface.shutdown_flag):
 
                 if len(server_message_buffer.messages_for_remote):
                     message = server_message_buffer.messages_for_remote.popleft()
@@ -276,29 +278,46 @@ class App:
                                           self.logger,
                                           framerate)
 
-        # exit function for testing
+        # Client exit function for testing
         #
-        def exit():
+        def client_exit():
             """Wait for some time given in App.__init__(), the emulate an
-               UserInterface exit request, then call server.handle_exit().
+               UserInterface exit request.
             """
             sleep(self.timeout)
             user_interface.exit_requested = True
+
+        # Server exit function if client exits
+        #
+        def server_exit():
+            client_thread.join()
+            #while client_thread.is_alive():
+            #    sleep(1)
+            #    logger.debug(threading.enumerate())
+            logger.debug("client exited, calling server.handle_exit()")
             server.handle_exit(2, None)
 
         # Starting threads
         #
-        interface_thread = threading.Thread(target = handle_messages)
+        interface_thread = threading.Thread(target = handle_messages,
+                                            name = "handle_messages")
         interface_thread.start()
 
-        client_thread = threading.Thread(target = client.run)
+        client_thread = threading.Thread(target = client.run,
+                                         name = "client_thread")
         client_thread.start()
 
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0:
-            exit_thread = threading.Thread(target = exit)
-            exit_thread.start()
+            client_exit_thread = threading.Thread(target = client_exit,
+                                                  name = "client_exit")
+            client_exit_thread.start()
+
+
+        server_exit_thread = threading.Thread(target = server_exit,
+                                              name = "server_exit")
+        server_exit_thread.start()
 
         # This method will block until the server exits.
         # Cannot be put in a thread since the server installs signal handlers.
@@ -309,6 +328,8 @@ class App:
         #
         self.logger.info("server exited, waiting for client thread to stop")
         client_thread.join()
+
+        self.logger.info("client thread stopped, shutting down logger")
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

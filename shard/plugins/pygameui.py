@@ -1,13 +1,5 @@
 """2D Shard User Interface using PyGame
 
-   Addiotional attributes:
-
-   PygameUserInterface.clock
-       Pygame frame timing clock
-
-   PygameUserInterface.fade_surface
-       A black Pygame Surface for fade effects
-
    (c) Florian Berger <fberger@florian-berger.de>
 """
 
@@ -447,6 +439,7 @@ class PygameMapEditor(PygameUserInterface):
         #
         self.window.sub(clickndrag.Plane("buttons",
                                          pygame.Rect((0, 0), (100, 600))))
+
         self.window.buttons.image.fill((127, 127, 127))
 
         self.logger.debug("complete")

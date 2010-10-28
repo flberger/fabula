@@ -39,7 +39,7 @@ Tile Fetching and Display in PygameUserInterface
     ...         shard.plugins.pygameui.pygame.event.post(quit_event)
     ...         return
     ...
-    >>> app = shard.run.App("d", timeout = 5)
+    >>> app = shard.run.App("d", timeout = 0)
     >>> app.user_interface_class = QuittingInterface
     >>> app.server_plugin_class = MapTest
     >>> app.run_standalone(60, "player")
