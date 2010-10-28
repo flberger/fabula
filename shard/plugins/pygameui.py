@@ -14,6 +14,7 @@ import pygame
 import clickndrag
 import clickndrag.gui
 import tkinter.filedialog
+import os.path
 
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
@@ -475,16 +476,16 @@ class PygameMapEditor(PygameUserInterface):
         tk = tkinter.Tk()
         tk.withdraw()
 
-        filename = tkinter.filedialog.askopenfilename()
+        fullpath = tkinter.filedialog.askopenfilename()
 
         tk.destroy()
         
-        if filename:
+        if fullpath:
 
-            self.logger.debug("open: {}".format(filename))
+            self.logger.debug("open: {}".format(fullpath))
 
             try:
-                new_image = pygame.image.load(filename)
+                new_image = pygame.image.load(fullpath)
 
                 for x in range(8):
                     for y in range(6):
@@ -492,7 +493,7 @@ class PygameMapEditor(PygameUserInterface):
                         self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
             except pygame.error:
-                self.logger.debug("could not load image '{}'".format(filename))
+                self.logger.debug("could not load image '{}'".format(fullpath))
 
         else:
             self.logger.debug("no filename selected")
@@ -502,3 +503,41 @@ class PygameMapEditor(PygameUserInterface):
         """
 
         self.logger.debug("called")
+
+        tk = tkinter.Tk()
+        tk.withdraw()
+
+        fullpath = tkinter.filedialog.asksaveasfilename()
+
+        tk.destroy()
+
+        path, filename = os.path.split(fullpath)
+
+        # Strip extension, if given
+        #
+        filename = os.path.splitext(filename)[0]
+
+        if filename:
+
+            self.logger.debug("save to: {}".format(filename))
+
+            for x in range(8):
+                for y in range(6):
+
+                    # Save image file
+                    #
+                    current_file = filename + "-{0}_{1}.png".format(x, y)
+                    self.logger.debug(current_file)
+                    pygame.image.save(self.window.room.subplanes[str((x, y))].image,
+                                      os.path.join(path, current_file))
+
+                    # Send Tile to Server
+                    #
+                    tile = shard.Tile(shard.FLOOR, current_file)
+                    event = shard.ChangeMapElementEvent(tile, (x, y))
+                    self.message_for_host.event_list.append(event)
+
+            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+
+        else:
+            self.logger.debug("no filename selected")

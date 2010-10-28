@@ -27,3 +27,16 @@ class MapEditor(shard.plugins.Plugin):
                 self.message_for_host.event_list.append(event)
 
         self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+
+    def process_ChangeMapElementEvent(self, event):
+        """Forward the event to the Server to update the Room.
+        """
+
+        self.logger.debug("called")
+        self.message_for_host.event_list.append(event)
+
+    def process_RoomCompleteEvent(self, event):
+        """Process the event.
+        """
+        self.logger.debug("called")
+        self.logger.debug("floor_plan: {}".format(self.host.room.floor_plan))
