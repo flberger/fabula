@@ -47,9 +47,7 @@ endif
 make win2k_update: clean
 	mount /mnt/win2k/
 	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/*
-	cp -r ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
-	cp /home/florian/programmieren/python/clickndrag/clickndrag_bzr-repo/clickndrag/clickndrag.py \
-	   /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
+	cp -r --dereference ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
 	umount /mnt/win2k/
 
 clean:

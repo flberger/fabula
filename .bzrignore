@@ -3,5 +3,6 @@
 examples/shard
 commit.txt
 *.log
-clickndrag.py
+clickndrag
 *.png
+*.jpg

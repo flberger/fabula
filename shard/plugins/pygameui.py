@@ -12,6 +12,8 @@
 import shard.plugins.ui
 import pygame
 import clickndrag
+import clickndrag.gui
+import tkinter.filedialog
 
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
@@ -105,7 +107,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Create a black pygame surface for fade effects
         # New Surfaces are black by default in Pygame 1.x
         #
-        self.fade_surface = pygame.Surface((800, 600))
+        self.fade_surface = self.window.image.copy()
+        self.fade_surface.fill((0, 0, 0))
 
         # Create inventory plane at PygameUserInterface.window.inventory
         #
@@ -421,10 +424,15 @@ class PygameMapEditor(PygameUserInterface):
         #
         self.window = clickndrag.Display((900, 600))
 
+        # Set window name
+        #
+        pygame.display.set_caption("Shard Map Editor")
+
         # Create a black pygame surface for fade effects
         # New Surfaces are black by default in Pygame 1.x
         #
-        self.fade_surface = pygame.Surface((800, 600))
+        self.fade_surface = self.window.image.copy()
+        self.fade_surface.fill((0, 0, 0))
 
         # Create inventory plane at PygameUserInterface.window.inventory
         #
@@ -442,6 +450,55 @@ class PygameMapEditor(PygameUserInterface):
 
         self.window.buttons.image.fill((127, 127, 127))
 
+        # Add buttons
+        #
+        self.window.buttons.sub(clickndrag.gui.Button("Open Image",
+                                                      pygame.Rect((5, 5),
+                                                                  (90, 30)),
+                                                      self.set_room_background))
+
+        self.window.buttons.sub(clickndrag.gui.Button("Save Room",
+                                                      pygame.Rect((5, 45),
+                                                                  (90, 30)),
+                                                      self.save_room))
+
         self.logger.debug("complete")
 
         return
+
+    def set_room_background(self):
+        """Prompt the user for a room background image, load it and assign it to tiles.
+        """
+
+        self.logger.debug("called")
+
+        tk = tkinter.Tk()
+        tk.withdraw()
+
+        filename = tkinter.filedialog.askopenfilename()
+
+        tk.destroy()
+        
+        if filename:
+
+            self.logger.debug("open: {}".format(filename))
+
+            try:
+                new_image = pygame.image.load(filename)
+
+                for x in range(8):
+                    for y in range(6):
+                        rect = pygame.Rect((x * 100, y * 100), (100, 100))
+                        self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
+
+            except pygame.error:
+                self.logger.debug("could not load image '{}'".format(filename))
+
+        else:
+            self.logger.debug("no filename selected")
+
+    def save_room(self):
+        """Save the tile images.
+        """
+
+        self.logger.debug("called")

@@ -12,7 +12,7 @@ import time
 
 class Server(shard.core.Engine):
     """The Server is the central management and control authority in Shard.
-       It relies on the ServerInterface and the StoryEngine.
+       It relies on the ServerInterface and the Plugin.
     """
 
     def __init__(self, interface_instance, plugin_instance, logger, framerate):
@@ -66,7 +66,7 @@ class Server(shard.core.Engine):
         #
         # self.plugin
         #
-        #     StoryEngine
+        #     Plugin
         #
         #
         # self.message_for_plugin
@@ -121,7 +121,7 @@ class Server(shard.core.Engine):
         # TODO: restart plugin when SIGHUP is received
 
     def run(self):
-        """Server main method, calling the StoryEngine in the process.
+        """Server main method, calling the Plugin in the process.
         """
 
         self.logger.info("starting")
@@ -136,7 +136,7 @@ class Server(shard.core.Engine):
 
                 if len(message.event_list):
 
-                    self.logger.debug("%s incoming: %s" % (address_port_tuple, message))
+                    self.logger.debug("{0} incoming: {1}".format(address_port_tuple, message))
 
                     for event in message.event_list:
 
@@ -144,31 +144,38 @@ class Server(shard.core.Engine):
                         # Otherwise, a long burst of events might unfairly
                         # block other clients. (hint by Alexander Marbach)
 
-                        # TODO: call story engine even if client message is empty!
-                        # Probably at the end of the connections loop, treating 
-                        # the plugin as another client (idea Alexander Marbach).
-
-                        # This is a bit of Python magic. 
-                        # self.event_dict is a dict which maps classes to handling
-                        # functions. We use the class of the event supplied as
-                        # a key to call the appropriate handler, and hand over
-                        # the event.
-                        # These methods may add events for the plugin engine
-                        # to self.message_for_plugin
+                        # Be sceptical. Only accept typical client events.
+                        # TODO: Include shard.ChangeStateEvent?
                         #
-                        # client_key is really only needed
-                        # by process_InitEvent, but to avoid splitting
-                        # this beautiful call we submit it to all methods.
-                        #
-                        self.event_dict[event.__class__](event,
-                                                         message = self.message_for_plugin,
-                                                         client_key = address_port_tuple)
+                        if event.__class__ in [shard.InitEvent,
+                                               shard.AttemptEvent,
+                                               shard.SaysEvent]:
 
-                        # Contrary to the Client, the
-                        # Server calls its plugin engine
-                        # on an event-by-event rather than on a
-                        # message-by-message base to allow for
-                        # quick and real-time reaction.
+                            # This is a bit of Python magic. 
+                            # self.event_dict is a dict which maps classes to
+                            # handling functions. We use the class of the event
+                            # supplied as a key to call the appropriate handler, and
+                            # hand over the event.
+                            # These methods may add events for the plugin engine
+                            # to self.message_for_plugin
+                            #
+                            # client_key is really only needed by process_InitEvent,
+                            # but to avoid splitting this beautiful call we submit
+                            # it to all methods.
+                            #
+                            self.event_dict[event.__class__](event,
+                                                             message = self.message_for_plugin,
+                                                             client_key = address_port_tuple)
+                        else:
+                            # Looks like the Client sent an Event typically
+                            # issued by the Server. Let the Plugin handle that.
+                            #
+                            self.message_for_plugin.event_list.append(event)
+
+                        # Contrary to the Client, the Server calls its plugin
+                        # engine on an event-by-event rather than on a
+                        # message-by-message base to allow for quick and
+                        # real-time reaction.
 
                         self.call_plugin(address_port_tuple)
 
@@ -176,12 +183,8 @@ class Server(shard.core.Engine):
 
                 else:
                     # len(message.event_list) == 0
-                    #
-                    # Call Plugin anyway to catch
-                    # Plugin initiated Events
-                    #
-                    # self.message_for_plugin is already set
-                    # to an empty Message
+                    # Call Plugin anyway to catch Plugin initiated Events
+                    # self.message_for_plugin is already set to an empty Message
                     #
                     self.call_plugin(address_port_tuple)
 
@@ -254,7 +257,8 @@ class Server(shard.core.Engine):
         #
         if self.message_for_remote.event_list:
 
-            self.logger.debug("%s outgoing: %s" % (address_port_tuple, self.message_for_remote))
+            self.logger.debug("{0} outgoing: {1}".format(address_port_tuple,
+                                                         self.message_for_remote))
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
@@ -324,8 +328,7 @@ class Server(shard.core.Engine):
         #
         if len(self.message_for_all.event_list):
 
-            self.logger.debug("message for all clients in current room: %s"
-                              % self.message_for_all.event_list)
+            self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
             for client_key in self.room.active_clients:
 
@@ -353,8 +356,7 @@ class Server(shard.core.Engine):
                        3 : "SIGQUIT",
                        15 : "SIGTERM"}
 
-        self.logger.info("caught signal %s (%s), setting exit flag"
-                         % (signalnum, signal_dict[signalnum]))
+        self.logger.info("caught signal {0} ({1}), setting exit flag".format(signalnum, signal_dict[signalnum]))
 
 
         self.exit_requested = True
@@ -368,7 +370,7 @@ class Server(shard.core.Engine):
 
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
 
-        self.logger.debug("%s -> %s" % (event.identifier, event.target_identifier))
+        self.logger.debug("{0} -> {1}".format(event.identifier, event.target_identifier))
 
         # Do we need to move / turn at all?
         #
@@ -385,8 +387,7 @@ class Server(shard.core.Engine):
 
             # TODO: we exit here to hunt bugs
             #
-            raise shard.ShardException("invalid difference in TriesToMoveEvent: %s"
-                                       % (difference,))
+            raise shard.ShardException("invalid difference in TriesToMoveEvent: {}".format(difference))
 
         else:
 
@@ -682,15 +683,13 @@ class Server(shard.core.Engine):
         #
         if kwargs["client_key"] in self.room.active_clients:
 
-            self.logger.debug("client %s already in current room, deregistering"
-                              % str(kwargs["client_key"]))
+            self.logger.debug("client {} already in current room, deregistering".formatstr(kwargs["client_key"]))
 
             self.room.active_clients.remove(kwargs["client_key"])
 
         else:
 
-            self.logger.debug("registering client %s in current room"
-                              % str(kwargs["client_key"]))
+            self.logger.debug("registering client {} in current room".format(str(kwargs["client_key"])))
 
             self.room.active_clients.append(kwargs["client_key"])
 
