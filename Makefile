@@ -54,3 +54,6 @@ clean:
 	rm -vf *pyc
 	rm -vf */*pyc
 	rm -vf */*/*pyc
+	rm -vf *log
+	rm -vf */*log
+	rm -vf */*/*log

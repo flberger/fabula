@@ -463,6 +463,11 @@ class PygameMapEditor(PygameUserInterface):
                                                                   (90, 30)),
                                                       self.save_room))
 
+        self.window.buttons.sub(clickndrag.gui.Button("Quit",
+                                                      pygame.Rect((5, 565),
+                                                                  (90, 30)),
+                                                      self.quit))
+
         self.logger.debug("complete")
 
         return
@@ -540,6 +545,13 @@ class PygameMapEditor(PygameUserInterface):
                     self.message_for_host.event_list.append(event)
 
             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+            self.message_for_host.event_list.append(shard.InitEvent(self.host.player_id))
 
         else:
             self.logger.debug("no filename selected")
+
+    def quit(self):
+        """Set self.exit_requested = True
+        """
+        self.logger.debug("setting exit_requested = True")
+        self.exit_requested = True

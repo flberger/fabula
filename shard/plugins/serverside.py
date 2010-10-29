@@ -60,5 +60,19 @@ class MapEditor(shard.plugins.Plugin):
         """Process the event.
         """
         self.logger.debug("called")
-        self.logger.debug("floor_plan for room '{0}': {1}".format(self.current_room,
-                                                                  self.host.room.floor_plan))
+
+        roomfile = open(self.current_room + ".floorplan", "wt")
+
+        for coordinates in self.host.room.floor_plan:
+
+            tile = self.host.room.floor_plan[coordinates].tile
+
+            roomfile.write("{0}\t{1}\t{2}\n".format(repr(coordinates),
+                                                    tile.tile_type,
+                                                    tile.asset_desc))
+
+            # TODO: save FloorPlanElement.entities = []
+
+        roomfile.close()
+
+        self.logger.debug("wrote {}".format(self.current_room + ".floorplan"))

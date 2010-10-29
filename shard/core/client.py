@@ -14,6 +14,30 @@ class Client(shard.core.Engine):
        It connects to the Client Interface and to the UserInterface,
        passes events and keeps track of Entities.
        It is normally instantiated in shard.run.
+
+       Additional attributes:
+
+       Client.player_id
+           The unique id for this Client.
+
+       Client.await_confirmation
+       Client.got_empty_message
+           Flags used by Client.run()
+
+       Client.message_sent
+           Buffer for sent message
+
+       Client.timestamp
+           Timestamp to detect server dropouts
+
+       Client.message_timestamp
+           Timestamp for Message log
+
+       Client.message_log_file
+           Open stream to record a list of Messages and time intervals
+
+       Client.local_moves_to_event
+           Cache for the latest local MovesToEvent
     """
 
     ####################

@@ -22,6 +22,9 @@ import threading
 import logging
 from time import sleep
 
+import sys
+import traceback
+
 class App:
     """An App instance represents a Shard client or server application.
 
@@ -321,8 +324,15 @@ class App:
 
         # This method will block until the server exits.
         # Cannot be put in a thread since the server installs signal handlers.
+        # Strangely, tracebacks in this main thread are not printed, so they
+        # are logged.
         #
-        server.run()
+        exception = ''
+        try:
+            server.run()
+        except:
+            exception = traceback.format_exc()
+            self.logger.debug("exception in server.run():\n{}".format(exception))
 
         # Just to be sure
         #
@@ -330,6 +340,9 @@ class App:
         client_thread.join()
 
         self.logger.info("client thread stopped, shutting down logger")
+
+        if exception:
+            self.logger.debug("exception in server.run() was:\n{}".format(exception))
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
