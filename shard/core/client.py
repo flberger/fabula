@@ -642,7 +642,7 @@ class Client(shard.core.Engine):
 
         # Delete old room and create new
         #
-        self.room = shard.Room()
+        self.room = shard.Room(event.room_identifier)
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them

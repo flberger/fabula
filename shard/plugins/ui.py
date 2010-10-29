@@ -109,7 +109,7 @@ class UserInterface(shard.plugins.Plugin):
         # Variables to be filled by the Client
         # before each call to process_message()
         #
-        self.room = shard.Room()
+        self.room = None
 
         # Convenience dict converting symbolic
         # directions to a vector
@@ -563,7 +563,7 @@ class UserInterface(shard.plugins.Plugin):
            it receives a RoomCompleteEvent.
         """
 
-        self.logger.debug("entering room: {}".format(event.name))
+        self.logger.debug("entering room: {}".format(event.room_identifier))
 
         self.display_single_frame()
 

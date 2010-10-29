@@ -23,6 +23,7 @@ class MapEditor(shard.plugins.Plugin):
         shard.plugins.Plugin.__init__(self, logger)
 
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
+        # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
         #
         self.current_room = ''
 
@@ -32,22 +33,27 @@ class MapEditor(shard.plugins.Plugin):
 
         self.logger.debug("called")
 
-        self.message_for_host.event_list.append(shard.EnterRoomEvent("edit_this"))
+        if self.host.room is None:
 
-        tile = shard.Tile(shard.FLOOR, "tile_default.png")
+            self.logger.debug("no room sent yet, sending initial room")
 
-        for x in range(8):
-            for y in range(6):
-                event = shard.ChangeMapElementEvent(tile, (x, y))
-                self.message_for_host.event_list.append(event)
+            self.message_for_host.event_list.append(shard.EnterRoomEvent("edit_this"))
 
-        self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+            tile = shard.Tile(shard.FLOOR, "tile_default.png")
+
+            for x in range(8):
+                for y in range(6):
+                    event = shard.ChangeMapElementEvent(tile, (x, y))
+                    self.message_for_host.event_list.append(event)
+
+            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
     def process_EnterRoomEvent(self, event):
-        """Save the name of the room to be entered.
+        """Save the name of the room to be entered and forward the event to the Server to update the Room..
         """
-        self.logger.debug("entering room: {}".format(event.name))
-        self.current_room = event.name
+        self.logger.debug(str(event))
+        self.current_room = event.room_identifier
+        self.message_for_host.event_list.append(event)
 
     def process_ChangeMapElementEvent(self, event):
         """Forward the event to the Server to update the Room.
@@ -57,8 +63,9 @@ class MapEditor(shard.plugins.Plugin):
         self.message_for_host.event_list.append(event)
 
     def process_RoomCompleteEvent(self, event):
-        """Process the event.
+        """Save the Room to a local file, then forward the event to the Server .
         """
+
         self.logger.debug("called")
 
         roomfile = open(self.current_room + ".floorplan", "wt")
@@ -76,3 +83,5 @@ class MapEditor(shard.plugins.Plugin):
         roomfile.close()
 
         self.logger.debug("wrote {}".format(self.current_room + ".floorplan"))
+
+        self.message_for_host.event_list.append(event)

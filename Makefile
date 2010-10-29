@@ -10,7 +10,14 @@ FILES = shard/assetengine.py \
         shard/servercoreengine.py
 
 help:
-	@echo Targets: docs, check, errors, doctest, win2k_update
+	@echo Targets:
+	@echo '    docs'
+	@echo '    check'
+	@echo '    errors'
+	@echo '    doctest'
+	@echo '    win2k_update'
+	@echo '    clean'
+	@echo '    zip'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -44,7 +51,7 @@ doctest:
 
 endif
 
-make win2k_update: clean
+win2k_update: clean
 	mount /mnt/win2k/
 	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/*
 	cp -r --dereference ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
@@ -57,3 +64,6 @@ clean:
 	rm -vf *log
 	rm -vf */*log
 	rm -vf */*/*log
+
+zip: clean
+	cd .. ; rm -fv shard.zip ; zip -9 -r shard.zip pygame_ui -x '*bzr*'

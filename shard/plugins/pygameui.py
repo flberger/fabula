@@ -60,6 +60,13 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
        PygameUserInterface.clock
            An instance of pygame.time.Clock
 
+       PygameUserInterface.font
+           A pygame.font.Font instance
+
+       PygameUserInterface.loading_surface
+       PygameUserInterface.loading_surface_position
+           Surface and position for a loading message
+
        PygameUserInterface.fps_log_counter
            Counter to log actual fps every <framerate> frames
 
@@ -105,11 +112,22 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         self.window = clickndrag.Display((800, 600))
 
+        # Initialise a font instance.
+        #
+        self.font = pygame.font.Font(None, 40)
+
         # Create a black pygame surface for fade effects
-        # New Surfaces are black by default in Pygame 1.x
         #
         self.fade_surface = self.window.image.copy()
         self.fade_surface.fill((0, 0, 0))
+
+        loading_surface = self.font.render("Loading, please wait...",
+                                           True,
+                                           (255, 255, 255))
+
+        self.fade_surface.blit(loading_surface,
+                               (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
+                                int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
         #
@@ -199,12 +217,15 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """Fade window to black and remove subplanes of PygameUserInterface.window.room
         """
 
-        self.logger.debug("entering room: {}".format(event.name))
+        self.logger.debug("entering room: {}".format(event.room_identifier))
 
         # Only fade out if a room is already displayed.
         #
-        if self.window.room.subplanes:
-
+        if not self.window.room.subplanes:
+            # REMOVE
+            self.logger.debug("not fading out. room: {0}, room.subplanes: {1}".format(self.window.room,
+                                                                                      self.window.room.subplanes))
+        else:
             self.logger.debug("room visible, fading out")
 
             fadestep = int(255 / self.action_frames)
@@ -233,9 +254,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
                 frames = frames - 1
 
-        # Make the window is black now
+        # Make sure the window is black now
         #
-        self.window.rendersurface.fill((0, 0, 0))
+        self.fade_surface.set_alpha(255)
+        self.window.rendersurface.blit(self.fade_surface, (0, 0))
+
         pygame.display.flip()
 
         # Clear room
@@ -403,23 +426,14 @@ class PygameMapEditor(PygameUserInterface):
     """
 
     def __init__(self, assets, framerate, logger):
-        """This is an almost verbatim copy of PygameUserInterface.__init__().
-           It sets up an additional plane with editor buttons.
+        """Call PygameUserInterface.__init__(), but set up different Planes.
         """
 
-        # Call UserInterface.__init__()
+        # Call base class __init__()
         #
-        shard.plugins.ui.UserInterface.__init__(self, assets, framerate, logger)
+        PygameUserInterface.__init__(self, assets, framerate, logger)
 
         self.logger.debug("called")
-
-        self.logger.debug("initialising pygame")
-        pygame.init()
-
-        # Initialise the frame timing clock.
-        #
-        self.clock = pygame.time.Clock()
-        self.fps_log_counter = self.framerate
 
         # Open a click'n'drag window.
         #
@@ -430,10 +444,17 @@ class PygameMapEditor(PygameUserInterface):
         pygame.display.set_caption("Shard Map Editor")
 
         # Create a black pygame surface for fade effects
-        # New Surfaces are black by default in Pygame 1.x
         #
         self.fade_surface = self.window.image.copy()
         self.fade_surface.fill((0, 0, 0))
+
+        loading_surface = self.font.render("Loading, please wait...",
+                                           True,
+                                           (255, 255, 255))
+
+        self.fade_surface.blit(loading_surface,
+                               (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
+                                int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
         #
@@ -545,7 +566,9 @@ class PygameMapEditor(PygameUserInterface):
                     self.message_for_host.event_list.append(event)
 
             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
-            self.message_for_host.event_list.append(shard.InitEvent(self.host.player_id))
+            # TODO: This was meant to trigger a clean Room re-submission from the server, but since the Room is processed and mirrored incrementally, it can probably be thrown away.
+            #
+            #self.message_for_host.event_list.append(shard.InitEvent(self.host.player_id))
 
         else:
             self.logger.debug("no filename selected")

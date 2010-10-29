@@ -16,11 +16,18 @@ class Engine(shard.eventprocessor.EventProcessor):
        Attributes:
 
        Engine.logger
+
        Engine.interface
+
        Engine.plugin
+
        Engine.message_for_plugin
+
        Engine.message_for_remote
+
        Engine.room
+           An instance of shard.Room, initialy None.
+
        Engine.rack
     """
 
@@ -74,8 +81,10 @@ class Engine(shard.eventprocessor.EventProcessor):
         self.message_for_remote = shard.Message([])
         
         # self.room keeps track of the map and active Entites.
+        # An actual room is created when the first EnterRoomEvent is
+        # encountered.
         #
-        self.room = shard.Room()
+        self.room = None
 
         # self.rack serves as a storage for deleted Entities
         # because there may be the need to respawn them.

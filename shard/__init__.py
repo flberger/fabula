@@ -489,15 +489,15 @@ class EnterRoomEvent(ServerEvent):
        follow. The room is done and can be used when the server issues
        RoomCompleteEvent.
 
-       EnterRoomEvent.name
-           The name of the Room to be entered.
+       EnterRoomEvent.room_identifier
+           The identifier of the Room to be entered.
     """
 
-    def __init__(self, name):
+    def __init__(self, room_identifier):
         """Event initialisation.
-           name is the name of the Room to be entered.
+           room_identifier is the identifier of the Room to be entered.
         """
-        self.name = name
+        self.room_identifier = room_identifier
 
 class RoomCompleteEvent(ServerEvent):
     """Issued by the server after an EnterRoomEvent
@@ -845,6 +845,10 @@ class Room(shard.eventprocessor.EventProcessor):
        It is maintained for the current room in the Client
        and for all active rooms in the Server.
 
+       Room.identifier
+           Must be an object whose string representation yields an unique
+           identification.
+
        Room.entity_dict
            A dict of all Entities in this room, mapping Entity identifiers to
            Entity instances.
@@ -864,25 +868,26 @@ class Room(shard.eventprocessor.EventProcessor):
        Note that all these dicts assume that Entity identifiers are unique.
     """
 
-    def __init__(self):
+    def __init__(self, identifier):
         """Initialise a room.
+           identifier must be an object whose string representation yields an
+           unique identification.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
 
         # Now we have:
         # self.event_dict
-        # mapping Event classes to handler methods
-        # though we do not need it since all
-        # methods of this class are called from
-        # the outside.
+        # mapping Event classes to handler methods though we do not need it
+        # since all methods of this class are called from the outside.
 
-        # floor_plan is an attempt of an efficient storage of
-        # an arbitrary two-dimensional map. To save space, 
-        # only explicitly defined elements are stored. This
-        # is done in a dict whose keys are tuples. Access the
-        # elements using floor_plan[(x, y)]. The upper left element
-        # is floor_plan[(0, 0)].
+        self.identifier = identifier
+
+        # floor_plan is an attempt of an efficient storage of an arbitrary
+        # two-dimensional map. To save space, only explicitly defined elements
+        # are stored. This is done in a dict whose keys are tuples. Access the
+        # elements using floor_plan[(x, y)]. The upper left element is
+        # floor_plan[(0, 0)].
         #
         self.floor_plan = {}
 

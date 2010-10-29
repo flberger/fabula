@@ -13,89 +13,32 @@ import time
 class Server(shard.core.Engine):
     """The Server is the central management and control authority in Shard.
        It relies on the ServerInterface and the Plugin.
-    """
+
+       Additional attributes:
+
+       Server.interval
+           1.0 / framerate
+
+       Server.message_for_all
+           Message to be broadcasted to all clients
+
+       Server.exit_requested
+           Flag to be changed by signal handler
+     """
 
     def __init__(self, interface_instance, plugin_instance, logger, framerate):
         """Initialise the Server.
         """
 
-        self.interval = 1.0 / framerate
-
         # Setup base class
+        # Engine.__init__() calls EventProcessor.__init__()
         #
-        shard.core.shard.eventprocessor.EventProcessor.__init__(self)
-
-        # Now we have:
-        #
-        # self.event_dict
-        #
-        #     Dictionary that maps event classes to
-        #     functions to be called for the respective
-        #     event
-
         shard.core.Engine.__init__(self,
                                    interface_instance,
                                    plugin_instance,
                                    logger)
 
-        # Now we have:
-        #
-        # self.logger
-        #
-        #     logging.Logger instance
-        #
-        #
-        # self.interface
-        #
-        #     An instance of
-        #     shard.interfaces.ServerInterface
-        #
-        #
-        #     self.interface.connections
-        #
-        #         A dict of MessageBuffer instances,
-        #         indexed by (address, port) tuples
-        #
-        #
-        #     MessageBuffer.send_message(message)
-        #     MessageBuffer.grab_message()
-        #
-        #         Methods for sending and retrieving
-        #         messages
-        #
-        #
-        # self.plugin
-        #
-        #     Plugin
-        #
-        #
-        # self.message_for_plugin
-        #
-        #     Events for special consideration for the
-        #     plugin. Must be emptied once the plugin
-        #     has processed all Events.
-        #
-        #
-        # self.message_for_remote
-        #
-        #     Events to be sent to the remote host in
-        #     each loop
-        #
-        #
-        # self.room = shard.Room()
-        #
-        #     self.room.entity_dict
-        #         A dict of all Entities in this room,
-        #         mapping Entity identifiers to Entity
-        #         instances.
-        #
-        #     self.room.floor_plan
-        #         A dict mapping 2D coordinate tuples
-        #         to a FloorPlanElement instance.
-        #
-        #     self.room.entity_locations
-        #         A dict mapping Entity identifiers to a
-        #         2D coordinate tuple.
+        self.interval = 1.0 / framerate
 
         # Message to be broadcasted to all clients
         #
@@ -221,13 +164,9 @@ class Server(shard.core.Engine):
         """
 
         # Put in a method to avoid duplication.
-
-        # Must not take too long since the client
-        # is waiting.
-        #
-        # Call Plugin to catch Plugin-initiated
-        # Events even if there were no Events
-        # from the client.
+        # Must not take too long since the client is waiting.
+        # Call Plugin even if there were no Events from the client to catch
+        # Plugin-initiated Events.
         #
         message_from_plugin = self.plugin.process_message(self.message_for_plugin)
 
@@ -358,7 +297,6 @@ class Server(shard.core.Engine):
 
         self.logger.info("caught signal {0} ({1}), setting exit flag".format(signalnum, signal_dict[signalnum]))
 
-
         self.exit_requested = True
 
         return
@@ -443,21 +381,22 @@ class Server(shard.core.Engine):
         return
 
     def process_InitEvent(self, event, **kwargs):
-        """Check if we already have a room and
-           entities. If yes, send the data
-           If not, pass on to the plugin.
+        """Check if we already have a room and entities.
+           If yes, send the data. If not, pass on to the plugin.
         """
+        # TODO: update docstring
 
-        if len(self.room.floor_plan):
+        self.logger.debug("called")
+
+        if self.room is not None:
 
             self.logger.debug("sending existing floor_plan and entities")
 
             # TODO: The following is even worse in terms on consistency. :-) Replace with a clean, room-oriented design.
             #
-            # This will register the client in the room and forward
-            # the Event.
+            # This will register the client in the room and forward the Event.
             #
-            self.process_EnterRoomEvent(shard.EnterRoomEvent(),
+            self.process_EnterRoomEvent(shard.EnterRoomEvent(self.room.identifier),
                                         message = self.message_for_remote,
                                         client_key = kwargs["client_key"])
 
@@ -488,11 +427,9 @@ class Server(shard.core.Engine):
 
             for identifier in self.rack.entity_dict:
 
-                # We must spawn at a valid location.
-                # Spawning at the first coordinate
-                # tuple in the room. Doesn't matter,
-                # it will be picked up in an instant
-                # anyway.
+                # We must spawn at a valid location. Spawning at the first
+                # coordinate tuple in the room. Doesn't matter, it will be
+                # picked up in an instant anyway.
                 #
                 spawn_event = shard.SpawnEvent(self.rack.entity_dict[identifier],
                                                self.room.floor_plan.keys()[0])
@@ -504,9 +441,8 @@ class Server(shard.core.Engine):
 
                 self.message_for_remote.event_list.append(picks_up_event)
 
-        # If a room has already been sent,
-        # the plugin should only spawn a
-        # new player entity.
+        # If a room has already been sent, the plugin should only spawn a new
+        # player entity.
         #
         kwargs["message"].event_list.append(event)
 
@@ -679,21 +615,31 @@ class Server(shard.core.Engine):
         """Register the client in the room and forward the Event.
         """
 
-        self.logger.debug("entering room: {}".format(event.name))
+        self.logger.debug("called, room: {}".format(event.room_identifier))
 
-        # TODO: This is a hack. Implement correct handling of multiple rooms.
-        #
-        if kwargs["client_key"] in self.room.active_clients:
+        # TODO: Implement correct handling of multiple rooms.
 
-            self.logger.debug("client {} already in current room, deregistering".formatstr(kwargs["client_key"]))
+        if self.room is None:
 
-            self.room.active_clients.remove(kwargs["client_key"])
+            self.room = shard.Room(event.room_identifier)
+            self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
+            self.room.active_clients.append(kwargs["client_key"])
 
         else:
+            if event.room_identifier == self.room.identifier:
 
-            self.logger.debug("registering client {} in current room".format(str(kwargs["client_key"])))
+                if kwargs["client_key"] in self.room.active_clients:
 
-            self.room.active_clients.append(kwargs["client_key"])
+                    self.logger.debug("client {} already in current room".format(str(kwargs["client_key"])))
+
+                else:
+                    self.logger.debug("registering client {} in current room".format(str(kwargs["client_key"])))
+                    self.room.active_clients.append(kwargs["client_key"])
+
+            else:
+                self.room = shard.Room(event.room_identifier)
+                self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
+                self.room.active_clients.append(kwargs["client_key"])
 
         kwargs["message"].event_list.append(event)
 
