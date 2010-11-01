@@ -6,6 +6,7 @@
 # work started on 27. Oct 2010
 
 import shard.plugins
+import re
 
 class MapEditor(shard.plugins.Plugin):
     """This is the server-side Plugin for a Shard map editor.
@@ -85,3 +86,69 @@ class MapEditor(shard.plugins.Plugin):
         self.logger.debug("wrote {}".format(self.current_room + ".floorplan"))
 
         self.message_for_host.event_list.append(event)
+
+class DefaultGame(shard.plugins.Plugin):
+    """This is an off-the-shelf server plugin, running a standard Shard game.
+    """
+
+    def process_InitEvent(self, event):
+        """If there is no host.room yet, load default.floorplan and send it.
+        """
+
+        self.logger.debug("called")
+
+        # Prevent "referenced before assignment"
+        #
+        roomfile = None
+
+        if self.host.room is  not None:
+
+            self.logger.debug("room already loaded, current room: {}".format(self.host.room.identifier))
+
+        else:
+            self.logger.debug("no room loaded yet, attempting to load 'default.floorplan'")
+
+            try:
+                roomfile = open("default.floorplan", "rt")
+
+            except IOError:
+                self.logger.error("could not open file 'default.floorplan'")
+
+                # No need to raise SystemExit though
+                #
+                return
+
+            self.message_for_host.event_list.append(shard.EnterRoomEvent("default"))
+
+            for line in roomfile:
+
+                # TODO: Check for 3-part tab-separated string
+                #
+                coordiantes_string, type, asset_desc = line.split("\t")
+
+                coordiantes_string = coordiantes_string.strip()
+                type = type.strip()
+                asset_desc = asset_desc.strip()
+
+                # Match only "(x, y)" coordinates
+                #
+                if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", coordiantes_string):
+                    coordinates = eval(coordiantes_string)
+
+                    # TODO: Check for shard.FLOOR etc.
+                    # TODO: Check asset_desc
+                    #
+                    tile = shard.Tile(type, asset_desc)
+
+                    event = shard.ChangeMapElementEvent(tile, coordinates)
+
+                    self.message_for_host.event_list.append(event)
+
+                else:
+                    self.logger.warning("non-matching coordinate string in default.floorplan: {}".format(repr(coordiantes_string)))
+
+            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+
+            roomfile.close()
+
+        return
