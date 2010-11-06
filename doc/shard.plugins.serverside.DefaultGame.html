@@ -3,48 +3,54 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;shard.plugins.Plugin&rdquo;</title>
+    <title>API docs for &ldquo;shard.plugins.serverside.DefaultGame&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class s.p.Plugin(<a href="shard.eventprocessor.EventProcessor.html">shard.eventprocessor.EventProcessor</a>):</h1>
+    <h1 class="class">Class s.p.s.DefaultGame(<a href="shard.plugins.Plugin.html">shard.plugins.Plugin</a>):</h1>
     <p>
-      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.plugins.html">plugins</a></span>
+      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.plugins.html">plugins</a>.<a href="shard.plugins.serverside.html">serverside</a></span>
       
-      <a href="classIndex.html#shard.plugins.Plugin">View In Hierarchy</a>
+      <a href="classIndex.html#shard.plugins.serverside.DefaultGame">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></p>
+      
     </div>
-    <pre>Base class for plugins to be used by a shard.core.Engine.
-
-Attributes:
-
-Plugin.logger
-    The host's logger
-
-Plugin.message_for_host
-    Shard Message to be returned by Plugin.process_message()
-
-Plugin.host
-    The host of this plugin, an instance of shard.core.Engine</pre>
+    <pre>This is an off-the-shelf server plugin, running a standard Shard game.
+    </pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id35">
+      <table class="children sortable" id="id31">
   
   
 <tr class="method">
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>If there is no host.room yet, load default.floorplan and send it.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.plugins.Plugin.html">Plugin</a>:
+        </p>
+        <table class="children sortable" id="id32">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.Plugin.html#__init__">__init__</a></td>
     <td><tt>Initialise the plugin.</tt></td>
-  </tr><tr class="method">
+  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -55,9 +61,9 @@ Plugin.host
 </table>
       
         <p>
-          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id36">
+        <table class="children sortable" id="id33">
   
   
 <tr class="basemethod">
@@ -216,12 +222,6 @@ Plugin.host
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
   </tr>
   
 </table>
@@ -233,48 +233,22 @@ Plugin.host
     
 
     <div class="function">
-  <a name="shard.plugins.Plugin.__init__">
+  <a name="shard.plugins.serverside.DefaultGame.process_InitEvent">
     
   </a>
-  <a name="__init__">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    __init__(self, logger):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#__init__">shard.eventprocessor.EventProcessor.__init__</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Initialise the plugin.
-logger is an instance of logging.Logger.
-The default implementation does nothing.</pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_message">
-    
-  </a>
-  <a name="process_message">
+  <a name="process_InitEvent">
     
   </a>
   <div class="functionHeader">
     
     def
-    process_message(self, message):
+    process_InitEvent(self, event):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>This is the main method of a plugin.
-
-It is called with an instance of shard.Message. This method does not
-run in a thread. It should process the message quickly and return
-another instance of shard.Message to be processed by the host and
-possibly to be sent to the remote host.
-
-The default implementation calls the respective functions for the
-Events in message and returns Plugin.message_for_host.</pre>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">shard.eventprocessor.EventProcessor.process_InitEvent</a></div>
+    <pre>If there is no host.room yet, load default.floorplan and send it.
+        </pre>
   </div>
 </div>
     <address>

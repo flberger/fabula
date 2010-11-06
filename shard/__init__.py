@@ -24,7 +24,7 @@
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
 # TODO: most prominently: message.event_list.append -> message.append
 #
-# TODO: readable __repr__ of more shard objects: Rack, ...
+# TODO: readable __repr__ of shard objects: Rack
 #
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 #
@@ -735,6 +735,25 @@ class Entity(shard.eventprocessor.EventProcessor):
         """
         pass
 
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        # TODO: This is a duplicate of Tile.__repr__
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ############################################################
 # Entity And Tile Types

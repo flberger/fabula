@@ -7,6 +7,55 @@
 
 import shard.plugins
 import re
+import os
+
+def load_room_from_file(filename):
+    """This function reads a Shard room from the file and returns a list of corresponding Events.
+       Returns None upon failure.
+    """
+
+    try:
+        roomfile = open(filename, "rt")
+
+    except IOError:
+
+        return None
+
+    event_list = [shard.EnterRoomEvent(filename.split(".floorplan")[0])]
+
+    for line in roomfile:
+
+        # TODO: Check for 3-part tab-separated string
+        #
+        coordiantes_string, type, asset_desc = line.split("\t")
+
+        coordiantes_string = coordiantes_string.strip()
+        type = type.strip()
+        asset_desc = asset_desc.strip()
+
+        # Match only "(x, y)" coordinates
+        #
+        if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", coordiantes_string):
+            coordinates = eval(coordiantes_string)
+
+            # TODO: Check for shard.FLOOR etc.
+            # TODO: Check asset_desc
+            #
+            tile = shard.Tile(type, asset_desc)
+
+            event = shard.ChangeMapElementEvent(tile, coordinates)
+
+            event_list.append(event)
+
+        else:
+            # TODO: warn here
+            pass
+
+    event_list.append(shard.RoomCompleteEvent())
+
+    roomfile.close()
+
+    return event_list
 
 class MapEditor(shard.plugins.Plugin):
     """This is the server-side Plugin for a Shard map editor.
@@ -40,12 +89,17 @@ class MapEditor(shard.plugins.Plugin):
 
             self.message_for_host.event_list.append(shard.EnterRoomEvent("edit_this"))
 
-            tile = shard.Tile(shard.FLOOR, "tile_default.png")
+            tile = shard.Tile(shard.FLOOR, "100x100-gray.png")
 
             for x in range(8):
                 for y in range(6):
                     event = shard.ChangeMapElementEvent(tile, (x, y))
                     self.message_for_host.event_list.append(event)
+
+            entity = shard.Entity(shard.PLAYER, "player", "100x100-gray.png")
+
+            self.message_for_host.event_list.append(shard.SpawnEvent(entity,
+                                                                     (0, 0)))
 
             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
@@ -87,6 +141,46 @@ class MapEditor(shard.plugins.Plugin):
 
         self.message_for_host.event_list.append(event)
 
+    def process_TriesToTalkToEvent(self, event):
+        """Return the CanSpeakEvent to offer a selection to the player.
+        """
+        self.logger.debug("called")
+
+        if event.target_identifier == "load_room":
+
+            room_list = []
+
+            for filename in os.listdir(os.getcwd()):
+
+                if filename.endswith(".floorplan"):
+
+                    room_list.append(filename.split(".floorplan")[0])
+
+            event = shard.CanSpeakEvent(event.identifier, room_list)
+
+            self.message_for_host.event_list.append(event)
+
+    def process_SaysEvent(self, event):
+        """If the text matches a room file, load and send the room.
+        """
+
+        self.logger.debug("called")
+
+        if event.text + ".floorplan" in os.listdir(os.getcwd()):
+
+            self.logger.debug("'{}.floorplan' exists, attempting to load".format(event.text))
+
+            event_list = load_room_from_file(event.text + ".floorplan")
+
+            if event_list is None:
+
+                self.logger.error("error opening file 'default.floorplan'")
+
+            else:
+                self.message_for_host.event_list = self.message_for_host.event_list + event_list
+        else:
+            self.logger.debug("'{}.floorplan' not found, cannot load room".format(event.text))
+
 class DefaultGame(shard.plugins.Plugin):
     """This is an off-the-shelf server plugin, running a standard Shard game.
     """
@@ -101,54 +195,20 @@ class DefaultGame(shard.plugins.Plugin):
         #
         roomfile = None
 
-        if self.host.room is  not None:
+        if self.host.room is not None:
 
             self.logger.debug("room already loaded, current room: {}".format(self.host.room.identifier))
 
         else:
             self.logger.debug("no room loaded yet, attempting to load 'default.floorplan'")
 
-            try:
-                roomfile = open("default.floorplan", "rt")
+            event_list = load_room_from_file("default.floorplan")
 
-            except IOError:
-                self.logger.error("could not open file 'default.floorplan'")
+            if event_list is None:
 
-                # No need to raise SystemExit though
-                #
-                return
+                self.logger.error("error opening file 'default.floorplan'")
 
-            self.message_for_host.event_list.append(shard.EnterRoomEvent("default"))
-
-            for line in roomfile:
-
-                # TODO: Check for 3-part tab-separated string
-                #
-                coordiantes_string, type, asset_desc = line.split("\t")
-
-                coordiantes_string = coordiantes_string.strip()
-                type = type.strip()
-                asset_desc = asset_desc.strip()
-
-                # Match only "(x, y)" coordinates
-                #
-                if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", coordiantes_string):
-                    coordinates = eval(coordiantes_string)
-
-                    # TODO: Check for shard.FLOOR etc.
-                    # TODO: Check asset_desc
-                    #
-                    tile = shard.Tile(type, asset_desc)
-
-                    event = shard.ChangeMapElementEvent(tile, coordinates)
-
-                    self.message_for_host.event_list.append(event)
-
-                else:
-                    self.logger.warning("non-matching coordinate string in default.floorplan: {}".format(repr(coordiantes_string)))
-
-            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
-
-            roomfile.close()
+            else:
+                self.message_for_host.event_list = self.message_for_host.event_list + event_list
 
         return

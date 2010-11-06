@@ -69,6 +69,24 @@ class EventProcessor:
                                self.process_InitEvent,
                           }
 
+    def __getstate__(self):
+        """Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.
+        """
+        dict = self.__dict__.copy()
+
+        del dict["event_dict"]
+
+        return dict
+
+    def __setstate__(self, state_dict):
+        """Update self.__dict__ with state_dict provided by the pickle module, then call __init__().
+        """
+        self.__dict__.update(state_dict)
+
+        # Setup the un-pickleable event_dict
+        #
+        self.__init__()
+
     def process_TriesToMoveEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.

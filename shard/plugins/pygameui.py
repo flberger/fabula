@@ -70,6 +70,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
        PygameUserInterface.fps_log_counter
            Counter to log actual fps every <framerate> frames
 
+       PygameUserInterface.spacing
+           Spacing between tiles.
+
        PygameUserInterface.window
            An instance of clickndrag.Display. By default this is 800x600px and
            windowed.
@@ -107,6 +110,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         self.clock = pygame.time.Clock()
         self.fps_log_counter = self.framerate
+
+        # Spacing between tiles.
+        #
+        self.spacing = 100
 
         # Open a click'n'drag window.
         #
@@ -298,8 +305,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             # No need to check for existing, everything is new.
             #
             plane = clickndrag.Plane(str(coordinates),
-                                     pygame.Rect((coordinates[0] * 100,
-                                                  coordinates[1] * 100),
+                                     pygame.Rect((coordinates[0] * self.spacing,
+                                                  coordinates[1] * self.spacing),
                                                  (100, 100)))
 
             self.window.room.sub(plane)
@@ -390,8 +397,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         if str(event.location) not in self.window.room.subplanes:
 
             plane = clickndrag.Plane(str(event.location),
-                                     pygame.Rect((event.location[0] * 100,
-                                                  event.location[1] * 100),
+                                     pygame.Rect((event.location[0] * self.spacing,
+                                                  event.location[1] * self.spacing),
                                                  (100, 100)))
 
             self.window.room.sub(plane)
@@ -434,6 +441,10 @@ class PygameMapEditor(PygameUserInterface):
         PygameUserInterface.__init__(self, assets, framerate, logger)
 
         self.logger.debug("called")
+
+        # Spacing is a little larger here to show grid lines.
+        #
+        self.spacing = 101
 
         # Open a click'n'drag window.
         #
@@ -479,8 +490,13 @@ class PygameMapEditor(PygameUserInterface):
                                                                   (90, 30)),
                                                       self.set_room_background))
 
-        self.window.buttons.sub(clickndrag.gui.Button("Save Room",
+        self.window.buttons.sub(clickndrag.gui.Button("Load Room",
                                                       pygame.Rect((5, 45),
+                                                                  (90, 30)),
+                                                      self.load_room))
+
+        self.window.buttons.sub(clickndrag.gui.Button("Save Room",
+                                                      pygame.Rect((5, 85),
                                                                   (90, 30)),
                                                       self.save_room))
 
@@ -572,6 +588,28 @@ class PygameMapEditor(PygameUserInterface):
 
         else:
             self.logger.debug("no filename selected")
+
+    def load_room(self):
+        """Issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
+        """
+        self.logger.debug("called")
+
+        event = shard.TriesToTalkToEvent(self.host.player_id, "load_room")
+
+        self.message_for_host.event_list.append(event)
+
+    def process_CanSpeakEvent(self, event):
+
+        self.logger.debug("called")
+
+        rect = pygame.Rect((100, 100),
+                           (300, len(event.sentences) * 30 + 30))
+
+        self.window.room.sub(clickndrag.gui.OptionList("select_room",
+                                                       rect,
+                                                       event.sentences,
+                                                       lambda option: self.message_for_host.event_list.append(shard.SaysEvent(self.host.player_id, option.text))))
+        return
 
     def quit(self):
         """Set self.exit_requested = True

@@ -292,7 +292,7 @@ class Client(shard.core.Engine):
                     #
                     for event in message_from_plugin.event_list:
 
-                        if isinstance(event, shard.AttemptEvent):
+                        if isinstance(event, shard.TriesToMoveEvent):
 
                             # TODO: similar to Server.process_TriesToMoveEvent()
 
@@ -309,8 +309,7 @@ class Client(shard.core.Engine):
                             #
                             # Only allow certain vectors
                             #
-                            if (difference in ((0, 1), (0, -1), (1, 0), (-1, 0))
-                                and isinstance(event, shard.TriesToMoveEvent)):
+                            if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
                                 self.logger.debug("applying TriesToMoveEvent locally")
 
@@ -472,14 +471,21 @@ class Client(shard.core.Engine):
 
             self.await_confirmation = False
 
-    #def process_CanSpeakEvent(self, event, **kwargs):
-    #    """Currently not implemented."""
-    #    #    Engine: if there was a Confirmation and
-    #    #    it has been applied or if there was an
-    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-    #    # Pass on the event.
-    #    #
-    #    message.event_list.append(event)
+    def process_CanSpeakEvent(self, event, **kwargs):
+        """Call default and unblock client.
+        """
+
+        # Call default.
+        #
+        shard.core.Engine.process_CanSpeakEvent(self,
+                                                event,
+                                                message = kwargs["message"])
+
+        # TriesToTalkTo confirmed
+        #
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
 
     def process_DropsEvent(self, event, **kwargs):
         """Remove affected Entity from rack,
@@ -492,8 +498,8 @@ class Client(shard.core.Engine):
         # Call default.
         #
         shard.core.Engine.process_DropsEvent(self,
-                                                       event,
-                                                       message = kwargs["message"])
+                                             event,
+                                             message = kwargs["message"])
 
         # Drop confirmed
         #
@@ -508,8 +514,8 @@ class Client(shard.core.Engine):
         # Call default.
         #
         shard.core.Engine.process_ChangeStateEvent(self,
-                                                             event,
-                                                             message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
         # ChangeState confirmed
         #
@@ -557,8 +563,8 @@ class Client(shard.core.Engine):
             # Call default implementation
             #
             shard.core.Engine.process_MovesToEvent(self,
-                                                             event,
-                                                             message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
             # Only allow new input if the last
             # MovesToEvent has been confirmed.
@@ -578,8 +584,8 @@ class Client(shard.core.Engine):
         # Call default
         #
         shard.core.Engine.process_PicksUpEvent(self,
-                                                         event,
-                                                         message = kwargs["message"])
+                                               event,
+                                               message = kwargs["message"])
 
         # picking up confirmed
         #
@@ -601,8 +607,8 @@ class Client(shard.core.Engine):
         # Call default implementation
         #
         shard.core.Engine.process_PerceptionEvent(self,
-                                                            event, 
-                                                            message = kwargs["message"])
+                                                  event, 
+                                                  message = kwargs["message"])
 
     #def process_SaysEvent(self, event, **kwargs):
     #    """The UserInterface usually must display the 
@@ -627,8 +633,8 @@ class Client(shard.core.Engine):
             # queues it in the Message given
             #
             shard.core.Engine.process_DeleteEvent(self,
-                                                            event,
-                                                            message = kwargs["message"])
+                                                  event,
+                                                  message = kwargs["message"])
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -661,8 +667,8 @@ class Client(shard.core.Engine):
         # Call default implementation
         #
         shard.core.Engine.process_EnterRoomEvent(self,
-                                                           event,
-                                                           message = kwargs["message"])
+                                                 event,
+                                                 message = kwargs["message"])
 
     def process_RoomCompleteEvent(self, event, **kwargs):
         """The event is queued for the UserInterface here.
@@ -680,5 +686,5 @@ class Client(shard.core.Engine):
         # Call default implementation
         #
         shard.core.Engine.process_RoomCompleteEvent(self,
-                                                              event,
-                                                              message = kwargs["message"])
+                                                    event,
+                                                    message = kwargs["message"])
