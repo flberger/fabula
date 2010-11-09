@@ -739,11 +739,9 @@ class Entity(shard.eventprocessor.EventProcessor):
         """Readable and informative string representation.
         """
 
-        # TODO: This is a duplicate of Tile.__repr__
-
         arguments = ""
 
-        for key in self.__dict__:
+        for key in ("entity_type", "identifier", "asset_desc", "asset", "state"):
 
             arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
 

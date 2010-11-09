@@ -239,25 +239,27 @@ class UserInterface(shard.plugins.Plugin):
                 # all important data and handed them over to us, so wen can
                 # build a new screen.
 
-                # Load and store assets for Tiles and Entities using the assets
+                # TODO: kept for reference. Remove.
                 #
-                entity_tile_list = list(self.room.entity_dict.values()) + list(self.room.tile_list)
-
-                for element in entity_tile_list:
-
-                    # Fetch if not already done so
-                    #
-                    if element.asset is None:
-
-                        try:
-                            retrieved_asset = self.assets.fetch(element.asset_desc)
-
-                        except:
-                            # See the method for explaination
-                            #
-                            self.display_asset_exception(element.asset_desc)
-
-                        element.asset = retrieved_asset
+                ## Load and store assets for Tiles and Entities using the assets
+                ##
+                #entity_tile_list = list(self.room.entity_dict.values()) + list(self.room.tile_list)
+                #
+                #for element in entity_tile_list:
+                #
+                #    # Fetch if not already done so
+                #    #
+                #    if element.asset is None:
+                #
+                #        try:
+                #            retrieved_asset = self.assets.fetch(element.asset_desc)
+                #
+                #        except:
+                #            # See the method for explaination
+                #            #
+                #            self.display_asset_exception(element.asset_desc)
+                #
+                #        element.asset = retrieved_asset
 
                 # Delete everything in the event_list up to and
                 # including the RoomCompleteEvent
@@ -611,8 +613,6 @@ class UserInterface(shard.plugins.Plugin):
         self.logger.debug("called")
 
         event.entity.user_interface = self
-
-        self.display_single_frame()
 
         return           
 

@@ -65,6 +65,8 @@ class MapEditor(shard.plugins.Plugin):
            name of the current room
     """
 
+    # TODO: replace hardwired "player" with client id
+
     def __init__(self, logger):
         """Initialise.
         """
@@ -92,11 +94,11 @@ class MapEditor(shard.plugins.Plugin):
             tile = shard.Tile(shard.FLOOR, "100x100-gray.png")
 
             for x in range(8):
-                for y in range(6):
+                for y in range(5):
                     event = shard.ChangeMapElementEvent(tile, (x, y))
                     self.message_for_host.event_list.append(event)
 
-            entity = shard.Entity(shard.PLAYER, "player", "100x100-gray.png")
+            entity = shard.Entity(shard.PLAYER, "player", "player.png")
 
             self.message_for_host.event_list.append(shard.SpawnEvent(entity,
                                                                      (0, 0)))
@@ -178,8 +180,30 @@ class MapEditor(shard.plugins.Plugin):
 
             else:
                 self.message_for_host.event_list = self.message_for_host.event_list + event_list
+
+                # Make sure the player is spawned
+                # TODO: check whether a player entity should be mandatory in a room so this would be obsolete
+                #
+                entity = shard.Entity(shard.PLAYER, "player", "player.png")
+
+                self.message_for_host.event_list.append(shard.SpawnEvent(entity,
+                                                                         (0, 0)))
         else:
             self.logger.debug("'{}.floorplan' not found, cannot load room".format(event.text))
+
+    def process_SpawnEvent(self, event):
+        """Forward the event to the Server.
+        """
+
+        self.logger.debug("called")
+        self.message_for_host.event_list.append(event)
+
+    def process_PicksUpEvent(self, event):
+        """Forward the event to the Server.
+        """
+
+        self.logger.debug("called")
+        self.message_for_host.event_list.append(event)
 
 class DefaultGame(shard.plugins.Plugin):
     """This is an off-the-shelf server plugin, running a standard Shard game.

@@ -14,7 +14,44 @@ import pygame
 import clickndrag
 import clickndrag.gui
 import tkinter.filedialog
+import tkinter.simpledialog
 import os.path
+
+def open_image(title, logger):
+    """Auxillary function to make the user open an image file.
+       Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
+    """
+
+    surface = None
+    filename = None
+
+    tk = tkinter.Tk()
+    tk.withdraw()
+
+    image_types = ("Image Files",
+                   ".jpg .png .gif .bmp .pcx .tga .tif .lbm .pbm .xpm")
+
+    fullpath = tkinter.filedialog.askopenfilename(filetypes = [image_types],
+                                                  title = title)
+    tk.destroy()
+
+    if not fullpath:
+
+        logger.debug("no filename selected")
+
+    else:
+        filename = os.path.basename(fullpath)
+
+        logger.debug("open: {}".format(fullpath))
+
+        try:
+            surface = pygame.image.load(fullpath)
+
+        except pygame.error:
+
+            self.logger.debug("could not load image '{}'".format(fullpath))
+
+    return (surface, filename)
 
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
@@ -123,9 +160,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         self.font = pygame.font.Font(None, 40)
 
-        # Create a black pygame surface for fade effects
+        # Create a black pygame surface for fade effects.
+        # Do not use Surface.copy() since we do not want per-pixel alphas.
         #
-        self.fade_surface = self.window.image.copy()
+        #self.fade_surface = self.window.image.copy()
+        self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
         loading_surface = self.font.render("Loading, please wait...",
@@ -270,7 +309,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Clear room
         #
-        self.window.room.subplanes = {}
+        self.window.room.remove()
 
         return
 
@@ -280,17 +319,28 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
-        # UserInterface.process_message() has already fetched the assets, but
-        # right now they are only open streams. Actually load the images here
-        # and replace the asset.
-        #
         for tile in self.room.tile_list:
 
-            self.logger.debug("loading Surface from {0} for Tile {1}".format(tile.asset, tile))
+            # TODO: possible duplicate with process_ChangeMapElementEvent
 
-            surface = pygame.image.load(tile.asset)
+            # Assets are entirely up to the UserInterface, so we fetch the asset
+            # here
+            #
+            try:
+                # Get a file-like object from asset manager
+                #
+                file = self.assets.fetch(tile.asset_desc)
 
-            tile.asset.close()
+            except:
+                self.display_asset_exception(tile.asset_desc)
+
+            # Replace with Surface from image file
+            #
+            self.logger.debug("loading Surface from {0} for Tile {1}".format(file, tile))
+
+            surface = pygame.image.load(file)
+
+            file.close()
 
             # Convert to internal format suitable for blitting
             #
@@ -309,11 +359,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                                   coordinates[1] * self.spacing),
                                                  (100, 100)))
 
+            plane.image = self.room.floor_plan[coordinates].tile.asset
+
             self.window.room.sub(plane)
-
-            surface = self.room.floor_plan[coordinates].tile.asset
-
-            self.window.room.subplanes[str(coordinates)].image = surface
 
         self.logger.debug("fading in")
 
@@ -359,7 +407,50 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
 #    def process_CanSpeakEvent(self, event):
 
-#    def process_SpawnEvent(self, event):
+    def process_SpawnEvent(self, event):
+        """Load the image and add a subplane to window.room.
+           The name of the subplane is the Entity identifier, so the subplane
+           is accessible using window.room.<identifier>.
+        """
+
+        # Call base class
+        #
+        shard.plugins.ui.UserInterface.process_SpawnEvent(self, event)
+
+        # TODO: duplication from process_ChangeMapElementEvent
+
+        # Assets are entirely up to the UserInterface, so we fetch the asset
+        # here
+        #
+        try:
+            # Get a file-like object from asset manager
+            #
+            file = self.assets.fetch(event.entity.asset_desc)
+
+        except:
+            self.display_asset_exception(event.entity.asset_desc)
+
+        # Replace with Surface from image file
+        #
+        surface = pygame.image.load(file)
+
+        file.close()
+
+        # Convert to internal format suitable for blitting
+        #
+        surface = surface.convert_alpha()
+
+        # Create subplane, name is the entity identifier
+        #
+        plane = clickndrag.Plane(event.entity.identifier,
+                                 pygame.Rect((event.location[0] * self.spacing,
+                                              event.location[1] * self.spacing),
+                                             (100, 100)))
+        plane.image = surface
+
+        self.window.room.sub(plane)
+
+        return
 
 #    def process_DeleteEvent(self, event):
 
@@ -403,6 +494,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
             self.window.room.sub(plane)
 
+        # Update image regardless whether the tile existed or not
+        #
         self.window.room.subplanes[str(event.location)].image = surface
 
         return
@@ -455,8 +548,10 @@ class PygameMapEditor(PygameUserInterface):
         pygame.display.set_caption("Shard Map Editor")
 
         # Create a black pygame surface for fade effects
+        # Do not use Surface.copy() since we do not want per-pixel alphas.
         #
-        self.fade_surface = self.window.image.copy()
+        #self.fade_surface = self.window.image.copy()
+        self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
         loading_surface = self.font.render("Loading, please wait...",
@@ -500,6 +595,11 @@ class PygameMapEditor(PygameUserInterface):
                                                                   (90, 30)),
                                                       self.save_room))
 
+        self.window.buttons.sub(clickndrag.gui.Button("Add Item",
+                                                      pygame.Rect((5, 125),
+                                                                  (90, 30)),
+                                                      self.add_item))
+
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
                                                       pygame.Rect((5, 565),
                                                                   (90, 30)),
@@ -515,30 +615,17 @@ class PygameMapEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        tk = tkinter.Tk()
-        tk.withdraw()
+        new_image = open_image("Open Background Image", self.logger)[0]
 
-        fullpath = tkinter.filedialog.askopenfilename()
+        if new_image is not None:
 
-        tk.destroy()
-        
-        if fullpath:
+            for x in range(8):
+                for y in range(5):
+                    rect = pygame.Rect((x * 100, y * 100), (100, 100))
 
-            self.logger.debug("open: {}".format(fullpath))
-
-            try:
-                new_image = pygame.image.load(fullpath)
-
-                for x in range(8):
-                    for y in range(6):
-                        rect = pygame.Rect((x * 100, y * 100), (100, 100))
-                        self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
-
-            except pygame.error:
-                self.logger.debug("could not load image '{}'".format(fullpath))
-
-        else:
-            self.logger.debug("no filename selected")
+                    # TODO: catch exception for smaller images
+                    #
+                    self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
     def save_room(self):
         """Save the tile images.
@@ -549,7 +636,9 @@ class PygameMapEditor(PygameUserInterface):
         tk = tkinter.Tk()
         tk.withdraw()
 
-        fullpath = tkinter.filedialog.asksaveasfilename()
+        fullpath = tkinter.filedialog.asksaveasfilename(filetypes = [("Shard Room Files",
+                                                                      ".floorplan")],
+                                                        title = "Save Tiles And Floorplan")
 
         tk.destroy()
 
@@ -566,7 +655,7 @@ class PygameMapEditor(PygameUserInterface):
             self.message_for_host.event_list.append(shard.EnterRoomEvent(filename))
 
             for x in range(8):
-                for y in range(6):
+                for y in range(5):
 
                     # Save image file
                     #
@@ -597,6 +686,43 @@ class PygameMapEditor(PygameUserInterface):
         event = shard.TriesToTalkToEvent(self.host.player_id, "load_room")
 
         self.message_for_host.event_list.append(event)
+
+    def add_item(self):
+        """Request item identifier and image and add it to the rack.
+        """
+
+        self.logger.debug("called")
+
+        tk = tkinter.Tk()
+        tk.withdraw()
+
+        item_identifier = tkinter.simpledialog.askstring("Add Item",
+                                                         "Identifier Of New Item:")
+
+        tk.destroy()
+
+        if item_identifier == '' or item_identifier is None:
+
+            self.logger.debug("no item identifer given")
+
+        else:
+
+            image, filename = open_image("Image Of New Item", self.logger)
+
+            if image is not None:
+
+                entity = shard.Entity(shard.ITEM_BLOCK,
+                                      item_identifier,
+                                      filename)
+
+                self.logger.debug("appending SpawnEvent and PicksUpEvent")
+
+                # TODO: revert to (0, 0) or another safe spawning location
+                #
+                self.message_for_host.event_list.append(shard.SpawnEvent(entity, (3, 3)))
+
+                self.message_for_host.event_list.append(shard.PicksUpEvent(self.host.player_id,
+                                                                           item_identifier))
 
     def process_CanSpeakEvent(self, event):
 
