@@ -45,15 +45,16 @@ class UserInterface(shard.plugins.Plugin):
            The UserInterface is responsible for catching an exit request by the
            user. This value is checked in the Client main loop.
 
+       UserInterface.freeze = True
+           Flag whether to display the game and collect input.
+           True upon initialisation.
+
        UserInterface.room
            Variables to be filled by the Client before each call to
            process_message()
 
        UserInterface.direction_vector_dict
            Convenience dict converting symbolic directions to a vector
-
-       UserInterface.waiting_for_RoomCompleteEvent
-           Flag, True after initialisation
     """
 
     ####################
@@ -106,6 +107,10 @@ class UserInterface(shard.plugins.Plugin):
         #
         self.exit_requested = False
 
+        # Flag whether to display the game and collect input
+        #
+        self.freeze = True
+
         # Variables to be filled by the Client
         # before each call to process_message()
         #
@@ -122,13 +127,6 @@ class UserInterface(shard.plugins.Plugin):
                                       (1, 0) : ">",
                                       (0, 1) : "v",
                                       (-1, 0) : "<"}
-
-        # Are we waiting for a RoomCompleteEvent after
-        # an EnterRoomEvent? Upon initialization this
-        # is True, since a room has not yet been
-        # transfered.
-        #
-        self.waiting_for_RoomCompleteEvent = True
 
         self.logger.info("complete, now waiting for RoomCompleteEvent")
 
@@ -185,117 +183,13 @@ class UserInterface(shard.plugins.Plugin):
         #
         event_list = message.event_list
 
-        ####################
-        # Check EnterRoomEvent
-
-        # The first thing to check for is if there has
-        # been an EnterRoomEvent. For our convenience, 
-        # the ControlEngine has set up a flag in the
-        # message, so we simply check that instead
-        # of scanning the whole list.
-        #
-        if message.has_EnterRoomEvent:
-
-            # When this arrives here all data scructures
-            # have already been cleared and possibly
-            # populated with new Entities and a new map.
-            # So we have to ignore everything before
-            # an EnterRoomEvent.
-
-            for event in event_list:
-
-                if isinstance(event, shard.EnterRoomEvent):
-
-                    # See the method for explaination
-                    #
-                    self.process_EnterRoomEvent(event)
-
-            # Set a flag that we are waiting
-            # for RoomCompleteEvent
-            #
-            self.logger.info("now waiting for RoomCompleteEvent")
-
-            self.waiting_for_RoomCompleteEvent = True
-
-        ####################
-        # Check RoomCompleteEvent
-
-        # Next, as long as we are waiting for a
-        # RoomCompleteEvent, nothig will be rendered
-        # and no player input is accepted.
-        #
-        if self.waiting_for_RoomCompleteEvent:
-
-            # The ControlEngine has set a flag for
-            # our convenience.
-            #
-            if message.has_RoomCompleteEvent:
-
-                self.logger.debug("got RoomCompleteEvent")
-
-                # TODO: That original design - handling Events before RoomComplete here or not at all, then deleting - can probably be discarded and replaced by an ordinary Plugin behaviour: process all Events with the according methods.
-
-                # By the time the event arrives the ControlEngine has gathered
-                # all important data and handed them over to us, so wen can
-                # build a new screen.
-
-                # TODO: kept for reference. Remove.
-                #
-                ## Load and store assets for Tiles and Entities using the assets
-                ##
-                #entity_tile_list = list(self.room.entity_dict.values()) + list(self.room.tile_list)
-                #
-                #for element in entity_tile_list:
-                #
-                #    # Fetch if not already done so
-                #    #
-                #    if element.asset is None:
-                #
-                #        try:
-                #            retrieved_asset = self.assets.fetch(element.asset_desc)
-                #
-                #        except:
-                #            # See the method for explaination
-                #            #
-                #            self.display_asset_exception(element.asset_desc)
-                #
-                #        element.asset = retrieved_asset
-
-                # Delete everything in the event_list up to and
-                # including the RoomCompleteEvent
-                #
-                while not isinstance(event_list[0], shard.RoomCompleteEvent):
-                    del event_list[0]
-                
-                # Arrived at RoomCompleteEvent.
-                # See the method for explaination
-                #
-                self.process_RoomCompleteEvent(event_list[0])
-
-                # Delete it as well.
-                #
-                del event_list[0]
-
-                # No more waiting!
-                #
-                self.waiting_for_RoomCompleteEvent = False
-
-            else:
-                # If there is no RoomCompleteEvent in that message, 
-                # ignore everything.
-
-                # Technically this waiting corresponds to a
-                # frame, though we do not render anything.
-
-                # TODO: Well, we completely lock out the user here. If the server is down, he will not be able to interact with the application (quit, for examlpe).
-
-                # See method for explaination.
-                #
-                self.update_frame_timer()
-
-                # Discard and check the next message.
-                #
-                return self.message_for_host
+        # We used to check for EnterRoomEvent and RoomCompleteEvent here and
+        # discard all inbetween since UserInterface.process_RoomCompleteEvent
+        # was expected to infer the game state, fetch assets and setup the whole
+        # thing. Instead we now treat the setup Events - ChangeMapEvent,
+        # SpawnEvent - like any other event, which is much more in line with
+        # Shard plugin design. UserInterface.process_EnterRoomEvent is expected
+        # to stall the game display.
 
         ####################
         # Countdown and rendering waiting Events
@@ -472,11 +366,12 @@ class UserInterface(shard.plugins.Plugin):
         return
 
     def display_single_frame(self):
-        """Called when the UserInterface needs to render a single frame
-           of the current game state. There is nothing special going on here,
-           so you should notify the Entities that there is a next frame to be
-           displayed (whichever way that is done in your implementation) and
-           update their graphics.
+        """Called when the UserInterface needs to render a single frame of the current game state.
+           There is nothing special going on here, so you should notify the
+           Entities that there is a next frame to be displayed (whichever way
+           that is done in your implementation) and update their graphics.
+           You might want to check the UserInterface.freeze flag whether to
+           display the game and accept input.
         """
 
         # You might want to restrict your updates to
@@ -508,7 +403,7 @@ class UserInterface(shard.plugins.Plugin):
 
         self.logger.debug("called")
 
-        user_input = raw_input("Quit? (y/n):")
+        user_input = input("Quit? (y/n):")
 
         if user_input == "y":
 
@@ -563,22 +458,29 @@ class UserInterface(shard.plugins.Plugin):
            You should override it, blank the screen here and display a waiting
            message since the UserInterface is going to twiddle thumbs until
            it receives a RoomCompleteEvent.
+           The default implementation sets UserInterface.freeze = True.
         """
 
         self.logger.debug("entering room: {}".format(event.room_identifier))
 
-        self.display_single_frame()
+        self.logger.debug("freezing")
+        self.freeze = True
+        # TODO: make sure the user can interact with the game (close etc.) even if frozen
 
         return
 
     def process_RoomCompleteEvent(self, event):
         """Called when everything is fetched and ready after a RoomCompleteEvent.
-           Here you should set up the main screen and display some Map
-           elements and Entities.
+           Here you should set up the main screen and display some Map elements
+           and Entities.
+           The default implementation sets UserInterface.freeze = False and
+           displays a single frame.
         """
 
         self.logger.debug("called")
 
+        self.logger.debug("unfreezing")
+        self.freeze = False
         self.display_single_frame()
 
         return
@@ -698,16 +600,14 @@ class UserInterface(shard.plugins.Plugin):
         return           
 
     def process_PicksUpEvent(self, event):
-        """Remove the target from all data structures,
-           then let the Entity handle the Event.
-           Possibly update an inventory display.
+        """Let the Entity picking up the item handle the Event.
+           The Client has already put the item Entity from Client.room into
+           client.rack. 
         """
 
         self.logger.debug("called")
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
-
-        self.display_single_frame()
 
         return           
 

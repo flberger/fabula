@@ -201,84 +201,87 @@ class Server(shard.core.Engine):
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
-        ### Build broadcast message for all clients
-        #
-        # TODO: this of course has to be refactored thoroughly for multiple room handling
-
-        # Triple flag:
-        # True: skip on EnterRoomEvent
-        # "now": now skip all events
-        # False: stop skipping
-        #
-        skip_room_events = False
-
-        # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
-        #
-        if self.message_for_remote.has_RoomCompleteEvent:
-
-            self.logger.debug("has_RoomCompleteEvent set, skipping room events")
-
-            skip_room_events = True
-
-        elif len(self.message_for_remote.event_list):
-
-            self.logger.debug("has_RoomCompleteEvent not set, broadcasting all events")
-
-        for event in self.message_for_remote.event_list:
-
-            # We also broadcast all SpawnEvents. That means
-            # that when a new client joins, all entities
-            # (in the current room) are respawned.
-            # process_SpawnEvent in the engine will
-            # filter duplicate entities, so no harm done.
-            # 
-            # TODO: respawning might cause some loss of internal entity state
+            ### Build broadcast message for all clients
             #
-            if (skip_room_events
-                and
-                isinstance(event, shard.EnterRoomEvent)):
+            # TODO: this of course has to be refactored thoroughly for multiple room handling
 
-                self.logger.debug("EnterRoomEvent found, starting to skip")
+            # Triple flag:
+            # True: skip on EnterRoomEvent
+            # "now": now skip all events
+            # False: stop skipping
+            #
+            skip_room_events = False
 
-                skip_room_events = "now"
+            # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
+            # TODO: The following ifs and loops can surely be optimized.
+            #
+            for event in self.message_for_remote.event_list:
 
-            elif (skip_room_events == "now"
-                  and
-                  isinstance(event, shard.RoomCompleteEvent)):
+                if isinstance(event, shard.RoomCompleteEvent):
 
-                self.logger.debug("RoomCompleteEvent found, stopping to skip")
+                    self.logger.debug("found RoomCompleteEvent, will skip room events")
 
-                skip_room_events = False
+                    skip_room_events = True
 
-            elif (not skip_room_events == "now"
-                  and
-                  event.__class__ in [shard.DropsEvent, 
-                                      shard.MovesToEvent, 
-                                      shard.PicksUpEvent,
-                                      shard.SaysEvent,
-                                      shard.SpawnEvent,
-                                      shard.DeleteEvent,
-                                      shard.ChangeStateEvent,
-                                      shard.ChangeMapElementEvent]):
+            if not skip_room_events:
 
-                self.message_for_all.event_list.append(event)
+                self.logger.debug("no RoomCompleteEvent found, broadcasting all events")
 
-        # Only send self.message_for_all when not empty
-        #
-        if len(self.message_for_all.event_list):
+            for event in self.message_for_remote.event_list:
 
-            self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
-
-            for client_key in self.room.active_clients:
-
-                # Leave out current MessageBuffer which
-                # already has reveived the events above.
-                # We can compare MessageBuffer instances
-                # right away. ;-)
+                # We also broadcast all SpawnEvents. That means
+                # that when a new client joins, all entities
+                # (in the current room) are respawned.
+                # process_SpawnEvent in the engine will
+                # filter duplicate entities, so no harm done.
+                # 
+                # TODO: respawning might cause some loss of internal entity state
                 #
-                if not client_key == address_port_tuple:
+                if (skip_room_events
+                    and
+                    isinstance(event, shard.EnterRoomEvent)):
 
-                    self.interface.connections[client_key].send_message(self.message_for_all)
+                    self.logger.debug("EnterRoomEvent found, starting to skip")
+
+                    skip_room_events = "now"
+
+                elif (skip_room_events == "now"
+                      and
+                      isinstance(event, shard.RoomCompleteEvent)):
+
+                    self.logger.debug("RoomCompleteEvent found, stopping to skip")
+
+                    skip_room_events = False
+
+                elif (not skip_room_events == "now"
+                      and
+                      event.__class__ in [shard.DropsEvent, 
+                                          shard.MovesToEvent, 
+                                          shard.PicksUpEvent,
+                                          shard.SaysEvent,
+                                          shard.SpawnEvent,
+                                          shard.DeleteEvent,
+                                          shard.ChangeStateEvent,
+                                          shard.ChangeMapElementEvent]):
+
+                    self.message_for_all.event_list.append(event)
+
+            # Only send self.message_for_all when not empty
+            #
+            if len(self.message_for_all.event_list):
+
+                self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
+
+                for client_key in self.room.active_clients:
+
+                    # Leave out current MessageBuffer which
+                    # already has reveived the events above.
+                    # We can compare MessageBuffer instances
+                    # right away. ;-)
+                    #
+                    if not client_key == address_port_tuple:
+
+                        self.interface.connections[client_key].send_message(self.message_for_all)
 
         # Clean up
         #
@@ -418,8 +421,6 @@ class Server(shard.core.Engine):
                 self.message_for_remote.event_list.append(spawn_event)
 
             self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
-
-            self.message_for_remote.has_RoomCompleteEvent = True
 
         if len(self.rack.entity_dict):
 

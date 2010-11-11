@@ -441,10 +441,6 @@ class Engine(shard.eventprocessor.EventProcessor):
 
         kwargs["message"].event_list.append(event)
 
-        # Set flag
-        #
-        kwargs["message"].has_RoomCompleteEvent = True
-
         return
 
     def process_ChangeMapElementEvent(self, event, **kwargs):

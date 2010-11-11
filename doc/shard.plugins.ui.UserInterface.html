@@ -52,15 +52,16 @@ UserInterface.exit_requested
     The UserInterface is responsible for catching an exit request by the
     user. This value is checked in the Client main loop.
 
+UserInterface.freeze = True
+    Flag whether to display the game and collect input.
+    True upon initialisation.
+
 UserInterface.room
     Variables to be filled by the Client before each call to
     process_message()
 
 UserInterface.direction_vector_dict
-    Convenience dict converting symbolic directions to a vector
-
-UserInterface.waiting_for_RoomCompleteEvent
-    Flag, True after initialisation</pre>
+    Convenience dict converting symbolic directions to a vector</pre>
 
     
     
@@ -97,7 +98,7 @@ UserInterface.waiting_for_RoomCompleteEvent
     
     <td>Method</td>
     <td><a href="shard.plugins.ui.UserInterface.html#display_single_frame">display_single_frame</a></td>
-    <td><tt>Called when the UserInterface needs to render a single frame</tt></td>
+    <td><tt>Called when the UserInterface needs to render a single frame of the current game state.</tt></td>
   </tr><tr class="method">
     
     
@@ -169,7 +170,7 @@ UserInterface.waiting_for_RoomCompleteEvent
     
     <td>Method</td>
     <td><a href="shard.plugins.ui.UserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Remove the target from all data structures,</tt></td>
+    <td><tt>Let the Entity picking up the item handle the Event.</tt></td>
   </tr><tr class="method">
     
     
@@ -398,11 +399,12 @@ down to a certain frame rate. The default implementation waits
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
-    <pre>Called when the UserInterface needs to render a single frame
-of the current game state. There is nothing special going on here,
-so you should notify the Entities that there is a next frame to be
-displayed (whichever way that is done in your implementation) and
-update their graphics.</pre>
+    <pre>Called when the UserInterface needs to render a single frame of the current game state.
+There is nothing special going on here, so you should notify the
+Entities that there is a next frame to be displayed (whichever way
+that is done in your implementation) and update their graphics.
+You might want to check the UserInterface.freeze flag whether to
+display the game and accept input.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.ui.UserInterface.collect_player_input">
@@ -453,7 +455,8 @@ The default implementation reads user input from the console.</pre>
     <pre>Called when the UserInterface has encoutered an EnterRoomEvent.
 You should override it, blank the screen here and display a waiting
 message since the UserInterface is going to twiddle thumbs until
-it receives a RoomCompleteEvent.</pre>
+it receives a RoomCompleteEvent.
+The default implementation sets UserInterface.freeze = True.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.ui.UserInterface.process_RoomCompleteEvent">
@@ -471,8 +474,10 @@ it receives a RoomCompleteEvent.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
     <pre>Called when everything is fetched and ready after a RoomCompleteEvent.
-Here you should set up the main screen and display some Map
-elements and Entities.</pre>
+Here you should set up the main screen and display some Map elements
+and Entities.
+The default implementation sets UserInterface.freeze = False and
+displays a single frame.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.ui.UserInterface.process_CanSpeakEvent">
@@ -509,7 +514,7 @@ makes the player say "blah". </pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">shard.eventprocessor.EventProcessor.process_SpawnEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">shard.eventprocessor.EventProcessor.process_SpawnEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
     <pre>This method is called with an instance of SpawnEvent to be displayed.
 You should supply the Entity with self.user_interface as done
 in the default implementation. Then add the new Enties to a list of
@@ -647,10 +652,10 @@ Display a single frame to show the result.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
-    <pre>Remove the target from all data structures,
-then let the Entity handle the Event.
-Possibly update an inventory display.</pre>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Let the Entity picking up the item handle the Event.
+The Client has already put the item Entity from Client.room into
+client.rack. </pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.ui.UserInterface.process_SaysEvent">
@@ -698,7 +703,7 @@ that do not affect the same identifier.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-06 19:59:43.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-11 13:00:32.
     </address>
   </body>
 </html>

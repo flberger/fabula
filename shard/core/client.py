@@ -238,8 +238,6 @@ class Client(shard.core.Engine):
             # been applied and processed. Clean up.
             #
             self.message_for_plugin = shard.Message([])
-            self.message_for_plugin.has_EnterRoomEvent = False
-            self.message_for_plugin.has_RoomCompleteEvent = False
 
             # TODO: possibly unset "AwaitConfirmation" flag
             # If there has been a Confirmation for a LookAt or
@@ -659,11 +657,6 @@ class Client(shard.core.Engine):
         #
         self.deleted_entities_dict = {}
 
-        # Finally set the flag in the Message
-        # for the UserInterface.
-        #
-        kwargs["message"].has_EnterRoomEvent = True
-
         # Call default implementation
         #
         shard.core.Engine.process_EnterRoomEvent(self,
@@ -677,11 +670,6 @@ class Client(shard.core.Engine):
            By the time the event arrives the Client
            should have saved all important data in data structures.
         """
-
-        # This is a convenience flag so the UserInterface
-        # does not have to scan the event_list.
-        #
-        kwargs["message"].has_RoomCompleteEvent = True
 
         # Call default implementation
         #

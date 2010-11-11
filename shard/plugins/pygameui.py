@@ -209,12 +209,13 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """Update and render all click'd'drag planes.
         """
 
-        self.window.update()
-        self.window.render()
+        if not self.freeze:
+            self.window.update()
+            self.window.render()
 
-        # TODO: replace with update(dirty_rect_list)
-        #
-        pygame.display.flip()
+            # TODO: replace with update(dirty_rect_list)
+            #
+            pygame.display.flip()
 
         self.update_frame_timer()
 
@@ -268,9 +269,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Only fade out if a room is already displayed.
         #
         if not self.window.room.subplanes:
-            # REMOVE
-            self.logger.debug("not fading out. room: {0}, room.subplanes: {1}".format(self.window.room,
-                                                                                      self.window.room.subplanes))
+
+            self.logger.debug("not fading out. window.room.subplanes == {}".format(self.window.room.subplanes))
+
         else:
             self.logger.debug("room visible, fading out")
 
@@ -311,6 +312,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         self.window.room.remove()
 
+        # No more rendering until RoomComplete
+        #
+        self.logger.debug("freezing")
+        self.freeze = True
+
         return
 
     def process_RoomCompleteEvent(self, event):
@@ -319,50 +325,14 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
-        for tile in self.room.tile_list:
+        # Display the game again and accept input
+        #
+        self.logger.debug("unfreezing")
+        self.freeze = False
 
-            # TODO: possible duplicate with process_ChangeMapElementEvent
-
-            # Assets are entirely up to the UserInterface, so we fetch the asset
-            # here
-            #
-            try:
-                # Get a file-like object from asset manager
-                #
-                file = self.assets.fetch(tile.asset_desc)
-
-            except:
-                self.display_asset_exception(tile.asset_desc)
-
-            # Replace with Surface from image file
-            #
-            self.logger.debug("loading Surface from {0} for Tile {1}".format(file, tile))
-
-            surface = pygame.image.load(file)
-
-            file.close()
-
-            # Convert to internal format suitable for blitting
-            #
-            tile.asset = surface.convert_alpha()
-
-        self.logger.debug("creating subplanes for tiles")
-
-        for coordinates in self.room.floor_plan:
-
-            # Tiles are clickndrag subplanes of self.window.room, indexed by
-            # the string representation of their location.
-            # No need to check for existing, everything is new.
-            #
-            plane = clickndrag.Plane(str(coordinates),
-                                     pygame.Rect((coordinates[0] * self.spacing,
-                                                  coordinates[1] * self.spacing),
-                                                 (100, 100)))
-
-            plane.image = self.room.floor_plan[coordinates].tile.asset
-
-            self.window.room.sub(plane)
-
+        # process_ChangeMapElementEvent and process_SpawnEvent should have
+        # set up everything by now, so we can simply fade in and roll.
+        #
         self.logger.debug("fading in")
 
         fadestep = int(255 / self.action_frames)
@@ -460,26 +430,53 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
-        # Assets are entirely up to the UserInterface, so we fetch the asset
-        # here
+        tile_from_list = None
+
+        # The Client should have added the Tile to self.room.tile_list
         #
-        try:
-            # Get a file-like object from asset manager
+        for tile in self.room.tile_list:
+
+            # This should succeed only once
             #
-            file = self.assets.fetch(event.tile.asset_desc)
+            if tile == event.tile:
 
-        except:
-            self.display_asset_exception(event.tile.asset_desc)
+                # Tiles may compare equal, but the may not refer to the same
+                # instance, so we use tile from tile_list.
+                #
+                self.logger.debug("found event.tile in self.room.tile_list")
+                tile_from_list = tile
 
-        # Replace with Surface from image file
-        #
-        surface = pygame.image.load(file)
+        if tile_from_list.asset is not None:
 
-        file.close()
+            self.logger.debug("tile already has an asset: {}".format(tile_from_list))
 
-        # Convert to internal format suitable for blitting
-        #
-        surface = surface.convert_alpha()
+        else:
+            # Assets are entirely up to the UserInterface, so we fetch
+            # the asset here
+            #
+            self.logger.debug("no asset for {}, attempting to fetch".format(tile_from_list))
+
+            try:
+                # Get a file-like object from asset manager
+                #
+                file = self.assets.fetch(tile_from_list.asset_desc)
+
+            except:
+                self.display_asset_exception(tile_from_list.asset_desc)
+
+            self.logger.debug("loading Surface from {}".format(file))
+
+            surface = pygame.image.load(file)
+
+            file.close()
+
+            # Convert to internal format suitable for blitting
+            #
+            surface = surface.convert_alpha()
+
+            tile_from_list.asset = surface
+
+        # Now tile_from_list.asset is present
 
         # Do we already have a tile there?
         # Tiles are clickndrag subplanes of self.window.room, indexed by their
@@ -496,7 +493,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Update image regardless whether the tile existed or not
         #
-        self.window.room.subplanes[str(event.location)].image = surface
+        self.logger.debug("changing image for tile at {0} to {1}".format(str(event.location),
+                                                                        tile_from_list.asset))
+        self.window.room.subplanes[str(event.location)].image = tile_from_list.asset
 
         return
 
@@ -511,7 +510,35 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
 #    def process_DropsEvent(self, event):
 
-#    def process_PicksUpEvent(self, event):
+    def process_PicksUpEvent(self, event):
+        """Move the item's Plane from window.room to window.inventory.
+           Then call the base class implementation to notify the Entity.
+        """
+
+        self.logger.debug("called")
+
+        # The Client has already put the item from Client.room to Client.rack.
+        # We have to update the display accordingly, so move the item plane
+        # from window.room to window.inventory.
+
+        # Cache the plane
+        #
+        plane = self.window.room.subplanes[event.item_identifier]
+
+        self.window.room.remove(event.item_identifier)
+
+        # Append at the right of the inventory.
+        # Since the item is already in self.host.rack.entity_dict, the position 
+        # is len - 1.
+        #
+        plane.rect.top = 0
+        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
+
+        self.window.inventory.sub(plane)
+
+        # Call base class to notify the Entity
+        #
+        shard.plugins.ui.UserInterface.process_PicksUpEvent(self, event)
 
 #    def process_SaysEvent(self, event):
 

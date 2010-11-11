@@ -578,10 +578,6 @@ class Message:
 
        Message.event_list
            A list of shard.Events
-
-       Message.has_EnterRoomEvent
-       Message.has_RoomCompleteEvent
-           Convenience flags, initially False
     """
 
     def __init__(self, event_list):
@@ -592,14 +588,6 @@ class Message:
         # TODO: check the list elements for being instances of shard.Event here?
         #
         self.event_list = event_list
-
-        # We attach custom flags to the Message created in
-        # setup() to notify the UserInterface whether
-        # an EnterRoomEvent or RoomCompleteEvent occured,
-        # so it does not have to scan the events.
-        #
-        self.has_EnterRoomEvent = False
-        self.has_RoomCompleteEvent = False
 
     def __repr__(self):
         """Readable and informative string representation.
