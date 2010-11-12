@@ -38,7 +38,12 @@ class Server(shard.core.Engine):
                                    plugin_instance,
                                    logger)
 
-        self.interval = 1.0 / framerate
+        # If framerate is 0, run as fast as possible
+        #
+        if framerate:
+            self.interval = 1.0 / framerate
+        else:
+            self.interval = 0
 
         # Message to be broadcasted to all clients
         #
@@ -90,9 +95,9 @@ class Server(shard.core.Engine):
                         # Be sceptical. Only accept typical client events.
                         # TODO: Include shard.ChangeStateEvent?
                         #
-                        if event.__class__ in [shard.InitEvent,
-                                               shard.AttemptEvent,
-                                               shard.SaysEvent]:
+                        if isinstance(event, (shard.InitEvent,
+                                              shard.AttemptEvent,
+                                              shard.SaysEvent)):
 
                             # This is a bit of Python magic. 
                             # self.event_dict is a dict which maps classes to
@@ -113,6 +118,7 @@ class Server(shard.core.Engine):
                             # Looks like the Client sent an Event typically
                             # issued by the Server. Let the Plugin handle that.
                             #
+                            self.logger.debug("{} is no typical client event, forwarding to Plugin".format(event))
                             self.message_for_plugin.event_list.append(event)
 
                         # Contrary to the Client, the Server calls its plugin
@@ -512,12 +518,12 @@ class Server(shard.core.Engine):
         return
 
     def process_TriesToPickUpEvent(self, event, **kwargs):
-        """Check what is being picked up,
-           replace event.target_identifier with the identifier of the Entity
-           to be picked up, then let the Plugin handle the Event.
+        """Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
         """
 
         # TODO: duplicate from TriesToManipulateEvent
+
+        self.logger.debug("called")
 
         new_event = None
 
@@ -531,6 +537,9 @@ class Server(shard.core.Engine):
 
                 if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
 
+                    self.logger.debug("trying to pick up '{}' at {}".format(entity.identifier,
+                                                                            event.target_identifier))
+
                     new_event = shard.TriesToPickUpEvent(event.identifier,
                                                          entity.identifier)
 
@@ -539,6 +548,7 @@ class Server(shard.core.Engine):
             # Nothing to pick up.
             # Issue AttemptFailed to unblock client.
             #
+            self.logger.debug("AttemptFailed for {}".format(event))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
@@ -547,22 +557,19 @@ class Server(shard.core.Engine):
         return
 
     def process_TriesToDropEvent(self, event, **kwargs):
-        """If event.identifier does not own
-           event.item_identifier in self.rack,
+        """Check for a valid drop action and issue DropsEvent or AttemptFailedEvent.
+
+           If event.identifier does not own event.item_identifier in self.rack,
            the attempt fails.
 
-           If event.target_identifier is not
-           shard.FLOOR, the attempt fails.
+           If event.target_identifier is not shard.FLOOR, the attempt fails.
 
-           If event.target_identifier is
-           shard.FLOOR and there is no Entity
-           on it, pass event on to the Plugin.
+           If event.target_identifier is shard.FLOOR and there is no Entity on
+           it, pass event on to the Plugin.
 
-           If event.target_identifier is
-           shard.FLOOR and there is an Entity
-           on it, replace target_identifier with
-           Entity.identifier and pass on to the
-           Plugin.
+           If event.target_identifier is shard.FLOOR and there is an Entity on
+           it, replace target_identifier with Entity.identifier and pass on to
+           the Plugin.
         """
 
         # TODO: These checks are so fundamental that they should probably be the default in Engine.process_TriesToDropEvent
@@ -570,32 +577,36 @@ class Server(shard.core.Engine):
 
         self.logger.debug("called")
 
-        # If event.identifier does not own
-        # event.item_identifier in self.rack,
+        if event.item_identifier not in self.rack.entity_dict.keys():
+
+            self.logger.debug("AttemptFailed: '{}' not in Rack".format(event.item_identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        # If event.identifier does not own event.item_identifier in self.rack,
         # the attempt fails.
         #
-        if self.rack.owner_dict[event.item_identifier] != event.identifier:
+        elif self.rack.owner_dict[event.item_identifier] != event.identifier:
 
+            self.logger.debug("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.item_identifier))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
         
         elif event.target_identifier not in self.room.floor_plan:
 
+            self.logger.debug("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         elif self.room.floor_plan[event.target_identifier].tile.tile_type != shard.FLOOR:
 
-            # If event.target_identifier is not
-            # shard.FLOOR, the attempt fails.
+            # If event.target_identifier is not shard.FLOOR, the attempt fails.
             #
+            self.logger.debug("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         elif len(self.room.floor_plan[event.target_identifier].entities):
 
-            # If event.target_identifier is
-            # shard.FLOOR and there is at least one
-            # Entity on it, replace target_identifier
-            # with the first Entity's identifier and
-            # pass on to the Plugin.
+            # If event.target_identifier is shard.FLOOR and there is at least
+            # one Entity on it, replace target_identifier with the first
+            # Entity's identifier and pass on to the Plugin.
             #
             target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
 
@@ -604,8 +615,7 @@ class Server(shard.core.Engine):
                                                              target_identifier))
 
         else:
-            # If event.target_identifier is
-            # shard.FLOOR and there is no Entity
+            # If event.target_identifier is shard.FLOOR and there is no Entity
             # on it, pass event on to the Plugin.
             #
             kwargs["message"].event_list.append(event)

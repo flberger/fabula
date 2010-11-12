@@ -94,7 +94,7 @@ PygameUserInterface.fade_surface
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id38">
+      <table class="children sortable" id="id39">
   
   
 <tr class="method">
@@ -138,7 +138,7 @@ PygameUserInterface.fade_surface
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Load the image and add a subplane to window.room.</tt></td>
+    <td><tt>Add a subplane to window.room, possibly fetching an asset before.</tt></td>
   </tr><tr class="method">
     
     
@@ -149,8 +149,26 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Call base class process_DropsEvent and clean up the inventory plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
     <td><tt>Move the item's Plane from window.room to window.inventory.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#inventory_callback">inventory_callback</a></td>
+    <td><tt>Issue a TriesToPickUpEvent if the item is not already in Rack.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_callback">tile_callback</a></td>
+    <td><tt>Issue TriesToDropEvent and a TriesToPickUpEvent before if necessary.</tt></td>
   </tr>
   
 </table>
@@ -158,7 +176,7 @@ PygameUserInterface.fade_surface
         <p>
           Inherited from <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>:
         </p>
-        <table class="children sortable" id="id39">
+        <table class="children sortable" id="id40">
   
   
 <tr class="basemethod">
@@ -207,12 +225,6 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.ui.UserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Let the Entity handle the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="shard.plugins.ui.UserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
     <td><tt>Called with an instance of SaysEvent</tt></td>
   </tr><tr class="basemethod">
@@ -228,7 +240,7 @@ PygameUserInterface.fade_surface
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id40">
+        <table class="children sortable" id="id41">
   
   
 <tr class="basemethod">
@@ -462,9 +474,10 @@ clients in the server. (hint by Alexander Marbach)</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_SpawnEvent">shard.plugins.ui.UserInterface.process_SpawnEvent</a></div>
-    <pre>Load the image and add a subplane to window.room.
+    <pre>Add a subplane to window.room, possibly fetching an asset before.
 The name of the subplane is the Entity identifier, so the subplane
-is accessible using window.room.&lt;identifier&gt;.</pre>
+is accessible using window.room.&lt;identifier&gt;.
+Entity.asset points to the Plane of the Entity.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.pygameui.PygameUserInterface.process_ChangeMapElementEvent">
@@ -482,6 +495,25 @@ is accessible using window.room.&lt;identifier&gt;.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_ChangeMapElementEvent">shard.plugins.ui.UserInterface.process_ChangeMapElementEvent</a></div>
     <pre>Fetch asset and register/replace tile.
+Tile.asset is the Pygame Surface since possibly multiple Planes must
+be derived from a single Tile.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_DropsEvent">shard.plugins.ui.UserInterface.process_DropsEvent</a></div>
+    <pre>Call base class process_DropsEvent and clean up the inventory plane.
         </pre>
   </div>
 </div><div class="function">
@@ -502,9 +534,45 @@ is accessible using window.room.&lt;identifier&gt;.</pre>
     <pre>Move the item's Plane from window.room to window.inventory.
 Then call the base class implementation to notify the Entity.</pre>
   </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.inventory_callback">
+    
+  </a>
+  <a name="inventory_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    inventory_callback(self, drop_plane_name, item_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Issue a TriesToPickUpEvent if the item is not already in Rack.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.tile_callback">
+    
+  </a>
+  <a name="tile_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_callback(self, drop_plane_name, item_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Issue TriesToDropEvent and a TriesToPickUpEvent before if necessary.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-11 13:00:32.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-12 21:40:27.
     </address>
   </body>
 </html>

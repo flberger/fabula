@@ -512,7 +512,7 @@ class UserInterface(shard.plugins.Plugin):
            visible Entities you might have set up and render a static frame.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
 
         event.entity.user_interface = self
 
@@ -588,12 +588,20 @@ class UserInterface(shard.plugins.Plugin):
         return           
 
     def process_DropsEvent(self, event):
-        """Let the Entity handle the Event.
+        """Pass the Event to the dropping Entity and spawn the dropped Entity.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("passing Event to '{}'".format(event.identifier))
 
         self.room.entity_dict[event.identifier].process_DropsEvent(event)
+
+        # Spawn the dropped Entity
+        #
+        self.logger.debug("spawning '{}' in room".format(event.item_identifier))
+
+        entity = self.room.entity_dict[event.item_identifier]
+
+        self.process_SpawnEvent(shard.SpawnEvent(entity, event.location))
 
         self.display_single_frame()
 
@@ -605,7 +613,7 @@ class UserInterface(shard.plugins.Plugin):
            client.rack. 
         """
 
-        self.logger.debug("called")
+        self.logger.debug("notifying Entity '{}'".format(event.identifier))
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 

@@ -24,6 +24,34 @@ from time import sleep
 
 import sys
 import traceback
+import re
+
+class ShardFileFormatter(logging.Formatter):
+    """Subclass of Formatter with reasonable module information.
+    """
+
+    def __init__(self, fmt, datefmt):
+        """Compile a regular expression object, then call base class __init__().
+        """
+        logging.Formatter.__init__(self, fmt, datefmt)
+
+        self.module_re = re.compile("^.*shard/([^/]+/)*?([^/]+)(/__init__)*.py$")
+
+    def format(self, record):
+        """Override logging.Formatter.format()
+        """
+        
+        # Reformat path to module information
+        #
+        record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
+
+        # Fixed-length line number
+        #
+        record.lineno = "{:3}".format(record.lineno)
+
+        # Call base class implementation
+        #
+        return logging.Formatter.format(self, record)
 
 class App:
     """An App instance represents a Shard client or server application.
@@ -96,6 +124,7 @@ class App:
         self.stderr_handler.setFormatter(stderr_formatter)
 
         # File handler
+        #
         # TODO: Different file names for client and server?
         # TODO: Checking for existing file, creating a new one?
         #
@@ -107,10 +136,8 @@ class App:
         # Loglevel:
         # + "%(levelname)-5s "
 
-        file_formatter = logging.Formatter("%(asctime)s "
-                                           + "%(filename)s [%(lineno)s] %(funcName)s() : %(message)s"
-                                           ,
-                                           "%Y-%m-%d %H:%M:%S")
+        file_formatter = ShardFileFormatter("%(asctime)s %(pathname)s [%(lineno)s] %(funcName)s() : %(message)s",
+                                            "%Y-%m-%d %H:%M:%S")
 
         self.file_handler.setFormatter(file_formatter)
 

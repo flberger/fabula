@@ -205,6 +205,45 @@ class MapEditor(shard.plugins.Plugin):
         self.logger.debug("called")
         self.message_for_host.event_list.append(event)
 
+    def process_TriesToPickUpEvent(self, event):
+        """Return a PicksUpEvent to the Server.
+        """
+
+        self.logger.debug("returning PicksUpEvent")
+
+        # The Server has already performed sanity checks.
+        #
+        self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+                                                                   event.target_identifier))
+
+    def process_TriesToDropEvent(self, event):
+        """Return a DropsEvent to the Server.
+           If the Entity is still in the Room, issue a PicksUpEvent before.
+        """
+
+        # TODO: PicksUpEvent still necessary?
+
+        self.logger.debug("called")
+
+        if event.item_identifier in self.host.room.entity_dict.keys():
+            self.logger.debug("Entity '{}' is still in Room, issuing PicksUpEvent".format(event.item_identifier))
+
+            self.message_for_host.event_list.append(shard.PicksUpEvent("player",
+                                                                       event.item_identifier))
+
+        # Server.process_TriesToDropEvent() has already done some checks,
+        # so we can be sure that target_identifier is either a valid
+        # coordinate tuple or an instance of shard.Entity.
+        #
+        if isinstance(event.target_identifier, shard.Entity):
+            self.logger.debug("'' has been dropped on Entity ''. Not supported.".format(event.item_identifier, event.target_identifier))
+
+        else:
+            self.logger.debug("returning DropsEvent")
+            self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
+                                                                     event.item_identifier,
+                                                                     event.target_identifier))
+
 class DefaultGame(shard.plugins.Plugin):
     """This is an off-the-shelf server plugin, running a standard Shard game.
     """

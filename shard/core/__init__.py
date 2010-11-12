@@ -238,9 +238,7 @@ class Engine(shard.eventprocessor.EventProcessor):
         return
 
     def process_DropsEvent(self, event, **kwargs):
-        """Respawn the Entity to be dropped in Engine.room,
-           delete it from Engine.rack
-           and pass the PicksUpEvent on.
+        """Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
         """
 
         self.logger.debug("called")
@@ -250,13 +248,15 @@ class Engine(shard.eventprocessor.EventProcessor):
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
+        self.logger.debug("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+
         dropped_entity = self.rack.retrieve(event.item_identifier)
 
         spawn_event = shard.SpawnEvent(dropped_entity, event.location)
 
         self.room.process_SpawnEvent(spawn_event)
 
-        # and pass the PicksUpEvent on
+        # and pass the DropsEvent on
         #
         kwargs["message"].event_list.append(event)
 

@@ -9,6 +9,11 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
+# TODO: save Entities with Room
+# TODO: support Entity Surfaces > 100x100
+# TODO: obey shard.OBSTACLE, spawn Entities accordingly, make FLOOR/OBSTACLE editable, obey when placing Entites in PygameMapEditor
+# TODO: Display all assets from local folder in PygameMapEditor fpr visual editing
+
 import shard.plugins.ui
 import pygame
 import clickndrag
@@ -16,6 +21,7 @@ import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
 import os.path
+import re
 
 def open_image(title, logger):
     """Auxillary function to make the user open an image file.
@@ -52,6 +58,34 @@ def open_image(title, logger):
             self.logger.debug("could not load image '{}'".format(fullpath))
 
     return (surface, filename)
+
+class DropPlane(clickndrag.Plane):
+    """A DropPlane emits a TriesToDropEvent or TriesToPickUpEvent when a Plane is dropped upon it.
+
+       Additional attributes:
+
+       DropPlane.callback
+           The callback function to be called when something is dropped
+    """
+
+    def __init__(self, name, rect, callback, drag = False, grab = False):
+        """Initialise.
+        """
+
+        # Call base class __init__
+        #
+        clickndrag.Plane.__init__(self, name, rect, drag, grab)
+
+        self.callback = callback
+
+    def dropped_upon(self, plane, coordinates):
+        """Call DropPlane.callback(DropPlane.name, plane.name)
+           By convention, the name of the dropped Plane is the item identifier.
+        """
+
+        self.callback(self.name, plane.name)
+
+        return
 
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
@@ -176,9 +210,12 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
+        # This Plane is a DropPlane.
         #
-        self.window.sub(clickndrag.Plane("inventory",
-                                         pygame.Rect((0, 500), (800, 100))))
+        self.window.sub(DropPlane("inventory",
+                                  pygame.Rect((0, 500), (800, 100)),
+                                  callback = self.inventory_callback))
+
         # Create plane for the room.
         #
         self.window.sub(clickndrag.Plane("room",
@@ -275,19 +312,19 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         else:
             self.logger.debug("room visible, fading out")
 
-            fadestep = int(255 / self.action_frames)
-            
+            frames = int(self.action_frames / 4)
+
+            fadestep = int(255 / frames)
+
             self.fade_surface.set_alpha(0)
             
-            frames = self.action_frames
-
             # This is actually an exponential fade since the original surface is
             # not restored before blitting the fading surface
             #
             while frames:
                 # Bypassing display_single_frame()
 
-                self.window.rendersurface.blit(self.fade_surface, (0, 0))
+                self.window.display.blit(self.fade_surface, (0, 0))
 
                 pygame.display.flip()
 
@@ -304,7 +341,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Make sure the window is black now
         #
         self.fade_surface.set_alpha(255)
-        self.window.rendersurface.blit(self.fade_surface, (0, 0))
+        self.window.display.blit(self.fade_surface, (0, 0))
 
         pygame.display.flip()
 
@@ -332,22 +369,24 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # process_ChangeMapElementEvent and process_SpawnEvent should have
         # set up everything by now, so we can simply fade in and roll.
+        # Since full screen blits are very slow, use a fraction of
+        # action_frames.
         #
-        self.logger.debug("fading in")
+        frames = int(self.action_frames / 4)
 
-        fadestep = int(255 / self.action_frames)
-        
+        fadestep = int(255 / frames)
+
         self.fade_surface.set_alpha(255)
-        
-        frames = self.action_frames
+
+        self.logger.debug("fading in over {} frames, stepping {}".format(frames, fadestep))
 
         while frames:
             # Bypassing display_single_frame()
 
             self.window.update()
-            self.window.render()
+            self.window.render(force = True)
 
-            self.window.rendersurface.blit(self.fade_surface, (0, 0))
+            self.window.display.blit(self.fade_surface, (0, 0))
 
             pygame.display.flip()
 
@@ -364,7 +403,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Make sure it's all visible now
         #
         self.window.update()
-        self.window.render()
+        self.window.render(force = True)
         pygame.display.flip()
 
         self.update_frame_timer()
@@ -378,47 +417,73 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 #    def process_CanSpeakEvent(self, event):
 
     def process_SpawnEvent(self, event):
-        """Load the image and add a subplane to window.room.
+        """Add a subplane to window.room, possibly fetching an asset before.
            The name of the subplane is the Entity identifier, so the subplane
            is accessible using window.room.<identifier>.
+           Entity.asset points to the Plane of the Entity.
         """
 
-        # Call base class
-        #
-        shard.plugins.ui.UserInterface.process_SpawnEvent(self, event)
-
-        # TODO: duplication from process_ChangeMapElementEvent
-
-        # Assets are entirely up to the UserInterface, so we fetch the asset
-        # here
-        #
-        try:
-            # Get a file-like object from asset manager
+        if event.entity.user_interface is None:
+            # Call base class
             #
-            file = self.assets.fetch(event.entity.asset_desc)
+            shard.plugins.ui.UserInterface.process_SpawnEvent(self, event)
 
-        except:
-            self.display_asset_exception(event.entity.asset_desc)
-
-        # Replace with Surface from image file
+        # This is prossibly a respawn from Rack, and the Entity already has
+        # an asset.
         #
-        surface = pygame.image.load(file)
+        if event.entity.asset is not None:
+            self.logger.debug("Entity '{}' already has an asset, updating position to {}".format(event.entity.identifier,
+                                                                                                 event.location))
 
-        file.close()
+            event.entity.asset.rect.left = event.location[0] * self.spacing
+            event.entity.asset.rect.top = event.location[1] * self.spacing
 
-        # Convert to internal format suitable for blitting
+        else:
+            self.logger.debug("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
+
+            # Assets are entirely up to the UserInterface, so we fetch the asset
+            # here
+            #
+            try:
+                # Get a file-like object from asset manager
+                #
+                file = self.assets.fetch(event.entity.asset_desc)
+
+            except:
+                self.display_asset_exception(event.entity.asset_desc)
+
+            # Replace with Surface from image file
+            #
+            surface = pygame.image.load(file)
+
+            file.close()
+
+            # Convert to internal format suitable for blitting
+            #
+            surface = surface.convert_alpha()
+
+            # Create Plane, name is the entity identifier
+            #
+            plane = clickndrag.Plane(event.entity.identifier,
+                                     pygame.Rect((event.location[0] * self.spacing,
+                                                  event.location[1] * self.spacing),
+                                                 (100, 100)))
+            plane.image = surface
+
+            # Items can be dragged by default
+            #
+            if event.entity.entity_type in (shard.ITEM_BLOCK, shard.ITEM_NOBLOCK):
+                plane.draggable = True
+
+            # Finally attach the Plane as the Entity's asset
+            #
+            event.entity.asset = plane
+
+        # Now there is a Plane for the Entity. Add to room.
+        # This implicitly removes the Plane from the former parent plane.
         #
-        surface = surface.convert_alpha()
-
-        # Create subplane, name is the entity identifier
-        #
-        plane = clickndrag.Plane(event.entity.identifier,
-                                 pygame.Rect((event.location[0] * self.spacing,
-                                              event.location[1] * self.spacing),
-                                             (100, 100)))
-        plane.image = surface
-
-        self.window.room.sub(plane)
+        self.logger.debug("adding {} to window.room".format(event.entity.asset))
+        self.window.room.sub(event.entity.asset)
 
         return
 
@@ -426,6 +491,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
     def process_ChangeMapElementEvent(self, event):
         """Fetch asset and register/replace tile.
+           Tile.asset is the Pygame Surface since possibly multiple Planes must
+           be derived from a single Tile.
         """
 
         self.logger.debug("called")
@@ -484,12 +551,15 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         if str(event.location) not in self.window.room.subplanes:
 
-            plane = clickndrag.Plane(str(event.location),
-                                     pygame.Rect((event.location[0] * self.spacing,
-                                                  event.location[1] * self.spacing),
-                                                 (100, 100)))
+            # Use the DropPlane class which emits TriesToDropEvents
+            #
+            tile_plane = DropPlane(str(event.location),
+                                   pygame.Rect((event.location[0] * self.spacing,
+                                                event.location[1] * self.spacing),
+                                                (100, 100)),
+                                   callback = self.tile_callback)
 
-            self.window.room.sub(plane)
+            self.window.room.sub(tile_plane)
 
         # Update image regardless whether the tile existed or not
         #
@@ -508,14 +578,26 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
 #    def process_ChangeStateEvent(self, event):
 
-#    def process_DropsEvent(self, event):
+    def process_DropsEvent(self, event):
+        """Call base class process_DropsEvent and clean up the inventory plane.
+        """
+
+        shard.plugins.ui.UserInterface.process_DropsEvent(self, event)
+
+        for name in self.window.inventory.subplanes_list:
+
+            plane = self.window.inventory.subplanes[name]
+
+            # Too lazy to use a counter ;-)
+            #
+            plane.rect.left = self.window.inventory.subplanes_list.index(name) * 100
 
     def process_PicksUpEvent(self, event):
         """Move the item's Plane from window.room to window.inventory.
            Then call the base class implementation to notify the Entity.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("moving Plane from window.room to window.inventory")
 
         # The Client has already put the item from Client.room to Client.rack.
         # We have to update the display accordingly, so move the item plane
@@ -525,8 +607,6 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         plane = self.window.room.subplanes[event.item_identifier]
 
-        self.window.room.remove(event.item_identifier)
-
         # Append at the right of the inventory.
         # Since the item is already in self.host.rack.entity_dict, the position 
         # is len - 1.
@@ -534,6 +614,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         plane.rect.top = 0
         plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
 
+        # This will remove the plane from its current parent, window.room
+        #
         self.window.inventory.sub(plane)
 
         # Call base class to notify the Entity
@@ -541,6 +623,61 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         shard.plugins.ui.UserInterface.process_PicksUpEvent(self, event)
 
 #    def process_SaysEvent(self, event):
+
+    def inventory_callback(self, drop_plane_name, item_identifier):
+        """Issue a TriesToPickUpEvent if the item is not already in Rack.
+        """
+
+        self.logger.debug("'{}' dropped on inventory".format(item_identifier))
+
+        if item_identifier in self.host.rack.entity_dict.keys():
+
+            self.logger.debug("'{}' already in Rack, skipping".format(item_identifier))
+
+        else:
+
+            self.logger.debug("issuing TriesToPickUpEvent")
+
+            event = shard.TriesToPickUpEvent(self.host.player_id,
+                                             self.room.entity_locations[item_identifier])
+
+            self.message_for_host.event_list.append(event)
+
+        return
+
+    def tile_callback(self, drop_plane_name, item_identifier):
+        """Issue TriesToDropEvent and a TriesToPickUpEvent before if necessary.
+        """
+
+        # Just to be sure, check if the DropPlane's name matches a "(x, y)"
+        # string.
+        # Taken from shard.plugins.serverside
+        #
+        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", drop_plane_name):
+            self.logger.error("DropPlane.name does not match coordinate tuple: '{}'".format(drop_plane_name))
+
+        else:
+            # The target identifier is a coordinate tuple in a Room which
+            # can by convention be infered from the DropPlane's name.
+            #
+            tries_to_drop_event = shard.TriesToDropEvent(self.host.player_id,
+                                                         item_identifier,
+                                                         eval(drop_plane_name))
+
+            if item_identifier not in self.host.rack.entity_dict.keys():
+
+                self.logger.debug("'{}' not in Rack, issuing TriesToPickUpEvent before TriesToDropEvent".format(item_identifier))
+
+                # TODO: duplicate from above
+                #
+                tries_to_pick_up_event = shard.TriesToPickUpEvent(self.player_id,
+                                                                  self.room.entity_locations[item_identifier])
+
+                self.message_for_host.event_list.append(tries_to_pick_up_event)
+
+            self.message_for_host.event_list.append(tries_to_drop_event)
+
+        return
 
 class PygameMapEditor(PygameUserInterface):
     """A Pygame-based user interface that serves as a map editor.
@@ -590,9 +727,12 @@ class PygameMapEditor(PygameUserInterface):
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
+        # This Plane is a DropPlane.
         #
-        self.window.sub(clickndrag.Plane("inventory",
-                                         pygame.Rect((100, 500), (800, 100))))
+        self.window.sub(DropPlane("inventory",
+                                  pygame.Rect((100, 500), (800, 100)),
+                                  callback = self.inventory_callback))
+
         # Create plane for the room.
         #
         self.window.sub(clickndrag.Plane("room",

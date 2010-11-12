@@ -37,6 +37,8 @@
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 #
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
+#
+# TODO: add a description of what is being done to "called" log messages
 
 import shard.eventprocessor
 
@@ -628,11 +630,8 @@ class Entity(shard.eventprocessor.EventProcessor):
        Entity.state
            The state the Entity is in. Defaults to None.
 
-       In addition,
-
        Entity.user_interface
-
-       is added by and points to the UserInterface instance.
+           Pointer to the UserInterface instance.
 
        A Shard Client should use subclasses (possibly with multiple inheritance)
        or custom attachements to instances of this class to implement the game
@@ -666,6 +665,10 @@ class Entity(shard.eventprocessor.EventProcessor):
         self.asset_desc = asset_desc
         self.asset = None
         self.state = None
+
+        # Will be filled by the UserInterface at runtime
+        #
+        self.user_interface = None
 
     # EventProcessor overrides
     #
