@@ -9,10 +9,9 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: save Entities with Room
 # TODO: support Entity Surfaces > 100x100
 # TODO: obey shard.OBSTACLE, spawn Entities accordingly, make FLOOR/OBSTACLE editable, obey when placing Entites in PygameMapEditor
-# TODO: Display all assets from local folder in PygameMapEditor fpr visual editing
+# TODO: Display all assets from local folder in PygameMapEditor for visual editing
 
 import shard.plugins.ui
 import pygame
@@ -837,10 +836,22 @@ class PygameMapEditor(PygameUserInterface):
                     event = shard.ChangeMapElementEvent(tile, (x, y))
                     self.message_for_host.event_list.append(event)
 
-            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
-            # TODO: This was meant to trigger a clean Room re-submission from the server, but since the Room is processed and mirrored incrementally, it can probably be thrown away.
+            # Now spawn all Entities in the Server
             #
-            #self.message_for_host.event_list.append(shard.InitEvent(self.host.player_id))
+            for identifier in self.room.entity_dict.keys():
+
+                # Create a new Entity which can be pickled by Event loggers
+                #
+                entity = shard.Entity(self.room.entity_dict[identifier].entity_type,
+                                      identifier,
+                                      self.room.entity_dict[identifier].asset_desc)
+
+                event = shard.SpawnEvent(entity,
+                                         self.room.entity_locations[identifier])
+
+                self.message_for_host.event_list.append(event)
+
+            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
         else:
             self.logger.debug("no filename selected")

@@ -12,6 +12,10 @@ import os
 def load_room_from_file(filename):
     """This function reads a Shard room from the file and returns a list of corresponding Events.
        Returns None upon failure.
+
+       The file must consist of lines of tab-separated elements:
+
+       (x, y)    tile_type    tile_asset_desc    entity_type,identifier,entity_asset_desc
     """
 
     try:
@@ -25,22 +29,26 @@ def load_room_from_file(filename):
 
     for line in roomfile:
 
-        # TODO: Check for 3-part tab-separated string
+        # Remove whitespace. This also makes sure that the splitted line
+        # will not end in a tab.
         #
-        coordiantes_string, type, asset_desc = line.split("\t")
+        line = line.strip()
 
-        coordiantes_string = coordiantes_string.strip()
-        type = type.strip()
-        asset_desc = asset_desc.strip()
+        # TODO: Check for tab-separated string
+        # TODO: And more checks in general. shard.FLOOR, asset_desc etc.
+        #
+        splitted_line = line.split("\t")
+
+        coordiantes_string = splitted_line.pop(0)
+        type = splitted_line.pop(0)
+        asset_desc = splitted_line.pop(0)
+
+        coordinates = eval(coordiantes_string)
 
         # Match only "(x, y)" coordinates
         #
         if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", coordiantes_string):
-            coordinates = eval(coordiantes_string)
 
-            # TODO: Check for shard.FLOOR etc.
-            # TODO: Check asset_desc
-            #
             tile = shard.Tile(type, asset_desc)
 
             event = shard.ChangeMapElementEvent(tile, coordinates)
@@ -50,6 +58,17 @@ def load_room_from_file(filename):
         else:
             # TODO: warn here
             pass
+
+        if len(splitted_line):
+            # There is still something there. This should be Entities.
+
+            for comma_sep_entity in splitted_line:
+
+                entity_type, identifier, asset_desc = comma_sep_entity.split(",")
+
+                entity = shard.Entity(entity_type, identifier, asset_desc)
+
+                event_list.append(shard.SpawnEvent(entity, coordinates))
 
     event_list.append(shard.RoomCompleteEvent())
 
@@ -131,9 +150,20 @@ class MapEditor(shard.plugins.Plugin):
 
             tile = self.host.room.floor_plan[coordinates].tile
 
-            roomfile.write("{0}\t{1}\t{2}\n".format(repr(coordinates),
-                                                    tile.tile_type,
-                                                    tile.asset_desc))
+            entities_string = ""
+
+            for entity in self.host.room.floor_plan[coordinates].entities:
+
+                # TODO: make sure commas are not present in the other strings
+                #
+                entities_string = entities_string + "\t{},{},{}".format(entity.entity_type,
+                                                                        entity.identifier,
+                                                                        entity.asset_desc)
+
+            roomfile.write("{}\t{}\t{}{}\n".format(repr(coordinates),
+                                                     tile.tile_type,
+                                                     tile.asset_desc,
+                                                     entities_string))
 
             # TODO: save FloorPlanElement.entities = []
 
@@ -168,8 +198,11 @@ class MapEditor(shard.plugins.Plugin):
 
         self.logger.debug("called")
 
-        if event.text + ".floorplan" in os.listdir(os.getcwd()):
+        if event.text + ".floorplan" not in os.listdir(os.getcwd()):
 
+            self.logger.debug("'{}.floorplan' not found, cannot load room".format(event.text))
+
+        else:
             self.logger.debug("'{}.floorplan' exists, attempting to load".format(event.text))
 
             event_list = load_room_from_file(event.text + ".floorplan")
@@ -181,15 +214,7 @@ class MapEditor(shard.plugins.Plugin):
             else:
                 self.message_for_host.event_list = self.message_for_host.event_list + event_list
 
-                # Make sure the player is spawned
-                # TODO: check whether a player entity should be mandatory in a room so this would be obsolete
-                #
-                entity = shard.Entity(shard.PLAYER, "player", "player.png")
-
-                self.message_for_host.event_list.append(shard.SpawnEvent(entity,
-                                                                         (0, 0)))
-        else:
-            self.logger.debug("'{}.floorplan' not found, cannot load room".format(event.text))
+        return
 
     def process_SpawnEvent(self, event):
         """Forward the event to the Server.

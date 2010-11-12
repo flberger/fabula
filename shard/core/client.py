@@ -8,6 +8,7 @@ import shard.core
 import time
 import datetime
 import pickle
+import traceback
 
 class Client(shard.core.Engine):
     """An instance of this class is the main engine in every Shard client.
@@ -178,10 +179,15 @@ class Client(shard.core.Engine):
 
                 # timedifference as seconds + tenth of a second
                 #
-                self.message_log_file.write(pickle.dumps((timedifference.seconds
-                                                          + timedifference.microseconds / 1000000.0,
-                                                          server_message),
-                                                         0))
+                exception = ''
+                try:
+                    self.message_log_file.write(pickle.dumps((timedifference.seconds
+                                                              + timedifference.microseconds / 1000000.0,
+                                                              server_message),
+                                                             0))
+                except:
+                    exception = traceback.format_exc()
+                    self.logger.debug("exception trying to pickle {}:\n{}".format(server_message, exception))
 
                 # Add double newline as separator
                 #
