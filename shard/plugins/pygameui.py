@@ -60,7 +60,7 @@ def open_image(title, logger):
     return (surface, filename)
 
 class DropPlane(clickndrag.Plane):
-    """A DropPlane emits a TriesToDropEvent or TriesToPickUpEvent when a Plane is dropped upon it.
+    """A DropPlane calls a callback when a Plane is dropped upon it.
 
        Additional attributes:
 
