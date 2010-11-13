@@ -58,34 +58,6 @@ def open_image(title, logger):
 
     return (surface, filename)
 
-class DropPlane(clickndrag.Plane):
-    """A DropPlane calls a callback when a Plane is dropped upon it.
-
-       Additional attributes:
-
-       DropPlane.callback
-           The callback function to be called when something is dropped
-    """
-
-    def __init__(self, name, rect, callback, drag = False, grab = False):
-        """Initialise.
-        """
-
-        # Call base class __init__
-        #
-        clickndrag.Plane.__init__(self, name, rect, drag, grab)
-
-        self.callback = callback
-
-    def dropped_upon(self, plane, coordinates):
-        """Call DropPlane.callback(DropPlane.name, plane.name)
-           By convention, the name of the dropped Plane is the item identifier.
-        """
-
-        self.callback(self.name, plane.name)
-
-        return
-
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
 
@@ -192,9 +164,15 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Initialise font instances.
         #
-        self.logger.debug("Using default font '{}'".format(pygame.font.get_default_font()))
-        self.big_font = pygame.font.Font(None, 40)
-        self.small_font = pygame.font.Font(None, 20)
+        try:
+            self.big_font = pygame.font.Font("Vera.ttf", 30)
+            self.small_font = pygame.font.Font("Vera.ttf", 12)
+            self.logger.debug("Using font 'Vera.ttf'")
+
+        except:
+            self.logger.debug("Font 'Vera.ttf' not found, using default font '{}'".format(pygame.font.get_default_font()))
+            self.big_font = pygame.font.Font(None, 40)
+            self.small_font = pygame.font.Font(None, 20)
 
         # Create a black pygame surface for fade effects.
         # Do not use Surface.copy() since we do not want per-pixel alphas.
@@ -212,11 +190,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
-        # This Plane is a DropPlane.
         #
-        self.window.sub(DropPlane("inventory",
-                                  pygame.Rect((0, 500), (800, 100)),
-                                  callback = self.inventory_callback))
+        self.window.sub(clickndrag.Plane("inventory",
+                                         pygame.Rect((0, 500), (800, 100)),
+                                         dropped_upon_callback = self.inventory_callback))
 
         # Create plane for the room.
         #
@@ -238,8 +215,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.fps_log_counter = self.fps_log_counter - 1
 
         else:
-            self.window.display.blit(self.small_font.render("{:3}/{} fps".format(int(self.clock.get_fps()),
-                                                                           self.framerate),
+            self.window.display.blit(self.small_font.render("{}/{} fps  ".format(int(self.clock.get_fps()),
+                                                                                 self.framerate),
                                                             True,
                                                             (255, 255, 255),
                                                             (0, 0, 0)),
@@ -558,13 +535,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         if str(event.location) not in self.window.room.subplanes:
 
-            # Use the DropPlane class which emits TriesToDropEvents
-            #
-            tile_plane = DropPlane(str(event.location),
-                                   pygame.Rect((event.location[0] * self.spacing,
-                                                event.location[1] * self.spacing),
-                                                (100, 100)),
-                                   callback = self.tile_callback)
+            tile_plane = clickndrag.Plane(str(event.location),
+                                          pygame.Rect((event.location[0] * self.spacing,
+                                                       event.location[1] * self.spacing),
+                                                      (100, 100)),
+                                          dropped_upon_callback = self.tile_callback)
 
             self.window.room.sub(tile_plane)
 
@@ -631,9 +606,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
 #    def process_SaysEvent(self, event):
 
-    def inventory_callback(self, drop_plane_name, item_identifier):
-        """Issue a TriesToPickUpEvent if the item is not already in Rack.
+    def inventory_callback(self, plane, dropped_plane, screen_coordinates):
+        """Drop callback to issue a TriesToPickUpEvent if the item is not already in Rack.
         """
+
+        item_identifier = dropped_plane.name
 
         self.logger.debug("'{}' dropped on inventory".format(item_identifier))
 
@@ -652,24 +629,25 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         return
 
-    def tile_callback(self, drop_plane_name, item_identifier):
-        """Issue TriesToDropEvent and a TriesToPickUpEvent before if necessary.
+    def tile_callback(self, plane, dropped_plane, screen_coordinates):
+        """Drop callback to issue a TriesToDropEvent.
         """
 
-        # Just to be sure, check if the DropPlane's name matches a "(x, y)"
-        # string.
+        name = plane.name
+
+        # Just to be sure, check if the Plane's name matches a "(x, y)" string.
         # Taken from shard.plugins.serverside
         #
-        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", drop_plane_name):
-            self.logger.error("DropPlane.name does not match coordinate tuple: '{}'".format(drop_plane_name))
+        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", name):
+            self.logger.error("plane.name does not match coordinate tuple: '{}'".format(name))
 
         else:
             # The target identifier is a coordinate tuple in a Room which
-            # can by convention be infered from the DropPlane's name.
+            # can by convention be infered from the Plane's name.
             #
             tries_to_drop_event = shard.TriesToDropEvent(self.host.player_id,
-                                                         item_identifier,
-                                                         eval(drop_plane_name))
+                                                         dropped_plane.name,
+                                                         eval(name))
 
             self.message_for_host.event_list.append(tries_to_drop_event)
 
@@ -701,7 +679,7 @@ class PygameMapEditor(PygameUserInterface):
 
         # Open a click'n'drag window.
         #
-        self.window = clickndrag.Display((900, 600))
+        self.window = clickndrag.Display((1000, 600))
 
         # Set window name
         #
@@ -723,11 +701,10 @@ class PygameMapEditor(PygameUserInterface):
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create inventory plane at PygameUserInterface.window.inventory
-        # This Plane is a DropPlane.
         #
-        self.window.sub(DropPlane("inventory",
-                                  pygame.Rect((100, 500), (800, 100)),
-                                  callback = self.inventory_callback))
+        self.window.sub(clickndrag.Plane("inventory",
+                                         pygame.Rect((100, 500), (800, 100)),
+                                         dropped_upon_callback = self.inventory_callback))
 
         # Create plane for the room.
         #
@@ -739,7 +716,7 @@ class PygameMapEditor(PygameUserInterface):
         self.window.sub(clickndrag.Plane("buttons",
                                          pygame.Rect((0, 0), (100, 600))))
 
-        self.window.buttons.image.fill((150, 150, 150))
+        self.window.buttons.image.fill((120, 120, 120))
 
         # Add buttons
         #
@@ -768,12 +745,19 @@ class PygameMapEditor(PygameUserInterface):
                                                                   (90, 30)),
                                                       self.quit))
 
+        # Create plane for the properties
+        #
+        self.window.sub(clickndrag.Plane("properties",
+                                         pygame.Rect((900, 0), (100, 600))))
+
+        self.window.properties.image.fill((120, 120, 120))
+
         self.logger.debug("complete")
 
         return
 
-    def set_room_background(self):
-        """Prompt the user for a room background image, load it and assign it to tiles.
+    def set_room_background(self, plane):
+        """Button callback to prompt the user for a room background image, load it and assign it to tiles.
         """
 
         self.logger.debug("called")
@@ -790,8 +774,8 @@ class PygameMapEditor(PygameUserInterface):
                     #
                     self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
-    def save_room(self):
-        """Save the tile images.
+    def save_room(self, plane):
+        """Button callback to save the tile images.
         """
 
         self.logger.debug("called")
@@ -853,8 +837,8 @@ class PygameMapEditor(PygameUserInterface):
         else:
             self.logger.debug("no filename selected")
 
-    def load_room(self):
-        """Issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
+    def load_room(self, plane):
+        """Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
         """
         self.logger.debug("called")
 
@@ -862,8 +846,8 @@ class PygameMapEditor(PygameUserInterface):
 
         self.message_for_host.event_list.append(event)
 
-    def add_item(self):
-        """Request item identifier and image and add it to the rack.
+    def add_item(self, plane):
+        """Button callback to request item identifier and image and add it to the rack.
         """
 
         self.logger.debug("called")
@@ -899,6 +883,12 @@ class PygameMapEditor(PygameUserInterface):
                 self.message_for_host.event_list.append(shard.PicksUpEvent(self.host.player_id,
                                                                            item_identifier))
 
+    def quit(self, plane):
+        """Button callback to set self.exit_requested = True
+        """
+        self.logger.debug("setting exit_requested = True")
+        self.exit_requested = True
+
     def process_CanSpeakEvent(self, event):
 
         self.logger.debug("called")
@@ -911,9 +901,3 @@ class PygameMapEditor(PygameUserInterface):
                                                        event.sentences,
                                                        lambda option: self.message_for_host.event_list.append(shard.SaysEvent(self.host.player_id, option.text))))
         return
-
-    def quit(self):
-        """Set self.exit_requested = True
-        """
-        self.logger.debug("setting exit_requested = True")
-        self.exit_requested = True
