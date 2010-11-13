@@ -130,8 +130,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
        PygameUserInterface.clock
            An instance of pygame.time.Clock
 
-       PygameUserInterface.font
-           A pygame.font.Font instance
+       PygameUserInterface.big_font
+       PygameUserInterface.small_font
+           Pygame.font.Font instances
 
        PygameUserInterface.loading_surface
        PygameUserInterface.loading_surface_position
@@ -189,9 +190,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         #
         self.window = clickndrag.Display((800, 600))
 
-        # Initialise a font instance.
+        # Initialise font instances.
         #
-        self.font = pygame.font.Font(None, 40)
+        self.big_font = pygame.font.Font(None, 40)
+        self.small_font = pygame.font.Font(None, 20)
 
         # Create a black pygame surface for fade effects.
         # Do not use Surface.copy() since we do not want per-pixel alphas.
@@ -200,9 +202,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
-        loading_surface = self.font.render("Loading, please wait...",
-                                           True,
-                                           (255, 255, 255))
+        loading_surface = self.big_font.render("Loading, please wait...",
+                                               True,
+                                               (255, 255, 255))
 
         self.fade_surface.blit(loading_surface,
                                (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
@@ -235,8 +237,13 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.fps_log_counter = self.fps_log_counter - 1
 
         else:
-            self.logger.debug("{0}/{1} fps".format(int(self.clock.get_fps()),
-                                                   self.framerate))
+            self.window.display.blit(self.small_font.render("{:3}/{} fps".format(int(self.clock.get_fps()),
+                                                                           self.framerate),
+                                                            True,
+                                                            (255, 255, 255),
+                                                            (0, 0, 0)),
+                                     (700, 580))
+
             self.fps_log_counter = self.framerate
 
         return
@@ -665,6 +672,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
             if item_identifier not in self.host.rack.entity_dict.keys():
 
+                # TODO: Change! This is for the editor only!
+                #
                 self.logger.debug("'{}' not in Rack, issuing TriesToPickUpEvent before TriesToDropEvent".format(item_identifier))
 
                 # TODO: duplicate from above
@@ -717,9 +726,9 @@ class PygameMapEditor(PygameUserInterface):
         self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
-        loading_surface = self.font.render("Loading, please wait...",
-                                           True,
-                                           (255, 255, 255))
+        loading_surface = self.big_font.render("Loading, please wait...",
+                                               True,
+                                               (255, 255, 255))
 
         self.fade_surface.blit(loading_surface,
                                (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
@@ -742,7 +751,7 @@ class PygameMapEditor(PygameUserInterface):
         self.window.sub(clickndrag.Plane("buttons",
                                          pygame.Rect((0, 0), (100, 600))))
 
-        self.window.buttons.image.fill((127, 127, 127))
+        self.window.buttons.image.fill((150, 150, 150))
 
         # Add buttons
         #

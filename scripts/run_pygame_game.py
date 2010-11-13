@@ -21,7 +21,7 @@ def main():
     app = shard.run.App("d", timeout = 0)
     app.user_interface_class = shard.plugins.pygameui.PygameUserInterface
     app.server_plugin_class = shard.plugins.serverside.DefaultGame
-    app.run_standalone(30, "player")
+    app.run_standalone(200, "player")
 
 if __name__ == "__main__":
 

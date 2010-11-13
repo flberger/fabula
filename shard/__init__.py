@@ -17,11 +17,11 @@
 #
 # TODO: import shard.xyz also imports shard - so get rid of redundant imports
 #
-# TODO: string.format() instead of "%s" % s or "s" + "s" in the whole package!
+# TODO: string.format() / .join() instead of "%s" % s or "s" + "s" in the whole package!
 #
 # TODO: use map() instead of "for" loops where applicable
 #
-# TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
+# TODO: "avoid dots" -> prefetch functions from.long.dotted.operations, especially in loops
 # TODO: most prominently: message.event_list.append -> message.append
 #
 # TODO: readable __repr__ of shard objects: Rack
