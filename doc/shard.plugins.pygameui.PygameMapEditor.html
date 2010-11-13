@@ -30,7 +30,7 @@ PygameUserInterface.window.buttons
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id43">
+      <table class="children sortable" id="id42">
   
   
 <tr class="method">
@@ -44,37 +44,37 @@ PygameUserInterface.window.buttons
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#set_room_background">set_room_background</a></td>
-    <td><tt>Prompt the user for a room background image, load it and assign it to tiles.</tt></td>
+    <td><tt>Button callback to prompt the user for a room background image, load it and assign it to tiles.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#save_room">save_room</a></td>
-    <td><tt>Save the tile images.</tt></td>
+    <td><tt>Button callback to save the tile images.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#load_room">load_room</a></td>
-    <td><tt>Issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.</tt></td>
+    <td><tt>Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#add_item">add_item</a></td>
-    <td><tt>Request item identifier and image and add it to the rack.</tt></td>
+    <td><tt>Button callback to request item identifier and image and add it to the rack.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#quit">quit</a></td>
+    <td><tt>Button callback to set self.exit_requested = True</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
     <td><tt>Called when the UserInterface needs to render a CanSpeakEvent.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#quit">quit</a></td>
-    <td><tt>Set self.exit_requested = True</tt></td>
   </tr>
   
 </table>
@@ -82,7 +82,7 @@ PygameUserInterface.window.buttons
         <p>
           Inherited from <a href="shard.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>:
         </p>
-        <table class="children sortable" id="id44">
+        <table class="children sortable" id="id43">
   
   
 <tr class="basemethod">
@@ -144,13 +144,13 @@ PygameUserInterface.window.buttons
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameUserInterface.html#inventory_callback">inventory_callback</a></td>
-    <td><tt>Issue a TriesToPickUpEvent if the item is not already in Rack.</tt></td>
+    <td><tt>Drop callback to issue a TriesToPickUpEvent if the item is not already in Rack.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_callback">tile_callback</a></td>
-    <td><tt>Issue TriesToDropEvent and a TriesToPickUpEvent before if necessary.</tt></td>
+    <td><tt>Drop callback to issue a TriesToDropEvent.</tt></td>
   </tr>
   
 </table>
@@ -158,7 +158,7 @@ PygameUserInterface.window.buttons
         <p>
           Inherited from <a href="shard.plugins.ui.UserInterface.html">UserInterface</a> (via <a href="shard.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>):
         </p>
-        <table class="children sortable" id="id45">
+        <table class="children sortable" id="id44">
   
   
 <tr class="basemethod">
@@ -216,7 +216,7 @@ PygameUserInterface.window.buttons
         <p>
           Inherited from <a href="shard.plugins.Plugin.html">Plugin</a> (via <a href="shard.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>, <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>):
         </p>
-        <table class="children sortable" id="id46">
+        <table class="children sortable" id="id45">
   
   
 <tr class="basemethod">
@@ -304,7 +304,7 @@ PygameUserInterface.window.buttons
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>, <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id47">
+        <table class="children sortable" id="id46">
   
   
 <tr class="basemethod">
@@ -357,12 +357,12 @@ PygameUserInterface.window.buttons
   <div class="functionHeader">
     
     def
-    set_room_background(self):
+    set_room_background(self, plane):
     
   </div>
   <div class="functionBody">
     
-    <pre>Prompt the user for a room background image, load it and assign it to tiles.
+    <pre>Button callback to prompt the user for a room background image, load it and assign it to tiles.
         </pre>
   </div>
 </div><div class="function">
@@ -375,12 +375,12 @@ PygameUserInterface.window.buttons
   <div class="functionHeader">
     
     def
-    save_room(self):
+    save_room(self, plane):
     
   </div>
   <div class="functionBody">
     
-    <pre>Save the tile images.
+    <pre>Button callback to save the tile images.
         </pre>
   </div>
 </div><div class="function">
@@ -393,12 +393,12 @@ PygameUserInterface.window.buttons
   <div class="functionHeader">
     
     def
-    load_room(self):
+    load_room(self, plane):
     
   </div>
   <div class="functionBody">
     
-    <pre>Issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
+    <pre>Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
         </pre>
   </div>
 </div><div class="function">
@@ -411,12 +411,30 @@ PygameUserInterface.window.buttons
   <div class="functionHeader">
     
     def
-    add_item(self):
+    add_item(self, plane):
     
   </div>
   <div class="functionBody">
     
-    <pre>Request item identifier and image and add it to the rack.
+    <pre>Button callback to request item identifier and image and add it to the rack.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameMapEditor.quit">
+    
+  </a>
+  <a name="quit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    quit(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Button callback to set self.exit_requested = True
         </pre>
   </div>
 </div><div class="function">
@@ -440,27 +458,9 @@ corresponding SaysEvent to self.message_for_host, which is
 evaluated by the ControlEngine. The default implementation
 makes the player say "blah". </pre>
   </div>
-</div><div class="function">
-  <a name="shard.plugins.pygameui.PygameMapEditor.quit">
-    
-  </a>
-  <a name="quit">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    quit(self):
-    
-  </div>
-  <div class="functionBody">
-    
-    <pre>Set self.exit_requested = True
-        </pre>
-  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-13 15:35:10.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-13 17:27:16.
     </address>
   </body>
 </html>
