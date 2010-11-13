@@ -192,6 +192,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Initialise font instances.
         #
+        self.logger.debug("Using default font '{}'".format(pygame.font.get_default_font()))
         self.big_font = pygame.font.Font(None, 40)
         self.small_font = pygame.font.Font(None, 20)
 
@@ -669,19 +670,6 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             tries_to_drop_event = shard.TriesToDropEvent(self.host.player_id,
                                                          item_identifier,
                                                          eval(drop_plane_name))
-
-            if item_identifier not in self.host.rack.entity_dict.keys():
-
-                # TODO: Change! This is for the editor only!
-                #
-                self.logger.debug("'{}' not in Rack, issuing TriesToPickUpEvent before TriesToDropEvent".format(item_identifier))
-
-                # TODO: duplicate from above
-                #
-                tries_to_pick_up_event = shard.TriesToPickUpEvent(self.player_id,
-                                                                  self.room.entity_locations[item_identifier])
-
-                self.message_for_host.event_list.append(tries_to_pick_up_event)
 
             self.message_for_host.event_list.append(tries_to_drop_event)
 

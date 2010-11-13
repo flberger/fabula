@@ -131,13 +131,6 @@ class MapEditor(shard.plugins.Plugin):
         self.current_room = event.room_identifier
         self.message_for_host.event_list.append(event)
 
-    def process_ChangeMapElementEvent(self, event):
-        """Forward the event to the Server to update the Room.
-        """
-
-        self.logger.debug("called")
-        self.message_for_host.event_list.append(event)
-
     def process_RoomCompleteEvent(self, event):
         """Save the Room to a local file, then forward the event to the Server .
         """
@@ -215,20 +208,6 @@ class MapEditor(shard.plugins.Plugin):
                 self.message_for_host.event_list = self.message_for_host.event_list + event_list
 
         return
-
-    def process_SpawnEvent(self, event):
-        """Forward the event to the Server.
-        """
-
-        self.logger.debug("called")
-        self.message_for_host.event_list.append(event)
-
-    def process_PicksUpEvent(self, event):
-        """Forward the event to the Server.
-        """
-
-        self.logger.debug("called")
-        self.message_for_host.event_list.append(event)
 
     def process_TriesToPickUpEvent(self, event):
         """Return a PicksUpEvent to the Server.

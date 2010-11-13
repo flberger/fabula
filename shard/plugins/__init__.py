@@ -24,7 +24,6 @@ class Plugin(shard.eventprocessor.EventProcessor):
     def __init__(self, logger):
         """Initialise the plugin.
            logger is an instance of logging.Logger.
-           The default implementation does nothing.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
@@ -60,3 +59,204 @@ class Plugin(shard.eventprocessor.EventProcessor):
                 self.event_dict[event.__class__](event)
 
         return self.message_for_host
+
+    def process_TriesToMoveEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToLookAtEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToPickUpEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToDropEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToManipulateEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToTalkToEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_MovesToEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PicksUpEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DropsEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ManipulatesEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_CanSpeakEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_AttemptFailedEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PerceptionEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_SaysEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ChangeStateEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+        # ChangeState is based on a concept by Alexander Marbach.
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PassedEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_LookedAtEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PickedUpEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DroppedEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_SpawnEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DeleteEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_EnterRoomEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_RoomCompleteEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ChangeMapElementEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_InitEvent(self, event, **kwargs):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return

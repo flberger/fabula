@@ -10,35 +10,37 @@
 #
 # Transformed into a package on 22. September 2009.
 
-# TODO: reasonable package docstring above: what is where :) PEP 257: The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each.
+# CODING STYLE
 #
+# TODO: reasonable package docstring above: what is where :) PEP 257: The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each.
 # TODO: PEP 8: Comparisons to singletons like None should always be done with 'is' or 'is not', never the equality operators.
 # TODO: PEP 8: Don't compare boolean values to True or False using ==
+# TODO: give the method return value in docstring
+# TODO: unify Event attributes target_identifier, trigger_identifier, item_identifier where applicable
+# TODO: add a description of what is being done to "called" log messages
+#
+#
+# CLEANUPS
 #
 # TODO: import shard.xyz also imports shard - so get rid of redundant imports
 #
+#
+# OPTIMISATION
+#
+# TODO: don't call base classes for trivial actions. Duplicate and save calls.
 # TODO: string.format() / .join() instead of "%s" % s or "s" + "s" in the whole package!
-#
 # TODO: use map() instead of "for" loops where applicable
-#
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations, especially in loops
 # TODO: most prominently: message.event_list.append -> message.append
 #
+#
+# IMPROVEMENTS
+#
 # TODO: readable __repr__ of shard objects: Rack
-#
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
-#
-# TODO: give the method return value in docstring
-#
-# TODO: unify Event attributes target_identifier, trigger_identifier, item_identifier where applicable
-#
 # TODO: per-player inventories in server... -.-
-#
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
-#
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
-#
-# TODO: add a description of what is being done to "called" log messages
 
 import shard.eventprocessor
 

@@ -187,7 +187,7 @@ class Client(shard.core.Engine):
                                                              0))
                 except:
                     exception = traceback.format_exc()
-                    self.logger.debug("exception trying to pickle {}:\n{}".format(server_message, exception))
+                    self.logger.debug("exception trying to pickle server message {}:\n{}".format(server_message, exception))
 
                 # Add double newline as separator
                 #
@@ -447,7 +447,7 @@ class Client(shard.core.Engine):
         """Unset await_confirmation flag.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("attempt failed for '{}'".format(event.identifier))
 
         # Did this fail for the Entity we just moved locally?
         #
