@@ -9,8 +9,8 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
+# TODO: obey OBSTACLE tiles, spawn Entities accordingly, make FLOOR/OBSTACLE editable, obey when placing Entites in PygameMapEditor
 # TODO: support Entity Surfaces > 100x100
-# TODO: obey shard.OBSTACLE, spawn Entities accordingly, make FLOOR/OBSTACLE editable, obey when placing Entites in PygameMapEditor
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
 
 import shard.plugins.ui
@@ -890,6 +890,8 @@ class PygameMapEditor(PygameUserInterface):
         self.exit_requested = True
 
     def process_CanSpeakEvent(self, event):
+        """Open the senteces as an OptionList and return a SaysEvent to the host.
+        """
 
         self.logger.debug("called")
 
@@ -901,3 +903,87 @@ class PygameMapEditor(PygameUserInterface):
                                                        event.sentences,
                                                        lambda option: self.message_for_host.event_list.append(shard.SaysEvent(self.host.player_id, option.text))))
         return
+
+    def process_SpawnEvent(self, event):
+        """Call PygameUserInterface.process_SpawnEvent and add a clicked_callback to the Entity.
+        """
+
+        PygameUserInterface.process_SpawnEvent(self, event)
+
+        plane = self.window.room.subplanes[event.entity.identifier]
+
+        if plane.clicked_callback is None:
+
+            self.logger.debug("clicked_callback of '{}' is still None, adding callback".format(event.entity.identifier))
+            plane.clicked_callback = self.show_properties
+
+            #REMOVE
+            self.logger.debug(plane)
+
+        return
+
+    def show_properties(self, plane):
+        """Click callback for entities which shows their properties in the properties Plane.
+        """
+
+        self.logger.debug("called")
+
+        # Only update if not already visible
+        #
+        if self.window.properties.subplanes_list and self.window.properties.identifier.text == plane.name:
+
+            self.logger.debug("properties for '{}' already displayed".format(plane.name))
+
+        else:
+            self.logger.debug("showing properties of '{}'".format(plane.name))
+
+            self.window.properties.remove()
+
+            if plane.name in self.room.entity_dict.keys():
+
+                entity = self.room.entity_dict[plane.name]
+
+            elif plane.name in self.host.rack.entity_dict.keys():
+
+                entity = self.host.rack.entity_dict[plane.name]
+
+            else:
+                self.logger.error("entity '{}' neither in Room nor Rack, can not update property inspector".format(plane.name))
+
+                return
+
+            # Entity.identifier
+            #
+            self.window.properties.sub(clickndrag.gui.Label("identifier",
+                                                            entity.identifier,
+                                                            pygame.Rect((0, 0), (100, 30)),
+                                                            color = (120, 120, 120)))
+
+            # Entity.asset
+            #
+            asset_plane = clickndrag.Plane("asset", pygame.Rect((0, 33), (100, 100)))
+            asset_plane.image = entity.asset.image
+
+            self.window.properties.sub(asset_plane)
+
+            # Entity.asset_desc
+            #
+            self.window.properties.sub(clickndrag.gui.Label("asset_desc",
+                                                            entity.asset_desc,
+                                                            pygame.Rect((0, 136), (100, 30)),
+                                                            color = (120, 120, 120)))
+
+            # Entity.entity_type
+            #
+            self.window.properties.sub(clickndrag.gui.Label("entity_type",
+                                                            entity.entity_type,
+                                                            pygame.Rect((0, 169), (100, 30)),
+                                                            color = (120, 120, 120)))
+
+            # Entity.state
+            #
+            self.window.properties.sub(clickndrag.gui.Label("state",
+                                                            entity.state,
+                                                            pygame.Rect((0, 202), (100, 30)),
+                                                            color = (120, 120, 120)))
+            return

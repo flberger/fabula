@@ -32,6 +32,7 @@
 # TODO: use map() instead of "for" loops where applicable
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations, especially in loops
 # TODO: most prominently: message.event_list.append -> message.append
+# TODO: Room.entity_dict.keys() is scanned so often that there should be a fixed list prepared to read from
 #
 #
 # IMPROVEMENTS

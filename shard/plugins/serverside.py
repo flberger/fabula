@@ -125,7 +125,7 @@ class MapEditor(shard.plugins.Plugin):
             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
     def process_EnterRoomEvent(self, event):
-        """Save the name of the room to be entered and forward the event to the Server to update the Room..
+        """Save the name of the room to be entered and forward the event to the Server to update the Room.
         """
         self.logger.debug(str(event))
         self.current_room = event.room_identifier
