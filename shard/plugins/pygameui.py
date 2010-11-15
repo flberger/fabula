@@ -466,7 +466,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Now there is a Plane for the Entity. Add to room.
         # This implicitly removes the Plane from the former parent plane.
         #
-        self.logger.debug("adding {} to window.room".format(event.entity.asset))
+        self.logger.debug("adding '{}' to window.room".format(event.entity.asset.name))
         self.window.room.sub(event.entity.asset)
 
         return

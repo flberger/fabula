@@ -17,9 +17,12 @@
       <a href="classIndex.html#shard.plugins.Plugin">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></p>
+      <p>Known subclasses: <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></p>
     </div>
     <pre>Base class for plugins to be used by a shard.core.Engine.
+
+Plugin does not override the EventProcessor handler methods, so the
+default for a Plugin is to silently discard all incoming events.
 
 Attributes:
 
@@ -35,7 +38,7 @@ Plugin.host
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id35">
+      <table class="children sortable" id="id36">
   
   
 <tr class="method">
@@ -50,156 +53,6 @@ Plugin.host
     <td>Method</td>
     <td><a href="shard.plugins.Plugin.html#process_message">process_message</a></td>
     <td><tt>This is the main method of a plugin.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
   </tr>
   
 </table>
@@ -207,7 +60,7 @@ Plugin.host
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
         </p>
-        <table class="children sortable" id="id36">
+        <table class="children sortable" id="id37">
   
   
 <tr class="basemethod">
@@ -222,6 +75,156 @@ Plugin.host
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
     <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
   </tr>
   
 </table>
@@ -275,459 +278,9 @@ possibly to be sent to the remote host.
 The default implementation calls the respective functions for the
 Events in message and returns Plugin.message_for_host.</pre>
   </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToMoveEvent">
-    
-  </a>
-  <a name="process_TriesToMoveEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToMoveEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">shard.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToLookAtEvent">
-    
-  </a>
-  <a name="process_TriesToLookAtEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToLookAtEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">shard.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToPickUpEvent">
-    
-  </a>
-  <a name="process_TriesToPickUpEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToPickUpEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToDropEvent">
-    
-  </a>
-  <a name="process_TriesToDropEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToDropEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">shard.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToManipulateEvent">
-    
-  </a>
-  <a name="process_TriesToManipulateEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToManipulateEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">shard.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_TriesToTalkToEvent">
-    
-  </a>
-  <a name="process_TriesToTalkToEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToTalkToEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">shard.eventprocessor.EventProcessor.process_TriesToTalkToEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_MovesToEvent">
-    
-  </a>
-  <a name="process_MovesToEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_MovesToEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_PicksUpEvent">
-    
-  </a>
-  <a name="process_PicksUpEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_PicksUpEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_DropsEvent">
-    
-  </a>
-  <a name="process_DropsEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_DropsEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_ManipulatesEvent">
-    
-  </a>
-  <a name="process_ManipulatesEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_ManipulatesEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">shard.eventprocessor.EventProcessor.process_ManipulatesEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_CanSpeakEvent">
-    
-  </a>
-  <a name="process_CanSpeakEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_CanSpeakEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">shard.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_AttemptFailedEvent">
-    
-  </a>
-  <a name="process_AttemptFailedEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_AttemptFailedEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">shard.eventprocessor.EventProcessor.process_AttemptFailedEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_PerceptionEvent">
-    
-  </a>
-  <a name="process_PerceptionEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_PerceptionEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">shard.eventprocessor.EventProcessor.process_PerceptionEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_SaysEvent">
-    
-  </a>
-  <a name="process_SaysEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_SaysEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_ChangeStateEvent">
-    
-  </a>
-  <a name="process_ChangeStateEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_ChangeStateEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_PassedEvent">
-    
-  </a>
-  <a name="process_PassedEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_PassedEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">shard.eventprocessor.EventProcessor.process_PassedEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_LookedAtEvent">
-    
-  </a>
-  <a name="process_LookedAtEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_LookedAtEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">shard.eventprocessor.EventProcessor.process_LookedAtEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_PickedUpEvent">
-    
-  </a>
-  <a name="process_PickedUpEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_PickedUpEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">shard.eventprocessor.EventProcessor.process_PickedUpEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_DroppedEvent">
-    
-  </a>
-  <a name="process_DroppedEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_DroppedEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">shard.eventprocessor.EventProcessor.process_DroppedEvent</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_SpawnEvent">
-    
-  </a>
-  <a name="process_SpawnEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_SpawnEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">shard.eventprocessor.EventProcessor.process_SpawnEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_DeleteEvent">
-    
-  </a>
-  <a name="process_DeleteEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_DeleteEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">shard.eventprocessor.EventProcessor.process_DeleteEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_EnterRoomEvent">
-    
-  </a>
-  <a name="process_EnterRoomEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_EnterRoomEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_RoomCompleteEvent">
-    
-  </a>
-  <a name="process_RoomCompleteEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_RoomCompleteEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_ChangeMapElementEvent">
-    
-  </a>
-  <a name="process_ChangeMapElementEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_ChangeMapElementEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.Plugin.process_InitEvent">
-    
-  </a>
-  <a name="process_InitEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_InitEvent(self, event, **kwargs):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">shard.eventprocessor.EventProcessor.process_InitEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return the Event to the host.
-        </pre>
-  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-15 15:10:26.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-15 16:06:24.
     </address>
   </body>
 </html>

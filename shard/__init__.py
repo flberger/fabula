@@ -23,6 +23,8 @@
 # CLEANUPS
 #
 # TODO: import shard.xyz also imports shard - so get rid of redundant imports
+# TODO: Clean up log levels: use debug(), info(), warning(), error(), critical()
+# TODO: is the default mirroring policy in Plugin OK? UserInterface also is a Plugin, after all, and it makes no sense here.
 #
 #
 # OPTIMISATION

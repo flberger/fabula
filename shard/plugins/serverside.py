@@ -76,7 +76,232 @@ def load_room_from_file(filename):
 
     return event_list
 
-class MapEditor(shard.plugins.Plugin):
+class DefaultGame(shard.plugins.Plugin):
+    """This is an off-the-shelf server plugin, running a standard Shard game.
+    """
+
+    def process_InitEvent(self, event):
+        """If there is no host.room yet, load default.floorplan and send it.
+        """
+
+        self.logger.debug("called")
+
+        # Prevent "referenced before assignment"
+        #
+        roomfile = None
+
+        if self.host.room is not None:
+
+            self.logger.debug("room already loaded, current room: {}".format(self.host.room.identifier))
+
+        else:
+            self.logger.debug("no room loaded yet, attempting to load 'default.floorplan'")
+
+            event_list = load_room_from_file("default.floorplan")
+
+            if event_list is None:
+
+                self.logger.error("error opening file 'default.floorplan'")
+
+            else:
+                self.message_for_host.event_list = self.message_for_host.event_list + event_list
+
+        return
+
+    def process_TriesToMoveEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_TriesToLookAtEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_TriesToPickUpEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_TriesToDropEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_TriesToManipulateEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_TriesToTalkToEvent(self, event):
+        """Return AttemptFailedEvent to the host.
+        """
+
+        self.logger.debug("returning AttemptFailedEvent to host")
+        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        return
+
+    def process_MovesToEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PicksUpEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DropsEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ManipulatesEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_CanSpeakEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_AttemptFailedEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PerceptionEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_SaysEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ChangeStateEvent(self, event):
+        """Return the Event to the host.
+        """
+        # ChangeState is based on a concept by Alexander Marbach.
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PassedEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_LookedAtEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_PickedUpEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DroppedEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_SpawnEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_DeleteEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_EnterRoomEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_RoomCompleteEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+    def process_ChangeMapElementEvent(self, event):
+        """Return the Event to the host.
+        """
+
+        self.logger.debug("returning Event to host")
+        self.message_for_host.event_list.append(event)
+        return
+
+class MapEditor(DefaultGame):
     """This is the server-side Plugin for a Shard map editor.
        Additional attributes:
 
@@ -91,7 +316,7 @@ class MapEditor(shard.plugins.Plugin):
         """
         # Call base class
         #
-        shard.plugins.Plugin.__init__(self, logger)
+        DefaultGame.__init__(self, logger)
 
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
@@ -236,35 +461,3 @@ class MapEditor(shard.plugins.Plugin):
             self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
                                                                      event.item_identifier,
                                                                      event.target_identifier))
-
-class DefaultGame(shard.plugins.Plugin):
-    """This is an off-the-shelf server plugin, running a standard Shard game.
-    """
-
-    def process_InitEvent(self, event):
-        """If there is no host.room yet, load default.floorplan and send it.
-        """
-
-        self.logger.debug("called")
-
-        # Prevent "referenced before assignment"
-        #
-        roomfile = None
-
-        if self.host.room is not None:
-
-            self.logger.debug("room already loaded, current room: {}".format(self.host.room.identifier))
-
-        else:
-            self.logger.debug("no room loaded yet, attempting to load 'default.floorplan'")
-
-            event_list = load_room_from_file("default.floorplan")
-
-            if event_list is None:
-
-                self.logger.error("error opening file 'default.floorplan'")
-
-            else:
-                self.message_for_host.event_list = self.message_for_host.event_list + event_list
-
-        return
