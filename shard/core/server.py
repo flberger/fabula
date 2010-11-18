@@ -7,7 +7,6 @@
 
 import shard
 import shard.core
-import signal
 import time
 
 class Server(shard.core.Engine):
@@ -26,8 +25,10 @@ class Server(shard.core.Engine):
            Flag to be changed by signal handler
      """
 
-    def __init__(self, interface_instance, plugin_instance, logger, framerate):
+    def __init__(self, interface_instance, plugin_instance, logger, framerate,
+                 threadsafe = True):
         """Initialise the Server.
+           If threadsafe is True (default), no signal handlers are installed.
         """
 
         # Setup base class
@@ -53,20 +54,24 @@ class Server(shard.core.Engine):
         #
         self.exit_requested = False
 
-        # install signal handlers
-        #
-        signal.signal(signal.SIGINT, self.handle_exit)
-        signal.signal(signal.SIGTERM, self.handle_exit)
+        if not threadsafe:
 
-        try:
-            signal.signal(signal.SIGQUIT, self.handle_exit)
-
-        except:
-            # Microsoft Windows has no SIGQUIT - ignore
+            # install signal handlers
             #
-            pass
+            import signal
 
-        # TODO: restart plugin when SIGHUP is received
+            signal.signal(signal.SIGINT, self.handle_exit)
+            signal.signal(signal.SIGTERM, self.handle_exit)
+
+            try:
+                signal.signal(signal.SIGQUIT, self.handle_exit)
+
+            except:
+                # Microsoft Windows has no SIGQUIT - ignore
+                #
+                pass
+
+            # TODO: restart plugin when SIGHUP is received
 
     def run(self):
         """Server main method, calling the Plugin in the process.
@@ -297,7 +302,7 @@ class Server(shard.core.Engine):
         return
 
     def handle_exit(self, signalnum, frame):
-        """Stop the Server when an according OS signal is received.
+        """Callback to stop the Server when an according OS signal is received.
         """
 
         signal_dict = {2 : "SIGINT",

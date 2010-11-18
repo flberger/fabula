@@ -193,10 +193,14 @@ class App:
 
         plugin = self.server_plugin_class(self.logger)
 
+        # Since the Server will run in the main thread, signal handlers can
+        # be installed.
+        #
         server = shard.core.server.Server(interface,
                                           plugin,
                                           self.logger,
-                                          framerate)
+                                          framerate,
+                                          threadsafe = False)
         def exit():
             """Wait for some time given in App.__init__(), then call
                server.handle_exit().
@@ -306,7 +310,8 @@ class App:
         server = shard.core.server.Server(server_interface,
                                           server_plugin,
                                           self.logger,
-                                          framerate)
+                                          framerate,
+                                          threadsafe = True)
 
         # Client exit function for testing
         #
@@ -317,25 +322,18 @@ class App:
             sleep(self.timeout)
             user_interface.exit_requested = True
 
-        # Server exit function if client exits
-        #
-        def server_exit():
-            client_thread.join()
-            #while client_thread.is_alive():
-            #    sleep(1)
-            #    logger.debug(threading.enumerate())
-            logger.debug("client exited, calling server.handle_exit()")
-            server.handle_exit(2, None)
-
         # Starting threads
         #
         interface_thread = threading.Thread(target = handle_messages,
                                             name = "handle_messages")
         interface_thread.start()
 
-        client_thread = threading.Thread(target = client.run,
-                                         name = "client_thread")
-        client_thread.start()
+        # Client must run in main thread to be able to interact properly
+        # with the OS (think Pygame events). So we put the server in a thread.
+        #
+        server_thread = threading.Thread(target = server.run,
+                                         name = "server_thread")
+        server_thread.start()
 
         # Exit trigger for non-interactive unit tests
         #
@@ -344,32 +342,27 @@ class App:
                                                   name = "client_exit")
             client_exit_thread.start()
 
-
-        server_exit_thread = threading.Thread(target = server_exit,
-                                              name = "server_exit")
-        server_exit_thread.start()
-
-        # This method will block until the server exits.
-        # Cannot be put in a thread since the server installs signal handlers.
+        # This method will block until the client exits.
         # Strangely, tracebacks in this main thread are not printed, so they
         # are logged.
         #
         exception = ''
         try:
-            server.run()
+            client.run()
         except:
             exception = traceback.format_exc()
-            self.logger.debug("exception in server.run():\n{}".format(exception))
+            self.logger.debug("exception in client.run():\n{}".format(exception))
 
-        # Just to be sure
-        #
-        self.logger.info("server exited, waiting for client thread to stop")
-        client_thread.join()
+        self.logger.debug("client exited, calling server.handle_exit()")
+        server.handle_exit(2, None)
 
-        self.logger.info("client thread stopped, shutting down logger")
+        self.logger.debug("waiting for server thread to stop")
+        server_thread.join()
+
+        self.logger.info("server thread stopped, shutting down logger")
 
         if exception:
-            self.logger.debug("exception in server.run() was:\n{}".format(exception))
+            self.logger.debug("exception in client.run() was:\n{}".format(exception))
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

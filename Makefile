@@ -58,12 +58,12 @@ win2k_update: clean
 	umount /mnt/win2k/
 
 clean:
-	rm -vf *pyc
-	rm -vf */*pyc
-	rm -vf */*/*pyc
-	rm -vf *log
-	rm -vf */*log
-	rm -vf */*/*log
+	rm -vf *.pyc
+	rm -vf */*.pyc
+	rm -vf */*/*.pyc
+	rm -vf *.log
+	rm -vf */*.log
+	rm -vf */*/*.log
 
 zip: clean
 	cd .. ; rm -fv shard.zip ; zip -9 -r shard.zip pygame_ui -x '*bzr*'
