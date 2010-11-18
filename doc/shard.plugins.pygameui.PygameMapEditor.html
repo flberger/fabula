@@ -25,7 +25,18 @@ Additional PygameMapEditor attributes:
 
 PygameUserInterface.window.buttons
     clickndrag Plane for the buttons, 100x600px and located at the left
-    border of the window.</pre>
+    border of the window.
+
+PygameUserInterface.window.properties
+    clickndrag Plane for Entity properties, 100x600px and located at the
+    right border of the window.
+
+PygameUserInterface.plane_cache
+    A list to cache temporarily invisible planes
+
+PygameUserInterface.overlay_surface
+    A semi-transparent red Surface to be used as an OBSTACLE indicator
+    overlay</pre>
 
     
     
@@ -43,14 +54,14 @@ PygameUserInterface.window.buttons
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#set_room_background">set_room_background</a></td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#open_image">open_image</a></td>
     <td><tt>Button callback to prompt the user for a room background image, load it and assign it to tiles.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#save_room">save_room</a></td>
-    <td><tt>Button callback to save the tile images.</tt></td>
+    <td><tt>Button callback to save the tile images, resend and save the whole Room.</tt></td>
   </tr><tr class="method">
     
     
@@ -69,6 +80,30 @@ PygameUserInterface.window.buttons
     <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameMapEditor.html#quit">quit</a></td>
     <td><tt>Button callback to set self.exit_requested = True</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#edit_walls">edit_walls</a></td>
+    <td><tt>Button callback to switch to wall edit mode.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#make_tile_obstacle">make_tile_obstacle</a></td>
+    <td><tt>Clicked callback which changes the Tile type to shard.OBSTACLE.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#make_tile_floor">make_tile_floor</a></td>
+    <td><tt>Clicked callback which changes the Tile type to shard.FLOOR.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameMapEditor.html#wall_edit_done">wall_edit_done</a></td>
+    <td><tt>Button callback which restores the editor to the state before edit_walls().</tt></td>
   </tr><tr class="method">
     
     
@@ -344,16 +379,16 @@ PygameUserInterface.window.buttons
         </pre>
   </div>
 </div><div class="function">
-  <a name="shard.plugins.pygameui.PygameMapEditor.set_room_background">
+  <a name="shard.plugins.pygameui.PygameMapEditor.open_image">
     
   </a>
-  <a name="set_room_background">
+  <a name="open_image">
     
   </a>
   <div class="functionHeader">
     
     def
-    set_room_background(self, plane):
+    open_image(self, plane):
     
   </div>
   <div class="functionBody">
@@ -376,7 +411,7 @@ PygameUserInterface.window.buttons
   </div>
   <div class="functionBody">
     
-    <pre>Button callback to save the tile images.
+    <pre>Button callback to save the tile images, resend and save the whole Room.
         </pre>
   </div>
 </div><div class="function">
@@ -431,6 +466,80 @@ PygameUserInterface.window.buttons
   <div class="functionBody">
     
     <pre>Button callback to set self.exit_requested = True
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameMapEditor.edit_walls">
+    
+  </a>
+  <a name="edit_walls">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    edit_walls(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Button callback to switch to wall edit mode.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameMapEditor.make_tile_obstacle">
+    
+  </a>
+  <a name="make_tile_obstacle">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    make_tile_obstacle(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Clicked callback which changes the Tile type to shard.OBSTACLE.
+More specific, a ChangeMapElementEvent is sent to the Server, and an
+overlay is applied to visualize the OBSTACLE type.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameMapEditor.make_tile_floor">
+    
+  </a>
+  <a name="make_tile_floor">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    make_tile_floor(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Clicked callback which changes the Tile type to shard.FLOOR.
+More specific, a ChangeMapElementEvent is sent to the Server, and the
+overlay to visualize the OBSTACLE type is deleted.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameMapEditor.wall_edit_done">
+    
+  </a>
+  <a name="wall_edit_done">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    wall_edit_done(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Button callback which restores the editor to the state before edit_walls().
         </pre>
   </div>
 </div><div class="function">
@@ -489,7 +598,7 @@ PygameUserInterface.window.buttons
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-15 16:06:24.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-18 13:06:01.
     </address>
   </body>
 </html>

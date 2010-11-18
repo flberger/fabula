@@ -392,11 +392,18 @@ class Client(shard.core.Engine):
                                     #
                                     pass
 
-                    # Since we had player input, we now await confirmation
+                    # If any of the Events to be sent is an AttemptEvent, we now
+                    # await confirmation
                     #
-                    self.logger.debug("awaiting confirmation, discarding further user input")
+                    has_attempt_event = False
 
-                    self.await_confirmation = True
+                    for event in message_from_plugin.event_list:
+
+                        if isinstance(event, shard.AttemptEvent):
+
+                            self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+
+                            self.await_confirmation = True
 
                     # Reset dropout timer
                     #

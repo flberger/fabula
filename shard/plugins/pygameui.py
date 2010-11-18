@@ -9,8 +9,12 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: obey OBSTACLE tiles, spawn Entities accordingly, make FLOOR/OBSTACLE editable, obey when placing Entites in PygameMapEditor
+# TODO: spawn default Entities according to OBSTACLE tiles
+# TODO: make tile FLOOR/OBSTACLE editable
+# TODO: obey OBSTACLE tiles when placing Entites in PygameMapEditor
+#
 # TODO: support Entity Surfaces > 100x100
+#
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
 
 import shard.plugins.ui
@@ -231,6 +235,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """
 
         if not self.freeze:
+
             self.window.update()
             self.window.render()
 
@@ -661,6 +666,17 @@ class PygameMapEditor(PygameUserInterface):
        PygameUserInterface.window.buttons
            clickndrag Plane for the buttons, 100x600px and located at the left
            border of the window.
+
+       PygameUserInterface.window.properties
+           clickndrag Plane for Entity properties, 100x600px and located at the
+           right border of the window.
+
+       PygameUserInterface.plane_cache
+           A list to cache temporarily invisible planes
+
+       PygameUserInterface.overlay_surface
+           A semi-transparent red Surface to be used as an OBSTACLE indicator
+           overlay
     """
 
     def __init__(self, assets, framerate, logger):
@@ -677,6 +693,10 @@ class PygameMapEditor(PygameUserInterface):
         #
         self.spacing = 101
 
+        # Setup a cache for planes
+        #
+        self.plane_cache = []
+
         # Open a click'n'drag window.
         #
         self.window = clickndrag.Display((1000, 600))
@@ -688,7 +708,6 @@ class PygameMapEditor(PygameUserInterface):
         # Create a black pygame surface for fade effects
         # Do not use Surface.copy() since we do not want per-pixel alphas.
         #
-        #self.fade_surface = self.window.image.copy()
         self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
@@ -699,6 +718,13 @@ class PygameMapEditor(PygameUserInterface):
         self.fade_surface.blit(loading_surface,
                                (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
+
+        # Create a semi-transparent red Surface to be used as an OBSTACLE
+        # indicator overlay
+        #
+        self.overlay_surface = pygame.Surface((100, 100))
+        self.overlay_surface.fill((255, 0, 0))
+        self.overlay_surface.set_alpha(127)
 
         # Create inventory plane at PygameUserInterface.window.inventory
         #
@@ -723,7 +749,7 @@ class PygameMapEditor(PygameUserInterface):
         self.window.buttons.sub(clickndrag.gui.Button("Open Image",
                                                       pygame.Rect((5, 5),
                                                                   (90, 30)),
-                                                      self.set_room_background))
+                                                      self.open_image))
 
         self.window.buttons.sub(clickndrag.gui.Button("Load Room",
                                                       pygame.Rect((5, 45),
@@ -739,6 +765,11 @@ class PygameMapEditor(PygameUserInterface):
                                                       pygame.Rect((5, 125),
                                                                   (90, 30)),
                                                       self.add_item))
+
+        self.window.buttons.sub(clickndrag.gui.Button("Edit Walls",
+                                                      pygame.Rect((5, 165),
+                                                                  (90, 30)),
+                                                      self.edit_walls))
 
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
                                                       pygame.Rect((5, 565),
@@ -756,7 +787,7 @@ class PygameMapEditor(PygameUserInterface):
 
         return
 
-    def set_room_background(self, plane):
+    def open_image(self, plane):
         """Button callback to prompt the user for a room background image, load it and assign it to tiles.
         """
 
@@ -774,8 +805,10 @@ class PygameMapEditor(PygameUserInterface):
                     #
                     self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
+        # TODO: warn user to save the room before editing walls
+
     def save_room(self, plane):
-        """Button callback to save the tile images.
+        """Button callback to save the tile images, resend and save the whole Room.
         """
 
         self.logger.debug("called")
@@ -813,8 +846,11 @@ class PygameMapEditor(PygameUserInterface):
 
                     # Send Tile to Server
                     #
-                    tile = shard.Tile(shard.FLOOR, current_file)
+                    tile = shard.Tile(self.room.floor_plan[(x, y)].tile.tile_type,
+                                      current_file)
+
                     event = shard.ChangeMapElementEvent(tile, (x, y))
+
                     self.message_for_host.event_list.append(event)
 
             # Now spawn all Entities in the Server
@@ -889,6 +925,158 @@ class PygameMapEditor(PygameUserInterface):
         self.logger.debug("setting exit_requested = True")
         self.exit_requested = True
 
+    def edit_walls(self, plane):
+        """Button callback to switch to wall edit mode.
+        """
+        self.logger.debug("called")
+
+        # Cache button planes from sidebar...
+        #
+        for button in self.window.buttons.subplanes.values():
+            self.plane_cache.append(button)
+
+        # ...and remove
+        #
+        self.window.buttons.remove()
+
+        self.window.buttons.sub(clickndrag.gui.Label("title",
+                                                     "Edit Walls",
+                                                      pygame.Rect((0, 0),
+                                                                  (100, 30)),
+                                                      color = (120, 120, 120)))
+
+        self.window.buttons.sub(clickndrag.gui.Button("Done",
+                                                      pygame.Rect((5, 35),
+                                                                  (90, 30)),
+                                                      self.wall_edit_done))
+
+        # Clear Entity planes from room, but cache them.
+        # By convention the name of the Entity Plane is Entity.identifier.
+        #
+        for identifier in self.room.entity_dict.keys():
+            self.plane_cache.append(self.window.room.subplanes[identifier])
+            self.window.room.remove(identifier)
+
+        self.logger.debug("{} Plane(s) in plane_cache now".format(len(self.plane_cache)))
+
+        # Make Entity planes in inventory insensitive to drags
+        #
+        for plane in self.window.inventory.subplanes.values():
+            plane.draggable = False
+
+        # Install Tile clicked callback.
+        # All Entity Planes have been removed from room, so there should be only
+        # tiles left.
+        #
+        for plane in self.window.room.subplanes.values():
+            plane.clicked_callback = self.make_tile_obstacle
+
+        # Finally, create overlays for OBSTACLE tiles.
+        # TODO: slight duplicate from make_tile_obstacle
+        #
+        for coordinates in self.room.floor_plan.keys():
+
+            if self.room.floor_plan[coordinates].tile.tile_type == shard.OBSTACLE:
+
+                overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
+                                                 pygame.Rect(self.window.room.subplanes[str(coordinates)].rect),
+                                                 clicked_callback = self.make_tile_floor)
+
+                overlay_plane.image = self.overlay_surface
+
+                self.window.room.sub(overlay_plane)
+
+    def make_tile_obstacle(self, plane):
+        """Clicked callback which changes the Tile type to shard.OBSTACLE.
+           More specific, a ChangeMapElementEvent is sent to the Server, and an
+           overlay is applied to visualize the OBSTACLE type.
+        """
+
+        self.logger.debug("returning ChangeMapElementEvent and creating overlay for tile at {}".format(plane.name))
+
+        # The name of the clicked Plane is supposed to be a string representation
+        # of a coordinate tuple.
+        #
+        coordinates = eval(plane.name)
+        asset_desc = self.room.floor_plan[coordinates].tile.asset_desc
+
+        event = shard.ChangeMapElementEvent(shard.Tile(shard.OBSTACLE, asset_desc),
+                                            coordinates)
+
+        self.message_for_host.event_list.append(event)
+
+        # Draw an overlay indicating the OBSTACLE type.
+        # rect can be taken from the Plane that received the click, but we make
+        # a copy to be on the safe side.
+        #
+        overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
+                                         pygame.Rect(plane.rect),
+                                         clicked_callback = self.make_tile_floor)
+
+        overlay_plane.image = self.overlay_surface
+
+        self.window.room.sub(overlay_plane)
+
+    def make_tile_floor(self, plane):
+        """Clicked callback which changes the Tile type to shard.FLOOR.
+           More specific, a ChangeMapElementEvent is sent to the Server, and the
+           overlay to visualize the OBSTACLE type is deleted.
+        """
+
+        # Based on a copy-paste from make_tile_obstacle()
+
+        self.logger.debug("returning ChangeMapElementEvent and deleting '{}'".format(plane.name))
+
+        # The clicked Plane is  the overlay. Its name is supposed to be a string
+        # representation of a coordinate tuple plus "_overlay".
+        #
+        coordinates = eval(plane.name.split("_overlay")[0])
+        asset_desc = self.room.floor_plan[coordinates].tile.asset_desc
+
+        event = shard.ChangeMapElementEvent(shard.Tile(shard.FLOOR, asset_desc),
+                                            coordinates)
+
+        self.message_for_host.event_list.append(event)
+
+        # Delete the overlay indicating the OBSTACLE type.
+        #
+        plane.destroy()
+
+    def wall_edit_done(self, plane):
+        """Button callback which restores the editor to the state before edit_walls().
+        """
+        self.logger.debug("called")
+
+        # Remove all wall marker overlays.
+        # Remove Tile clicked callbacks along the way.
+        # Entity Planes are not yet restored, so there should be only tiles left.
+        #
+        for plane in list(self.window.room.subplanes.values()):
+
+            if plane.name.endswith("_overlay"):
+
+                plane.destroy()
+
+            else:
+                plane.clicked_callback = None
+                
+        # Restore Entity Planes in room
+        #
+        while not isinstance(self.plane_cache[-1], clickndrag.gui.Button):
+            self.window.room.sub(self.plane_cache.pop())
+
+        # Make Entity Planes in inventory sensitive to drags
+        #
+        for plane in self.window.inventory.subplanes.values():
+            plane.draggable = True
+
+        self.window.buttons.remove()
+
+        # Restore buttons, flushing plane cache
+        #
+        while len(self.plane_cache):
+            self.window.buttons.sub(self.plane_cache.pop())
+
     def process_CanSpeakEvent(self, event):
         """Open the senteces as an OptionList and return a SaysEvent to the host.
         """
@@ -916,9 +1104,6 @@ class PygameMapEditor(PygameUserInterface):
 
             self.logger.debug("clicked_callback of '{}' is still None, adding callback".format(event.entity.identifier))
             plane.clicked_callback = self.show_properties
-
-            #REMOVE
-            self.logger.debug(plane)
 
         return
 

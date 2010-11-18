@@ -118,7 +118,7 @@ class Server(shard.core.Engine):
                             # Looks like the Client sent an Event typically
                             # issued by the Server. Let the Plugin handle that.
                             #
-                            self.logger.debug("{} is no typical client event, forwarding to Plugin".format(event))
+                            self.logger.debug("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
                             self.message_for_plugin.event_list.append(event)
 
                         # Contrary to the Client, the Server calls its plugin
