@@ -10,8 +10,6 @@
 # CharanisMLClient developed in May 2008.
 
 # TODO: spawn default Entities according to OBSTACLE tiles
-# TODO: make tile FLOOR/OBSTACLE editable
-# TODO: obey OBSTACLE tiles when placing Entites in PygameMapEditor
 #
 # TODO: support Entity Surfaces > 100x100
 #
@@ -224,7 +222,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                                             True,
                                                             (255, 255, 255),
                                                             (0, 0, 0)),
-                                     (700, 580))
+                                     (700, 0))
 
             self.fps_log_counter = self.framerate
 
@@ -336,7 +334,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Clear room
         #
-        self.window.room.remove()
+        self.window.room.remove_all()
 
         # No more rendering until RoomComplete
         #
@@ -700,6 +698,7 @@ class PygameMapEditor(PygameUserInterface):
         # Open a click'n'drag window.
         #
         self.window = clickndrag.Display((1000, 600))
+        self.window.image.fill((16, 16, 16))
 
         # Set window name
         #
@@ -737,51 +736,52 @@ class PygameMapEditor(PygameUserInterface):
         self.window.sub(clickndrag.Plane("room",
                                          pygame.Rect((100, 0), (800, 500))))
 
-        # Create plane for the editor buttons.
+        # Create Container for the editor buttons.
         #
-        self.window.sub(clickndrag.Plane("buttons",
-                                         pygame.Rect((0, 0), (100, 600))))
-
-        self.window.buttons.image.fill((120, 120, 120))
+        container = clickndrag.gui.Container("buttons",
+                                             padding = 5,
+                                             color = (120, 120, 120))
+        container.rect.topleft = (0, 0)
+        self.window.sub(container)
 
         # Add buttons
         #
         self.window.buttons.sub(clickndrag.gui.Button("Open Image",
-                                                      pygame.Rect((5, 5),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.open_image))
 
         self.window.buttons.sub(clickndrag.gui.Button("Load Room",
-                                                      pygame.Rect((5, 45),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.load_room))
 
         self.window.buttons.sub(clickndrag.gui.Button("Save Room",
-                                                      pygame.Rect((5, 85),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.save_room))
 
         self.window.buttons.sub(clickndrag.gui.Button("Add Item",
-                                                      pygame.Rect((5, 125),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.add_item))
 
         self.window.buttons.sub(clickndrag.gui.Button("Edit Walls",
-                                                      pygame.Rect((5, 165),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.edit_walls))
 
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
-                                                      pygame.Rect((5, 565),
-                                                                  (90, 30)),
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
                                                       self.quit))
 
-        # Create plane for the properties
+        # Create Container for the properties
         #
-        self.window.sub(clickndrag.Plane("properties",
-                                         pygame.Rect((900, 0), (100, 600))))
-
-        self.window.properties.image.fill((120, 120, 120))
+        container = clickndrag.gui.Container("properties",
+                                             color = (120, 120, 120))
+        container.rect.topleft = (900, 0)
+        self.window.sub(container)
 
         self.logger.debug("complete")
 
@@ -805,7 +805,11 @@ class PygameMapEditor(PygameUserInterface):
                     #
                     self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
-        # TODO: warn user to save the room before editing walls
+        # Warn user
+        #
+        warning_box = clickndrag.gui.OkBox("Please save the room before editing walls.")
+        warning_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+        self.window.room.sub(warning_box)
 
     def save_room(self, plane):
         """Button callback to save the tile images, resend and save the whole Room.
@@ -937,17 +941,17 @@ class PygameMapEditor(PygameUserInterface):
 
         # ...and remove
         #
-        self.window.buttons.remove()
+        self.window.buttons.remove_all()
 
         self.window.buttons.sub(clickndrag.gui.Label("title",
                                                      "Edit Walls",
                                                       pygame.Rect((0, 0),
-                                                                  (100, 30)),
+                                                                  (88, 30)),
                                                       color = (120, 120, 120)))
 
         self.window.buttons.sub(clickndrag.gui.Button("Done",
                                                       pygame.Rect((5, 35),
-                                                                  (90, 30)),
+                                                                  (88, 30)),
                                                       self.wall_edit_done))
 
         # Clear Entity planes from room, but cache them.
@@ -1070,7 +1074,7 @@ class PygameMapEditor(PygameUserInterface):
         for plane in self.window.inventory.subplanes.values():
             plane.draggable = True
 
-        self.window.buttons.remove()
+        self.window.buttons.remove_all()
 
         # Restore buttons, flushing plane cache
         #
@@ -1083,11 +1087,7 @@ class PygameMapEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        rect = pygame.Rect((100, 100),
-                           (300, len(event.sentences) * 30 + 30))
-
         self.window.room.sub(clickndrag.gui.OptionList("select_room",
-                                                       rect,
                                                        event.sentences,
                                                        lambda option: self.message_for_host.event_list.append(shard.SaysEvent(self.host.player_id, option.text))))
         return
@@ -1122,7 +1122,7 @@ class PygameMapEditor(PygameUserInterface):
         else:
             self.logger.debug("showing properties of '{}'".format(plane.name))
 
-            self.window.properties.remove()
+            self.window.properties.remove_all()
 
             if plane.name in self.room.entity_dict.keys():
 
@@ -1146,7 +1146,7 @@ class PygameMapEditor(PygameUserInterface):
 
             # Entity.asset
             #
-            asset_plane = clickndrag.Plane("asset", pygame.Rect((0, 33), (100, 100)))
+            asset_plane = clickndrag.Plane("asset", pygame.Rect((0, 0), (100, 100)))
             asset_plane.image = entity.asset.image
 
             self.window.properties.sub(asset_plane)
@@ -1155,20 +1155,20 @@ class PygameMapEditor(PygameUserInterface):
             #
             self.window.properties.sub(clickndrag.gui.Label("asset_desc",
                                                             entity.asset_desc,
-                                                            pygame.Rect((0, 136), (100, 30)),
+                                                            pygame.Rect((0, 0), (100, 30)),
                                                             color = (120, 120, 120)))
 
             # Entity.entity_type
             #
             self.window.properties.sub(clickndrag.gui.Label("entity_type",
                                                             entity.entity_type,
-                                                            pygame.Rect((0, 169), (100, 30)),
+                                                            pygame.Rect((0, 0), (100, 30)),
                                                             color = (120, 120, 120)))
 
             # Entity.state
             #
             self.window.properties.sub(clickndrag.gui.Label("state",
                                                             entity.state,
-                                                            pygame.Rect((0, 202), (100, 30)),
+                                                            pygame.Rect((0, 0), (100, 30)),
                                                             color = (120, 120, 120)))
             return
