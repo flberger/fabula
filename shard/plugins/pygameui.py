@@ -9,10 +9,6 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: spawn default Entities according to OBSTACLE tiles
-#
-# TODO: support Entity Surfaces > 100x100
-#
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
 
 import shard.plugins.ui
@@ -347,7 +343,27 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """Update and render the Planes of the map elements and fade in the room.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("rearranging tile and entity planes")
+
+        # Entities may have been spawned inbetween ChangeMapElementEvents, but
+        # clickndrag requires their Planes to be the last ones in
+        # window.room.subplanes_list to be rendered on top of the tiles. So,
+        # check if there are any entites in the wrong place and correct.
+
+        tiles = []
+        entities = []
+
+        for name in self.window.room.subplanes_list:
+
+            # By convention, a tile's plane name is the string representation of
+            # the coordinates, so it starts with a brace.
+            #
+            if name.startswith("("):
+                tiles.append(name)
+            else:
+                entities.append(name)
+
+        self.window.room.subplanes_list = tiles + entities
 
         # Display the game again and accept input
         #
@@ -415,15 +431,20 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             #
             shard.plugins.ui.UserInterface.process_SpawnEvent(self, event)
 
-        # This is prossibly a respawn from Rack, and the Entity already has
+        # This is possibly a respawn from Rack, and the Entity already has
         # an asset.
         #
         if event.entity.asset is not None:
-            self.logger.debug("Entity '{}' already has an asset, updating position to {}".format(event.entity.identifier,
-                                                                                                 event.location))
 
-            event.entity.asset.rect.left = event.location[0] * self.spacing
-            event.entity.asset.rect.top = event.location[1] * self.spacing
+            msg = "Entity '{}' already has an asset, updating position to {}"
+            self.logger.debug(msg.format(event.entity.identifier,
+                                         event.location))
+
+            x = event.location[0] * self.spacing + self.spacing / 2
+            y = event.location[1] * self.spacing + self.spacing
+
+            event.entity.asset.rect.centerx = x
+            event.entity.asset.rect.bottom = y
 
         else:
             self.logger.debug("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
@@ -449,12 +470,17 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             #
             surface = surface.convert_alpha()
 
+            # Create Rect - taken from above
+            #
+            rect = pygame.Rect((0, 0), surface.get_rect().size)
+            
+            rect.centerx = event.location[0] * self.spacing + self.spacing / 2
+            rect.bottom = event.location[1] * self.spacing + self.spacing
+
             # Create Plane, name is the entity identifier
             #
-            plane = clickndrag.Plane(event.entity.identifier,
-                                     pygame.Rect((event.location[0] * self.spacing,
-                                                  event.location[1] * self.spacing),
-                                                 (100, 100)))
+            plane = clickndrag.Plane(event.entity.identifier, rect)
+            
             plane.image = surface
 
             # Items can be dragged by default
