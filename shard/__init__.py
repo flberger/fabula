@@ -938,7 +938,7 @@ class Room(shard.eventprocessor.EventProcessor):
         """
         if event.location not in self.floor_plan:
 
-            raise ShardException("cannot spawn entity %s at undefined location %s"
+            raise Exception("cannot spawn entity %s at undefined location %s"
                                  % (event.entity.identifier, event.location))
 
         # If Entity is already there, just do nothing.
@@ -961,12 +961,12 @@ class Room(shard.eventprocessor.EventProcessor):
 
         if event.identifier not in self.entity_dict:
 
-            raise ShardException("cannot move unknown entity %s"
+            raise Exception("cannot move unknown entity %s"
                                  % event.identifier)
 
         if event.location not in self.floor_plan:
 
-            raise ShardException("cannot move entity %s to undefined location %s"
+            raise Exception("cannot move entity %s to undefined location %s"
                                  % (event.identifier, event.location))
 
         # Only process changed locations
@@ -997,7 +997,7 @@ class Room(shard.eventprocessor.EventProcessor):
         """
         if event.identifier not in self.entity_dict:
 
-            raise ShardException("cannot delete unknown entity %s"
+            raise Exception("cannot delete unknown entity %s"
                                  % event.identifier)
 
         entity = self.entity_dict[event.identifier]
@@ -1212,21 +1212,3 @@ def join_lists(first_list, second_list):
     new_list = new_list + longer_list[index:]
 
     return new_list
-
-############################################################
-# Exceptions
-
-class ShardException():
-    """This is the base class of Shard-related exceptions.
-       Shard Implementations should raise an instance of this class when
-       appropriate, providing an error description.
-    """
-
-    def __init__(self, error_description):
-        self.error_description = error_description
-
-    def __repr__(self):
-        # This is called and should return a
-        # string representation which is shown
-        #
-        return self.error_description

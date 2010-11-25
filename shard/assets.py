@@ -8,8 +8,6 @@
 # in turn was based on the LocalFileAssetEngine from the CharanisMLClient
 # developed in May 2008.
 
-
-from shard import ShardException
 import os.path
 
 class Assets:
@@ -28,7 +26,7 @@ class Assets:
     def fetch(self, asset_desc):
         """This method retrieves the file specified in asset_desc and returns a file-like object.
            Since fetch() is a synchronous method, it will cancel after a timeout
-           and raise a shard.ShardException if it failes to retrieve the data.
+           and raise a Exception if it failes to retrieve the data.
            This method actually is a dispatcher to more specialised methods.
         """
 
@@ -55,7 +53,7 @@ class Assets:
 
             self.logger.critical(errormessage)
 
-            raise ShardException(errormessage)
+            raise Exception(errormessage)
 
     def fetch_uri(self, asset_desc):
 
@@ -65,7 +63,7 @@ class Assets:
 
         self.logger.critical(errormessage)
 
-        raise ShardException(errormessage)
+        raise Exception(errormessage)
 
     def fetch_zip_file(self, asset_desc):
         """This method reads a ZIP file and returns a dict with the asset_desc minus extension as keys and a PyGame surface as values.
@@ -98,7 +96,7 @@ class Assets:
 
         self.logger.critical(errormessage)
 
-        raise ShardException(errormessage)
+        raise Exception(errormessage)
 
     def fetch_local_file(self, asset_desc):
         """This method returns a a file-like object for the file specified.

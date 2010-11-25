@@ -9,11 +9,19 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
+# TODO: Display loading progress
+#
+# TODO: implement user interaction for TriesToMoveEvent and MovesToEvent
+# TODO: implement user interaction for TriesToLookAtEvent
+# TODO: implement user interaction for TriesToManipulateEvent
+# TODO: implement user interaction for TriesToTalkToEvent
+#
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
+#
+# TODO: render order top-down, following lines
 
 import shard.plugins.ui
 import pygame
-import clickndrag
 import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
@@ -56,6 +64,109 @@ def open_image(title, logger):
 
     return (surface, filename)
 
+class EntityPlane(clickndrag.Plane):
+    """Subclass of Plane with an update() method that handles movement.
+
+       Additional attributes:
+
+       EntityPlane.position_list
+           A list of movement steps as position tuples
+    """
+
+    def __init__(self, name, rect, drag=False,
+                                   grab=False,
+                                   clicked_callback=None,
+                                   dropped_upon_callback=None):
+        """Initialise.
+        """
+
+        # Call base class
+        #
+        clickndrag.Plane.__init__(self, name, rect, drag,
+                                                    grab,
+                                                    clicked_callback,
+                                                    dropped_upon_callback)
+
+        self.position_list = []
+
+        return
+
+    def update(self):
+        """If EntityPlane.target has not yet been reached, move by EntityPlane.movement_vector.
+        """
+
+        if self.position_list:
+            new_position = self.position_list.pop(0)
+            self.rect.centerx = new_position[0]
+            self.rect.bottom = new_position[1]
+
+        return
+
+class PygameEntity(shard.Entity):
+    """Pygame-aware subclass of Entity to be used in PygameUserInterface.
+
+       Additional attributes:
+
+       PygameEntity.spacing
+           The spacing between tiles.
+
+       PygameEntity.action_frames
+           The number of frames per action.
+    """
+
+    def __init__(entity_type, identifier, asset_desc, spacing, action_frames):
+        """Initialise.
+           spacing is the spacing between tiles.
+           action_frames is the number of frames per action.
+        """
+
+        # Call base class
+        #
+        shard.Entity.__init__(self, entity_type, identifier, asset_desc)
+
+        self.spacing = spacing
+        self.action_frames = action_frames
+
+        return
+
+    def process_MovesToEvent(self, event):
+        """Instruct the EntityPlane with the movement.
+        """
+
+        # Reference point is the bottom center of the image, which is positioned
+        # at the bottom center of the tile
+
+        current_x = self.asset.rect.centerx
+        current_y = self.asset.rect.bottom
+
+        future_x = event.location[0] * self.spacing + int(self.spacing / 2)
+        future_y = event.location[1] * self.spacing + self.spacing
+
+        dx_per_frame = (future_x - current_x) / self.action_frames
+        dy_per_frame = (future_y - current_y) / self.action_frames
+
+        position_list = []
+
+        # Re-using current_x, current_y retrieved above.
+        # But omit last step.
+        #
+        for i in range(self.action_frames - 1):
+
+            current_x = current_x + dx_per_frame
+            current_y = current_y + dy_per_frame
+
+            # Round now to distribute the error
+            #
+            position_list.append((int(current_x), int(current_y)))
+
+        # Append final position to make sure it's being hit.
+        #
+        position_list.append((future_x, future_y))
+
+        self.asset.position_list = position_list
+
+        return
+
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
 
@@ -66,8 +177,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
            take, in seconds.
 
        UserInterface.framerate
+           Just what you think.
+
        UserInterface.assets
-           framerate and assets manager
+           The assets manager instance.
 
        UserInterface.action_frames
            The number of frames per action.
@@ -295,7 +408,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         else:
             self.logger.debug("room visible, fading out")
 
-            frames = int(self.action_frames / 4)
+            frames = self.action_frames
 
             fadestep = int(255 / frames)
 
@@ -375,7 +488,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Since full screen blits are very slow, use a fraction of
         # action_frames.
         #
-        frames = int(self.action_frames / 4)
+        frames = self.action_frames
 
         fadestep = int(255 / frames)
 
@@ -424,6 +537,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
            The name of the subplane is the Entity identifier, so the subplane
            is accessible using window.room.<identifier>.
            Entity.asset points to the Plane of the Entity.
+           When a Plane has not yet been added, the Entity's class is changed
+           to PygameEntity in addition.
         """
 
         if event.entity.user_interface is None:
@@ -477,9 +592,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             rect.centerx = event.location[0] * self.spacing + self.spacing / 2
             rect.bottom = event.location[1] * self.spacing + self.spacing
 
-            # Create Plane, name is the entity identifier
+            # Create EntityPlane, name is the entity identifier
             #
-            plane = clickndrag.Plane(event.entity.identifier, rect)
+            plane = EntityPlane(event.entity.identifier, rect)
             
             plane.image = surface
 
@@ -491,6 +606,19 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             # Finally attach the Plane as the Entity's asset
             #
             event.entity.asset = plane
+
+            # The Entity must be able to react to Events. These reactions are
+            # Pygame specific and are thus not covered in the basic shard.Entity
+            # class. Thus, we exploit a Python feature here and change the
+            # Entity's class at runtime to a subclass that supports Pygame.
+            #
+            event.entity.__class__ = PygameEntity
+
+            # Since we do not call PygameEntity.__init__() to prevent messing
+            # up already present data, we add required attributes
+            #
+            event.entity.spacing = self.spacing
+            event.entity.action_frames = self.action_frames
 
         # Now there is a Plane for the Entity. Add to room.
         # This implicitly removes the Plane from the former parent plane.
@@ -568,7 +696,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                           pygame.Rect((event.location[0] * self.spacing,
                                                        event.location[1] * self.spacing),
                                                       (100, 100)),
-                                          dropped_upon_callback = self.tile_callback)
+                                          clicked_callback = self.tile_clicked_callback,
+                                          dropped_upon_callback = self.tile_drop_callback)
 
             self.window.room.sub(tile_plane)
 
@@ -580,7 +709,45 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         return
 
-#    def process_PerceptionEvent(self, event):
+    def process_PerceptionEvent(self, event):
+        """Display the perception.
+        """
+
+        self.logger.debug("called")
+
+        # Using a OkBox for now.
+        # Taken from PygameMapEditor.open_image().
+        #
+        perception_box = clickndrag.gui.OkBox(event.perception)
+        perception_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+        self.window.room.sub(perception_box)
+
+        return
+
+    def process_AttemptFailedEvent(self, event):
+        """Flash the screen.
+        """
+
+        self.logger.debug("called")
+
+        # Flash very short
+        #
+        frames = int(self.action_frames / 20)
+
+        self.window.room.rendersurface.fill((250, 250, 250))
+        self.window.room.last_rect = None
+
+        while frames:
+            self.display_single_frame()
+            frames = frames - 1
+
+        # Mark Entity Plane as changed to trigger redraw of the room
+        #
+        self.window.room.subplanes[event.identifier].last_rect = None
+
+        self.display_single_frame()
+
+        return
 
     ####################
     # Event handlers affecting Entities
@@ -658,9 +825,36 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         return
 
-    def tile_callback(self, plane, dropped_plane, screen_coordinates):
+    def tile_clicked_callback(self, plane):
+        """Clicked callback to issue a TriesToMoveEvent.
+        """
+
+        # TODO: This is so tile_drop_callback() that it should be unified.
+
+        self.logger.debug("called")
+
+        # Just to be sure, check if the Plane's name matches a "(x, y)" string.
+        # Taken from shard.plugins.serverside
+        #
+        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", plane.name):
+            self.logger.error("plane.name does not match coordinate tuple: '{}'".format(plane.name))
+
+        else:
+            # The target identifier is a coordinate tuple in a Room which
+            # can by convention be infered from the Plane's name.
+            #
+            event = shard.TriesToMoveEvent(self.host.player_id,
+                                           eval(plane.name))
+
+            self.message_for_host.event_list.append(event)
+
+        return
+
+    def tile_drop_callback(self, plane, dropped_plane, screen_coordinates):
         """Drop callback to issue a TriesToDropEvent.
         """
+
+        self.logger.debug("called")
 
         name = plane.name
 
@@ -889,9 +1083,9 @@ class PygameMapEditor(PygameUserInterface):
 
                 # Create a new Entity which can be pickled by Event loggers
                 #
-                entity = shard.Entity(self.room.entity_dict[identifier].entity_type,
-                                      identifier,
-                                      self.room.entity_dict[identifier].asset_desc)
+                entity = Entity(self.room.entity_dict[identifier].entity_type,
+                                identifier,
+                                self.room.entity_dict[identifier].asset_desc)
 
                 event = shard.SpawnEvent(entity,
                                          self.room.entity_locations[identifier])
@@ -936,9 +1130,9 @@ class PygameMapEditor(PygameUserInterface):
 
             if image is not None:
 
-                entity = shard.Entity(shard.ITEM_BLOCK,
-                                      item_identifier,
-                                      filename)
+                entity = Entity(shard.ITEM_BLOCK,
+                                item_identifier,
+                                filename)
 
                 self.logger.debug("appending SpawnEvent and PicksUpEvent")
 
@@ -1078,7 +1272,7 @@ class PygameMapEditor(PygameUserInterface):
         self.logger.debug("called")
 
         # Remove all wall marker overlays.
-        # Remove Tile clicked callbacks along the way.
+        # Restore Tile clicked callbacks along the way.
         # Entity Planes are not yet restored, so there should be only tiles left.
         #
         for plane in list(self.window.room.subplanes.values()):
@@ -1088,7 +1282,7 @@ class PygameMapEditor(PygameUserInterface):
                 plane.destroy()
 
             else:
-                plane.clicked_callback = None
+                plane.clicked_callback = self.tile_clicked_callback
                 
         # Restore Entity Planes in room
         #
@@ -1167,12 +1361,15 @@ class PygameMapEditor(PygameUserInterface):
             #
             self.window.properties.sub(clickndrag.gui.Label("identifier",
                                                             entity.identifier,
-                                                            pygame.Rect((0, 0), (100, 30)),
+                                                            pygame.Rect((0, 0), (98, 30)),
                                                             color = (120, 120, 120)))
 
             # Entity.asset
             #
-            asset_plane = clickndrag.Plane("asset", pygame.Rect((0, 0), (100, 100)))
+            rect = pygame.Rect((0, 0), (98, entity.asset.image.get_rect().height))
+
+            asset_plane = clickndrag.Plane("asset", rect)
+
             asset_plane.image = entity.asset.image
 
             self.window.properties.sub(asset_plane)
@@ -1181,20 +1378,20 @@ class PygameMapEditor(PygameUserInterface):
             #
             self.window.properties.sub(clickndrag.gui.Label("asset_desc",
                                                             entity.asset_desc,
-                                                            pygame.Rect((0, 0), (100, 30)),
+                                                            pygame.Rect((0, 0), (98, 30)),
                                                             color = (120, 120, 120)))
 
             # Entity.entity_type
             #
             self.window.properties.sub(clickndrag.gui.Label("entity_type",
                                                             entity.entity_type,
-                                                            pygame.Rect((0, 0), (100, 30)),
+                                                            pygame.Rect((0, 0), (98, 30)),
                                                             color = (120, 120, 120)))
 
             # Entity.state
             #
             self.window.properties.sub(clickndrag.gui.Label("state",
                                                             entity.state,
-                                                            pygame.Rect((0, 0), (100, 30)),
+                                                            pygame.Rect((0, 0), (98, 30)),
                                                             color = (120, 120, 120)))
             return

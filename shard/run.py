@@ -263,7 +263,7 @@ class App:
             """Interconnect client and server Interface.
             """
 
-            logger.debug("starting up")
+            logger.debug("starting up, slowing down to {} fps".format(framerate))
 
             # Run thread as long as no shutdown is requested
             #
@@ -277,6 +277,10 @@ class App:
                 if len(client_message_buffer.messages_for_remote):
                     message = client_message_buffer.messages_for_remote.popleft()
                     server_message_buffer.messages_for_local.append(message)
+
+                # Slow down
+                #
+                sleep(1 / framerate)
 
             # Caught shutdown notification, stopping thread
             #

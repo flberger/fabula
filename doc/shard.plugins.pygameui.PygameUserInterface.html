@@ -28,8 +28,10 @@ UserInterface.action_time
     take, in seconds.
 
 UserInterface.framerate
+    Just what you think.
+
 UserInterface.assets
-    framerate and assets manager
+    The assets manager instance.
 
 UserInterface.action_frames
     The number of frames per action.
@@ -95,7 +97,7 @@ PygameUserInterface.fade_surface
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id39">
+      <table class="children sortable" id="id42">
   
   
 <tr class="method">
@@ -150,6 +152,18 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Display the perception.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Flash the screen.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
     <td><tt>Call base class process_DropsEvent and clean up the inventory plane.</tt></td>
   </tr><tr class="method">
@@ -168,7 +182,13 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_callback">tile_callback</a></td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_clicked_callback">tile_clicked_callback</a></td>
+    <td><tt>Clicked callback to issue a TriesToMoveEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_drop_callback">tile_drop_callback</a></td>
     <td><tt>Drop callback to issue a TriesToDropEvent.</tt></td>
   </tr>
   
@@ -177,7 +197,7 @@ PygameUserInterface.fade_surface
         <p>
           Inherited from <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>:
         </p>
-        <table class="children sortable" id="id40">
+        <table class="children sortable" id="id43">
   
   
 <tr class="basemethod">
@@ -204,12 +224,6 @@ PygameUserInterface.fade_surface
     <td>Method</td>
     <td><a href="shard.plugins.ui.UserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
     <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.ui.UserInterface.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Called with a list of instances of PerceptionEvent.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -241,7 +255,7 @@ PygameUserInterface.fade_surface
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id41">
+        <table class="children sortable" id="id44">
   
   
 <tr class="basemethod">
@@ -297,12 +311,6 @@ PygameUserInterface.fade_surface
     
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
     <td><tt>Process the Event.</tt></td>
   </tr><tr class="basemethod">
     
@@ -478,7 +486,9 @@ clients in the server. (hint by Alexander Marbach)</pre>
     <pre>Add a subplane to window.room, possibly fetching an asset before.
 The name of the subplane is the Entity identifier, so the subplane
 is accessible using window.room.&lt;identifier&gt;.
-Entity.asset points to the Plane of the Entity.</pre>
+Entity.asset points to the Plane of the Entity.
+When a Plane has not yet been added, the Entity's class is changed
+to PygameEntity in addition.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.pygameui.PygameUserInterface.process_ChangeMapElementEvent">
@@ -498,6 +508,42 @@ Entity.asset points to the Plane of the Entity.</pre>
     <pre>Fetch asset and register/replace tile.
 Tile.asset is the Pygame Surface since possibly multiple Planes must
 be derived from a single Tile.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_PerceptionEvent">shard.plugins.ui.UserInterface.process_PerceptionEvent</a></div>
+    <pre>Display the perception.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">shard.eventprocessor.EventProcessor.process_AttemptFailedEvent</a></div>
+    <pre>Flash the screen.
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.pygameui.PygameUserInterface.process_DropsEvent">
@@ -554,16 +600,34 @@ Then call the base class implementation to notify the Entity.</pre>
         </pre>
   </div>
 </div><div class="function">
-  <a name="shard.plugins.pygameui.PygameUserInterface.tile_callback">
+  <a name="shard.plugins.pygameui.PygameUserInterface.tile_clicked_callback">
     
   </a>
-  <a name="tile_callback">
+  <a name="tile_clicked_callback">
     
   </a>
   <div class="functionHeader">
     
     def
-    tile_callback(self, plane, dropped_plane, screen_coordinates):
+    tile_clicked_callback(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Clicked callback to issue a TriesToMoveEvent.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.tile_drop_callback">
+    
+  </a>
+  <a name="tile_drop_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_drop_callback(self, plane, dropped_plane, screen_coordinates):
     
   </div>
   <div class="functionBody">
@@ -573,7 +637,7 @@ Then call the base class implementation to notify the Entity.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-18 13:06:01.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-25 13:34:58.
     </address>
   </body>
 </html>

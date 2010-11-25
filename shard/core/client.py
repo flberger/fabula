@@ -223,6 +223,8 @@ class Client(shard.core.Engine):
                 # These methods may add events for the plugin engine
                 # to self.message_for_plugin
                 #
+                # TODO: This really should return a message, instead of giving one to write to
+                #
                 self.event_dict[current_event.__class__](current_event,
                                                          message = self.message_for_plugin)
 
@@ -451,7 +453,7 @@ class Client(shard.core.Engine):
     # Auxiliary Methods
 
     def process_AttemptFailedEvent(self, event, **kwargs):
-        """Unset await_confirmation flag.
+        """Possibly revert movement or call default, then unblock the client.
         """
 
         self.logger.debug("attempt failed for '{}'".format(event.identifier))
@@ -478,6 +480,12 @@ class Client(shard.core.Engine):
 
             self.logger.debug("%s now reverted to %s" % (event.identifier,
                                                          (restored_x, restored_y)))
+        # Call default to forward to the Plugin.
+        #
+        shard.core.Engine.process_AttemptFailedEvent(self,
+                                                     event,
+                                                     message = kwargs["message"])
+
         if event.identifier == self.player_id:
 
             self.await_confirmation = False

@@ -71,8 +71,6 @@ class UserInterface(shard.plugins.Plugin):
         #
         shard.plugins.Plugin.__init__(self, logger)
 
-        self.logger.debug("called")
-
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.
         #
@@ -86,6 +84,8 @@ class UserInterface(shard.plugins.Plugin):
         # Compute the number of frames per action.
         #
         self.action_frames = int(self.action_time * self.framerate)
+
+        self.logger.debug("action_time == {} s, action_frames == {}".format(self.action_time, self.action_frames))
 
         # A copy to count down.
         # Creates a copy since action_frames is immutable.
@@ -568,7 +568,7 @@ class UserInterface(shard.plugins.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("forwarding Event to Entity and displaying a single frame")
 
         self.room.entity_dict[event.identifier].process_MovesToEvent(event)
 

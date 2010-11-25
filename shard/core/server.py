@@ -339,7 +339,7 @@ class Server(shard.core.Engine):
 
             # TODO: we exit here to hunt bugs
             #
-            raise shard.ShardException("invalid difference in TriesToMoveEvent: {}".format(difference))
+            raise Exception("invalid difference in TriesToMoveEvent: {}".format(difference))
 
         else:
 
