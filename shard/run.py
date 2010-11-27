@@ -42,8 +42,8 @@ class ShardFileFormatter(logging.Formatter):
         """
         
         # Reformat path to module information
-        # Old: "{:10}"
-        record.pathname = "{}".format(self.module_re.sub(r"\2", record.pathname))
+        #
+        record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
 
         # Fixed-length line number
         #
@@ -138,7 +138,7 @@ class App:
         # Line number:
         # "[%(lineno)s]"
 
-        file_formatter = ShardFileFormatter("%(asctime)s  %(pathname)s: %(funcName)s() --- %(message)s",
+        file_formatter = ShardFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s",
                                             "%Y-%m-%d %H:%M:%S")
 
         self.file_handler.setFormatter(file_formatter)

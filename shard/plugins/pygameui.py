@@ -9,11 +9,13 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: Display loading progress
-#
+# TODO: implement dropping on Entities ("use with...")
+# Restrict drop an pickup to items right next to the player. Other items should not even be draggable.
 # TODO: implement user interaction for TriesToLookAtEvent
 # TODO: implement user interaction for TriesToManipulateEvent
 # TODO: implement user interaction for TriesToTalkToEvent
+#
+# TODO: Display loading progress
 #
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
 #

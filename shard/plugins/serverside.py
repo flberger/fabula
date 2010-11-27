@@ -214,19 +214,41 @@ class DefaultGame(shard.plugins.Plugin):
         return
 
     def process_TriesToPickUpEvent(self, event):
-        """Return AttemptFailedEvent to the host.
+        """Return a PicksUpEvent to the Server.
         """
 
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        self.logger.debug("returning PicksUpEvent")
+
+        # The Server has already performed sanity checks.
+        #
+        self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+                                                                   event.target_identifier))
         return
 
     def process_TriesToDropEvent(self, event):
-        """Return AttemptFailedEvent to the host.
+        """Return a DropsEvent to the Server.
         """
 
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        # Server.process_TriesToDropEvent() has already done some checks,
+        # so we can be sure that target_identifier is either a valid
+        # coordinate tuple or an instance of shard.Entity.
+        # Still, the Entity to be dropped may originate either from Room or from
+        # Rack.
+        #
+        if isinstance(event.target_identifier, shard.Entity):
+            self.logger.debug("'{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+
+        else:
+            if event.item_identifier not in self.host.rack.entity_dict.keys():
+                self.logger.debug("item still in Room, returning PicksUpEvent")
+                self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+                                                                           event.item_identifier))
+
+            self.logger.debug("returning DropsEvent")
+            self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
+                                                                     event.item_identifier,
+                                                                     event.target_identifier))
+
         return
 
     def process_TriesToManipulateEvent(self, event):
@@ -572,31 +594,3 @@ class MapEditor(DefaultGame):
                 self.message_for_host.event_list = self.message_for_host.event_list + event_list
 
         return
-
-    def process_TriesToPickUpEvent(self, event):
-        """Return a PicksUpEvent to the Server.
-        """
-
-        self.logger.debug("returning PicksUpEvent")
-
-        # The Server has already performed sanity checks.
-        #
-        self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
-                                                                   event.target_identifier))
-
-    def process_TriesToDropEvent(self, event):
-        """Return a DropsEvent to the Server.
-        """
-
-        # Server.process_TriesToDropEvent() has already done some checks,
-        # so we can be sure that target_identifier is either a valid
-        # coordinate tuple or an instance of shard.Entity.
-        #
-        if isinstance(event.target_identifier, shard.Entity):
-            self.logger.debug("'{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
-
-        else:
-            self.logger.debug("returning DropsEvent")
-            self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
-                                                                     event.item_identifier,
-                                                                     event.target_identifier))
