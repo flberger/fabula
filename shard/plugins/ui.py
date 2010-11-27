@@ -45,7 +45,7 @@ class UserInterface(shard.plugins.Plugin):
            The UserInterface is responsible for catching an exit request by the
            user. This value is checked in the Client main loop.
 
-       UserInterface.freeze = True
+       UserInterface.freeze
            Flag whether to display the game and collect input.
            True upon initialisation.
 

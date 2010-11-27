@@ -10,12 +10,10 @@
 # CharanisMLClient developed in May 2008.
 
 # TODO: implement dropping on Entities ("use with...")
-# Restrict drop an pickup to items right next to the player. Other items should not even be draggable.
+# TODO: Restrict drop an pickup to items right next to the player. Other items should not even be draggable.
 # TODO: implement user interaction for TriesToLookAtEvent
 # TODO: implement user interaction for TriesToManipulateEvent
 # TODO: implement user interaction for TriesToTalkToEvent
-#
-# TODO: Display loading progress
 #
 # TODO: Display all assets from local folder in PygameMapEditor for visual editing
 #
@@ -179,45 +177,7 @@ class PygameEntity(shard.Entity):
 class PygameUserInterface(shard.plugins.ui.UserInterface):
     """This is a Pygame implementation of an UserInterface for the Shard Client.
 
-       Inherited from shard.plugins.ui.UserInterface:
-
-       UserInterface.action_time
-           Set how long actions like a movement from Map element to Map element
-           take, in seconds.
-
-       UserInterface.framerate
-           Just what you think.
-
-       UserInterface.assets
-           The assets manager instance.
-
-       UserInterface.action_frames
-           The number of frames per action.
-
-       UserInterface.action_countdown
-           A copy of action_frames used in UserInterface.process_message().
-
-       UserInterface.event_queue
-           A queue for Events of a Message to be rendered later.
-           UserInterface.action_countdown will be counted down between
-           processing the Events.
-
-       UserInterface.exit_requested
-           The UserInterface is responsible for catching an exit request by the
-           user. This value is checked in the Client main loop.
-
-       UserInterface.room
-           Variables to be filled by the Client before each call to
-           process_message()
-
-       UserInterface.direction_vector_dict
-           Convenience dict converting symbolic directions to a vector
-
-       UserInterface.waiting_for_RoomCompleteEvent
-           Flag, True after initialisation
-
-
-       PygameUserInterface attributes:
+       Additional attributes:
 
        PygameUserInterface.clock
            An instance of pygame.time.Clock
@@ -335,12 +295,13 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.fps_log_counter = self.fps_log_counter - 1
 
         else:
-            self.window.display.blit(self.small_font.render("{}/{} fps  ".format(int(self.clock.get_fps()),
-                                                                                 self.framerate),
-                                                            True,
+            fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
+                                              self.framerate)
+
+            self.window.display.blit(self.small_font.render(fps_string, True,
                                                             (255, 255, 255),
                                                             (0, 0, 0)),
-                                     (700, 0))
+                                     (700, 500))
 
             self.fps_log_counter = self.framerate
 
@@ -579,6 +540,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             except:
                 self.display_asset_exception(event.entity.asset_desc)
 
+            self.display_loading_progress(event.entity.asset_desc)
+
             # Replace with Surface from image file
             #
             surface = pygame.image.load(file)
@@ -675,6 +638,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
             except:
                 self.display_asset_exception(tile_from_list.asset_desc)
+
+            self.display_loading_progress(tile_from_list.asset_desc)
 
             self.logger.debug("loading Surface from {}".format(file))
 
@@ -877,6 +842,24 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                                          eval(name))
 
             self.message_for_host.event_list.append(tries_to_drop_event)
+
+        return
+
+    def display_loading_progress(self, obj):
+        """Display the object given on the loading screen while the game is frozen.
+        """
+
+        if self.freeze:
+
+            displaystring = str(obj).center(32)
+
+            self.window.display.blit(self.small_font.render(displaystring,
+                                                            True,
+                                                            (127, 127, 127),
+                                                            (0, 0, 0)),
+                                     (300, 500))
+
+            pygame.display.flip()
 
         return
 

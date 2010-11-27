@@ -20,6 +20,7 @@
       
     </div>
     <pre>This is the server-side Plugin for a Shard map editor.
+
 Additional attributes:
 
 MapEditor.current_room
@@ -28,7 +29,7 @@ MapEditor.current_room
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id31">
+      <table class="children sortable" id="id30">
   
   
 <tr class="method">
@@ -67,18 +68,6 @@ MapEditor.current_room
     <td>Method</td>
     <td><a href="shard.plugins.serverside.MapEditor.html#process_SaysEvent">process_SaysEvent</a></td>
     <td><tt>If the text matches a room file, load and send the room.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.MapEditor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Return a PicksUpEvent to the Server.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.MapEditor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Return a DropsEvent to the Server.</tt></td>
   </tr>
   
 </table>
@@ -86,21 +75,39 @@ MapEditor.current_room
         <p>
           Inherited from <a href="shard.plugins.serverside.DefaultGame.html">DefaultGame</a>:
         </p>
-        <table class="children sortable" id="id32">
+        <table class="children sortable" id="id31">
   
   
 <tr class="basemethod">
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#process_message">process_message</a></td>
+    <td><tt>DefaultGame main method.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Return AttemptFailedEvent to the host.</tt></td>
+    <td><tt>Queue the target and make the Entity move one step at a time.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
     <td><tt>Return AttemptFailedEvent to the host.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Return a PicksUpEvent to the Server.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Return a DropsEvent to the Server.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -197,22 +204,12 @@ MapEditor.current_room
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Return the Event to the host.</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="shard.plugins.Plugin.html">Plugin</a> (via <a href="shard.plugins.serverside.DefaultGame.html">DefaultGame</a>):
-        </p>
-        <table class="children sortable" id="id33">
-  
-  
-<tr class="basemethod">
+  </tr><tr class="basemethod">
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_message">process_message</a></td>
-    <td><tt>This is the main method of a plugin.</tt></td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#move_towards">move_towards</a></td>
+    <td><tt>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.</tt></td>
   </tr>
   
 </table>
@@ -220,7 +217,7 @@ MapEditor.current_room
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.serverside.DefaultGame.html">DefaultGame</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id34">
+        <table class="children sortable" id="id32">
   
   
 <tr class="basemethod">
@@ -259,7 +256,7 @@ MapEditor.current_room
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#__init__">shard.plugins.Plugin.__init__</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#__init__">shard.plugins.serverside.DefaultGame.__init__</a></div>
     <pre>Initialise.
         </pre>
   </div>
@@ -353,45 +350,9 @@ MapEditor.current_room
     <pre>If the text matches a room file, load and send the room.
         </pre>
   </div>
-</div><div class="function">
-  <a name="shard.plugins.serverside.MapEditor.process_TriesToPickUpEvent">
-    
-  </a>
-  <a name="process_TriesToPickUpEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToPickUpEvent(self, event):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_TriesToPickUpEvent">shard.plugins.serverside.DefaultGame.process_TriesToPickUpEvent</a></div>
-    <pre>Return a PicksUpEvent to the Server.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.serverside.MapEditor.process_TriesToDropEvent">
-    
-  </a>
-  <a name="process_TriesToDropEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToDropEvent(self, event):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_TriesToDropEvent">shard.plugins.serverside.DefaultGame.process_TriesToDropEvent</a></div>
-    <pre>Return a DropsEvent to the Server.
-        </pre>
-  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-25 13:34:58.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-27 13:19:43.
     </address>
   </body>
 </html>

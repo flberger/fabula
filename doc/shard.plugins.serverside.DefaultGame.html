@@ -19,8 +19,17 @@
     <div>
       <p>Known subclasses: <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></p>
     </div>
-    <pre>This is an off-the-shelf server plugin, running a standard Shard game.
-    </pre>
+    <pre>This is an off-the-shelf server plugin, running a default Shard game.
+
+Additional attributes:
+
+DefaultGame.tries_to_move_dict
+    Dict mapping Entity identifiers to coordinate tuples to be moved
+    towards.
+
+DefaultGame.last_position_dict
+    Dict mapping Entity identifiers to their last position before a
+    movement.</pre>
 
     
     
@@ -32,6 +41,18 @@
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#process_message">process_message</a></td>
+    <td><tt>DefaultGame main method.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>If there is no host.room yet, load default.floorplan and send it.</tt></td>
   </tr><tr class="method">
@@ -39,7 +60,7 @@
     
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Return AttemptFailedEvent to the host.</tt></td>
+    <td><tt>Queue the target and make the Entity move one step at a time.</tt></td>
   </tr><tr class="method">
     
     
@@ -51,13 +72,13 @@
     
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Return AttemptFailedEvent to the host.</tt></td>
+    <td><tt>Return a PicksUpEvent to the Server.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Return AttemptFailedEvent to the host.</tt></td>
+    <td><tt>Return a DropsEvent to the Server.</tt></td>
   </tr><tr class="method">
     
     
@@ -178,28 +199,12 @@
     <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Return the Event to the host.</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="shard.plugins.Plugin.html">Plugin</a>:
-        </p>
-        <table class="children sortable" id="id29">
-  
-  
-<tr class="basemethod">
+  </tr><tr class="method">
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#__init__">__init__</a></td>
-    <td><tt>Initialise the plugin.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.Plugin.html#process_message">process_message</a></td>
-    <td><tt>This is the main method of a plugin.</tt></td>
+    <td><a href="shard.plugins.serverside.DefaultGame.html#move_towards">move_towards</a></td>
+    <td><tt>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.</tt></td>
   </tr>
   
 </table>
@@ -207,7 +212,7 @@
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id30">
+        <table class="children sortable" id="id29">
   
   
 <tr class="basemethod">
@@ -233,6 +238,45 @@
     
 
     <div class="function">
+  <a name="shard.plugins.serverside.DefaultGame.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, logger):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#__init__">shard.plugins.Plugin.__init__</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
+    <pre>Initialise.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.DefaultGame.process_message">
+    
+  </a>
+  <a name="process_message">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_message(self, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#process_message">shard.plugins.Plugin.process_message</a></div>
+    <pre>DefaultGame main method.
+
+It calls the respective functions for the Events in message,
+processes pending moves from DefaultGame.tries_to_move_dict
+and returns DefaultGame.message_for_host.</pre>
+  </div>
+</div><div class="function">
   <a name="shard.plugins.serverside.DefaultGame.process_InitEvent">
     
   </a>
@@ -265,7 +309,7 @@
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">shard.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div>
-    <pre>Return AttemptFailedEvent to the host.
+    <pre>Queue the target and make the Entity move one step at a time.
         </pre>
   </div>
 </div><div class="function">
@@ -300,8 +344,8 @@
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return AttemptFailedEvent to the host.
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">shard.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div>
+    <pre>Return a PicksUpEvent to the Server.
         </pre>
   </div>
 </div><div class="function">
@@ -318,8 +362,8 @@
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">shard.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.serverside.MapEditor.html">shard.plugins.serverside.MapEditor</a></div>
-    <pre>Return AttemptFailedEvent to the host.
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">shard.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div>
+    <pre>Return a DropsEvent to the Server.
         </pre>
   </div>
 </div><div class="function">
@@ -682,9 +726,27 @@
     <pre>Return the Event to the host.
         </pre>
   </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.DefaultGame.move_towards">
+    
+  </a>
+  <a name="move_towards">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    move_towards(self, identifier, target_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-25 13:34:58.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-11-27 13:19:43.
     </address>
   </body>
 </html>
