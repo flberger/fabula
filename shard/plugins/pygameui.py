@@ -11,7 +11,6 @@
 
 # TODO: Display loading progress
 #
-# TODO: implement user interaction for TriesToMoveEvent and MovesToEvent
 # TODO: implement user interaction for TriesToLookAtEvent
 # TODO: implement user interaction for TriesToManipulateEvent
 # TODO: implement user interaction for TriesToTalkToEvent
@@ -92,7 +91,7 @@ class EntityPlane(clickndrag.Plane):
         return
 
     def update(self):
-        """If EntityPlane.target has not yet been reached, move by EntityPlane.movement_vector.
+        """If EntityPlane.target has not yet been reached, move to the positions given in EntityPlane.position_list.
         """
 
         if self.position_list:
@@ -133,11 +132,19 @@ class PygameEntity(shard.Entity):
         """Instruct the EntityPlane with the movement.
         """
 
-        # Reference point is the bottom center of the image, which is positioned
-        # at the bottom center of the tile
+        if self.asset.position_list:
 
-        current_x = self.asset.rect.centerx
-        current_y = self.asset.rect.bottom
+            # Take the last queued position as current
+            #
+            current_x = self.asset.position_list[-1][0]
+            current_y = self.asset.position_list[-1][1]
+
+        else:
+            # Reference point is the bottom center of the image, which is
+            # positioned at the bottom center of the tile
+            #
+            current_x = self.asset.rect.centerx
+            current_y = self.asset.rect.bottom
 
         future_x = event.location[0] * self.spacing + int(self.spacing / 2)
         future_y = event.location[1] * self.spacing + self.spacing
@@ -163,7 +170,7 @@ class PygameEntity(shard.Entity):
         #
         position_list.append((future_x, future_y))
 
-        self.asset.position_list = position_list
+        self.asset.position_list.extend(position_list)
 
         return
 
@@ -359,16 +366,12 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """When overriding this method,
-           you have to convert the data provided by your module into Shard 
-           events, most probably instances of shard.AttemptEvent. You must
-           append them to self.message_for_host which is evaluated by the
-           ControlEngine.
-           The UserInterface should only ever collect and send one
-           single client event to prevent cheating and blocking other
-           clients in the server. (hint by Alexander Marbach)
+        """Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         """
-        # TODO: change docstring
+
+        # The UserInterface should only ever collect and send one
+        # single client event to prevent cheating and blocking other
+        # clients in the server. (hint by Alexander Marbach)
 
         events = pygame.event.get()
 
@@ -385,8 +388,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.window.process(events)
 
-        # TODO: Must figure out Events here and set self.message_for_host.event_list.append(event)
-        # TODO: This is weird. This should be returned instead in some way, shouldn't it?
+        # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
 
         return
 
@@ -732,7 +734,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Flash very short
         #
-        frames = int(self.action_frames / 20)
+        frames = int(self.action_frames / 10)
 
         self.window.room.rendersurface.fill((250, 250, 250))
         self.window.room.last_rect = None
@@ -1025,11 +1027,11 @@ class PygameMapEditor(PygameUserInterface):
                     #
                     self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
 
-        # Warn user
-        #
-        warning_box = clickndrag.gui.OkBox("Please save the room before editing walls.")
-        warning_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
-        self.window.room.sub(warning_box)
+            # Warn user
+            #
+            warning_box = clickndrag.gui.OkBox("Please save the room before editing walls.")
+            warning_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+            self.window.room.sub(warning_box)
 
     def save_room(self, plane):
         """Button callback to save the tile images, resend and save the whole Room.
@@ -1058,6 +1060,8 @@ class PygameMapEditor(PygameUserInterface):
 
             self.message_for_host.event_list.append(shard.EnterRoomEvent(filename))
 
+            # TODO: only save PNGs if they have actually changed
+            #
             for x in range(8):
                 for y in range(5):
 
@@ -1083,9 +1087,9 @@ class PygameMapEditor(PygameUserInterface):
 
                 # Create a new Entity which can be pickled by Event loggers
                 #
-                entity = Entity(self.room.entity_dict[identifier].entity_type,
-                                identifier,
-                                self.room.entity_dict[identifier].asset_desc)
+                entity = shard.Entity(self.room.entity_dict[identifier].entity_type,
+                                      identifier,
+                                      self.room.entity_dict[identifier].asset_desc)
 
                 event = shard.SpawnEvent(entity,
                                          self.room.entity_locations[identifier])
@@ -1130,9 +1134,9 @@ class PygameMapEditor(PygameUserInterface):
 
             if image is not None:
 
-                entity = Entity(shard.ITEM_BLOCK,
-                                item_identifier,
-                                filename)
+                entity = shard.Entity(shard.ITEM_BLOCK,
+                                      item_identifier,
+                                      filename)
 
                 self.logger.debug("appending SpawnEvent and PicksUpEvent")
 

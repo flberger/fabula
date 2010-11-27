@@ -336,46 +336,20 @@ class Client(shard.core.Engine):
                                 # by the server in very short time.
                                 #
                                 try:
-                                    # Check tile type
-                                    #
-                                    tile = self.room.floor_plan[event.target_identifier].tile 
+                                    if self.tile_is_walkable(event.target_identifier):
 
-                                    if tile.tile_type == shard.FLOOR:
-
-                                        # Check if this field is occupied
+                                        moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                            event.target_identifier)
+ 
+                                        # Update room, needed for UserInterface
                                         #
-                                        occupied = False
+                                        self.process_MovesToEvent(moves_to_event,
+                                                                  message = self.message_for_plugin)
 
-                                        for entity in self.room.floor_plan[event.target_identifier].entities:
-
-                                            if entity.entity_type == shard.ITEM_BLOCK:
-
-                                                occupied = True
-
-                                        if occupied:
-
-                                            # Instead of
-                                            #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
-                                            # we wait for the server to respond with
-                                            # AttemptFailedEvent
-                                            #
-                                            pass
-
-                                        else:
-                                            # All clear. Go!
-                                            #
-                                            moves_to_event = shard.MovesToEvent(event.identifier,
-                                                                                event.target_identifier)
-     
-                                            # Update room, needed for UserInterface
-                                            #
-                                            self.process_MovesToEvent(moves_to_event,
-                                                                      message = self.message_for_plugin)
-
-                                            # Remember event for crosscheck with
-                                            # event from Server
-                                            #
-                                            self.local_moves_to_event = moves_to_event
+                                        # Remember event for crosscheck with
+                                        # event from Server
+                                        #
+                                        self.local_moves_to_event = moves_to_event
 
                                     else:
                                         # Instead of

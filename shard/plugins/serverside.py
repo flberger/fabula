@@ -8,6 +8,7 @@
 import shard.plugins
 import re
 import os
+import math
 
 def load_room_from_file(filename):
     """This function reads a Shard room from the file and returns a list of corresponding Events.
@@ -77,18 +78,102 @@ def load_room_from_file(filename):
     return event_list
 
 class DefaultGame(shard.plugins.Plugin):
-    """This is an off-the-shelf server plugin, running a standard Shard game.
+    """This is an off-the-shelf server plugin, running a default Shard game.
+
+       Additional attributes:
+
+       DefaultGame.tries_to_move_dict
+           Dict mapping Entity identifiers to coordinate tuples to be moved
+           towards.
+
+       DefaultGame.last_position_dict
+           Dict mapping Entity identifiers to their last position before a
+           movement.
     """
+
+    def __init__(self, logger):
+        """Initialise.
+        """
+        # Call base class
+        #
+        shard.plugins.Plugin.__init__(self, logger)
+
+        self.tries_to_move_dict = {}
+        self.last_position_dict = {}
+
+    def process_message(self, message):
+        """DefaultGame main method.
+
+           It calls the respective functions for the Events in message,
+           processes pending moves from DefaultGame.tries_to_move_dict
+           and returns DefaultGame.message_for_host.
+        """
+
+        # Copied from Plugin.process_message. We can not call the parent's
+        # method here since we need to add Events inbetween.
+
+        # Clear message for host
+        #
+        self.message_for_host = shard.Message([])
+
+        if message.event_list:
+
+            self.logger.debug("processing message {}".format(message.event_list))
+
+            for event in message.event_list:
+
+                # event_dict from EventProcessor base class
+                #
+                self.event_dict[event.__class__](event)
+
+        # Process pending moves.
+        # Create a new list to be able to change the dict during iteration.
+        #
+        for identifier in list(self.tries_to_move_dict.keys()):
+
+            target_identifier = self.tries_to_move_dict[identifier]
+
+            location = self.move_towards(identifier, target_identifier)
+
+            if location is None:
+
+                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(event.identifier))
+
+                del self.tries_to_move_dict[identifier]
+                del self.last_position_dict[identifier]
+
+            else:
+
+                if location == self.last_position_dict[identifier]:
+
+                    self.logger.warning("'{}' would move back to last position, removing from tries_to_move_dict".format(identifier))
+
+                    del self.tries_to_move_dict[identifier]
+                    del self.last_position_dict[identifier]
+
+                else:
+                    self.logger.debug("movement pending for '{}', last position {}, best move towards {} is {}".format(identifier, self.last_position_dict[identifier], target_identifier, location))
+                    
+                    # Save current position before movement as last position
+                    #
+                    self.last_position_dict[identifier] = self.host.room.entity_locations[identifier]
+
+                    self.message_for_host.event_list.append(shard.MovesToEvent(identifier, location))
+
+                    if location == target_identifier:
+
+                        self.logger.debug("target reached, removing from tries_to_move_dict")
+
+                        del self.tries_to_move_dict[identifier]
+                        del self.last_position_dict[identifier]
+
+        return self.message_for_host
 
     def process_InitEvent(self, event):
         """If there is no host.room yet, load default.floorplan and send it.
         """
 
         self.logger.debug("called")
-
-        # Prevent "referenced before assignment"
-        #
-        roomfile = None
 
         if self.host.room is not None:
 
@@ -109,11 +194,15 @@ class DefaultGame(shard.plugins.Plugin):
         return
 
     def process_TriesToMoveEvent(self, event):
-        """Return AttemptFailedEvent to the host.
+        """Queue the target and make the Entity move one step at a time.
         """
 
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+        self.logger.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
+                                                                          event.target_identifier))
+
+        self.tries_to_move_dict[event.identifier] = event.target_identifier
+        self.last_position_dict[event.identifier] = self.host.room.entity_locations[event.identifier]
+
         return
 
     def process_TriesToLookAtEvent(self, event):
@@ -301,8 +390,58 @@ class DefaultGame(shard.plugins.Plugin):
         self.message_for_host.event_list.append(event)
         return
 
+    def move_towards(self, identifier, target_identifier):
+        """Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.
+        """
+
+        location = self.host.room.entity_locations[identifier]
+
+        possible_moves = []
+
+        for vector in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+
+            possible_move = (location[0] + vector[0], location[1] + vector[1])
+
+            if self.host.tile_is_walkable(possible_move):
+
+                possible_moves.append(possible_move)
+
+        if len(possible_moves) == 0:
+
+            return None
+
+        elif len(possible_moves) == 1:
+
+            return possible_moves[0]
+
+        else:
+            # Taking first as reference
+            #
+            best_move = possible_moves.pop(0)
+
+            distance_vector = shard.difference_2d(best_move, target_identifier)
+
+            shortest_distance = math.sqrt(distance_vector[0] * distance_vector[0]
+                                          + distance_vector[1] * distance_vector[1])
+
+            # Examine remaining
+            #
+            for move in possible_moves:
+
+                distance_vector = shard.difference_2d(move, target_identifier)
+
+                distance = math.sqrt(distance_vector[0] * distance_vector[0]
+                                     + distance_vector[1] * distance_vector[1])
+
+                if distance < shortest_distance:
+                    shortest_distance = distance
+                    best_move = move
+
+            return best_move
+
 class MapEditor(DefaultGame):
     """This is the server-side Plugin for a Shard map editor.
+
        Additional attributes:
 
        MapEditor.current_room

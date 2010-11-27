@@ -21,7 +21,7 @@ def main():
     app = shard.run.App("d", timeout = 0)
     app.user_interface_class = shard.plugins.pygameui.PygameMapEditor
     app.server_plugin_class = shard.plugins.serverside.MapEditor
-    app.run_standalone(200, "player")
+    app.run_standalone(60, "player")
 
 if __name__ == "__main__":
 

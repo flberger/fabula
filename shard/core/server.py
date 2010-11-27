@@ -185,16 +185,14 @@ class Server(shard.core.Engine):
         #
         self.message_for_plugin = shard.Message([])
 
-        # Process events from the story engine
-        # before returning them to the client.
-        # We cannot just forward them since we
-        # may be required to change maps, spawn
-        # entities etc.
-        # Note that this time resulting events
-        # are queued for the remote host, not
-        # the plugin.
+        # Process events from the story engine before returning them to the
+        # client. We cannot just forward them since we may be required to change
+        # maps, spawn entities etc.
+        # Note that this time resulting events are queued for the remote host,
+        # not the plugin.
         #
         # TODO: could we be required to send any new events to the story engine? But this could become an infinite loop!
+        # TODO: Again it's completely weird to give the Message as an argument. Functions should return Event lists instead.
         #
         for event in message_from_plugin.event_list:
 
@@ -316,81 +314,23 @@ class Server(shard.core.Engine):
         return
 
     def process_TriesToMoveEvent(self, event, **kwargs):
-        """Test if the Entity is allowed to move to the desired location,
-           and append an according event to the message.
+        """Perform sanity checks on target and either confirm, reject or forward to Plugin.
         """
 
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
 
         self.logger.debug("{0} -> {1}".format(event.identifier, event.target_identifier))
 
-        # Do we need to move / turn at all?
-        #
-        location = self.room.entity_locations[event.identifier]
+        if not self.tile_is_walkable(event.target_identifier):
 
-        difference = shard.difference_2d(location,
-                                         event.target_identifier)
-
-        # Only allow certain vectors
-        #
-        if difference not in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            self.logger.debug("{} not walkable".format(event.target_identifier))
 
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-            # TODO: we exit here to hunt bugs
-            #
-            raise Exception("invalid difference in TriesToMoveEvent: {}".format(difference))
-
         else:
+            self.logger.debug("target clear, forwarding event to plugin")
 
-            # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
-
-            # Test if a movement from the current
-            # entity location to the new location
-            # on the map is possible
-            #
-            try:
-                # Check tile type
-                #
-                tile = self.room.floor_plan[event.target_identifier].tile 
-
-                if tile.tile_type == shard.FLOOR:
-
-                    self.logger.debug("tile_type == shard.FLOOR")
-
-                    # Check if this field is occupied
-                    #
-                    occupied = False
-
-                    for entity in self.room.floor_plan[event.target_identifier].entities:
-
-                        if entity.entity_type == shard.ITEM_BLOCK:
-
-                            occupied = True
-
-                    if occupied:
-
-                        self.logger.debug("occupied by shard.ITEM_BLOCK")
-
-                        kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-                    else:
-                        # All clear. Go!
-                        #
-                        kwargs["message"].event_list.append(shard.MovesToEvent(event.identifier,
-                                                                     event.target_identifier))
-
-                else:
-
-                    self.logger.debug("tile_type != shard.FLOOR")
-
-                    kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-            except KeyError:
-
-                self.logger.debug("KeyError")
-
-                kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(event)
 
         return
 

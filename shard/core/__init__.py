@@ -466,3 +466,47 @@ class Engine(shard.eventprocessor.EventProcessor):
         kwargs["message"].event_list.append(event)
 
         return
+
+    def tile_is_walkable(self, target_identifier):
+        """Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.
+        """
+
+        if self.room is None:
+
+            self.logger.debug("not walkable: room is None")
+
+            return False
+
+        elif target_identifier not in self.room.floor_plan.keys():
+
+            self.logger.debug("{} not walkable: not in floor_plan".format(target_identifier))
+
+            return False
+
+        else:
+            floor_plan_element = self.room.floor_plan[target_identifier]
+
+            if floor_plan_element.tile.tile_type != shard.FLOOR:
+
+                self.logger.debug("{} not walkable: target tile_type != shard.FLOOR".format(target_identifier))
+
+                return False
+
+            else:
+                occupied = False
+
+                for entity in floor_plan_element.entities:
+
+                    if entity.entity_type == shard.ITEM_BLOCK:
+
+                        occupied = True
+
+                if occupied:
+
+                    self.logger.debug("{} not walkable: target occupied by shard.ITEM_BLOCK".format(target_identifier))
+
+                    return False
+
+                else:
+
+                    return True

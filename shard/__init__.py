@@ -878,7 +878,7 @@ class Room(shard.eventprocessor.EventProcessor):
        Room.active_clients
            A list of client identifiers whose player entities are in this room.
 
-       Note that all these dicts assume that Entity identifiers are unique.
+       Note that these dicts assume that Entity identifiers are unique.
     """
 
     def __init__(self, identifier):
