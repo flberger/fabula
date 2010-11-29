@@ -10,12 +10,11 @@
 # CharanisMLClient developed in May 2008.
 
 # TODO: implement dropping on Entities ("use with...")
-# TODO: Restrict drop an pickup to items right next to the player. Other items should not even be draggable.
 # TODO: implement user interaction for TriesToLookAtEvent
 # TODO: implement user interaction for TriesToManipulateEvent
 # TODO: implement user interaction for TriesToTalkToEvent
 #
-# TODO: Display all assets from local folder in PygameMapEditor for visual editing
+# TODO: in PygameMapEditor, display all assets from local folder for visual editing
 #
 # TODO: render order top-down, following lines
 
@@ -28,7 +27,7 @@ import os.path
 import re
 
 def open_image(title, logger):
-    """Auxillary function to make the user open an image file.
+    """Auxiliary function to make the user open an image file.
        Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
     """
 
@@ -299,7 +298,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                               self.framerate)
 
             self.window.display.blit(self.small_font.render(fps_string, True,
-                                                            (255, 255, 255),
+                                                            (127, 127, 127),
                                                             (0, 0, 0)),
                                      (700, 500))
 
@@ -378,7 +377,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             fadestep = int(255 / frames)
 
             self.fade_surface.set_alpha(0)
-            
+
             # This is actually an exponential fade since the original surface is
             # not restored before blitting the fading surface
             #
@@ -442,6 +441,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                 entities.append(name)
 
         self.window.room.subplanes_list = tiles + entities
+
+        # Make items next to player draggable
+        #
+        self.make_items_draggable()
 
         # Display the game again and accept input
         #
@@ -555,20 +558,15 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             # Create Rect - taken from above
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
-            
+
             rect.centerx = event.location[0] * self.spacing + self.spacing / 2
             rect.bottom = event.location[1] * self.spacing + self.spacing
 
             # Create EntityPlane, name is the entity identifier
             #
             plane = EntityPlane(event.entity.identifier, rect)
-            
-            plane.image = surface
 
-            # Items can be dragged by default
-            #
-            if event.entity.entity_type in (shard.ITEM_BLOCK, shard.ITEM_NOBLOCK):
-                plane.draggable = True
+            plane.image = surface
 
             # Finally attach the Plane as the Entity's asset
             #
@@ -721,13 +719,30 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
     ####################
     # Event handlers affecting Entities
 
-#    def process_MovesToEvent(self, event):
+    def process_MovesToEvent(self, event):
+        """Make EntityPlanes surrounding the new position draggable and call the base class method.
+        """
+
+        self.logger.debug("called")
+
+        # Call base class
+        #
+        shard.plugins.ui.UserInterface.process_MovesToEvent(self, event)
+
+        # TODO: use actual player identifier
+        #
+        if event.identifier == "player":
+            self.make_items_draggable()
+
+        return
 
 #    def process_ChangeStateEvent(self, event):
 
     def process_DropsEvent(self, event):
-        """Call base class process_DropsEvent and clean up the inventory plane.
+        """Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.
         """
+
+        self.logger.debug("called")
 
         shard.plugins.ui.UserInterface.process_DropsEvent(self, event)
 
@@ -738,6 +753,12 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             # Too lazy to use a counter ;-)
             #
             plane.rect.left = self.window.inventory.subplanes_list.index(name) * 100
+
+        # Make items next to player draggable
+        #
+        self.make_items_draggable()
+
+        return
 
     def process_PicksUpEvent(self, event):
         """Move the item's Plane from window.room to window.inventory.
@@ -755,7 +776,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         plane = self.window.room.subplanes[event.item_identifier]
 
         # Append at the right of the inventory.
-        # Since the item is already in self.host.rack.entity_dict, the position 
+        # Since the item is already in self.host.rack.entity_dict, the position
         # is len - 1.
         #
         plane.rect.top = 0
@@ -846,7 +867,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         return
 
     def display_loading_progress(self, obj):
-        """Display the object given on the loading screen while the game is frozen.
+        """Display the string representation of the object given on the loading screen while the game is frozen.
         """
 
         if self.freeze:
@@ -860,6 +881,30 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                      (300, 500))
 
             pygame.display.flip()
+
+        return
+
+    def make_items_draggable(self):
+        """Auxiliary method to make items next to the player draggable.
+        """
+
+        # TODO: use actual player identifier
+        #
+        player_location = self.host.room.entity_locations["player"]
+
+        surrounding_positions = [(player_location[0] - 1, player_location[1]),
+                                 (player_location[0], player_location[1] - 1),
+                                 (player_location[0] + 1, player_location[1]),
+                                 (player_location[0], player_location[1] + 1)]
+
+        for identifier in self.host.room.entity_locations.keys():
+
+            if self.host.room.entity_locations[identifier] in surrounding_positions:
+
+                self.host.room.entity_dict[identifier].asset.draggable = True
+
+            else:
+                self.host.room.entity_dict[identifier].asset.draggable = False
 
         return
 
@@ -1272,7 +1317,7 @@ class PygameMapEditor(PygameUserInterface):
 
             else:
                 plane.clicked_callback = self.tile_clicked_callback
-                
+
         # Restore Entity Planes in room
         #
         while not isinstance(self.plane_cache[-1], clickndrag.gui.Button):

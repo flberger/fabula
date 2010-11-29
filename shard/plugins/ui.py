@@ -14,10 +14,10 @@ import time
 class UserInterface(shard.plugins.Plugin):
     """This is the base class for an UserInterface for the Shard Client.
        Subclasses should override the appropriate methods of this class
-       and implement a graphical representation of the game and the 
+       and implement a graphical representation of the game and the
        action. Shard is based on a two-dimensional map, but apart from
        that it makes very few assumptions about the graphical rendering.
-       Thus it is possible to write 2D and 3D UserInterfaces and 
+       Thus it is possible to write 2D and 3D UserInterfaces and
        even a text interface.
 
        Attributes:
@@ -89,7 +89,7 @@ class UserInterface(shard.plugins.Plugin):
 
         # A copy to count down.
         # Creates a copy since action_frames is immutable.
-        # 
+        #
         self.action_countdown = self.action_frames
 
         # A queue for Events of a Message to be
@@ -147,7 +147,7 @@ class UserInterface(shard.plugins.Plugin):
            This method is called regularly by the Client with a list of events
            to display (note: the list may be empty). It may take all the time it
            needs to render the action, just a couple or even hundreds of frames,
-           but it must return once the events have been displayed. 
+           but it must return once the events have been displayed.
            It must neither block completely nor run in a thread since the Client
            has to grab new events and change state between calls to
            process_message(). Put that way, process_message() is simply a part
@@ -158,11 +158,11 @@ class UserInterface(shard.plugins.Plugin):
 
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
-        # checks, like for duplicate RoomCompleteEvents, 
+        # checks, like for duplicate RoomCompleteEvents,
         # duplicate CanSpeakEvents and similar stuff.
         # Below we assume that everyone behaves nicely.
         # In some weird way we could sell that as
-        # "pythonic" ;-) Hey! Not a consenting adult, 
+        # "pythonic" ;-) Hey! Not a consenting adult,
         # anyone?
 
         ####################
@@ -174,7 +174,7 @@ class UserInterface(shard.plugins.Plugin):
         #
         self.player_id = player_id
 
-        # Reset the list of events triggered by 
+        # Reset the list of events triggered by
         # player actions
         #
         self.message_for_host = shard.Message([])
@@ -223,7 +223,7 @@ class UserInterface(shard.plugins.Plugin):
         # frames!
         # MovesTo, Drops and PicksUpEvents take the
         # same number of frames to render, which is given by
-        # self.action_time * self.framerate. During a 
+        # self.action_time * self.framerate. During a
         # SaysEvent or a PerceptionEvent, animation may even
         # stop for some time. These events are displayed last.
 
@@ -387,7 +387,7 @@ class UserInterface(shard.plugins.Plugin):
         """Called when the UserInterface wants to capture the user's reaction.
            The module you use for actual graphics rendering most probably
            has a way to capture user input. When overriding this method,
-           you have to convert the data provided by your module into Shard 
+           you have to convert the data provided by your module into Shard
            events, most probably instances of shard.AttemptEvent. You must
            append them to self.message_for_host which is evaluated by the
            ControlEngine.
@@ -418,14 +418,14 @@ class UserInterface(shard.plugins.Plugin):
     #       All visible Entities are already
     #       notified about their state at this point.
     #       This method must render exactly
-    #       self.action_frames frames. You have to 
-    #       compute a movement for each Entity in the 
-    #       list of MovesToEvent instances provided. 
-    #       Note that this list may be empty, but even 
-    #       then you have to render the full number of 
-    #       frames to display PickUp and Drop animations. 
-    #       You might get away with just changing the 
-    #       screen coordinates and calling 
+    #       self.action_frames frames. You have to
+    #       compute a movement for each Entity in the
+    #       list of MovesToEvent instances provided.
+    #       Note that this list may be empty, but even
+    #       then you have to render the full number of
+    #       frames to display PickUp and Drop animations.
+    #       You might get away with just changing the
+    #       screen coordinates and calling
     #       self.display_single_frame()."""
     #
     #    self.logger.debug("called")
@@ -490,7 +490,7 @@ class UserInterface(shard.plugins.Plugin):
            You have to prompt for appropriate user input here and add a
            corresponding SaysEvent to self.message_for_host, which is
            evaluated by the ControlEngine. The default implementation
-           makes the player say "blah". 
+           makes the player say "blah".
         """
 
         # TODO: Make sure that this is the last event rendered before returning to the ControlEngine?
@@ -516,7 +516,7 @@ class UserInterface(shard.plugins.Plugin):
 
         event.entity.user_interface = self
 
-        return           
+        return
 
     def process_DeleteEvent(self, event):
         """This method is called with an instance of DeleteEvent.
@@ -559,7 +559,7 @@ class UserInterface(shard.plugins.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     ####################
     # Event handlers affecting Entities
@@ -574,7 +574,7 @@ class UserInterface(shard.plugins.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     def process_ChangeStateEvent(self, event):
         """Entity has already handled the Event.
@@ -585,7 +585,7 @@ class UserInterface(shard.plugins.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     def process_DropsEvent(self, event):
         """Pass the Event to the dropping Entity and spawn the dropped Entity.
@@ -605,19 +605,19 @@ class UserInterface(shard.plugins.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     def process_PicksUpEvent(self, event):
         """Let the Entity picking up the item handle the Event.
            The Client has already put the item Entity from Client.room into
-           client.rack. 
+           client.rack.
         """
 
         self.logger.debug("notifying Entity '{}'".format(event.identifier))
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
-        return           
+        return
 
     def process_SaysEvent(self, event):
         """Called with an instance of SaysEvent
@@ -695,7 +695,7 @@ class UserInterface(shard.plugins.Plugin):
         # buffer for an identifier
         #
         identifier = ''
-        
+
         for current_event in message.event_list:
 
             if isinstance(current_event, shard.CanSpeakEvent):
@@ -707,7 +707,7 @@ class UserInterface(shard.plugins.Plugin):
                 # more than one in a message.
                 #
                 buffered_CanSpeakEvent = current_event
-            
+
             elif isinstance(current_event, shard.ChangeMapElementEvent):
 
                 # All these happen in parallel, no identifier
@@ -734,11 +734,11 @@ class UserInterface(shard.plugins.Plugin):
                     # Start a new event group.
                     #
                     grouped_events.append([])
-                
+
                     # Start new
                     #
                     collected_identifiers = []
-                
+
                 else:
                     # identifier is not yet in
                     # current group
@@ -749,7 +749,7 @@ class UserInterface(shard.plugins.Plugin):
                 #
                 grouped_events[-1].append(current_event)
 
-        # All parallel events are grouped now.            
+        # All parallel events are grouped now.
         # Append the CanSpeakEvent if it is there.
         #
         if isinstance(buffered_CanSpeakEvent, shard.CanSpeakEvent):

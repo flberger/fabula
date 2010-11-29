@@ -142,6 +142,9 @@ class DefaultGame(shard.plugins.Plugin):
                 del self.tries_to_move_dict[identifier]
                 del self.last_position_dict[identifier]
 
+                self.logger.warning("AttemptFailed for '{}'".format(identifier))
+                self.message_for_host.event_list.append(shard.AttemptFailedEvent(identifier))
+
             else:
 
                 if location == self.last_position_dict[identifier]:
@@ -153,7 +156,7 @@ class DefaultGame(shard.plugins.Plugin):
 
                 else:
                     self.logger.debug("movement pending for '{}', last position {}, best move towards {} is {}".format(identifier, self.last_position_dict[identifier], target_identifier, location))
-                    
+
                     # Save current position before movement as last position
                     #
                     self.last_position_dict[identifier] = self.host.room.entity_locations[identifier]
@@ -219,35 +222,76 @@ class DefaultGame(shard.plugins.Plugin):
 
         self.logger.debug("returning PicksUpEvent")
 
-        # The Server has already performed sanity checks.
+        # The Server has performed basic sanity checks.
+        # In addition, we restrict picking up to items right next to the player.
+        # TODO: duplicate from PygameUserInterface.make_items_draggable()
         #
-        self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
-                                                                   event.target_identifier))
+        player_location = self.host.room.entity_locations[event.identifier]
+
+        surrounding_positions = [(player_location[0] - 1, player_location[1]),
+                                 (player_location[0], player_location[1] - 1),
+                                 (player_location[0] + 1, player_location[1]),
+                                 (player_location[0], player_location[1] + 1)]
+
+        if self.host.room.entity_locations[event.target_identifier] in surrounding_positions:
+
+            self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+                                                                       event.target_identifier))
+
+        else:
+            self.logger.debug("AttemptFailed: '{}' not next to player".format(event.target_identifier))
+
+            self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
         return
 
     def process_TriesToDropEvent(self, event):
         """Return a DropsEvent to the Server.
         """
 
+        # Restrict drops to tiles right next to the player.
+        # TODO: copied from process_TriesToPickUpEvent
+        #
+        player_location = self.host.room.entity_locations[event.identifier]
+
+        surrounding_positions = [(player_location[0] - 1, player_location[1]),
+                                 (player_location[0], player_location[1] - 1),
+                                 (player_location[0] + 1, player_location[1]),
+                                 (player_location[0], player_location[1] + 1)]
+
         # Server.process_TriesToDropEvent() has already done some checks,
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of shard.Entity.
-        # Still, the Entity to be dropped may originate either from Room or from
-        # Rack.
         #
         if isinstance(event.target_identifier, shard.Entity):
-            self.logger.debug("'{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+
+            if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
+
+                self.logger.debug("AttemptFailed: drop not next to player")
+                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            else:
+                self.logger.debug("'{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
 
         else:
-            if event.item_identifier not in self.host.rack.entity_dict.keys():
-                self.logger.debug("item still in Room, returning PicksUpEvent")
-                self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
-                                                                           event.item_identifier))
+            if event.target_identifier not in surrounding_positions:
 
-            self.logger.debug("returning DropsEvent")
-            self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
-                                                                     event.item_identifier,
-                                                                     event.target_identifier))
+                self.logger.debug("AttemptFailed: drop not next to player")
+                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            else:
+                # Still, the Entity to be dropped may originate either from Room or from
+                # Rack.
+                #
+                if event.item_identifier not in self.host.rack.entity_dict.keys():
+                    self.logger.debug("item still in Room, returning PicksUpEvent")
+                    self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+                                                                               event.item_identifier))
+
+                self.logger.debug("returning DropsEvent")
+                self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
+                                                                         event.item_identifier,
+                                                                         event.target_identifier))
 
         return
 
