@@ -9,11 +9,6 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: implement dropping on Entities ("use with...")
-# TODO: implement user interaction for TriesToLookAtEvent
-# TODO: implement user interaction for TriesToManipulateEvent
-# TODO: implement user interaction for TriesToTalkToEvent
-#
 # TODO: in PygameMapEditor, display all assets from local folder for visual editing
 #
 # TODO: render order top-down, following lines
@@ -189,6 +184,12 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
        PygameUserInterface.loading_surface_position
            Surface and position for a loading message
 
+       PygameUserInterface.inventory_plane
+           Plane to display the inventory
+
+       PygameUserInterface.room_plane
+           Plane to display the room
+
        PygameUserInterface.fps_log_counter
            Counter to log actual fps every <framerate> frames
 
@@ -268,16 +269,60 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
                                 int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
-        # Create inventory plane at PygameUserInterface.window.inventory
+        # Create inventory plane.
         #
-        self.window.sub(clickndrag.Plane("inventory",
-                                         pygame.Rect((0, 500), (800, 100)),
-                                         dropped_upon_callback = self.inventory_callback))
+        self.inventory_plane = clickndrag.Plane("inventory",
+                                                pygame.Rect((0, 500), (800, 100)),
+                                                dropped_upon_callback = self.inventory_callback)
+
+        self.window.sub(self.inventory_plane)
+
+        self.window.inventory.image.fill((32, 32, 32))
+
+        # Add the standard action icons to the inventory
+        #
+        for name, x in (("look_at", 0), ("manipulate", 100), ("talk_to", 200)):
+
+            # Partly copied from process_SpawnEvent
+            #
+            try:
+                file = self.assets.fetch(name + ".png")
+
+            except:
+                self.display_asset_exception(name + ".png")
+
+            surface = pygame.image.load(file)
+
+            file.close()
+
+            # Convert to internal format suitable for blitting
+            #
+            surface = surface.convert_alpha()
+
+            # Create Rect - taken from above
+            #
+            rect = pygame.Rect((0, 0), surface.get_rect().size)
+
+            rect.topleft = (x, 0)
+
+            # Create Plane
+            #
+            plane = clickndrag.Plane(name, rect, drag = True)
+
+            plane.image = surface
+
+            self.logger.debug("adding {} to inventory".format(plane))
+
+            # Finally create subplane
+            #
+            self.window.inventory.sub(plane)
 
         # Create plane for the room.
         #
-        self.window.sub(clickndrag.Plane("room",
-                                         pygame.Rect((0, 0), (800, 500))))
+        self.room_plane = clickndrag.Plane("room",
+                                           pygame.Rect((0, 0), (800, 500)))
+
+        self.window.sub(self.room_plane)
 
         self.logger.debug("complete")
 
@@ -294,15 +339,17 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.fps_log_counter = self.fps_log_counter - 1
 
         else:
-            fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
-                                              self.framerate)
-
-            self.window.display.blit(self.small_font.render(fps_string, True,
-                                                            (127, 127, 127),
-                                                            (0, 0, 0)),
-                                     (700, 500))
-
             self.fps_log_counter = self.framerate
+
+            if not self.freeze:
+
+                fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
+                                                  self.framerate)
+
+                self.window.display.blit(self.small_font.render(fps_string, True,
+                                                                (127, 127, 127),
+                                                                (32, 32, 32)),
+                                         (700, 575))
 
         return
 
@@ -564,7 +611,9 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
             # Create EntityPlane, name is the entity identifier
             #
-            plane = EntityPlane(event.entity.identifier, rect)
+            plane = EntityPlane(event.entity.identifier,
+                                rect,
+                                dropped_upon_callback = self.entity_dropped_callback)
 
             plane.image = surface
 
@@ -778,13 +827,18 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Append at the right of the inventory.
         # Since the item is already in self.host.rack.entity_dict, the position
         # is len - 1.
+        # + 300 for the standard action icons.
         #
         plane.rect.top = 0
-        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
+        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100 + 300
 
         # This will remove the plane from its current parent, window.room
         #
         self.window.inventory.sub(plane)
+
+        # Make sure the plane is draggable
+        #
+        plane.draggable = True
 
         # Call base class to notify the Entity
         #
@@ -800,7 +854,13 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.logger.debug("'{}' dropped on inventory".format(item_identifier))
 
-        if item_identifier in self.host.rack.entity_dict.keys():
+        # Ignore drops of standard actions
+        #
+        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
+
+            self.logger.debug("ignoring drop of action icon")
+
+        elif item_identifier in self.host.rack.entity_dict.keys():
 
             self.logger.debug("'{}' already in Rack, skipping".format(item_identifier))
 
@@ -848,10 +908,17 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         name = plane.name
 
+        # Ignore drops of standard actions
+        #
+        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
+
+            self.logger.debug("ignoring drop of action icon")
+
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
         # Taken from shard.plugins.serverside
         #
-        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", name):
+        elif not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", name):
+
             self.logger.error("plane.name does not match coordinate tuple: '{}'".format(name))
 
         else:
@@ -863,6 +930,37 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                                                          eval(name))
 
             self.message_for_host.event_list.append(tries_to_drop_event)
+
+        return
+
+    def entity_dropped_callback(self, plane, dropped_plane, coordinates):
+        """Dropped upon callback for Entities.
+           Adds appropriate Events to PygameUserInterface.message_for_host.
+        """
+
+        self.logger.debug("called")
+
+        if dropped_plane.name == "look_at":
+
+            event = shard.TriesToLookAtEvent(self.host.player_id,
+                                             plane.name)
+
+        elif dropped_plane.name == "manipulate":
+
+            event = shard.TriesToManipulateEvent(self.host.player_id,
+                                                 plane.name)
+
+        elif dropped_plane.name == "talk_to":
+
+            event = shard.TriesToTalkToEvent(self.host.player_id,
+                                             plane.name)
+
+        else:
+            event = shard.TriesToDropEvent(self.host.player_id,
+                                           dropped_plane.name,
+                                           self.host.room.entity_locations[plane.name])
+
+        self.message_for_host.event_list.append(event)
 
         return
 
@@ -947,7 +1045,7 @@ class PygameMapEditor(PygameUserInterface):
         #
         self.plane_cache = []
 
-        # Open a click'n'drag window.
+        # Re-open the click'n'drag window.
         #
         self.window = clickndrag.Display((1000, 600))
         self.window.image.fill((16, 16, 16))
@@ -977,16 +1075,17 @@ class PygameMapEditor(PygameUserInterface):
         self.overlay_surface.fill((255, 0, 0))
         self.overlay_surface.set_alpha(127)
 
-        # Create inventory plane at PygameUserInterface.window.inventory
+        # Add the inventory plane created in PygameUserInterface.__init__()
         #
-        self.window.sub(clickndrag.Plane("inventory",
-                                         pygame.Rect((100, 500), (800, 100)),
-                                         dropped_upon_callback = self.inventory_callback))
+        self.inventory_plane.rect.left = 100
 
-        # Create plane for the room.
+        self.window.sub(self.inventory_plane)
+
+        # Add the room plane created in PygameUserInterface.__init__()
         #
-        self.window.sub(clickndrag.Plane("room",
-                                         pygame.Rect((100, 0), (800, 500))))
+        self.room_plane.rect.left = 100
+
+        self.window.sub(self.room_plane)
 
         # Create Container for the editor buttons.
         #
@@ -1429,3 +1528,13 @@ class PygameMapEditor(PygameUserInterface):
                                                             pygame.Rect((0, 0), (98, 30)),
                                                             color = (120, 120, 120)))
             return
+
+    def make_items_draggable(self):
+        """Overriding base class: make all items always draggable.
+        """
+
+        for identifier in self.host.room.entity_locations.keys():
+
+            self.host.room.entity_dict[identifier].asset.draggable = True
+
+        return

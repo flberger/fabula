@@ -104,7 +104,7 @@ class Server(shard.core.Engine):
                                               shard.AttemptEvent,
                                               shard.SaysEvent)):
 
-                            # This is a bit of Python magic. 
+                            # This is a bit of Python magic.
                             # self.event_dict is a dict which maps classes to
                             # handling functions. We use the class of the event
                             # supplied as a key to call the appropriate handler, and
@@ -243,7 +243,7 @@ class Server(shard.core.Engine):
                 # (in the current room) are respawned.
                 # process_SpawnEvent in the engine will
                 # filter duplicate entities, so no harm done.
-                # 
+                #
                 # TODO: respawning might cause some loss of internal entity state
                 #
                 if (skip_room_events
@@ -264,8 +264,8 @@ class Server(shard.core.Engine):
 
                 elif (not skip_room_events == "now"
                       and
-                      event.__class__ in [shard.DropsEvent, 
-                                          shard.MovesToEvent, 
+                      event.__class__ in [shard.DropsEvent,
+                                          shard.MovesToEvent,
                                           shard.PicksUpEvent,
                                           shard.SaysEvent,
                                           shard.SpawnEvent,
@@ -517,22 +517,43 @@ class Server(shard.core.Engine):
 
         self.logger.debug("called")
 
+        # Check target
+        #
         if event.target_identifier not in self.room.floor_plan:
 
             self.logger.debug("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
+
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            return
 
         elif self.room.floor_plan[event.target_identifier].tile.tile_type != shard.FLOOR:
 
             self.logger.debug("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
+
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-        elif event.item_identifier not in self.rack.entity_dict.keys():
+            return
+
+        # If event.target_identifier has at least one Entity on it, replace
+        # target_identifier with the first Entity's identifier.
+        #
+        if len(self.room.floor_plan[event.target_identifier].entities):
+
+            target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
+
+            event = shard.TriesToDropEvent(event.identifier,
+                                           event.item_identifier,
+                                           target_identifier)
+
+        # Check Rack and owner
+        #
+        if event.item_identifier not in self.rack.entity_dict.keys():
 
             if event.item_identifier in self.room.entity_dict.keys():
                 self.logger.debug("'{}' not in rack but in room, forwarding event to plugin".format(event.item_identifier))
                 kwargs["message"].event_list.append(event)
- 
+
             else:
                 self.logger.debug("AttemptFailed: '{}' neither in rack nor in room".format(event.item_identifier))
                 kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
@@ -541,18 +562,6 @@ class Server(shard.core.Engine):
 
             self.logger.debug("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.item_identifier))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-        elif len(self.room.floor_plan[event.target_identifier].entities):
-
-            # If event.target_identifier has at least one Entity on it, replace
-            # target_identifier with the first Entity's identifier and pass on
-            # to the Plugin.
-            #
-            target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
-
-            kwargs["message"].event_list.append(shard.TriesToDropEvent(event.identifier,
-                                                                       event.item_identifier,
-                                                                       target_identifier))
 
         else:
             self.logger.debug("looks OK, forwarding to plugin")

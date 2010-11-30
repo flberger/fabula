@@ -263,20 +263,26 @@ class DefaultGame(shard.plugins.Plugin):
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of shard.Entity.
         #
-        if isinstance(event.target_identifier, shard.Entity):
+
+        if event.target_identifier in self.host.room.entity_dict.keys():
+
+            self.logger.debug("target '{}' is an entity identifier".format(event.target_identifier))
 
             if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
 
-                self.logger.debug("AttemptFailed: drop not next to player")
+                self.logger.debug("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
                 self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             else:
-                self.logger.debug("'{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+                self.logger.debug("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
+            self.logger.debug("target '{}' is not an entity identifier".format(event.target_identifier))
+
             if event.target_identifier not in surrounding_positions:
 
-                self.logger.debug("AttemptFailed: drop not next to player")
+                self.logger.debug("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
                 self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             else:
