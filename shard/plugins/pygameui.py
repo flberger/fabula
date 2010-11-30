@@ -988,21 +988,26 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # TODO: use actual player identifier
         #
-        player_location = self.host.room.entity_locations["player"]
+        if "player" in self.host.room.entity_dict.keys():
 
-        surrounding_positions = [(player_location[0] - 1, player_location[1]),
-                                 (player_location[0], player_location[1] - 1),
-                                 (player_location[0] + 1, player_location[1]),
-                                 (player_location[0], player_location[1] + 1)]
+            player_location = self.host.room.entity_locations["player"]
 
-        for identifier in self.host.room.entity_locations.keys():
+            surrounding_positions = [(player_location[0] - 1, player_location[1]),
+                                     (player_location[0], player_location[1] - 1),
+                                     (player_location[0] + 1, player_location[1]),
+                                     (player_location[0], player_location[1] + 1)]
 
-            if self.host.room.entity_locations[identifier] in surrounding_positions:
+            for identifier in self.host.room.entity_locations.keys():
 
-                self.host.room.entity_dict[identifier].asset.draggable = True
+                if self.host.room.entity_locations[identifier] in surrounding_positions:
 
-            else:
-                self.host.room.entity_dict[identifier].asset.draggable = False
+                    self.host.room.entity_dict[identifier].asset.draggable = True
+
+                else:
+                    self.host.room.entity_dict[identifier].asset.draggable = False
+
+        else:
+            self.logger.warning("'{}' not found in room, items are not made draggable".format("player"))
 
         return
 

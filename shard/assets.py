@@ -9,6 +9,7 @@
 # developed in May 2008.
 
 import os.path
+import glob
 
 class Assets:
     """An assets manager which returns file-like objects for local files.
@@ -32,28 +33,17 @@ class Assets:
 
         self.logger.debug("unknown asset '{}', attempting to fetch".format(asset_desc))
 
-        if (asset_desc.startswith("http://")
-            or asset_desc.startswith("ftp://")):
+        if (asset_desc.startswith("http://") or asset_desc.startswith("ftp://")):
 
             return self.fetch_uri(asset_desc)
 
-        elif os.path.exists(asset_desc):
+        elif asset_desc.lower().endswith(".zip"):
 
-            if asset_desc.lower().endswith(".zip"):
-
-                return self.fetch_zip_file(asset_desc)
-
-            else:
-                # Local file, no *.zip
-                #
-                return self.fetch_local_file(asset_desc)
+            return self.fetch_zip_file(asset_desc)
 
         else:
-            errormessage = ("Could not open asset: '{}'".format(asset_desc))
 
-            self.logger.critical(errormessage)
-
-            raise Exception(errormessage)
+            return self.fetch_local_file(asset_desc)
 
     def fetch_uri(self, asset_desc):
 
@@ -79,7 +69,7 @@ class Assets:
 #
 #            self.logger.debug("retrieving %s from ZIP file %s" % (name, asset_desc))
 #
-#            string_io = StringIO.StringIO(zip_file.read(name)) 
+#            string_io = StringIO.StringIO(zip_file.read(name))
 #
 #            # Dict key is file name cut behind the
 #            # first dot.
@@ -102,7 +92,40 @@ class Assets:
         """This method returns a a file-like object for the file specified.
         """
 
-        self.logger.debug("attempting to retrieve {} from local file".format(asset_desc))
+        if os.path.exists(asset_desc):
+
+            pass
+
+        # Look in parent directory
+        #
+        elif os.path.exists(os.path.abspath("..") + asset_desc):
+
+            asset_desc = os.path.abspath("..") + asset_desc
+
+        # Look in subdirectories
+        #
+        elif glob.glob("./*/" + asset_desc):
+
+            # Take first match
+            #
+            asset_desc = os.path.abspath(glob.glob("./*/" + asset_desc)[0])
+
+        # Look in sibling directories
+        #
+        elif glob.glob("../*/" + asset_desc):
+
+            # Take first match
+            #
+            asset_desc = os.path.abspath(glob.glob("../*/" + asset_desc)[0])
+
+        else:
+            self.logger.critical("Could not open asset: '{}'".format(asset_desc))
+
+            raise Exception(errormessage)
+
+            return
+
+        self.logger.debug("attempting to retrieve '{}' from local file".format(asset_desc))
 
         file = open(asset_desc, mode='rb')
 
