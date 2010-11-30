@@ -511,12 +511,12 @@ class DefaultGame(shard.plugins.Plugin):
 
             return best_move
 
-class MapEditor(DefaultGame):
+class Editor(DefaultGame):
     """This is the server-side Plugin for a Shard map editor.
 
        Additional attributes:
 
-       MapEditor.current_room
+       Editor.current_room
            name of the current room
     """
 

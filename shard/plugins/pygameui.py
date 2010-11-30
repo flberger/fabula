@@ -9,7 +9,7 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: in PygameMapEditor, display all assets from local folder for visual editing
+# TODO: in PygameEditor, display all assets from local folder for visual editing
 #
 # TODO: render order top-down, following lines
 
@@ -732,7 +732,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         self.logger.debug("called")
 
         # Using a OkBox for now.
-        # Taken from PygameMapEditor.open_image().
+        # Taken from PygameEditor.open_image().
         #
         perception_box = clickndrag.gui.OkBox(event.perception)
         perception_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
@@ -1006,10 +1006,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         return
 
-class PygameMapEditor(PygameUserInterface):
+class PygameEditor(PygameUserInterface):
     """A Pygame-based user interface that serves as a map editor.
 
-       Additional PygameMapEditor attributes:
+       Additional PygameEditor attributes:
 
        PygameUserInterface.window.buttons
            clickndrag Plane for the buttons, 100x600px and located at the left
@@ -1052,7 +1052,7 @@ class PygameMapEditor(PygameUserInterface):
 
         # Set window name
         #
-        pygame.display.set_caption("Shard Map Editor")
+        pygame.display.set_caption("Shard Editor")
 
         # Create a black pygame surface for fade effects
         # Do not use Surface.copy() since we do not want per-pixel alphas.
@@ -1231,7 +1231,7 @@ class PygameMapEditor(PygameUserInterface):
             self.logger.debug("no filename selected")
 
     def load_room(self, plane):
-        """Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the MapEditor Plugin.
+        """Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the Editor Plugin.
         """
         self.logger.debug("called")
 
