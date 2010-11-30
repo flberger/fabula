@@ -66,17 +66,17 @@ class EntityPlane(clickndrag.Plane):
            A list of movement steps as position tuples
     """
 
-    def __init__(self, name, rect, drag=False,
-                                   grab=False,
-                                   clicked_callback=None,
-                                   dropped_upon_callback=None):
+    def __init__(self, name, rect, draggable = False,
+                                   dropzone = False,
+                                   clicked_callback = None,
+                                   dropped_upon_callback = None):
         """Initialise.
         """
 
         # Call base class
         #
-        clickndrag.Plane.__init__(self, name, rect, drag,
-                                                    grab,
+        clickndrag.Plane.__init__(self, name, rect, draggable,
+                                                    dropzone,
                                                     clicked_callback,
                                                     dropped_upon_callback)
 
@@ -307,7 +307,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
             # Create Plane
             #
-            plane = clickndrag.Plane(name, rect, drag = True)
+            plane = clickndrag.Plane(name, rect, draggable = True)
 
             plane.image = surface
 
