@@ -67,7 +67,7 @@ class EntityPlane(clickndrag.Plane):
     """
 
     def __init__(self, name, rect, draggable = False,
-                                   dropzone = False,
+                                   grab = False,
                                    clicked_callback = None,
                                    dropped_upon_callback = None):
         """Initialise.
@@ -76,7 +76,7 @@ class EntityPlane(clickndrag.Plane):
         # Call base class
         #
         clickndrag.Plane.__init__(self, name, rect, draggable,
-                                                    dropzone,
+                                                    grab,
                                                     clicked_callback,
                                                     dropped_upon_callback)
 
@@ -243,6 +243,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         self.window = clickndrag.Display((800, 600))
 
         # Initialise font instances.
+        # TODO: Use Assets to fetch the font
         #
         try:
             self.big_font = pygame.font.Font("Vera.ttf", 30)
@@ -576,6 +577,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             event.entity.asset.rect.centerx = x
             event.entity.asset.rect.bottom = y
 
+            # Restore callback
+            #
+            event.entity.asset.dropped_upon_callback = self.entity_dropped_callback
+
         else:
             self.logger.debug("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
 
@@ -839,6 +844,10 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         # Make sure the plane is draggable
         #
         plane.draggable = True
+
+        # Make insensitive to drops
+        #
+        plane.dropped_upon_callback = None
 
         # Call base class to notify the Entity
         #
@@ -1293,9 +1302,10 @@ class PygameEditor(PygameUserInterface):
         self.logger.debug("called")
 
         # Cache button planes from sidebar...
+        # Use subplanes_list to keep order
         #
-        for button in self.window.buttons.subplanes.values():
-            self.plane_cache.append(button)
+        for name in self.window.buttons.subplanes_list:
+            self.plane_cache.append(self.window.buttons.subplanes[name])
 
         # ...and remove
         #
@@ -1437,7 +1447,7 @@ class PygameEditor(PygameUserInterface):
         # Restore buttons, flushing plane cache
         #
         while len(self.plane_cache):
-            self.window.buttons.sub(self.plane_cache.pop())
+            self.window.buttons.sub(self.plane_cache.pop(0))
 
     def process_CanSpeakEvent(self, event):
         """Open the senteces as an OptionList and return a SaysEvent to the host.

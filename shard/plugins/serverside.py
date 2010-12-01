@@ -83,12 +83,10 @@ class DefaultGame(shard.plugins.Plugin):
        Additional attributes:
 
        DefaultGame.tries_to_move_dict
-           Dict mapping Entity identifiers to coordinate tuples to be moved
-           towards.
+           Dict mapping Entity identifiers to target positions.
 
-       DefaultGame.last_position_dict
-           Dict mapping Entity identifiers to their last position before a
-           movement.
+       DefaultGame.path_dict
+           Dict mapping Entity identifiers to a list of coordinates walked so far.
     """
 
     def __init__(self, logger):
@@ -99,7 +97,7 @@ class DefaultGame(shard.plugins.Plugin):
         shard.plugins.Plugin.__init__(self, logger)
 
         self.tries_to_move_dict = {}
-        self.last_position_dict = {}
+        self.path_dict = {}
 
     def process_message(self, message):
         """DefaultGame main method.
@@ -133,42 +131,35 @@ class DefaultGame(shard.plugins.Plugin):
 
             target_identifier = self.tries_to_move_dict[identifier]
 
-            location = self.move_towards(identifier, target_identifier)
+            location = self.move_towards(identifier,
+                                        target_identifier,
+                                        self.path_dict[identifier])
 
             if location is None:
 
-                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(event.identifier))
+                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(identifier))
 
                 del self.tries_to_move_dict[identifier]
-                del self.last_position_dict[identifier]
+                del self.path_dict[identifier]
 
                 self.logger.warning("AttemptFailed for '{}'".format(identifier))
                 self.message_for_host.event_list.append(shard.AttemptFailedEvent(identifier))
 
             else:
+                self.logger.debug("movement pending for '{}', last positions {}, best move towards {} is {}".format(identifier, self.path_dict[identifier], target_identifier, location))
 
-                if location == self.last_position_dict[identifier]:
+                # Save current position before movement as last position
+                #
+                self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
 
-                    self.logger.warning("'{}' would move back to last position, removing from tries_to_move_dict".format(identifier))
+                self.message_for_host.event_list.append(shard.MovesToEvent(identifier, location))
+
+                if location == target_identifier:
+
+                    self.logger.debug("target reached, removing from tries_to_move_dict")
 
                     del self.tries_to_move_dict[identifier]
-                    del self.last_position_dict[identifier]
-
-                else:
-                    self.logger.debug("movement pending for '{}', last position {}, best move towards {} is {}".format(identifier, self.last_position_dict[identifier], target_identifier, location))
-
-                    # Save current position before movement as last position
-                    #
-                    self.last_position_dict[identifier] = self.host.room.entity_locations[identifier]
-
-                    self.message_for_host.event_list.append(shard.MovesToEvent(identifier, location))
-
-                    if location == target_identifier:
-
-                        self.logger.debug("target reached, removing from tries_to_move_dict")
-
-                        del self.tries_to_move_dict[identifier]
-                        del self.last_position_dict[identifier]
+                    del self.path_dict[identifier]
 
         return self.message_for_host
 
@@ -204,7 +195,7 @@ class DefaultGame(shard.plugins.Plugin):
                                                                           event.target_identifier))
 
         self.tries_to_move_dict[event.identifier] = event.target_identifier
-        self.last_position_dict[event.identifier] = self.host.room.entity_locations[event.identifier]
+        self.path_dict[event.identifier] = []
 
         return
 
@@ -462,8 +453,9 @@ class DefaultGame(shard.plugins.Plugin):
         self.message_for_host.event_list.append(event)
         return
 
-    def move_towards(self, identifier, target_identifier):
+    def move_towards(self, identifier, target_identifier, forbidden_moves):
         """Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.
+           forbidden_moves is a list of targets that should be considered as not walkable.
         """
 
         location = self.host.room.entity_locations[identifier]
@@ -474,7 +466,8 @@ class DefaultGame(shard.plugins.Plugin):
 
             possible_move = (location[0] + vector[0], location[1] + vector[1])
 
-            if self.host.tile_is_walkable(possible_move):
+            if (self.host.tile_is_walkable(possible_move)
+                and possible_move not in forbidden_moves):
 
                 possible_moves.append(possible_move)
 
@@ -487,6 +480,8 @@ class DefaultGame(shard.plugins.Plugin):
             return possible_moves[0]
 
         else:
+            # self.logger.debug("possible_moves == {}".format(possible_moves))
+
             # Taking first as reference
             #
             best_move = possible_moves.pop(0)
@@ -495,6 +490,8 @@ class DefaultGame(shard.plugins.Plugin):
 
             shortest_distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                           + distance_vector[1] * distance_vector[1])
+
+            # self.logger.debug("move {} has distance {}".format(best_move, shortest_distance))
 
             # Examine remaining
             #
@@ -505,9 +502,13 @@ class DefaultGame(shard.plugins.Plugin):
                 distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                      + distance_vector[1] * distance_vector[1])
 
+                # self.logger.debug("move {} has distance {}".format(move, distance))
+
                 if distance < shortest_distance:
                     shortest_distance = distance
                     best_move = move
+
+            # self.logger.debug("choosing move {} with distance {}".format(best_move, shortest_distance))
 
             return best_move
 
@@ -620,6 +621,11 @@ class Editor(DefaultGame):
             event = shard.CanSpeakEvent(event.identifier, room_list)
 
             self.message_for_host.event_list.append(event)
+
+        else:
+            # Call base
+            #
+            DefaultGame.process_TriesToTalkToEvent(self, event)
 
     def process_SaysEvent(self, event):
         """If the text matches a room file, load and send the room.
