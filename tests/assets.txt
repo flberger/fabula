@@ -1,0 +1,21 @@
+Doctests for the Shard Package
+==============================
+
+Asset Manager
+-------------
+
+    >>> stream = open("temp.dat", mode="w")
+    >>> stream.write("shard")
+    5
+    >>> stream.close()
+    >>> import shard.assets
+    >>> import shard.run
+    >>> app = shard.run.App("d", timeout = 5)
+    >>> assets = shard.assets.Assets(app.logger)
+    >>> asset = assets.fetch("temp.dat")
+    >>> asset.read()
+    b'shard'
+    >>> asset.close()
+    >>> import os
+    >>> os.remove("temp.dat")
+    >>>

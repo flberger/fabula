@@ -10,33 +10,40 @@
 #
 # Transformed into a package on 22. September 2009.
 
-# TODO: reasonable package docstring above: what is where :) PEP 257: The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each.
+# CODING STYLE
 #
+# TODO: reasonable package docstring above: what is where :) PEP 257: The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each.
 # TODO: PEP 8: Comparisons to singletons like None should always be done with 'is' or 'is not', never the equality operators.
 # TODO: PEP 8: Don't compare boolean values to True or False using ==
+# TODO: give the method return value in docstring
+# TODO: unify Event attributes target_identifier, trigger_identifier, item_identifier where applicable
+# TODO: add a description of what is being done to "called" log messages
+#
+#
+# CLEANUPS
 #
 # TODO: import shard.xyz also imports shard - so get rid of redundant imports
+# TODO: Clean up log levels: use debug(), info(), warning(), error(), critical()
+# TODO: is the default mirroring policy in Plugin OK? UserInterface also is a Plugin, after all, and it makes no sense here.
 #
-# TODO: string.format() instead of "%s" % s or "s" + "s" in the whole package!
 #
+# OPTIMISATION
+#
+# TODO: don't call base classes for trivial actions. Duplicate and save calls.
+# TODO: string.format() / .join() instead of "%s" % s or "s" + "s" in the whole package!
 # TODO: use map() instead of "for" loops where applicable
-#
-# TODO: "avoid dots" -> prefetch functions from.long.dotted.operations
+# TODO: "avoid dots" -> prefetch functions from.long.dotted.operations, especially in loops
 # TODO: most prominently: message.event_list.append -> message.append
+# TODO: Room.entity_dict.keys() is scanned so often that there should be a fixed list prepared to read from
 #
-# TODO: readable __repr__ of all shard objects: Room, Tile, ...
-# TODO: use instance.__class__.__name__ and __module__ in repr
 #
+# IMPROVEMENTS
+#
+# TODO: introduce a client-specific Server timeout when an Event which requires multiple frames has been sent. Possibly send action_time in InitEvent to Server.
+# TODO: readable __repr__ of shard objects: Rack
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
-#
-# TODO: give the method return value in docstring
-#
-# TODO: unify Event attributes target_identifier, trigger_identifier, item_identifier where applicable
-#
 # TODO: per-player inventories in server... -.-
-#
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
-#
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
 
 import shard.eventprocessor
@@ -107,15 +114,21 @@ class Event:
         """Readable and informative string representation.
         """
 
+        # TODO: This is a duplicate of Tile.__repr__
+
         arguments = ""
 
         for key in self.__dict__:
 
-            arguments = arguments + "%s = %s, " % (key, self.__dict__[key])
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
 
+        # Chop final ", "
+        #
         arguments = arguments[:-2]
 
-        return "<%s(%s)>" % (self.__class__, arguments)
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ####################
 # Attempt events
@@ -483,12 +496,16 @@ class EnterRoomEvent(ServerEvent):
        Events building the map and spawning the player, items and NPCs should
        follow. The room is done and can be used when the server issues
        RoomCompleteEvent.
+
+       EnterRoomEvent.room_identifier
+           The identifier of the Room to be entered.
     """
 
-    def __init__(self):
-        """This event has no parameters.
+    def __init__(self, room_identifier):
+        """Event initialisation.
+           room_identifier is the identifier of the Room to be entered.
         """
-        pass
+        self.room_identifier = room_identifier
 
 class RoomCompleteEvent(ServerEvent):
     """Issued by the server after an EnterRoomEvent
@@ -511,7 +528,7 @@ class ChangeMapElementEvent(ServerEvent):
        ChangeMapElementEvent.location
            A description as in the TriesToMoveEvent
     """
-    
+
     def __init__(self, tile, location):
         """Event initialisation.
            tile is a shard map object having a type (obstacle or floor) and an
@@ -563,16 +580,12 @@ class InitEvent(Event):
 class Message:
     """A Message manages an ordered list of shard events.
        Messages sent by the server describe the action of a certain time frame.
-       The UserInterface has to decide which events happen in parallel and which 
+       The UserInterface has to decide which events happen in parallel and which
        ones happen sequential. Instances of Message expose a single Python list
        object as Message.event_list.
 
        Message.event_list
            A list of shard.Events
-
-       Message.has_EnterRoomEvent
-       Message.has_RoomCompleteEvent
-           Convenience flags, initially False
     """
 
     def __init__(self, event_list):
@@ -584,14 +597,6 @@ class Message:
         #
         self.event_list = event_list
 
-        # We attach custom flags to the Message created in
-        # setup() to notify the UserInterface whether
-        # an EnterRoomEvent or RoomCompleteEvent occured,
-        # so it does not have to scan the events.
-        #
-        self.has_EnterRoomEvent = False
-        self.has_RoomCompleteEvent = False
-
     def __repr__(self):
         """Readable and informative string representation.
         """
@@ -599,8 +604,8 @@ class Message:
         return str(self.event_list)
 
 #    def queueAsFirstEvent(self, event):
-#        """This is a convenience method. Queue the event 
-#           given as the first event to be processed, 
+#        """This is a convenience method. Queue the event
+#           given as the first event to be processed,
 #           shifting other events already queued."""
 #        self.event_list = [event] + self.event_list
 
@@ -620,22 +625,19 @@ class Entity(shard.eventprocessor.EventProcessor):
            Must be an object whose string representation yields an unique
            identification.
 
-       Entity.asset
+       Entity.asset_desc
            Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the Entity. Do not put large
-           objects here since Entities are pushed around quite a bit and
-           transfered across the network.
-           The UserInterface may fetch the asset and attach it to the instance
-           of the Entity.
+           containing the data for visualizing the Entity.
+
+       Entity.asset
+           The actual asset, application-dependent. The UserInterface may fetch
+           the asset using Entity.asset_desc and attach it here.
 
        Entity.state
            The state the Entity is in. Defaults to None.
 
-       In addition,
-
        Entity.user_interface
-
-       is added by and points to the UserInterface instance.
+           Pointer to the UserInterface instance.
 
        A Shard Client should use subclasses (possibly with multiple inheritance)
        or custom attachements to instances of this class to implement the game
@@ -647,12 +649,13 @@ class Entity(shard.eventprocessor.EventProcessor):
        how it handles game objects.
     """
 
-    def __init__(self, entity_type, identifier, asset):
+    def __init__(self, entity_type, identifier, asset_desc):
         """Initialise.
            This method sets up the following attributes from the values given:
 
            Entity.entity_type
            Entity.identifier
+           Entity.asset_desc
            Entity.asset
            Entity.state
         """
@@ -665,8 +668,13 @@ class Entity(shard.eventprocessor.EventProcessor):
 
         self.entity_type = entity_type
         self.identifier = identifier
-        self.asset = asset
+        self.asset_desc = asset_desc
+        self.asset = None
         self.state = None
+
+        # Will be filled by the UserInterface at runtime
+        #
+        self.user_interface = None
 
     # EventProcessor overrides
     #
@@ -724,6 +732,23 @@ class Entity(shard.eventprocessor.EventProcessor):
         """
         pass
 
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        arguments = ""
+
+        for key in ("entity_type", "identifier", "asset_desc", "asset", "state"):
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ############################################################
 # Entity And Tile Types
@@ -750,12 +775,16 @@ class Tile:
        Tile.tile_type
            shard.FLOOR or shard.OBSTACLE
 
-       Tile.asset
+       Tile.asset_desc
            Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the tile
+           containing the data for visualizing the Tile.
+
+       Tile.asset
+           The actual asset, application-dependent. The UserInterface may fetch
+           the asset using Entity.asset_desc and attach it here.
     """
 
-    def __init__(self, tile_type, asset):
+    def __init__(self, tile_type, asset_desc):
         """Tile initialisation.
            tile_type must be shard.FLOOR or shard.OBSTACLE, describing whether
            the player or NPCs can move across the tile.
@@ -763,7 +792,64 @@ class Tile:
            file containing the data for visualizing the tile.
         """
         self.tile_type = tile_type
-        self.asset = asset
+        self.asset_desc = asset_desc
+        self.asset = None
+
+    def __eq__(self, other):
+        """Allow the == operator to be used on Tiles.
+           Check if the object given has the same class, the same tile_type and
+           the same asset_desc.
+        """
+
+        if other.__class__ == self.__class__:
+
+            if (other.tile_type == self.tile_type
+                and other.asset_desc == self.asset_desc):
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return False
+
+    def __ne__(self, other):
+        """Allow the != operator to be used on Tiles.
+           Check if the object given has a different class or a different
+           tile_type or different asset_desc.
+        """
+
+        if other.__class__ == self.__class__:
+
+            if (other.tile_type != self.tile_type
+                or other.asset_desc != self.asset_desc):
+
+                return True
+
+            else:
+                return False
+
+        else:
+            return True
+
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ############################################################
 # Rooms
@@ -772,6 +858,10 @@ class Room(shard.eventprocessor.EventProcessor):
     """A Room instance saves the map as well as Entities and their locations.
        It is maintained for the current room in the Client
        and for all active rooms in the Server.
+
+       Room.identifier
+           Must be an object whose string representation yields an unique
+           identification.
 
        Room.entity_dict
            A dict of all Entities in this room, mapping Entity identifiers to
@@ -789,28 +879,29 @@ class Room(shard.eventprocessor.EventProcessor):
        Room.active_clients
            A list of client identifiers whose player entities are in this room.
 
-       Note that all these dicts assume that Entity identifiers are unique.
+       Note that these dicts assume that Entity identifiers are unique.
     """
 
-    def __init__(self):
+    def __init__(self, identifier):
         """Initialise a room.
+           identifier must be an object whose string representation yields an
+           unique identification.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
 
         # Now we have:
         # self.event_dict
-        # mapping Event classes to handler methods
-        # though we do not need it since all
-        # methods of this class are called from
-        # the outside.
+        # mapping Event classes to handler methods though we do not need it
+        # since all methods of this class are called from the outside.
 
-        # floor_plan is an attempt of an efficient storage of
-        # an arbitrary two-dimensional map. To save space, 
-        # only explicitly defined elements are stored. This
-        # is done in a dict whose keys are tuples. Access the
-        # elements using floor_plan[(x, y)]. The upper left element
-        # is floor_plan[(0, 0)].
+        self.identifier = identifier
+
+        # floor_plan is an attempt of an efficient storage of an arbitrary
+        # two-dimensional map. To save space, only explicitly defined elements
+        # are stored. This is done in a dict whose keys are tuples. Access the
+        # elements using floor_plan[(x, y)]. The upper left element is
+        # floor_plan[(0, 0)].
         #
         self.floor_plan = {}
 
@@ -835,7 +926,11 @@ class Room(shard.eventprocessor.EventProcessor):
 
             self.floor_plan[event.location] = FloorPlanElement(event.tile)
 
-        self.tile_list.append(event.tile)
+        # Avoid duplicates
+        #
+        if event.tile not in self.tile_list:
+
+            self.tile_list.append(event.tile)
 
         return
 
@@ -844,7 +939,7 @@ class Room(shard.eventprocessor.EventProcessor):
         """
         if event.location not in self.floor_plan:
 
-            raise ShardException("cannot spawn entity %s at undefined location %s"
+            raise Exception("cannot spawn entity %s at undefined location %s"
                                  % (event.entity.identifier, event.location))
 
         # If Entity is already there, just do nothing.
@@ -867,12 +962,12 @@ class Room(shard.eventprocessor.EventProcessor):
 
         if event.identifier not in self.entity_dict:
 
-            raise ShardException("cannot move unknown entity %s"
+            raise Exception("cannot move unknown entity %s"
                                  % event.identifier)
 
         if event.location not in self.floor_plan:
 
-            raise ShardException("cannot move entity %s to undefined location %s"
+            raise Exception("cannot move entity %s to undefined location %s"
                                  % (event.identifier, event.location))
 
         # Only process changed locations
@@ -903,7 +998,7 @@ class Room(shard.eventprocessor.EventProcessor):
         """
         if event.identifier not in self.entity_dict:
 
-            raise ShardException("cannot delete unknown entity %s"
+            raise Exception("cannot delete unknown entity %s"
                                  % event.identifier)
 
         entity = self.entity_dict[event.identifier]
@@ -915,6 +1010,26 @@ class Room(shard.eventprocessor.EventProcessor):
         del self.entity_locations[event.identifier]
 
         return
+
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        # TODO: This is a duplicate of Tile.__repr__
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 class FloorPlanElement:
     """Convenience class for floor plan elements.
@@ -931,6 +1046,26 @@ class FloorPlanElement:
         """
         self.tile = tile
         self.entities = []
+
+    def __repr__(self):
+        """Readable and informative string representation.
+        """
+
+        # TODO: This is a duplicate of Tile.__repr__
+
+        arguments = ""
+
+        for key in self.__dict__:
+
+            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+
+        # Chop final ", "
+        #
+        arguments = arguments[:-2]
+
+        return "<{0}.{1}({2})>".format(self.__module__,
+                                       self.__class__.__name__,
+                                       arguments)
 
 ############################################################
 # Rack
@@ -1078,21 +1213,3 @@ def join_lists(first_list, second_list):
     new_list = new_list + longer_list[index:]
 
     return new_list
-
-############################################################
-# Exceptions
-
-class ShardException():
-    """This is the base class of Shard-related exceptions.
-       Shard Implementations should raise an instance of this class when
-       appropriate, providing an error description.
-    """
-
-    def __init__(self, error_description):
-        self.error_description = error_description
-
-    def __repr__(self):
-        # This is called and should return a
-        # string representation which is shown
-        #
-        return self.error_description

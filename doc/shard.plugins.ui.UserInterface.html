@@ -1,0 +1,709 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;shard.plugins.ui.UserInterface&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class s.p.u.UserInterface(<a href="shard.plugins.Plugin.html">shard.plugins.Plugin</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.plugins.html">plugins</a>.<a href="shard.plugins.ui.html">ui</a></span>
+      
+      <a href="classIndex.html#shard.plugins.ui.UserInterface">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></p>
+    </div>
+    <pre>This is the base class for an UserInterface for the Shard Client.
+Subclasses should override the appropriate methods of this class
+and implement a graphical representation of the game and the
+action. Shard is based on a two-dimensional map, but apart from
+that it makes very few assumptions about the graphical rendering.
+Thus it is possible to write 2D and 3D UserInterfaces and
+even a text interface.
+
+Attributes:
+
+UserInterface.action_time
+    Set how long actions like a movement from Map element to Map element
+    take, in seconds.
+
+UserInterface.framerate
+UserInterface.assets
+    framerate and assets manager
+
+UserInterface.action_frames
+    The number of frames per action.
+
+UserInterface.action_countdown
+    A copy of action_frames used in UserInterface.process_message().
+
+UserInterface.event_queue
+    A queue for Events of a Message to be rendered later.
+    UserInterface.action_countdown will be counted down between
+    processing the Events.
+
+UserInterface.exit_requested
+    The UserInterface is responsible for catching an exit request by the
+    user. This value is checked in the Client main loop.
+
+UserInterface.freeze
+    Flag whether to display the game and collect input.
+    True upon initialisation.
+
+UserInterface.room
+    Variables to be filled by the Client before each call to
+    process_message()
+
+UserInterface.direction_vector_dict
+    Convenience dict converting symbolic directions to a vector</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id48">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#__init__">__init__</a></td>
+    <td><tt>This method initialises the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_message">process_message</a></td>
+    <td><tt>This is the main method of the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#display_asset_exception">display_asset_exception</a></td>
+    <td><tt>Called when assets is unable to retrieve the asset.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#update_frame_timer">update_frame_timer</a></td>
+    <td><tt>You might have to notify a timer once per frame.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#display_single_frame">display_single_frame</a></td>
+    <td><tt>Called when the UserInterface needs to render a single frame of the current game state.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#collect_player_input">collect_player_input</a></td>
+    <td><tt>Called when the UserInterface wants to capture the user's reaction.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Called when the UserInterface has encoutered an EnterRoomEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Called when everything is fetched and ready after a RoomCompleteEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Called when the UserInterface needs to render a CanSpeakEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>This method is called with an instance of SpawnEvent to be displayed.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Called with an instance of ChangeMapElementEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Called with a list of instances of PerceptionEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Let the Entity handle the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Entity has already handled the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Pass the Event to the dropping Entity and spawn the dropped Entity.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Let the Entity picking up the item handle the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Called with an instance of SaysEvent</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#group_events">group_events</a></td>
+    <td><tt>Returns a list of lists of parallel events.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.Plugin.html">Plugin</a>):
+        </p>
+        <table class="children sortable" id="id49">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="shard.plugins.ui.UserInterface.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, assets, framerate, logger):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#__init__">shard.plugins.Plugin.__init__</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>This method initialises the UserInterface.
+assets must be an instance of shard.Assets or a subclass.
+framerate must be an integer and sets the maximum (not minimum ;-))
+frames per second the client will run in.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_message">
+    
+  </a>
+  <a name="process_message">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_message(self, message, room, player_id):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.Plugin.html#process_message">shard.plugins.Plugin.process_message</a></div>
+    <pre>This is the main method of the UserInterface.
+You should normally not override this method unless you have to do
+some really advanced stuff. Overriding the other methods of this
+class (which in turn are called from process_message()) should be
+just fine. See the other methods and the source code for details.
+This method is called regularly by the Client with a list of events
+to display (note: the list may be empty). It may take all the time it
+needs to render the action, just a couple or even hundreds of frames,
+but it must return once the events have been displayed.
+It must neither block completely nor run in a thread since the Client
+has to grab new events and change state between calls to
+process_message(). Put that way, process_message() is simply a part
+of Client.run().</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.display_asset_exception">
+    
+  </a>
+  <a name="display_asset_exception">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    display_asset_exception(self, asset):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Called when assets is unable to retrieve the asset.
+This is a serious error which usually prohibits continuation.
+The user should be asked to check his installation, file system
+or network connection.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.update_frame_timer">
+    
+  </a>
+  <a name="update_frame_timer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    update_frame_timer(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>You might have to notify a timer once per frame.
+Do this here and use this method wherever you need it.
+It is also called from process_message() when appropriate.
+This method may block execution to slow the UserInterface
+down to a certain frame rate. The default implementation waits
+1.0/self.framerate seconds.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.display_single_frame">
+    
+  </a>
+  <a name="display_single_frame">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    display_single_frame(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called when the UserInterface needs to render a single frame of the current game state.
+There is nothing special going on here, so you should notify the
+Entities that there is a next frame to be displayed (whichever way
+that is done in your implementation) and update their graphics.
+You might want to check the UserInterface.freeze flag whether to
+display the game and accept input.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.collect_player_input">
+    
+  </a>
+  <a name="collect_player_input">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    collect_player_input(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called when the UserInterface wants to capture the user's reaction.
+The module you use for actual graphics rendering most probably
+has a way to capture user input. When overriding this method,
+you have to convert the data provided by your module into Shard
+events, most probably instances of shard.AttemptEvent. You must
+append them to self.message_for_host which is evaluated by the
+ControlEngine.
+Note that your module might provide you with numerous user
+actions if the user clicked and typed a lot during the rendering.
+You should create a reasonable subset of those actions, e.g.
+select only the very last user input action.
+The UserInterface should only ever collect and send one
+single client event to prevent cheating and blocking other
+clients in the server. (hint by Alexander Marbach)
+The default implementation reads user input from the console.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called when the UserInterface has encoutered an EnterRoomEvent.
+You should override it, blank the screen here and display a waiting
+message since the UserInterface is going to twiddle thumbs until
+it receives a RoomCompleteEvent.
+The default implementation sets UserInterface.freeze = True.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called when everything is fetched and ready after a RoomCompleteEvent.
+Here you should set up the main screen and display some Map elements
+and Entities.
+The default implementation sets UserInterface.freeze = False and
+displays a single frame.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_CanSpeakEvent">
+    
+  </a>
+  <a name="process_CanSpeakEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_CanSpeakEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">shard.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEditor.html">shard.plugins.pygameui.PygameEditor</a></div>
+    <pre>Called when the UserInterface needs to render a CanSpeakEvent.
+You have to prompt for appropriate user input here and add a
+corresponding SaysEvent to self.message_for_host, which is
+evaluated by the ControlEngine. The default implementation
+makes the player say "blah".</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">shard.eventprocessor.EventProcessor.process_SpawnEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>This method is called with an instance of SpawnEvent to be displayed.
+You should supply the Entity with self.user_interface as done
+in the default implementation. Then add the new Enties to a list of
+visible Entities you might have set up and render a static frame.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">shard.eventprocessor.EventProcessor.process_DeleteEvent</a></div>
+    <pre>This method is called with an instance of DeleteEvent.
+You need to remove the Entites affected from your data
+structures and draw a frame without the deleted Entities.
+Note that the Entities to be removed are already gone
+in self.room.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called with an instance of ChangeMapElementEvent.
+In this method you must implement a major redraw of the display,
+updating all Map elements and after that all Entities.
+This is only a single frame though.
+Note that event may be empty.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">shard.eventprocessor.EventProcessor.process_PerceptionEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Called with a list of instances of PerceptionEvent.
+You have to provide an implementation whicht displays them
+one by one, possibly awaiting user confirmation.
+event_list may be empty. Please do not continue animation
+of other Entities during the perception so there are no
+background actions which may pass unnoticed.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Let the Entity handle the Event.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
+    <pre>Entity has already handled the Event.
+Display a single frame to show the result.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Pass the Event to the dropping Entity and spawn the dropped Entity.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a></div>
+    <pre>Let the Entity picking up the item handle the Event.
+The Client has already put the item Entity from Client.room into
+client.rack.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
+    <pre>Called with an instance of SaysEvent
+when the UserInterface is ready to display what Entities say.
+In this method you have to compute a number of frames for
+displaying text and animation for each SaysEvent depending
+on how long the text is. Once you start displaying the text,
+you have to notify the affected Entity. You should catch
+some user confirmation. Consider not to continue  animation
+of other Entities so there are no background actions which may
+pass unnoticed.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.ui.UserInterface.group_events">
+    
+  </a>
+  <a name="group_events">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    group_events(self, message):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Returns a list of lists of parallel events.
+The division is simple: group all subsequent events
+that do not affect the same identifier.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
+    </address>
+  </body>
+</html>

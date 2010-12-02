@@ -8,12 +8,37 @@ import shard.core
 import time
 import datetime
 import pickle
+import traceback
 
 class Client(shard.core.Engine):
     """An instance of this class is the main engine in every Shard client.
        It connects to the Client Interface and to the UserInterface,
        passes events and keeps track of Entities.
        It is normally instantiated in shard.run.
+
+       Additional attributes:
+
+       Client.player_id
+           The unique id for this Client.
+
+       Client.await_confirmation
+       Client.got_empty_message
+           Flags used by Client.run()
+
+       Client.message_sent
+           Buffer for sent message
+
+       Client.timestamp
+           Timestamp to detect server dropouts
+
+       Client.message_timestamp
+           Timestamp for Message log
+
+       Client.message_log_file
+           Open stream to record a list of Messages and time intervals
+
+       Client.local_moves_to_event
+           Cache for the latest local MovesToEvent
     """
 
     ####################
@@ -85,9 +110,9 @@ class Client(shard.core.Engine):
         self.message_timestamp = None
 
         # The message log file records
-        # is a list of Messages and time intervals
+        # a list of Messages and time intervals
         #
-        self.message_log_file = open("messages-%s.log" % player_id, "w")
+        self.message_log_file = open("messages-{}.log".format(player_id), "wb")
 
         # Remember the latest local MovesToEvent
         #
@@ -154,12 +179,19 @@ class Client(shard.core.Engine):
 
                 # timedifference as seconds + tenth of a second
                 #
+                exception = ''
+                try:
+                    self.message_log_file.write(pickle.dumps((timedifference.seconds
+                                                              + timedifference.microseconds / 1000000.0,
+                                                              server_message),
+                                                             0))
+                except:
+                    exception = traceback.format_exc()
+                    self.logger.debug("exception trying to pickle server message {}:\n{}".format(server_message, exception))
+
                 # Add double newline as separator
                 #
-                self.message_log_file.write(pickle.dumps((timedifference.seconds
-                                                          + timedifference.microseconds / 1000000.0,
-                                                          server_message),
-                                                         0) + "\n\n")
+                self.message_log_file.write(bytes("\n\n", "utf_8"))
 
                 # Renew timestamp
                 #
@@ -191,6 +223,8 @@ class Client(shard.core.Engine):
                 # These methods may add events for the plugin engine
                 # to self.message_for_plugin
                 #
+                # TODO: This really should return a message, instead of giving one to write to
+                #
                 self.event_dict[current_event.__class__](current_event,
                                                          message = self.message_for_plugin)
 
@@ -212,8 +246,6 @@ class Client(shard.core.Engine):
             # been applied and processed. Clean up.
             #
             self.message_for_plugin = shard.Message([])
-            self.message_for_plugin.has_EnterRoomEvent = False
-            self.message_for_plugin.has_RoomCompleteEvent = False
 
             # TODO: possibly unset "AwaitConfirmation" flag
             # If there has been a Confirmation for a LookAt or
@@ -266,7 +298,7 @@ class Client(shard.core.Engine):
                     #
                     for event in message_from_plugin.event_list:
 
-                        if isinstance(event, shard.AttemptEvent):
+                        if isinstance(event, shard.TriesToMoveEvent):
 
                             # TODO: similar to Server.process_TriesToMoveEvent()
 
@@ -283,8 +315,7 @@ class Client(shard.core.Engine):
                             #
                             # Only allow certain vectors
                             #
-                            if (difference in ((0, 1), (0, -1), (1, 0), (-1, 0))
-                                and isinstance(event, shard.TriesToMoveEvent)):
+                            if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
                                 self.logger.debug("applying TriesToMoveEvent locally")
 
@@ -305,46 +336,20 @@ class Client(shard.core.Engine):
                                 # by the server in very short time.
                                 #
                                 try:
-                                    # Check tile type
-                                    #
-                                    tile = self.room.floor_plan[event.target_identifier].tile 
+                                    if self.tile_is_walkable(event.target_identifier):
 
-                                    if tile.tile_type == shard.FLOOR:
-
-                                        # Check if this field is occupied
+                                        moves_to_event = shard.MovesToEvent(event.identifier,
+                                                                            event.target_identifier)
+ 
+                                        # Update room, needed for UserInterface
                                         #
-                                        occupied = False
+                                        self.process_MovesToEvent(moves_to_event,
+                                                                  message = self.message_for_plugin)
 
-                                        for entity in self.room.floor_plan[event.target_identifier].entities:
-
-                                            if entity.entity_type == shard.ITEM_BLOCK:
-
-                                                occupied = True
-
-                                        if occupied:
-
-                                            # Instead of
-                                            #self.message_for_plugin.event_list.append(shard.AttemptFailedEvent(event.identifier))
-                                            # we wait for the server to respond with
-                                            # AttemptFailedEvent
-                                            #
-                                            pass
-
-                                        else:
-                                            # All clear. Go!
-                                            #
-                                            moves_to_event = shard.MovesToEvent(event.identifier,
-                                                                                event.target_identifier)
-     
-                                            # Update room, needed for UserInterface
-                                            #
-                                            self.process_MovesToEvent(moves_to_event,
-                                                                      message = self.message_for_plugin)
-
-                                            # Remember event for crosscheck with
-                                            # event from Server
-                                            #
-                                            self.local_moves_to_event = moves_to_event
+                                        # Remember event for crosscheck with
+                                        # event from Server
+                                        #
+                                        self.local_moves_to_event = moves_to_event
 
                                     else:
                                         # Instead of
@@ -363,11 +368,18 @@ class Client(shard.core.Engine):
                                     #
                                     pass
 
-                    # Since we had player input, we now await confirmation
+                    # If any of the Events to be sent is an AttemptEvent, we now
+                    # await confirmation
                     #
-                    self.logger.debug("awaiting confirmation, discarding further user input")
+                    has_attempt_event = False
 
-                    self.await_confirmation = True
+                    for event in message_from_plugin.event_list:
+
+                        if isinstance(event, shard.AttemptEvent):
+
+                            self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+
+                            self.await_confirmation = True
 
                     # Reset dropout timer
                     #
@@ -415,10 +427,10 @@ class Client(shard.core.Engine):
     # Auxiliary Methods
 
     def process_AttemptFailedEvent(self, event, **kwargs):
-        """Unset await_confirmation flag.
+        """Possibly revert movement or call default, then unblock the client.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("attempt failed for '{}'".format(event.identifier))
 
         # Did this fail for the Entity we just moved locally?
         #
@@ -442,18 +454,31 @@ class Client(shard.core.Engine):
 
             self.logger.debug("%s now reverted to %s" % (event.identifier,
                                                          (restored_x, restored_y)))
+        # Call default to forward to the Plugin.
+        #
+        shard.core.Engine.process_AttemptFailedEvent(self,
+                                                     event,
+                                                     message = kwargs["message"])
+
         if event.identifier == self.player_id:
 
             self.await_confirmation = False
 
-    #def process_CanSpeakEvent(self, event, **kwargs):
-    #    """Currently not implemented."""
-    #    #    Engine: if there was a Confirmation and
-    #    #    it has been applied or if there was an
-    #    #    AttemptFailedEvent: unset "AwaitConfirmation" flag
-    #    # Pass on the event.
-    #    #
-    #    message.event_list.append(event)
+    def process_CanSpeakEvent(self, event, **kwargs):
+        """Call default and unblock client.
+        """
+
+        # Call default.
+        #
+        shard.core.Engine.process_CanSpeakEvent(self,
+                                                event,
+                                                message = kwargs["message"])
+
+        # TriesToTalkTo confirmed
+        #
+        if event.identifier == self.player_id:
+
+            self.await_confirmation = False
 
     def process_DropsEvent(self, event, **kwargs):
         """Remove affected Entity from rack,
@@ -466,8 +491,8 @@ class Client(shard.core.Engine):
         # Call default.
         #
         shard.core.Engine.process_DropsEvent(self,
-                                                       event,
-                                                       message = kwargs["message"])
+                                             event,
+                                             message = kwargs["message"])
 
         # Drop confirmed
         #
@@ -482,8 +507,8 @@ class Client(shard.core.Engine):
         # Call default.
         #
         shard.core.Engine.process_ChangeStateEvent(self,
-                                                             event,
-                                                             message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
         # ChangeState confirmed
         #
@@ -531,8 +556,8 @@ class Client(shard.core.Engine):
             # Call default implementation
             #
             shard.core.Engine.process_MovesToEvent(self,
-                                                             event,
-                                                             message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
             # Only allow new input if the last
             # MovesToEvent has been confirmed.
@@ -552,8 +577,8 @@ class Client(shard.core.Engine):
         # Call default
         #
         shard.core.Engine.process_PicksUpEvent(self,
-                                                         event,
-                                                         message = kwargs["message"])
+                                               event,
+                                               message = kwargs["message"])
 
         # picking up confirmed
         #
@@ -575,8 +600,8 @@ class Client(shard.core.Engine):
         # Call default implementation
         #
         shard.core.Engine.process_PerceptionEvent(self,
-                                                            event, 
-                                                            message = kwargs["message"])
+                                                  event, 
+                                                  message = kwargs["message"])
 
     #def process_SaysEvent(self, event, **kwargs):
     #    """The UserInterface usually must display the 
@@ -601,8 +626,8 @@ class Client(shard.core.Engine):
             # queues it in the Message given
             #
             shard.core.Engine.process_DeleteEvent(self,
-                                                            event,
-                                                            message = kwargs["message"])
+                                                  event,
+                                                  message = kwargs["message"])
 
         else:
             self.logger.warn("Entity to delete does not exist.")
@@ -616,7 +641,7 @@ class Client(shard.core.Engine):
 
         # Delete old room and create new
         #
-        self.room = shard.Room()
+        self.room = shard.Room(event.room_identifier)
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them
@@ -627,16 +652,11 @@ class Client(shard.core.Engine):
         #
         self.deleted_entities_dict = {}
 
-        # Finally set the flag in the Message
-        # for the UserInterface.
-        #
-        kwargs["message"].has_EnterRoomEvent = True
-
         # Call default implementation
         #
         shard.core.Engine.process_EnterRoomEvent(self,
-                                                           event,
-                                                           message = kwargs["message"])
+                                                 event,
+                                                 message = kwargs["message"])
 
     def process_RoomCompleteEvent(self, event, **kwargs):
         """The event is queued for the UserInterface here.
@@ -646,13 +666,8 @@ class Client(shard.core.Engine):
            should have saved all important data in data structures.
         """
 
-        # This is a convenience flag so the UserInterface
-        # does not have to scan the event_list.
-        #
-        kwargs["message"].has_RoomCompleteEvent = True
-
         # Call default implementation
         #
         shard.core.Engine.process_RoomCompleteEvent(self,
-                                                              event,
-                                                              message = kwargs["message"])
+                                                    event,
+                                                    message = kwargs["message"])

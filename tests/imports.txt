@@ -1,0 +1,20 @@
+Doctests for the Shard Package
+==============================
+
+Core Modules and Imports
+------------------------
+
+First, make sure all core modules import fine:
+
+    >>> import shard
+    >>> import shard.eventprocessor
+    >>> import shard.assets
+    >>> import shard.core
+    >>> import shard.core.client
+    >>> import shard.core.server
+    >>> import shard.interfaces
+    >>> import shard.plugins
+    >>> import shard.plugins.ui
+    >>> import shard.plugins.pygameui
+    >>> import shard.run
+    >>>

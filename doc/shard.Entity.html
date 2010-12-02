@@ -10,14 +10,14 @@
     
   </head>
   <body>
-    <h1 class="class">Class s.Entity(<a href="shard.eventprocessor.EventProcessor.html">shard.eventprocessor.EventProcessor</a>):</h1>
+    <h1 class="class">Class s.Entity(<span title="shard.eventprocessor.EventProcessor">shard.eventprocessor.EventProcessor</span>):</h1>
     <p>
       <span id="part">Part of <a href="shard.html">shard</a></span>
       
       <a href="classIndex.html#shard.Entity">View In Hierarchy</a>
     </p>
     <div>
-      
+      <p>Known subclasses: <a href="shard.plugins.pygameui.PygameEntity.html">shard.plugins.pygameui.PygameEntity</a></p>
     </div>
     <pre>An Entity is a Shard game object.
 This is the base class for the player, NPCs and items.
@@ -31,22 +31,19 @@ Entity.identifier
     Must be an object whose string representation yields an unique
     identification.
 
-Entity.asset
+Entity.asset_desc
     Preferably a string with a file name or an URI of a media file
-    containing the data for visualizing the Entity. Do not put large
-    objects here since Entities are pushed around quite a bit and
-    transfered across the network.
-    The UserInterface may fetch the asset and attach it to the instance
-    of the Entity.
+    containing the data for visualizing the Entity.
+
+Entity.asset
+    The actual asset, application-dependent. The UserInterface may fetch
+    the asset using Entity.asset_desc and attach it here.
 
 Entity.state
     The state the Entity is in. Defaults to None.
 
-In addition,
-
 Entity.user_interface
-
-is added by and points to the UserInterface instance.
+    Pointer to the UserInterface instance.
 
 A Shard Client should use subclasses (possibly with multiple inheritance)
 or custom attachements to instances of this class to implement the game
@@ -60,7 +57,7 @@ how it handles game objects.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id47">
+      <table class="children sortable" id="id94">
   
   
 <tr class="method">
@@ -99,136 +96,12 @@ how it handles game objects.</pre>
     <td>Method</td>
     <td><a href="shard.Entity.html#process_SaysEvent">process_SaysEvent</a></td>
     <td><tt>This method is called by the UserInterface.</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
-        </p>
-        <table class="children sortable" id="id48">
-  
-  
-<tr class="basemethod">
+  </tr><tr class="method">
     
     
     <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><a href="shard.Entity.html#__repr__">__repr__</a></td>
+    <td><tt>Readable and informative string representation.</tt></td>
   </tr>
   
 </table>
@@ -249,16 +122,17 @@ how it handles game objects.</pre>
   <div class="functionHeader">
     
     def
-    __init__(self, entity_type, identifier, asset):
+    __init__(self, entity_type, identifier, asset_desc):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#__init__">shard.eventprocessor.EventProcessor.__init__</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEntity.html">shard.plugins.pygameui.PygameEntity</a></div>
     <pre>Initialise.
 This method sets up the following attributes from the values given:
 
 Entity.entity_type
 Entity.identifier
+Entity.asset_desc
 Entity.asset
 Entity.state</pre>
   </div>
@@ -276,7 +150,7 @@ Entity.state</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">shard.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEntity.html">shard.plugins.pygameui.PygameEntity</a></div>
     <pre>This method is called by the UserInterface.
 The Entity representation has to execute the according action over
 the course of Entity.action_frames frames. But it must du so in an
@@ -298,7 +172,7 @@ call another method once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">shard.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
+    
     <pre>This method is called by the UserInterface.
 The Entity representation has to execute the according action over
 the course of Entity.action_frames frames. But it must du so in an
@@ -320,7 +194,7 @@ call another method once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div>
+    
     <pre>This method is called by the UserInterface.
 The Entity representation has to execute the according action over
 the course of Entity.action_frames frames. But it must du so in an
@@ -342,7 +216,7 @@ call another method once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">shard.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
+    
     <pre>This method is called by the UserInterface.
 The Entity representation has to execute the according action over
 the course of Entity.action_frames frames. But it must du so in an
@@ -364,7 +238,7 @@ call another method once per frame, do the actual work there.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
+    
     <pre>This method is called by the UserInterface.
 The Entity representation has to execute the according action over
 the course of Entity.action_frames frames. But it must du so in an
@@ -372,9 +246,27 @@ non-blocking fashion - this method must return as soon as possible.
 So do set up counters or frame queues here. Your implementation may
 call another method once per frame, do the actual work there.</pre>
   </div>
+</div><div class="function">
+  <a name="shard.Entity.__repr__">
+    
+  </a>
+  <a name="__repr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __repr__(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Readable and informative string representation.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
     </address>
   </body>
 </html>

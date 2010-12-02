@@ -17,7 +17,7 @@
       <a href="classIndex.html#shard.eventprocessor.EventProcessor">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a>, <a href="shard.Room.html">shard.Room</a></p>
+      <p>Known subclasses: <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.Plugin.html">shard.plugins.Plugin</a></p>
     </div>
     <pre>This is the base class for all Shard objects that process events.
     </pre>
@@ -25,7 +25,7 @@
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id83">
+      <table class="children sortable" id="id105">
   
   
 <tr class="method">
@@ -34,6 +34,18 @@
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#__init__">__init__</a></td>
     <td><tt>Set up EventProcessor.event_dict</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
   </tr><tr class="method">
     
     
@@ -208,10 +220,46 @@
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.plugin.Plugin.html">shard.plugin.Plugin</a>, <a href="shard.Room.html">shard.Room</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.Plugin.html">shard.plugins.Plugin</a></div>
     <pre>Set up EventProcessor.event_dict
 which maps event classes to functions to be called for
 the respective event.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.__getstate__">
+    
+  </a>
+  <a name="__getstate__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __getstate__(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.eventprocessor.EventProcessor.__setstate__">
+    
+  </a>
+  <a name="__setstate__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __setstate__(self, state_dict):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.eventprocessor.EventProcessor.process_TriesToMoveEvent">
@@ -227,7 +275,7 @@ the respective event.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -245,7 +293,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -263,7 +311,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -281,7 +329,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -299,7 +347,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -317,7 +365,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -335,7 +383,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.Room.html">shard.Room</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -353,7 +401,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -371,7 +419,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -389,7 +437,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -407,7 +455,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -425,7 +473,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.pygameui.PygameUserInterface.html">shard.plugins.pygameui.PygameUserInterface</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -443,7 +491,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -461,7 +509,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -479,7 +527,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Entity.html">shard.Entity</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -497,7 +545,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -515,7 +563,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -533,7 +581,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -551,7 +599,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -569,7 +617,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Room.html">shard.Room</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -587,7 +635,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Room.html">shard.Room</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -605,7 +653,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -623,7 +671,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -641,7 +689,7 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.Room.html">shard.Room</a>, <a href="shard.user.UserInterface.html">shard.user.UserInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a>, <a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
@@ -659,13 +707,13 @@ The default implementation does nothing.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a></div>
+    <div class="interfaceinfo">overridden in <a href="shard.core.Engine.html">shard.core.Engine</a>, <a href="shard.plugins.serverside.DefaultGame.html">shard.plugins.serverside.DefaultGame</a></div>
     <pre>Process the Event.
 The default implementation does nothing.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
     </address>
   </body>
 </html>

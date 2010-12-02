@@ -12,15 +12,46 @@
 # Converted from run_shard.py on 06. Oct 2009
 
 import shard.assets
-import shard.user
 import shard.core.client
-import shard.plugin
 import shard.core.server
+import shard.plugins
+import shard.plugins.ui
 import shard.interfaces
 
-import _thread
+import threading
 import logging
 from time import sleep
+
+import sys
+import traceback
+import re
+
+class ShardFileFormatter(logging.Formatter):
+    """Subclass of Formatter with reasonable module information.
+    """
+
+    def __init__(self, fmt, datefmt):
+        """Compile a regular expression object, then call base class __init__().
+        """
+        logging.Formatter.__init__(self, fmt, datefmt)
+
+        self.module_re = re.compile("^.*shard/([^/]+/)*?([^/]+)(/__init__)*.py$")
+
+    def format(self, record):
+        """Override logging.Formatter.format()
+        """
+        
+        # Reformat path to module information
+        #
+        record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
+
+        # Fixed-length line number
+        #
+        record.lineno = "{:3}".format(record.lineno)
+
+        # Call base class implementation
+        #
+        return logging.Formatter.format(self, record)
 
 class App:
     """An App instance represents a Shard client or server application.
@@ -46,14 +77,15 @@ class App:
            an App instance.
     """
 
-    def __init__(self, loglevel, test = False):
+    def __init__(self, loglevel, timeout = 0):
         """Initialise the application.
 
            loglevel is one of "d" (DEBUG), "i" (INFO), "w" (WARNING),
            "e" (ERROR), "c" (CRITICAL).
 
-           When called with test = True, the engine will receive an
-           exit signal after some seconds. This feature is meant for unit tests.
+           timeout is the number of seconds after which the engine will receive
+           an exit signal. This feature is meant for unit tests. timeout = 0
+           will run for an unlimited time.
         """
 
         ### Set up logging
@@ -81,14 +113,18 @@ class App:
         # + "%(levelname)-5s "
         # + "\x1b\x5b\x33\x39\x6d"
 
-        stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
-                                             + "%(funcName)s() "
-                                             + "\x1b\x5b\x33\x39\x6d"
-                                             + "%(message)s")
+        # Fancy coloring for Unix terminals:
+        #stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
+        #                                     + "%(funcName)s() "
+        #                                     + "\x1b\x5b\x33\x39\x6d"
+        #                                     + "%(message)s")
+        
+        stderr_formatter = logging.Formatter("%(funcName)s() %(message)s")
 
         self.stderr_handler.setFormatter(stderr_formatter)
 
         # File handler
+        #
         # TODO: Different file names for client and server?
         # TODO: Checking for existing file, creating a new one?
         #
@@ -99,11 +135,11 @@ class App:
 
         # Loglevel:
         # + "%(levelname)-5s "
+        # Line number:
+        # "[%(lineno)s]"
 
-        file_formatter = logging.Formatter("%(asctime)s "
-                                           + "%(filename)s [%(lineno)s] %(funcName)s() : %(message)s"
-                                           ,
-                                           "%Y-%m-%d %H:%M:%S")
+        file_formatter = ShardFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s",
+                                            "%Y-%m-%d %H:%M:%S")
 
         self.file_handler.setFormatter(file_formatter)
 
@@ -114,11 +150,11 @@ class App:
 
         # Done with logging setup.
 
-        self.test = test
+        self.timeout = timeout
 
         self.assets_class = shard.assets.Assets
-        self.user_interface_class = shard.user.UserInterface
-        self.server_plugin_class = shard.plugin.Plugin
+        self.user_interface_class = shard.plugins.ui.UserInterface
+        self.server_plugin_class = shard.plugins.Plugin
 
     def run_client(self, framerate, interface, player_id):
         """Run a Shard client with the parameters given.
@@ -140,7 +176,11 @@ class App:
                                           player_id)
 
         def exit():
-            sleep(3)
+            """Wait for some time given in App.__init__(), then emulate a server
+               connection, then emulate an exit request from the client plugin
+               (user interface).
+            """
+            sleep(self.timeout)
             client.interface.connections["server"] = shard.interfaces.MessageBuffer()
             plugin.exit_requested = True
 
@@ -155,12 +195,19 @@ class App:
 
         plugin = self.server_plugin_class(self.logger)
 
+        # Since the Server will run in the main thread, signal handlers can
+        # be installed.
+        #
         server = shard.core.server.Server(interface,
                                           plugin,
                                           self.logger,
-                                          framerate)
+                                          framerate,
+                                          threadsafe = False)
         def exit():
-            sleep(3)
+            """Wait for some time given in App.__init__(), then call
+               server.handle_exit().
+            """
+            sleep(self.timeout)
             server.handle_exit(2, None)
 
         self.run(interface, server, exit)
@@ -169,7 +216,9 @@ class App:
         """Helper method to be called from run_client() or run_server().
         """
 
-        _thread.start_new_thread(interface.handle_messages, ())
+        interface_thread = threading.Thread(target = interface.handle_messages,
+                                            name = "handle_messages")
+        interface_thread.start()
 
         # Or instead, for debugging:
         #
@@ -177,8 +226,10 @@ class App:
 
         # Exit trigger for non-interactive unit tests
         #
-        if self.test and exit_function is not None:
-            _thread.start_new_thread(exit_function, ())
+        if self.timeout > 0 and exit_function is not None:
+            exit_thread = threading.Thread(target = exit_function,
+                                           name = "exit_function")
+            exit_thread.start()
 
         # This method will block until the Engine exits
         #
@@ -206,17 +257,20 @@ class App:
         client_message_buffer = shard.interfaces.MessageBuffer()
         client_interface.connections["server_connection"] = client_message_buffer
 
-        # Proxy for function
+        # Proxy for use in functions
         #
         logger = self.logger
 
         def handle_messages():
-            logger.debug("starting up")
+            """Interconnect client and server Interface.
+            """
+
+            logger.debug("starting up, slowing down to {} fps".format(framerate))
 
             # Run thread as long as no shutdown is requested
             #
             while not (server_interface.shutdown_flag
-                       or server_interface.shutdown_flag):
+                       or client_interface.shutdown_flag):
 
                 if len(server_message_buffer.messages_for_remote):
                     message = server_message_buffer.messages_for_remote.popleft()
@@ -225,6 +279,10 @@ class App:
                 if len(client_message_buffer.messages_for_remote):
                     message = client_message_buffer.messages_for_remote.popleft()
                     server_message_buffer.messages_for_local.append(message)
+
+                # Slow down
+                #
+                sleep(1 / framerate)
 
             # Caught shutdown notification, stopping thread
             #
@@ -244,48 +302,73 @@ class App:
         assets = self.assets_class(self.logger)
 
         user_interface = self.user_interface_class(assets,
-                                                             framerate,
-                                                             self.logger)
+                                                   framerate,
+                                                   self.logger)
 
         client = shard.core.client.Client(client_interface,
-                                                         user_interface,
-                                                         self.logger,
-                                                         player_id)
+                                          user_interface,
+                                          self.logger,
+                                          player_id)
         # Setting up server
         #
         server_plugin = self.server_plugin_class(self.logger)
 
         server = shard.core.server.Server(server_interface,
-                                                         server_plugin,
-                                                         self.logger,
-                                                         framerate)
+                                          server_plugin,
+                                          self.logger,
+                                          framerate,
+                                          threadsafe = True)
 
-        # exit function for testing
+        # Client exit function for testing
         #
-        def exit():
-            sleep(3)
+        def client_exit():
+            """Wait for some time given in App.__init__(), the emulate an
+               UserInterface exit request.
+            """
+            sleep(self.timeout)
             user_interface.exit_requested = True
-            server.handle_exit(2, None)
 
         # Starting threads
         #
-        _thread.start_new_thread(handle_messages, ())
+        interface_thread = threading.Thread(target = handle_messages,
+                                            name = "handle_messages")
+        interface_thread.start()
 
-        _thread.start_new_thread(client.run, ())
+        # Client must run in main thread to be able to interact properly
+        # with the OS (think Pygame events). So we put the server in a thread.
+        #
+        server_thread = threading.Thread(target = server.run,
+                                         name = "server_thread")
+        server_thread.start()
 
         # Exit trigger for non-interactive unit tests
         #
-        if self.test:
-            _thread.start_new_thread(exit, ())
+        if self.timeout > 0:
+            client_exit_thread = threading.Thread(target = client_exit,
+                                                  name = "client_exit")
+            client_exit_thread.start()
 
-        # This method will block until the server exits.
-        # Cannot be put in a thread since the server installs signal handlers.
+        # This method will block until the client exits.
+        # Strangely, tracebacks in this main thread are not printed, so they
+        # are logged.
         #
-        server.run()
+        exception = ''
+        try:
+            client.run()
+        except:
+            exception = traceback.format_exc()
+            self.logger.debug("exception in client.run():\n{}".format(exception))
 
-        # Just to be sure
-        #
-        sleep(3)
+        self.logger.debug("client exited, calling server.handle_exit()")
+        server.handle_exit(2, None)
+
+        self.logger.debug("waiting for server thread to stop")
+        server_thread.join()
+
+        self.logger.info("server thread stopped, shutting down logger")
+
+        if exception:
+            self.logger.debug("exception in client.run() was:\n{}".format(exception))
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

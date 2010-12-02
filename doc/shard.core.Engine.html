@@ -26,17 +26,24 @@ Engine, so the use of this class is providing a structure for Engines.
 Attributes:
 
 Engine.logger
+
 Engine.interface
+
 Engine.plugin
+
 Engine.message_for_plugin
+
 Engine.message_for_remote
+
 Engine.room
+    An instance of shard.Room, initialy None.
+
 Engine.rack</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id61">
+      <table class="children sortable" id="id14">
   
   
 <tr class="method">
@@ -104,7 +111,7 @@ Engine.rack</pre>
     
     <td>Method</td>
     <td><a href="shard.core.Engine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Respawn the Entity to be dropped in Engine.room,</tt></td>
+    <td><tt>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.</tt></td>
   </tr><tr class="method">
     
     
@@ -201,6 +208,34 @@ Engine.rack</pre>
     <td>Method</td>
     <td><a href="shard.core.Engine.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#tile_is_walkable">tile_is_walkable</a></td>
+    <td><tt>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a>:
+        </p>
+        <table class="children sortable" id="id15">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
   </tr>
   
 </table>
@@ -422,9 +457,8 @@ PicksUpEvent on.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">shard.eventprocessor.EventProcessor.process_DropsEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.core.client.Client.html">shard.core.client.Client</a></div>
-    <pre>Respawn the Entity to be dropped in Engine.room,
-delete it from Engine.rack
-and pass the PicksUpEvent on.</pre>
+    <pre>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.core.Engine.process_ManipulatesEvent">
@@ -458,7 +492,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">shard.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">shard.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.core.client.Client.html">shard.core.client.Client</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -658,18 +692,13 @@ delete the it from Engine.room and pass the DeleteEvent on.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.core.client.Client.html">shard.core.client.Client</a>, <a href="shard.core.server.Server.html">shard.core.server.Server</a></div>
     <pre>The default implementation simply forwards the Event.
-On the client side, an EnterRoomEvent
-means that the server is about to send
-a new map, respawn the player and send
-items and NPCs.
-On the server side, things may be a little
-more complicated. In a single player
-scenario the server might replace the
-current room or save it to be able to
-return to it later. In a multiplayer
-environment however the server has
-to set up another room to manage in
-parallel to the established rooms.</pre>
+On the client side, an EnterRoomEvent means that the server is about
+to send a new map, respawn the player and send items and NPCs.
+On the server side, things may be a little more complicated. In a
+single player scenario the server might replace the current room or
+save it to be able to return to it later. In a multiplayer
+environment however the server has to set up another room to manage
+in parallel to the established rooms.</pre>
   </div>
 </div><div class="function">
   <a name="shard.core.Engine.process_RoomCompleteEvent">
@@ -725,9 +754,27 @@ and add it to message.</pre>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
+</div><div class="function">
+  <a name="shard.core.Engine.tile_is_walkable">
+    
+  </a>
+  <a name="tile_is_walkable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_is_walkable(self, target_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
     </address>
   </body>
 </html>

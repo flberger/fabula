@@ -8,17 +8,53 @@
 # Renamed from PresentationEngine to UserInterface on 14. Oct 2010
 
 import shard
-import shard.plugin
+import shard.plugins
 import time
 
-class UserInterface(shard.plugin.Plugin):
+class UserInterface(shard.plugins.Plugin):
     """This is the base class for an UserInterface for the Shard Client.
        Subclasses should override the appropriate methods of this class
-       and implement a graphical representation of the game and the 
+       and implement a graphical representation of the game and the
        action. Shard is based on a two-dimensional map, but apart from
        that it makes very few assumptions about the graphical rendering.
-       Thus it is possible to write 2D and 3D UserInterfaces and 
+       Thus it is possible to write 2D and 3D UserInterfaces and
        even a text interface.
+
+       Attributes:
+
+       UserInterface.action_time
+           Set how long actions like a movement from Map element to Map element
+           take, in seconds.
+
+       UserInterface.framerate
+       UserInterface.assets
+           framerate and assets manager
+
+       UserInterface.action_frames
+           The number of frames per action.
+
+       UserInterface.action_countdown
+           A copy of action_frames used in UserInterface.process_message().
+
+       UserInterface.event_queue
+           A queue for Events of a Message to be rendered later.
+           UserInterface.action_countdown will be counted down between
+           processing the Events.
+
+       UserInterface.exit_requested
+           The UserInterface is responsible for catching an exit request by the
+           user. This value is checked in the Client main loop.
+
+       UserInterface.freeze
+           Flag whether to display the game and collect input.
+           True upon initialisation.
+
+       UserInterface.room
+           Variables to be filled by the Client before each call to
+           process_message()
+
+       UserInterface.direction_vector_dict
+           Convenience dict converting symbolic directions to a vector
     """
 
     ####################
@@ -33,7 +69,7 @@ class UserInterface(shard.plugin.Plugin):
 
         # First set up the plugin
         #
-        shard.plugin.Plugin.__init__(self, logger)
+        shard.plugins.Plugin.__init__(self, logger)
 
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.
@@ -49,9 +85,11 @@ class UserInterface(shard.plugin.Plugin):
         #
         self.action_frames = int(self.action_time * self.framerate)
 
+        self.logger.debug("action_time == {} s, action_frames == {}".format(self.action_time, self.action_frames))
+
         # A copy to count down.
         # Creates a copy since action_frames is immutable.
-        # 
+        #
         self.action_countdown = self.action_frames
 
         # A queue for Events of a Message to be
@@ -69,10 +107,14 @@ class UserInterface(shard.plugin.Plugin):
         #
         self.exit_requested = False
 
+        # Flag whether to display the game and collect input
+        #
+        self.freeze = True
+
         # Variables to be filled by the Client
         # before each call to process_message()
         #
-        self.room = shard.Room()
+        self.room = None
 
         # Convenience dict converting symbolic
         # directions to a vector
@@ -86,13 +128,6 @@ class UserInterface(shard.plugin.Plugin):
                                       (0, 1) : "v",
                                       (-1, 0) : "<"}
 
-        # Are we waiting for a RoomCompleteEvent after
-        # an EnterRoomEvent? Upon initialization this
-        # is True, since a room has not yet been
-        # transfered.
-        #
-        self.waiting_for_RoomCompleteEvent = True
-
         self.logger.info("complete, now waiting for RoomCompleteEvent")
 
         return
@@ -105,36 +140,29 @@ class UserInterface(shard.plugin.Plugin):
                         room,
                         player_id):
         """This is the main method of the UserInterface.
-           It is called regularly by the Client
-           with a list of events to display (note: the
-           list may be empty). It may take all the time 
-           it needs to render the action, just a couple 
-           or even hundreds of frames, but it must 
-           return once the events have been displayed. 
-           It must neither block completely nor run in 
-           a thread since the Client has to 
-           grab new events and change state between 
-           calls to process_message(). Put that way, 
-           process_message() is simply a part of 
-           Client.run().
-           You should normally not override this method
-           unless you have to do some really advanced
-           stuff. Overriding the other methods of this
-           class (which in turn are called from 
-           process_message()) should be just fine. See 
-           the other methods and the source code for 
-           details.
+           You should normally not override this method unless you have to do
+           some really advanced stuff. Overriding the other methods of this
+           class (which in turn are called from process_message()) should be
+           just fine. See the other methods and the source code for details.
+           This method is called regularly by the Client with a list of events
+           to display (note: the list may be empty). It may take all the time it
+           needs to render the action, just a couple or even hundreds of frames,
+           but it must return once the events have been displayed.
+           It must neither block completely nor run in a thread since the Client
+           has to grab new events and change state between calls to
+           process_message(). Put that way, process_message() is simply a part
+           of Client.run().
         """
 
         # TODO: do we still need to give room and player_id? The should be accessible via Plugin.host, and we can set up proxies here for faster access
 
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
-        # checks, like for duplicate RoomCompleteEvents, 
+        # checks, like for duplicate RoomCompleteEvents,
         # duplicate CanSpeakEvents and similar stuff.
         # Below we assume that everyone behaves nicely.
         # In some weird way we could sell that as
-        # "pythonic" ;-) Hey! Not a consenting adult, 
+        # "pythonic" ;-) Hey! Not a consenting adult,
         # anyone?
 
         ####################
@@ -146,7 +174,7 @@ class UserInterface(shard.plugin.Plugin):
         #
         self.player_id = player_id
 
-        # Reset the list of events triggered by 
+        # Reset the list of events triggered by
         # player actions
         #
         self.message_for_host = shard.Message([])
@@ -155,137 +183,13 @@ class UserInterface(shard.plugin.Plugin):
         #
         event_list = message.event_list
 
-        ####################
-        # Check EnterRoomEvent
-
-        # The first thing to check for is if there has
-        # been an EnterRoomEvent. For our convenience, 
-        # the ControlEngine has set up a flag in the
-        # message, so we simply check that instead
-        # of scanning the whole list.
-        #
-        if message.has_EnterRoomEvent:
-
-            # When this arrives here all data scructures
-            # have already been cleared and possibly
-            # populated with new Entities and a new map.
-            # So we have to ignore everything before
-            # an EnterRoomEvent.
-
-            for event in event_list:
-
-                if isinstance(event, shard.EnterRoomEvent):
-
-                    # See the method for explaination
-                    #
-                    self.process_EnterRoomEvent(event)
-
-            # Set a flag that we are waiting
-            # for RoomCompleteEvent
-            #
-            self.logger.info("now waiting for RoomCompleteEvent")
-
-            self.waiting_for_RoomCompleteEvent = True
-
-        ####################
-        # Check RoomCompleteEvent
-
-        # Next, as long as we are waiting for a
-        # RoomCompleteEvent, nothig will be rendered
-        # and no player input is accepted.
-        #
-        if self.waiting_for_RoomCompleteEvent:
-
-            # The ControlEngine has set a flag for
-            # our convenience.
-            #
-            if message.has_RoomCompleteEvent:
-
-                # TODO: That original design - handling Events before RoomComplete here or not at all, then deleting - can probably be discarded and replaced by an ordinary Plugin behaviour: process all Events with the according methods.
-
-                # By the time the event arrives the 
-                # ControlEngine has gathered all important
-                # data and handed them over to us, so wen can
-                # build a new screen.
-
-                # Load and store assets for tiles and 
-                # Entities using the assets
-                #
-                for current_entity in self.room.entity_dict.values():
-
-                    asset_to_fetch = current_entity.asset
-
-                    try:
-                        retrieved_asset = self.assets.fetch(asset_to_fetch)
-
-                    except:
-                        # See the method for explaination
-                        #
-                        self.display_asset_exception(asset_to_fetch)
-
-                    # After a RoomCompleteEvent all Entites
-                    # are freshly created instances. We
-                    # replace the string describing the
-                    # asset by the data object returned
-                    # by the assets.
-                    #
-                    current_entity.asset = retrieved_asset
-
-                for current_tile in self.room.tile_list:
-
-                    asset_to_fetch = current_tile.asset
-
-                    try:
-                        retrieved_asset = self.assets.fetch(asset_to_fetch)
-
-                    except:
-                        # See the method for explaination
-                        #
-                        self.display_asset_exception(asset_to_fetch)
-
-                    # After a RoomCompleteEvent all tiles
-                    # are freshly created instances. We
-                    # replace the string describing the
-                    # asset by the data object returned
-                    # by the assets.
-                    #
-                    current_tile.asset = retrieved_asset
-
-                # See the method for explaination
-                #
-                self.process_RoomCompleteEvent()
-
-                # Delete everything in the event_list up to and
-                # including the RoomCompleteEvent
-                #
-                while not isinstance(event_list[0], shard.RoomCompleteEvent):
-                    del event_list[0]
-                
-                # Arrived at RoomCompleteEvent. 
-                # Delete it as well.
-                #
-                del event_list[0]
-
-                # No more waiting!
-                #
-                self.waiting_for_RoomCompleteEvent = False
-
-            else:
-                # If there is no RoomCompleteEvent in that message, 
-                # ignore everything.
-
-                # Technically this waiting corresponds to a
-                # frame, though we do not render anything.
-
-                # TODO: Well, we completely lock out the user here. If the server is down, he will not be able to interact with the application (quit, for examlpe).
-
-                # See method for explaination.
-                #
-                self.update_frame_timer()
-
-                # Discard and check the next message.
-                #
-                return self.message_for_host
+        # We used to check for EnterRoomEvent and RoomCompleteEvent here and
+        # discard all inbetween since UserInterface.process_RoomCompleteEvent
+        # was expected to infer the game state, fetch assets and setup the whole
+        # thing. Instead we now treat the setup Events - ChangeMapEvent,
+        # SpawnEvent - like any other event, which is much more in line with
+        # Shard plugin design. UserInterface.process_EnterRoomEvent is expected
+        # to stall the game display.
 
         ####################
         # Countdown and rendering waiting Events
@@ -319,7 +223,7 @@ class UserInterface(shard.plugin.Plugin):
         # frames!
         # MovesTo, Drops and PicksUpEvents take the
         # same number of frames to render, which is given by
-        # self.action_time * self.framerate. During a 
+        # self.action_time * self.framerate. During a
         # SaysEvent or a PerceptionEvent, animation may even
         # stop for some time. These events are displayed last.
 
@@ -438,14 +342,13 @@ class UserInterface(shard.plugin.Plugin):
     # TODO: Most docstrings describe 2D stuff (images). Rewrite 2D-3D-agnostic.
 
     def display_asset_exception(self, asset):
-        """Called when the assets is unable to retrieve the asset.
+        """Called when assets is unable to retrieve the asset.
            This is a serious error which usually prohibits continuation.
            The user should be asked to check his installation, file system
            or network connection.
         """
 
-        self.logger.critical("Asset could not be fetched: %s. Aborting."
-                             % asset)
+        self.logger.critical("Asset could not be fetched: {}. Aborting.".format(asset))
 
         raise SystemExit
 
@@ -463,11 +366,12 @@ class UserInterface(shard.plugin.Plugin):
         return
 
     def display_single_frame(self):
-        """Called when the UserInterface needs to render a single frame
-           of the current game state. There is nothing special going on here,
-           so you should notify the Entities that there is a next frame to be
-           displayed (whichever way that is done in your implementation) and
-           update their graphics.
+        """Called when the UserInterface needs to render a single frame of the current game state.
+           There is nothing special going on here, so you should notify the
+           Entities that there is a next frame to be displayed (whichever way
+           that is done in your implementation) and update their graphics.
+           You might want to check the UserInterface.freeze flag whether to
+           display the game and accept input.
         """
 
         # You might want to restrict your updates to
@@ -483,7 +387,7 @@ class UserInterface(shard.plugin.Plugin):
         """Called when the UserInterface wants to capture the user's reaction.
            The module you use for actual graphics rendering most probably
            has a way to capture user input. When overriding this method,
-           you have to convert the data provided by your module into Shard 
+           you have to convert the data provided by your module into Shard
            events, most probably instances of shard.AttemptEvent. You must
            append them to self.message_for_host which is evaluated by the
            ControlEngine.
@@ -499,7 +403,7 @@ class UserInterface(shard.plugin.Plugin):
 
         self.logger.debug("called")
 
-        user_input = raw_input("Quit? (y/n):")
+        user_input = input("Quit? (y/n):")
 
         if user_input == "y":
 
@@ -514,14 +418,14 @@ class UserInterface(shard.plugin.Plugin):
     #       All visible Entities are already
     #       notified about their state at this point.
     #       This method must render exactly
-    #       self.action_frames frames. You have to 
-    #       compute a movement for each Entity in the 
-    #       list of MovesToEvent instances provided. 
-    #       Note that this list may be empty, but even 
-    #       then you have to render the full number of 
-    #       frames to display PickUp and Drop animations. 
-    #       You might get away with just changing the 
-    #       screen coordinates and calling 
+    #       self.action_frames frames. You have to
+    #       compute a movement for each Entity in the
+    #       list of MovesToEvent instances provided.
+    #       Note that this list may be empty, but even
+    #       then you have to render the full number of
+    #       frames to display PickUp and Drop animations.
+    #       You might get away with just changing the
+    #       screen coordinates and calling
     #       self.display_single_frame()."""
     #
     #    self.logger.debug("called")
@@ -554,22 +458,29 @@ class UserInterface(shard.plugin.Plugin):
            You should override it, blank the screen here and display a waiting
            message since the UserInterface is going to twiddle thumbs until
            it receives a RoomCompleteEvent.
+           The default implementation sets UserInterface.freeze = True.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("entering room: {}".format(event.room_identifier))
 
-        self.display_single_frame()
+        self.logger.debug("freezing")
+        self.freeze = True
+        # TODO: make sure the user can interact with the game (close etc.) even if frozen
 
         return
 
     def process_RoomCompleteEvent(self, event):
         """Called when everything is fetched and ready after a RoomCompleteEvent.
-           Here you should set up the main screen and display some Map
-           elements and Entities.
+           Here you should set up the main screen and display some Map elements
+           and Entities.
+           The default implementation sets UserInterface.freeze = False and
+           displays a single frame.
         """
 
         self.logger.debug("called")
 
+        self.logger.debug("unfreezing")
+        self.freeze = False
         self.display_single_frame()
 
         return
@@ -579,7 +490,7 @@ class UserInterface(shard.plugin.Plugin):
            You have to prompt for appropriate user input here and add a
            corresponding SaysEvent to self.message_for_host, which is
            evaluated by the ControlEngine. The default implementation
-           makes the player say "blah". 
+           makes the player say "blah".
         """
 
         # TODO: Make sure that this is the last event rendered before returning to the ControlEngine?
@@ -601,13 +512,11 @@ class UserInterface(shard.plugin.Plugin):
            visible Entities you might have set up and render a static frame.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
 
         event.entity.user_interface = self
 
-        self.display_single_frame()
-
-        return           
+        return
 
     def process_DeleteEvent(self, event):
         """This method is called with an instance of DeleteEvent.
@@ -624,11 +533,11 @@ class UserInterface(shard.plugin.Plugin):
         return
 
     def process_ChangeMapElementEvent(self, event):
-        """Called with a list of instances of ChangeMapElementEvent.
+        """Called with an instance of ChangeMapElementEvent.
            In this method you must implement a major redraw of the display,
            updating all Map elements and after that all Entities.
            This is only a single frame though.
-           Note that event_list may be empty.
+           Note that event may be empty.
         """
 
         self.logger.debug("called")
@@ -650,7 +559,7 @@ class UserInterface(shard.plugin.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     ####################
     # Event handlers affecting Entities
@@ -659,13 +568,13 @@ class UserInterface(shard.plugin.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("forwarding Event to Entity and displaying a single frame")
 
         self.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
         self.display_single_frame()
 
-        return           
+        return
 
     def process_ChangeStateEvent(self, event):
         """Entity has already handled the Event.
@@ -676,33 +585,39 @@ class UserInterface(shard.plugin.Plugin):
 
         self.display_single_frame()
 
-        return           
+        return
 
     def process_DropsEvent(self, event):
-        """Let the Entity handle the Event.
+        """Pass the Event to the dropping Entity and spawn the dropped Entity.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("passing Event to '{}'".format(event.identifier))
 
         self.room.entity_dict[event.identifier].process_DropsEvent(event)
 
+        # Spawn the dropped Entity
+        #
+        self.logger.debug("spawning '{}' in room".format(event.item_identifier))
+
+        entity = self.room.entity_dict[event.item_identifier]
+
+        self.process_SpawnEvent(shard.SpawnEvent(entity, event.location))
+
         self.display_single_frame()
 
-        return           
+        return
 
     def process_PicksUpEvent(self, event):
-        """Remove the target from all data structures,
-           then let the Entity handle the Event.
-           Possibly update an inventory display.
+        """Let the Entity picking up the item handle the Event.
+           The Client has already put the item Entity from Client.room into
+           client.rack.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("notifying Entity '{}'".format(event.identifier))
 
         self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
-        self.display_single_frame()
-
-        return           
+        return
 
     def process_SaysEvent(self, event):
         """Called with an instance of SaysEvent
@@ -780,7 +695,7 @@ class UserInterface(shard.plugin.Plugin):
         # buffer for an identifier
         #
         identifier = ''
-        
+
         for current_event in message.event_list:
 
             if isinstance(current_event, shard.CanSpeakEvent):
@@ -792,7 +707,7 @@ class UserInterface(shard.plugin.Plugin):
                 # more than one in a message.
                 #
                 buffered_CanSpeakEvent = current_event
-            
+
             elif isinstance(current_event, shard.ChangeMapElementEvent):
 
                 # All these happen in parallel, no identifier
@@ -819,11 +734,11 @@ class UserInterface(shard.plugin.Plugin):
                     # Start a new event group.
                     #
                     grouped_events.append([])
-                
+
                     # Start new
                     #
                     collected_identifiers = []
-                
+
                 else:
                     # identifier is not yet in
                     # current group
@@ -834,7 +749,7 @@ class UserInterface(shard.plugin.Plugin):
                 #
                 grouped_events[-1].append(current_event)
 
-        # All parallel events are grouped now.            
+        # All parallel events are grouped now.
         # Append the CanSpeakEvent if it is there.
         #
         if isinstance(buffered_CanSpeakEvent, shard.CanSpeakEvent):

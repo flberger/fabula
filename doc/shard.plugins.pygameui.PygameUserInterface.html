@@ -1,0 +1,695 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;shard.plugins.pygameui.PygameUserInterface&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class s.p.p.PygameUserInterface(<a href="shard.plugins.ui.UserInterface.html">shard.plugins.ui.UserInterface</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="shard.html">shard</a>.<a href="shard.plugins.html">plugins</a>.<a href="shard.plugins.pygameui.html">pygameui</a></span>
+      
+      <a href="classIndex.html#shard.plugins.pygameui.PygameUserInterface">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="shard.plugins.pygameui.PygameEditor.html">shard.plugins.pygameui.PygameEditor</a></p>
+    </div>
+    <pre>This is a Pygame implementation of an UserInterface for the Shard Client.
+
+Additional attributes:
+
+PygameUserInterface.clock
+    An instance of pygame.time.Clock
+
+PygameUserInterface.big_font
+PygameUserInterface.small_font
+    Pygame.font.Font instances
+
+PygameUserInterface.loading_surface
+PygameUserInterface.loading_surface_position
+    Surface and position for a loading message
+
+PygameUserInterface.inventory_plane
+    Plane to display the inventory
+
+PygameUserInterface.room_plane
+    Plane to display the room
+
+PygameUserInterface.fps_log_counter
+    Counter to log actual fps every &lt;framerate&gt; frames
+
+PygameUserInterface.spacing
+    Spacing between tiles.
+
+PygameUserInterface.window
+    An instance of clickndrag.Display. By default this is 800x600px and
+    windowed.
+
+PygameUserInterface.window.inventory
+    clickndrag Plane for the inventory. By default this is 800x100px
+    with space for 8 100x100px icons and located at the bottom of the
+    window.
+
+PygameUserInterface.window.room
+    clickndrag Plane for the room. By default this is 800x500px with
+    space for 8x5 tiles and located at the top of the window.
+
+PygameUserInterface.fade_surface
+    A black pygame surface for fade effects</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id40">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#__init__">__init__</a></td>
+    <td><tt>This method initialises the PygameUserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#update_frame_timer">update_frame_timer</a></td>
+    <td><tt>Use pygame.time.Clock.tick() to slow down to given framerate.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#display_single_frame">display_single_frame</a></td>
+    <td><tt>Update and render all click'd'drag planes.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#collect_player_input">collect_player_input</a></td>
+    <td><tt>Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Fade window to black and remove subplanes of PygameUserInterface.window.room</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Update and render the Planes of the map elements and fade in the room.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Add a subplane to window.room, possibly fetching an asset before.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Fetch asset and register/replace tile.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Display the perception.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Flash the screen.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Make EntityPlanes surrounding the new position draggable and call the base class method.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Move the item's Plane from window.room to window.inventory.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#inventory_callback">inventory_callback</a></td>
+    <td><tt>Drop callback to issue a TriesToPickUpEvent if the item is not already in Rack.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_clicked_callback">tile_clicked_callback</a></td>
+    <td><tt>Clicked callback to issue a TriesToMoveEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#tile_drop_callback">tile_drop_callback</a></td>
+    <td><tt>Drop callback to issue a TriesToDropEvent.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#entity_dropped_callback">entity_dropped_callback</a></td>
+    <td><tt>Dropped upon callback for Entities.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#display_loading_progress">display_loading_progress</a></td>
+    <td><tt>Display the string representation of the object given on the loading screen while the game is frozen.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.pygameui.PygameUserInterface.html#make_items_draggable">make_items_draggable</a></td>
+    <td><tt>Auxiliary method to make items next to the player draggable.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>:
+        </p>
+        <table class="children sortable" id="id41">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_message">process_message</a></td>
+    <td><tt>This is the main method of the UserInterface.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#display_asset_exception">display_asset_exception</a></td>
+    <td><tt>Called when assets is unable to retrieve the asset.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Called when the UserInterface needs to render a CanSpeakEvent.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Entity has already handled the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Called with an instance of SaysEvent</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.ui.UserInterface.html#group_events">group_events</a></td>
+    <td><tt>Returns a list of lists of parallel events.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.ui.UserInterface.html">UserInterface</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
+        </p>
+        <table class="children sortable" id="id42">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, assets, framerate, logger):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#__init__">shard.plugins.ui.UserInterface.__init__</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEditor.html">shard.plugins.pygameui.PygameEditor</a></div>
+    <pre>This method initialises the PygameUserInterface.
+assets must be an instance of shard.Assets or a subclass.
+framerate must be an integer and sets the maximum (not minimum ;-))
+frames per second the client will run at.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.update_frame_timer">
+    
+  </a>
+  <a name="update_frame_timer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    update_frame_timer(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#update_frame_timer">shard.plugins.ui.UserInterface.update_frame_timer</a></div>
+    <pre>Use pygame.time.Clock.tick() to slow down to given framerate.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.display_single_frame">
+    
+  </a>
+  <a name="display_single_frame">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    display_single_frame(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#display_single_frame">shard.plugins.ui.UserInterface.display_single_frame</a></div>
+    <pre>Update and render all click'd'drag planes.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.collect_player_input">
+    
+  </a>
+  <a name="collect_player_input">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    collect_player_input(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#collect_player_input">shard.plugins.ui.UserInterface.collect_player_input</a></div>
+    <pre>Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_EnterRoomEvent">shard.plugins.ui.UserInterface.process_EnterRoomEvent</a></div>
+    <pre>Fade window to black and remove subplanes of PygameUserInterface.window.room
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_RoomCompleteEvent">shard.plugins.ui.UserInterface.process_RoomCompleteEvent</a></div>
+    <pre>Update and render the Planes of the map elements and fade in the room.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_SpawnEvent">shard.plugins.ui.UserInterface.process_SpawnEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEditor.html">shard.plugins.pygameui.PygameEditor</a></div>
+    <pre>Add a subplane to window.room, possibly fetching an asset before.
+The name of the subplane is the Entity identifier, so the subplane
+is accessible using window.room.&lt;identifier&gt;.
+Entity.asset points to the Plane of the Entity.
+When a Plane has not yet been added, the Entity's class is changed
+to PygameEntity in addition.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_ChangeMapElementEvent">shard.plugins.ui.UserInterface.process_ChangeMapElementEvent</a></div>
+    <pre>Fetch asset and register/replace tile.
+Tile.asset is the Pygame Surface since possibly multiple Planes must
+be derived from a single Tile.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_PerceptionEvent">shard.plugins.ui.UserInterface.process_PerceptionEvent</a></div>
+    <pre>Display the perception.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">shard.eventprocessor.EventProcessor.process_AttemptFailedEvent</a></div>
+    <pre>Flash the screen.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_MovesToEvent">shard.plugins.ui.UserInterface.process_MovesToEvent</a></div>
+    <pre>Make EntityPlanes surrounding the new position draggable and call the base class method.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_DropsEvent">shard.plugins.ui.UserInterface.process_DropsEvent</a></div>
+    <pre>Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.ui.UserInterface.html#process_PicksUpEvent">shard.plugins.ui.UserInterface.process_PicksUpEvent</a></div>
+    <pre>Move the item's Plane from window.room to window.inventory.
+Then call the base class implementation to notify the Entity.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.inventory_callback">
+    
+  </a>
+  <a name="inventory_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    inventory_callback(self, plane, dropped_plane, screen_coordinates):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Drop callback to issue a TriesToPickUpEvent if the item is not already in Rack.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.tile_clicked_callback">
+    
+  </a>
+  <a name="tile_clicked_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_clicked_callback(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Clicked callback to issue a TriesToMoveEvent.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.tile_drop_callback">
+    
+  </a>
+  <a name="tile_drop_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_drop_callback(self, plane, dropped_plane, screen_coordinates):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Drop callback to issue a TriesToDropEvent.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.entity_dropped_callback">
+    
+  </a>
+  <a name="entity_dropped_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    entity_dropped_callback(self, plane, dropped_plane, coordinates):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Dropped upon callback for Entities.
+Adds appropriate Events to PygameUserInterface.message_for_host.</pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.display_loading_progress">
+    
+  </a>
+  <a name="display_loading_progress">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    display_loading_progress(self, obj):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Display the string representation of the object given on the loading screen while the game is frozen.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.pygameui.PygameUserInterface.make_items_draggable">
+    
+  </a>
+  <a name="make_items_draggable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    make_items_draggable(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="shard.plugins.pygameui.PygameEditor.html">shard.plugins.pygameui.PygameEditor</a></div>
+    <pre>Auxiliary method to make items next to the player draggable.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
+    </address>
+  </body>
+</html>

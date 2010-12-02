@@ -17,7 +17,7 @@
       <a href="classIndex.html#shard.user.UserInterface">View In Hierarchy</a>
     </p>
     <div>
-      
+      <p>Known subclasses: <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></p>
     </div>
     <pre>This is the base class for an UserInterface for the Shard Client.
 Subclasses should override the appropriate methods of this class
@@ -25,12 +25,47 @@ and implement a graphical representation of the game and the
 action. Shard is based on a two-dimensional map, but apart from
 that it makes very few assumptions about the graphical rendering.
 Thus it is possible to write 2D and 3D UserInterfaces and 
-even a text interface.</pre>
+even a text interface.
+
+Attributes:
+
+UserInterface.action_time
+    Set how long actions like a movement from Map element to Map element
+    take, in seconds.
+
+UserInterface.framerate
+UserInterface.assets
+    framerate and assets manager
+
+UserInterface.action_frames
+    The number of frames per action.
+
+UserInterface.action_countdown
+    A copy of action_frames used in UserInterface.process_message().
+
+UserInterface.event_queue
+    A queue for Events of a Message to be rendered later.
+    UserInterface.action_countdown will be counted down between
+    processing the Events.
+
+UserInterface.exit_requested
+    The UserInterface is responsible for catching an exit request by the
+    user. This value is checked in the Client main loop.
+
+UserInterface.room
+    Variables to be filled by the Client before each call to
+    process_message()
+
+UserInterface.direction_vector_dict
+    Convenience dict converting symbolic directions to a vector
+
+UserInterface.waiting_for_RoomCompleteEvent
+    Flag, True after initialisation</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id86">
+      <table class="children sortable" id="id25">
   
   
 <tr class="method">
@@ -104,7 +139,7 @@ even a text interface.</pre>
     
     <td>Method</td>
     <td><a href="shard.user.UserInterface.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Called with a list of instances of ChangeMapElementEvent.</tt></td>
+    <td><tt>Called with an instance of ChangeMapElementEvent.</tt></td>
   </tr><tr class="method">
     
     
@@ -154,7 +189,7 @@ even a text interface.</pre>
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugin.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id87">
+        <table class="children sortable" id="id26">
   
   
 <tr class="basemethod">
@@ -259,7 +294,7 @@ even a text interface.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugin.Plugin.html#__init__">shard.plugin.Plugin.__init__</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.plugin.Plugin.html#__init__">shard.plugin.Plugin.__init__</a></div><div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>This method initialises the UserInterface.
 assets must be an instance of shard.Assets or a subclass.
 framerate must be an integer and sets the maximum (not minimum ;-))
@@ -281,25 +316,18 @@ frames per second the client will run in.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.plugin.Plugin.html#process_message">shard.plugin.Plugin.process_message</a></div>
     <pre>This is the main method of the UserInterface.
-It is called regularly by the Client
-with a list of events to display (note: the
-list may be empty). It may take all the time 
-it needs to render the action, just a couple 
-or even hundreds of frames, but it must 
-return once the events have been displayed. 
-It must neither block completely nor run in 
-a thread since the Client has to 
-grab new events and change state between 
-calls to process_message(). Put that way, 
-process_message() is simply a part of 
-Client.run().
-You should normally not override this method
-unless you have to do some really advanced
-stuff. Overriding the other methods of this
-class (which in turn are called from 
-process_message()) should be just fine. See 
-the other methods and the source code for 
-details.</pre>
+You should normally not override this method unless you have to do
+some really advanced stuff. Overriding the other methods of this
+class (which in turn are called from process_message()) should be
+just fine. See the other methods and the source code for details.
+This method is called regularly by the Client with a list of events
+to display (note: the list may be empty). It may take all the time it
+needs to render the action, just a couple or even hundreds of frames,
+but it must return once the events have been displayed. 
+It must neither block completely nor run in a thread since the Client
+has to grab new events and change state between calls to
+process_message(). Put that way, process_message() is simply a part
+of Client.run().</pre>
   </div>
 </div><div class="function">
   <a name="shard.user.UserInterface.display_asset_exception">
@@ -335,7 +363,7 @@ or network connection.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>You might have to notify a timer once per frame.
 Do this here and use this method wherever you need it.
 It is also called from process_message() when appropriate.
@@ -357,7 +385,7 @@ down to a certain frame rate. The default implementation waits
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>Called when the UserInterface needs to render a single frame
 of the current game state. There is nothing special going on here,
 so you should notify the Entities that there is a next frame to be
@@ -378,7 +406,7 @@ update their graphics.</pre>
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>Called when the UserInterface wants to capture the user's reaction.
 The module you use for actual graphics rendering most probably
 has a way to capture user input. When overriding this method,
@@ -409,7 +437,7 @@ The default implementation reads user input from the console.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">shard.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>Called when the UserInterface has encoutered an EnterRoomEvent.
 You should override it, blank the screen here and display a waiting
 message since the UserInterface is going to twiddle thumbs until
@@ -429,7 +457,7 @@ it receives a RoomCompleteEvent.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">shard.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
     <pre>Called when everything is fetched and ready after a RoomCompleteEvent.
 Here you should set up the main screen and display some Map
 elements and Entities.</pre>
@@ -510,12 +538,12 @@ in self.room.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div>
-    <pre>Called with a list of instances of ChangeMapElementEvent.
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">shard.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div><div class="interfaceinfo">overridden in <a href="shard.user.pygameui.PygameUserInterface.html">shard.user.pygameui.PygameUserInterface</a></div>
+    <pre>Called with an instance of ChangeMapElementEvent.
 In this method you must implement a major redraw of the display,
 updating all Map elements and after that all Entities.
 This is only a single frame though.
-Note that event_list may be empty.</pre>
+Note that event may be empty.</pre>
   </div>
 </div><div class="function">
   <a name="shard.user.UserInterface.process_PerceptionEvent">
@@ -658,7 +686,7 @@ that do not affect the same identifier.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-22 14:37:20.
     </address>
   </body>
 </html>

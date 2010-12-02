@@ -16,11 +16,18 @@ class Engine(shard.eventprocessor.EventProcessor):
        Attributes:
 
        Engine.logger
+
        Engine.interface
+
        Engine.plugin
+
        Engine.message_for_plugin
+
        Engine.message_for_remote
+
        Engine.room
+           An instance of shard.Room, initialy None.
+
        Engine.rack
     """
 
@@ -74,8 +81,10 @@ class Engine(shard.eventprocessor.EventProcessor):
         self.message_for_remote = shard.Message([])
         
         # self.room keeps track of the map and active Entites.
+        # An actual room is created when the first EnterRoomEvent is
+        # encountered.
         #
-        self.room = shard.Room()
+        self.room = None
 
         # self.rack serves as a storage for deleted Entities
         # because there may be the need to respawn them.
@@ -229,9 +238,7 @@ class Engine(shard.eventprocessor.EventProcessor):
         return
 
     def process_DropsEvent(self, event, **kwargs):
-        """Respawn the Entity to be dropped in Engine.room,
-           delete it from Engine.rack
-           and pass the PicksUpEvent on.
+        """Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
         """
 
         self.logger.debug("called")
@@ -241,13 +248,15 @@ class Engine(shard.eventprocessor.EventProcessor):
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
+        self.logger.debug("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+
         dropped_entity = self.rack.retrieve(event.item_identifier)
 
         spawn_event = shard.SpawnEvent(dropped_entity, event.location)
 
         self.room.process_SpawnEvent(spawn_event)
 
-        # and pass the PicksUpEvent on
+        # and pass the DropsEvent on
         #
         kwargs["message"].event_list.append(event)
 
@@ -408,18 +417,13 @@ class Engine(shard.eventprocessor.EventProcessor):
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """The default implementation simply forwards the Event.
-           On the client side, an EnterRoomEvent
-           means that the server is about to send
-           a new map, respawn the player and send
-           items and NPCs.
-           On the server side, things may be a little
-           more complicated. In a single player
-           scenario the server might replace the
-           current room or save it to be able to
-           return to it later. In a multiplayer
-           environment however the server has
-           to set up another room to manage in
-           parallel to the established rooms.
+           On the client side, an EnterRoomEvent means that the server is about
+           to send a new map, respawn the player and send items and NPCs.
+           On the server side, things may be a little more complicated. In a
+           single player scenario the server might replace the current room or
+           save it to be able to return to it later. In a multiplayer
+           environment however the server has to set up another room to manage
+           in parallel to the established rooms.
         """
 
         self.logger.debug("called")
@@ -436,10 +440,6 @@ class Engine(shard.eventprocessor.EventProcessor):
         self.logger.debug("called")
 
         kwargs["message"].event_list.append(event)
-
-        # Set flag
-        #
-        kwargs["message"].has_RoomCompleteEvent = True
 
         return
 
@@ -466,3 +466,47 @@ class Engine(shard.eventprocessor.EventProcessor):
         kwargs["message"].event_list.append(event)
 
         return
+
+    def tile_is_walkable(self, target_identifier):
+        """Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.
+        """
+
+        if self.room is None:
+
+            self.logger.debug("not walkable: room is None")
+
+            return False
+
+        elif target_identifier not in self.room.floor_plan.keys():
+
+            self.logger.debug("{} not walkable: not in floor_plan".format(target_identifier))
+
+            return False
+
+        else:
+            floor_plan_element = self.room.floor_plan[target_identifier]
+
+            if floor_plan_element.tile.tile_type != shard.FLOOR:
+
+                self.logger.debug("{} not walkable: target tile_type != shard.FLOOR".format(target_identifier))
+
+                return False
+
+            else:
+                occupied = False
+
+                for entity in floor_plan_element.entities:
+
+                    if entity.entity_type == shard.ITEM_BLOCK:
+
+                        occupied = True
+
+                if occupied:
+
+                    self.logger.debug("{} not walkable: target occupied by shard.ITEM_BLOCK".format(target_identifier))
+
+                    return False
+
+                else:
+
+                    return True

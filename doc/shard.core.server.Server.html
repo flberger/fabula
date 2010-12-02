@@ -20,12 +20,23 @@
       
     </div>
     <pre>The Server is the central management and control authority in Shard.
-It relies on the ServerInterface and the StoryEngine.</pre>
+It relies on the ServerInterface and the Plugin.
+
+Additional attributes:
+
+Server.interval
+    1.0 / framerate
+
+Server.message_for_all
+    Message to be broadcasted to all clients
+
+Server.exit_requested
+    Flag to be changed by signal handler</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id66">
+      <table class="children sortable" id="id10">
   
   
 <tr class="method">
@@ -39,7 +50,7 @@ It relies on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#run">run</a></td>
-    <td><tt>Server main method, calling the StoryEngine in the process.</tt></td>
+    <td><tt>Server main method, calling the Plugin in the process.</tt></td>
   </tr><tr class="method">
     
     
@@ -51,19 +62,19 @@ It relies on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#handle_exit">handle_exit</a></td>
-    <td><tt>Stop the Server when an according OS signal is received.</tt></td>
+    <td><tt>Callback to stop the Server when an according OS signal is received.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Test if the Entity is allowed to move to the desired location,</tt></td>
+    <td><tt>Perform sanity checks on target and either confirm, reject or forward to Plugin.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Check if we already have a room and</tt></td>
+    <td><tt>Check if we already have a room and entities.</tt></td>
   </tr><tr class="method">
     
     
@@ -81,13 +92,13 @@ It relies on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Check what is being picked up,</tt></td>
+    <td><tt>Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="shard.core.server.Server.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>If event.identifier does not own</tt></td>
+    <td><tt>Perform checks and either forward the Event to the Plugin or issue AttemptFailedEvent.</tt></td>
   </tr><tr class="method">
     
     
@@ -101,7 +112,7 @@ It relies on the ServerInterface and the StoryEngine.</pre>
         <p>
           Inherited from <a href="shard.core.Engine.html">Engine</a>:
         </p>
-        <table class="children sortable" id="id67">
+        <table class="children sortable" id="id11">
   
   
 <tr class="basemethod">
@@ -127,7 +138,7 @@ It relies on the ServerInterface and the StoryEngine.</pre>
     
     <td>Method</td>
     <td><a href="shard.core.Engine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Respawn the Entity to be dropped in Engine.room,</tt></td>
+    <td><tt>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -212,6 +223,34 @@ It relies on the ServerInterface and the StoryEngine.</pre>
     <td>Method</td>
     <td><a href="shard.core.Engine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Let the shard.Room instance in self.room process the Event</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.core.Engine.html#tile_is_walkable">tile_is_walkable</a></td>
+    <td><tt>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.core.Engine.html">Engine</a>):
+        </p>
+        <table class="children sortable" id="id12">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
   </tr>
   
 </table>
@@ -232,13 +271,13 @@ It relies on the ServerInterface and the StoryEngine.</pre>
   <div class="functionHeader">
     
     def
-    __init__(self, interface_instance, plugin_instance, logger, framerate):
+    __init__(self, interface_instance, plugin_instance, logger, framerate, threadsafe=True):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#__init__">shard.core.Engine.__init__</a></div>
     <pre>Initialise the Server.
-        </pre>
+If threadsafe is True (default), no signal handlers are installed.</pre>
   </div>
 </div><div class="function">
   <a name="shard.core.server.Server.run">
@@ -255,7 +294,7 @@ It relies on the ServerInterface and the StoryEngine.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#run">shard.core.Engine.run</a></div>
-    <pre>Server main method, calling the StoryEngine in the process.
+    <pre>Server main method, calling the Plugin in the process.
         </pre>
   </div>
 </div><div class="function">
@@ -291,7 +330,7 @@ Auxiliary method.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>Stop the Server when an according OS signal is received.
+    <pre>Callback to stop the Server when an according OS signal is received.
         </pre>
   </div>
 </div><div class="function">
@@ -309,8 +348,8 @@ Auxiliary method.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToMoveEvent">shard.core.Engine.process_TriesToMoveEvent</a></div>
-    <pre>Test if the Entity is allowed to move to the desired location,
-and append an according event to the message.</pre>
+    <pre>Perform sanity checks on target and either confirm, reject or forward to Plugin.
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.core.server.Server.process_InitEvent">
@@ -327,9 +366,8 @@ and append an according event to the message.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_InitEvent">shard.core.Engine.process_InitEvent</a></div>
-    <pre>Check if we already have a room and
-entities. If yes, send the data
-If not, pass on to the plugin.</pre>
+    <pre>Check if we already have a room and entities.
+If yes, send the data. If not, pass on to the plugin.</pre>
   </div>
 </div><div class="function">
   <a name="shard.core.server.Server.process_TriesToLookAtEvent">
@@ -383,9 +421,8 @@ to be manipulated, then let the Plugin handle the Event.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToPickUpEvent">shard.core.Engine.process_TriesToPickUpEvent</a></div>
-    <pre>Check what is being picked up,
-replace event.target_identifier with the identifier of the Entity
-to be picked up, then let the Plugin handle the Event.</pre>
+    <pre>Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
+        </pre>
   </div>
 </div><div class="function">
   <a name="shard.core.server.Server.process_TriesToDropEvent">
@@ -402,22 +439,14 @@ to be picked up, then let the Plugin handle the Event.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.core.Engine.html#process_TriesToDropEvent">shard.core.Engine.process_TriesToDropEvent</a></div>
-    <pre>If event.identifier does not own
-event.item_identifier in self.rack,
-the attempt fails.
+    <pre>Perform checks and either forward the Event to the Plugin or issue AttemptFailedEvent.
 
-If event.target_identifier is not
-shard.FLOOR, the attempt fails.
-
-If event.target_identifier is
-shard.FLOOR and there is no Entity
-on it, pass event on to the Plugin.
-
-If event.target_identifier is
-shard.FLOOR and there is an Entity
-on it, replace target_identifier with
-Entity.identifier and pass on to the
-Plugin.</pre>
+If the target tile is not in Room.floor_plan, the attempt fails.
+If the tile is not FLOOR, the attempt fails.
+If the item is not in Rack (but in Room), the event is forwarded to the Plugin to decide what to do.
+If the Entity who tries to drop the item from Rack does not own it, the attempt fails.
+If there is another Entity on the tile, it is marked as the target.
+In any other case, the Event is forwarded to the Plugin.</pre>
   </div>
 </div><div class="function">
   <a name="shard.core.server.Server.process_EnterRoomEvent">
@@ -439,7 +468,7 @@ Plugin.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-10-18 15:21:55.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-01 12:53:38.
     </address>
   </body>
 </html>

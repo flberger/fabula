@@ -7,95 +7,44 @@
 
 import shard
 import shard.core
-import signal
 import time
 
 class Server(shard.core.Engine):
     """The Server is the central management and control authority in Shard.
-       It relies on the ServerInterface and the StoryEngine.
-    """
+       It relies on the ServerInterface and the Plugin.
 
-    def __init__(self, interface_instance, plugin_instance, logger, framerate):
+       Additional attributes:
+
+       Server.interval
+           1.0 / framerate
+
+       Server.message_for_all
+           Message to be broadcasted to all clients
+
+       Server.exit_requested
+           Flag to be changed by signal handler
+     """
+
+    def __init__(self, interface_instance, plugin_instance, logger, framerate,
+                 threadsafe = True):
         """Initialise the Server.
+           If threadsafe is True (default), no signal handlers are installed.
         """
 
-        self.interval = 1.0 / framerate
-
         # Setup base class
+        # Engine.__init__() calls EventProcessor.__init__()
         #
-        shard.core.shard.eventprocessor.EventProcessor.__init__(self)
-
-        # Now we have:
-        #
-        # self.event_dict
-        #
-        #     Dictionary that maps event classes to
-        #     functions to be called for the respective
-        #     event
-
         shard.core.Engine.__init__(self,
                                    interface_instance,
                                    plugin_instance,
                                    logger)
 
-        # Now we have:
+        # If framerate is 0, run as fast as possible
         #
-        # self.logger
-        #
-        #     logging.Logger instance
-        #
-        #
-        # self.interface
-        #
-        #     An instance of
-        #     shard.interfaces.ServerInterface
-        #
-        #
-        #     self.interface.connections
-        #
-        #         A dict of MessageBuffer instances,
-        #         indexed by (address, port) tuples
-        #
-        #
-        #     MessageBuffer.send_message(message)
-        #     MessageBuffer.grab_message()
-        #
-        #         Methods for sending and retrieving
-        #         messages
-        #
-        #
-        # self.plugin
-        #
-        #     StoryEngine
-        #
-        #
-        # self.message_for_plugin
-        #
-        #     Events for special consideration for the
-        #     plugin. Must be emptied once the plugin
-        #     has processed all Events.
-        #
-        #
-        # self.message_for_remote
-        #
-        #     Events to be sent to the remote host in
-        #     each loop
-        #
-        #
-        # self.room = shard.Room()
-        #
-        #     self.room.entity_dict
-        #         A dict of all Entities in this room,
-        #         mapping Entity identifiers to Entity
-        #         instances.
-        #
-        #     self.room.floor_plan
-        #         A dict mapping 2D coordinate tuples
-        #         to a FloorPlanElement instance.
-        #
-        #     self.room.entity_locations
-        #         A dict mapping Entity identifiers to a
-        #         2D coordinate tuple.
+        if framerate:
+            self.interval = 1.0 / framerate
+        else:
+            self.interval = 0
 
         # Message to be broadcasted to all clients
         #
@@ -105,23 +54,27 @@ class Server(shard.core.Engine):
         #
         self.exit_requested = False
 
-        # install signal handlers
-        #
-        signal.signal(signal.SIGINT, self.handle_exit)
-        signal.signal(signal.SIGTERM, self.handle_exit)
+        if not threadsafe:
 
-        try:
-            signal.signal(signal.SIGQUIT, self.handle_exit)
-
-        except:
-            # Microsoft Windows has no SIGQUIT - ignore
+            # install signal handlers
             #
-            pass
+            import signal
 
-        # TODO: restart plugin when SIGHUP is received
+            signal.signal(signal.SIGINT, self.handle_exit)
+            signal.signal(signal.SIGTERM, self.handle_exit)
+
+            try:
+                signal.signal(signal.SIGQUIT, self.handle_exit)
+
+            except:
+                # Microsoft Windows has no SIGQUIT - ignore
+                #
+                pass
+
+            # TODO: restart plugin when SIGHUP is received
 
     def run(self):
-        """Server main method, calling the StoryEngine in the process.
+        """Server main method, calling the Plugin in the process.
         """
 
         self.logger.info("starting")
@@ -136,7 +89,7 @@ class Server(shard.core.Engine):
 
                 if len(message.event_list):
 
-                    self.logger.debug("%s incoming: %s" % (address_port_tuple, message))
+                    self.logger.debug("{0} incoming: {1}".format(address_port_tuple, message))
 
                     for event in message.event_list:
 
@@ -144,31 +97,39 @@ class Server(shard.core.Engine):
                         # Otherwise, a long burst of events might unfairly
                         # block other clients. (hint by Alexander Marbach)
 
-                        # TODO: call story engine even if client message is empty!
-                        # Probably at the end of the connections loop, treating 
-                        # the plugin as another client (idea Alexander Marbach).
-
-                        # This is a bit of Python magic. 
-                        # self.event_dict is a dict which maps classes to handling
-                        # functions. We use the class of the event supplied as
-                        # a key to call the appropriate handler, and hand over
-                        # the event.
-                        # These methods may add events for the plugin engine
-                        # to self.message_for_plugin
+                        # Be sceptical. Only accept typical client events.
+                        # TODO: Include shard.ChangeStateEvent?
                         #
-                        # client_key is really only needed
-                        # by process_InitEvent, but to avoid splitting
-                        # this beautiful call we submit it to all methods.
-                        #
-                        self.event_dict[event.__class__](event,
-                                                         message = self.message_for_plugin,
-                                                         client_key = address_port_tuple)
+                        if isinstance(event, (shard.InitEvent,
+                                              shard.AttemptEvent,
+                                              shard.SaysEvent)):
 
-                        # Contrary to the Client, the
-                        # Server calls its plugin engine
-                        # on an event-by-event rather than on a
-                        # message-by-message base to allow for
-                        # quick and real-time reaction.
+                            # This is a bit of Python magic.
+                            # self.event_dict is a dict which maps classes to
+                            # handling functions. We use the class of the event
+                            # supplied as a key to call the appropriate handler, and
+                            # hand over the event.
+                            # These methods may add events for the plugin engine
+                            # to self.message_for_plugin
+                            #
+                            # client_key is really only needed by process_InitEvent,
+                            # but to avoid splitting this beautiful call we submit
+                            # it to all methods.
+                            #
+                            self.event_dict[event.__class__](event,
+                                                             message = self.message_for_plugin,
+                                                             client_key = address_port_tuple)
+                        else:
+                            # Looks like the Client sent an Event typically
+                            # issued by the Server. Let the Plugin handle that.
+                            #
+                            self.logger.debug("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
+                            self.message_for_plugin.event_list.append(event)
+
+                        # Contrary to the Client, the Server calls its plugin
+                        # engine on an event-by-event rather than on a
+                        # message-by-message base to allow for quick and
+                        # real-time reaction.
 
                         self.call_plugin(address_port_tuple)
 
@@ -176,12 +137,8 @@ class Server(shard.core.Engine):
 
                 else:
                     # len(message.event_list) == 0
-                    #
-                    # Call Plugin anyway to catch
-                    # Plugin initiated Events
-                    #
-                    # self.message_for_plugin is already set
-                    # to an empty Message
+                    # Call Plugin anyway to catch Plugin initiated Events
+                    # self.message_for_plugin is already set to an empty Message
                     #
                     self.call_plugin(address_port_tuple)
 
@@ -218,13 +175,9 @@ class Server(shard.core.Engine):
         """
 
         # Put in a method to avoid duplication.
-
-        # Must not take too long since the client
-        # is waiting.
-        #
-        # Call Plugin to catch Plugin-initiated
-        # Events even if there were no Events
-        # from the client.
+        # Must not take too long since the client is waiting.
+        # Call Plugin even if there were no Events from the client to catch
+        # Plugin-initiated Events.
         #
         message_from_plugin = self.plugin.process_message(self.message_for_plugin)
 
@@ -232,16 +185,14 @@ class Server(shard.core.Engine):
         #
         self.message_for_plugin = shard.Message([])
 
-        # Process events from the story engine
-        # before returning them to the client.
-        # We cannot just forward them since we
-        # may be required to change maps, spawn
-        # entities etc.
-        # Note that this time resulting events
-        # are queued for the remote host, not
-        # the plugin.
+        # Process events from the story engine before returning them to the
+        # client. We cannot just forward them since we may be required to change
+        # maps, spawn entities etc.
+        # Note that this time resulting events are queued for the remote host,
+        # not the plugin.
         #
         # TODO: could we be required to send any new events to the story engine? But this could become an infinite loop!
+        # TODO: Again it's completely weird to give the Message as an argument. Functions should return Event lists instead.
         #
         for event in message_from_plugin.event_list:
 
@@ -254,89 +205,92 @@ class Server(shard.core.Engine):
         #
         if self.message_for_remote.event_list:
 
-            self.logger.debug("%s outgoing: %s" % (address_port_tuple, self.message_for_remote))
+            self.logger.debug("{0} outgoing: {1}".format(address_port_tuple,
+                                                         self.message_for_remote))
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
 
-        ### Build broadcast message for all clients
-        #
-        # TODO: this of course has to be refactored thoroughly for multiple room handling
-
-        # Triple flag:
-        # True: skip on EnterRoomEvent
-        # "now": now skip all events
-        # False: stop skipping
-        #
-        skip_room_events = False
-
-        # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
-        #
-        if self.message_for_remote.has_RoomCompleteEvent:
-
-            self.logger.debug("has_RoomCompleteEvent set, skipping room events")
-
-            skip_room_events = True
-
-        elif len(self.message_for_remote.event_list):
-
-            self.logger.debug("has_RoomCompleteEvent not set, broadcasting all events")
-
-        for event in self.message_for_remote.event_list:
-
-            # We also broadcast all SpawnEvents. That means
-            # that when a new client joins, all entities
-            # (in the current room) are respawned.
-            # process_SpawnEvent in the engine will
-            # filter duplicate entities, so no harm done.
-            # 
-            # TODO: respawning might cause some loss of internal entity state
+            ### Build broadcast message for all clients
             #
-            if (skip_room_events
-                and
-                isinstance(event, shard.EnterRoomEvent)):
+            # TODO: this of course has to be refactored thoroughly for multiple room handling
 
-                self.logger.debug("EnterRoomEvent found, starting to skip")
+            # Triple flag:
+            # True: skip on EnterRoomEvent
+            # "now": now skip all events
+            # False: stop skipping
+            #
+            skip_room_events = False
 
-                skip_room_events = "now"
+            # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
+            # TODO: The following ifs and loops can surely be optimized.
+            #
+            for event in self.message_for_remote.event_list:
 
-            elif (skip_room_events == "now"
-                  and
-                  isinstance(event, shard.RoomCompleteEvent)):
+                if isinstance(event, shard.RoomCompleteEvent):
 
-                self.logger.debug("RoomCompleteEvent found, stopping to skip")
+                    self.logger.debug("found RoomCompleteEvent, will skip room events")
 
-                skip_room_events = False
+                    skip_room_events = True
 
-            elif (not skip_room_events == "now"
-                  and
-                  event.__class__ in [shard.DropsEvent, 
-                                      shard.MovesToEvent, 
-                                      shard.PicksUpEvent,
-                                      shard.SaysEvent,
-                                      shard.SpawnEvent,
-                                      shard.DeleteEvent,
-                                      shard.ChangeStateEvent,
-                                      shard.ChangeMapElementEvent]):
+            if not skip_room_events:
 
-                self.message_for_all.event_list.append(event)
+                self.logger.debug("no RoomCompleteEvent found, broadcasting all events")
 
-        # Only send self.message_for_all when not empty
-        #
-        if len(self.message_for_all.event_list):
+            for event in self.message_for_remote.event_list:
 
-            self.logger.debug("message for all clients in current room: %s"
-                              % self.message_for_all.event_list)
-
-            for client_key in self.room.active_clients:
-
-                # Leave out current MessageBuffer which
-                # already has reveived the events above.
-                # We can compare MessageBuffer instances
-                # right away. ;-)
+                # We also broadcast all SpawnEvents. That means
+                # that when a new client joins, all entities
+                # (in the current room) are respawned.
+                # process_SpawnEvent in the engine will
+                # filter duplicate entities, so no harm done.
                 #
-                if not client_key == address_port_tuple:
+                # TODO: respawning might cause some loss of internal entity state
+                #
+                if (skip_room_events
+                    and
+                    isinstance(event, shard.EnterRoomEvent)):
 
-                    self.interface.connections[client_key].send_message(self.message_for_all)
+                    self.logger.debug("EnterRoomEvent found, starting to skip")
+
+                    skip_room_events = "now"
+
+                elif (skip_room_events == "now"
+                      and
+                      isinstance(event, shard.RoomCompleteEvent)):
+
+                    self.logger.debug("RoomCompleteEvent found, stopping to skip")
+
+                    skip_room_events = False
+
+                elif (not skip_room_events == "now"
+                      and
+                      event.__class__ in [shard.DropsEvent,
+                                          shard.MovesToEvent,
+                                          shard.PicksUpEvent,
+                                          shard.SaysEvent,
+                                          shard.SpawnEvent,
+                                          shard.DeleteEvent,
+                                          shard.ChangeStateEvent,
+                                          shard.ChangeMapElementEvent]):
+
+                    self.message_for_all.event_list.append(event)
+
+            # Only send self.message_for_all when not empty
+            #
+            if len(self.message_for_all.event_list):
+
+                self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
+
+                for client_key in self.room.active_clients:
+
+                    # Leave out current MessageBuffer which
+                    # already has reveived the events above.
+                    # We can compare MessageBuffer instances
+                    # right away. ;-)
+                    #
+                    if not client_key == address_port_tuple:
+
+                        self.interface.connections[client_key].send_message(self.message_for_all)
 
         # Clean up
         #
@@ -346,117 +300,57 @@ class Server(shard.core.Engine):
         return
 
     def handle_exit(self, signalnum, frame):
-        """Stop the Server when an according OS signal is received.
+        """Callback to stop the Server when an according OS signal is received.
         """
 
         signal_dict = {2 : "SIGINT",
                        3 : "SIGQUIT",
                        15 : "SIGTERM"}
 
-        self.logger.info("caught signal %s (%s), setting exit flag"
-                         % (signalnum, signal_dict[signalnum]))
-
+        self.logger.info("caught signal {0} ({1}), setting exit flag".format(signalnum, signal_dict[signalnum]))
 
         self.exit_requested = True
 
         return
 
     def process_TriesToMoveEvent(self, event, **kwargs):
-        """Test if the Entity is allowed to move to the desired location,
-           and append an according event to the message.
+        """Perform sanity checks on target and either confirm, reject or forward to Plugin.
         """
 
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
 
-        self.logger.debug("%s -> %s" % (event.identifier, event.target_identifier))
+        self.logger.debug("{0} -> {1}".format(event.identifier, event.target_identifier))
 
-        # Do we need to move / turn at all?
-        #
-        location = self.room.entity_locations[event.identifier]
+        if not self.tile_is_walkable(event.target_identifier):
 
-        difference = shard.difference_2d(location,
-                                         event.target_identifier)
-
-        # Only allow certain vectors
-        #
-        if difference not in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            self.logger.debug("{} not walkable".format(event.target_identifier))
 
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-            # TODO: we exit here to hunt bugs
-            #
-            raise shard.ShardException("invalid difference in TriesToMoveEvent: %s"
-                                       % (difference,))
-
         else:
+            self.logger.debug("target clear, forwarding event to plugin")
 
-            # TODO: event.identifier in self.room.entity_dict? event.target_identifier in shard.DIRECTION_VECTOR?
-
-            # Test if a movement from the current
-            # entity location to the new location
-            # on the map is possible
-            #
-            try:
-                # Check tile type
-                #
-                tile = self.room.floor_plan[event.target_identifier].tile 
-
-                if tile.tile_type == shard.FLOOR:
-
-                    self.logger.debug("tile_type == shard.FLOOR")
-
-                    # Check if this field is occupied
-                    #
-                    occupied = False
-
-                    for entity in self.room.floor_plan[event.target_identifier].entities:
-
-                        if entity.entity_type == shard.ITEM_BLOCK:
-
-                            occupied = True
-
-                    if occupied:
-
-                        self.logger.debug("occupied by shard.ITEM_BLOCK")
-
-                        kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-                    else:
-                        # All clear. Go!
-                        #
-                        kwargs["message"].event_list.append(shard.MovesToEvent(event.identifier,
-                                                                     event.target_identifier))
-
-                else:
-
-                    self.logger.debug("tile_type != shard.FLOOR")
-
-                    kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-            except KeyError:
-
-                self.logger.debug("KeyError")
-
-                kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(event)
 
         return
 
     def process_InitEvent(self, event, **kwargs):
-        """Check if we already have a room and
-           entities. If yes, send the data
-           If not, pass on to the plugin.
+        """Check if we already have a room and entities.
+           If yes, send the data. If not, pass on to the plugin.
         """
+        # TODO: update docstring
 
-        if len(self.room.floor_plan):
+        self.logger.debug("called")
+
+        if self.room is not None:
 
             self.logger.debug("sending existing floor_plan and entities")
 
             # TODO: The following is even worse in terms on consistency. :-) Replace with a clean, room-oriented design.
             #
-            # This will register the client in the room and forward
-            # the Event.
+            # This will register the client in the room and forward the Event.
             #
-            self.process_EnterRoomEvent(shard.EnterRoomEvent(),
+            self.process_EnterRoomEvent(shard.EnterRoomEvent(self.room.identifier),
                                         message = self.message_for_remote,
                                         client_key = kwargs["client_key"])
 
@@ -479,19 +373,15 @@ class Server(shard.core.Engine):
 
             self.message_for_remote.event_list.append(shard.RoomCompleteEvent())
 
-            self.message_for_remote.has_RoomCompleteEvent = True
-
         if len(self.rack.entity_dict):
 
             self.logger.debug("sending Spawn and PickUpEvents from existing rack")
 
             for identifier in self.rack.entity_dict:
 
-                # We must spawn at a valid location.
-                # Spawning at the first coordinate
-                # tuple in the room. Doesn't matter,
-                # it will be picked up in an instant
-                # anyway.
+                # We must spawn at a valid location. Spawning at the first
+                # coordinate tuple in the room. Doesn't matter, it will be
+                # picked up in an instant anyway.
                 #
                 spawn_event = shard.SpawnEvent(self.rack.entity_dict[identifier],
                                                self.room.floor_plan.keys()[0])
@@ -503,40 +393,43 @@ class Server(shard.core.Engine):
 
                 self.message_for_remote.event_list.append(picks_up_event)
 
-        # If a room has already been sent,
-        # the plugin should only spawn a
-        # new player entity.
+        # If a room has already been sent, the plugin should only spawn a new
+        # player entity.
         #
         kwargs["message"].event_list.append(event)
 
         return
 
     def process_TriesToLookAtEvent(self, event, **kwargs):
-        """Check what is being looked at and issue an according LookedAtEvent.
+        """Check what is being looked at, forward the Event and issue an according LookedAtEvent.
         """
 
-        new_event = None
-
         # TODO: contracts...
-        #
+
         if event.target_identifier in self.room.floor_plan:
 
-            for entity in self.room.floor_plan[event.target_identifier].entities:
+            new_events = [event]
+            entities = self.room.floor_plan[event.target_identifier].entities
+
+            for entity in entities:
 
                 if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
 
-                    new_event = shard.LookedAtEvent(entity.identifier,
-                                                    event.identifier)
+                    event.target_identifier = entity.identifier
 
-        if new_event == None:
+                    new_events = [event,
+                                  shard.LookedAtEvent(entity.identifier,
+                                                      event.identifier)]
 
-            # Nothing to look at.
+            self.logger.debug("forwarding event(s)")
+            kwargs["message"].event_list.extend(new_events)
+
+        else:
+            self.logger.debug("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+
             # Issue AttemptFailed to unblock client.
             #
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-        else:
-            kwargs["message"].event_list.append(new_event)
 
         return
 
@@ -563,23 +456,25 @@ class Server(shard.core.Engine):
 
         if new_event == None:
 
-            # Nothing to manipulate.
+            self.logger.debug("AttemptFailed for {}".format(event))
+
             # Issue AttemptFailed to unblock client.
             #
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
+            self.logger.debug("forwarding event")
             kwargs["message"].event_list.append(new_event)
 
         return
 
     def process_TriesToPickUpEvent(self, event, **kwargs):
-        """Check what is being picked up,
-           replace event.target_identifier with the identifier of the Entity
-           to be picked up, then let the Plugin handle the Event.
+        """Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
         """
 
         # TODO: duplicate from TriesToManipulateEvent
+
+        self.logger.debug("called")
 
         new_event = None
 
@@ -593,6 +488,9 @@ class Server(shard.core.Engine):
 
                 if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
 
+                    self.logger.debug("trying to pick up '{}' at {}".format(entity.identifier,
+                                                                            event.target_identifier))
+
                     new_event = shard.TriesToPickUpEvent(event.identifier,
                                                          entity.identifier)
 
@@ -601,75 +499,78 @@ class Server(shard.core.Engine):
             # Nothing to pick up.
             # Issue AttemptFailed to unblock client.
             #
+            self.logger.debug("AttemptFailed for {}".format(event))
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
+            self.logger.debug("forwarding event")
             kwargs["message"].event_list.append(new_event)
 
         return
 
     def process_TriesToDropEvent(self, event, **kwargs):
-        """If event.identifier does not own
-           event.item_identifier in self.rack,
-           the attempt fails.
+        """Perform checks and either forward the Event to the Plugin or issue AttemptFailedEvent.
 
-           If event.target_identifier is not
-           shard.FLOOR, the attempt fails.
-
-           If event.target_identifier is
-           shard.FLOOR and there is no Entity
-           on it, pass event on to the Plugin.
-
-           If event.target_identifier is
-           shard.FLOOR and there is an Entity
-           on it, replace target_identifier with
-           Entity.identifier and pass on to the
-           Plugin.
+           If the target tile is not in Room.floor_plan, the attempt fails.
+           If the tile is not FLOOR, the attempt fails.
+           If the item is not in Rack (but in Room), the event is forwarded to the Plugin to decide what to do.
+           If the Entity who tries to drop the item from Rack does not own it, the attempt fails.
+           If there is another Entity on the tile, it is marked as the target.
+           In any other case, the Event is forwarded to the Plugin.
         """
 
-        # TODO: These checks are so fundamental that they should probably be the default in Engine.process_TriesToDropEvent
         # TODO: What about Entities in walls?
 
         self.logger.debug("called")
 
-        # If event.identifier does not own
-        # event.item_identifier in self.rack,
-        # the attempt fails.
+        # Check target
         #
-        if self.rack.owner_dict[event.item_identifier] != event.identifier:
+        if event.target_identifier not in self.room.floor_plan:
+
+            self.logger.debug("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
 
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-        
-        elif event.target_identifier not in self.room.floor_plan:
 
-            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+            return
 
         elif self.room.floor_plan[event.target_identifier].tile.tile_type != shard.FLOOR:
 
-            # If event.target_identifier is not
-            # shard.FLOOR, the attempt fails.
-            #
+            self.logger.debug("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
+
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
-        elif len(self.room.floor_plan[event.target_identifier].entities):
+            return
 
-            # If event.target_identifier is
-            # shard.FLOOR and there is at least one
-            # Entity on it, replace target_identifier
-            # with the first Entity's identifier and
-            # pass on to the Plugin.
-            #
+        # If event.target_identifier has at least one Entity on it, replace
+        # target_identifier with the first Entity's identifier.
+        #
+        if len(self.room.floor_plan[event.target_identifier].entities):
+
             target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
 
-            kwargs["message"].event_list.append(shard.TriesToDropEvent(event.identifier,
-                                                             event.item_identifier,
-                                                             target_identifier))
+            event = shard.TriesToDropEvent(event.identifier,
+                                           event.item_identifier,
+                                           target_identifier)
+
+        # Check Rack and owner
+        #
+        if event.item_identifier not in self.rack.entity_dict.keys():
+
+            if event.item_identifier in self.room.entity_dict.keys():
+                self.logger.debug("'{}' not in rack but in room, forwarding event to plugin".format(event.item_identifier))
+                kwargs["message"].event_list.append(event)
+
+            else:
+                self.logger.debug("AttemptFailed: '{}' neither in rack nor in room".format(event.item_identifier))
+                kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        elif self.rack.owner_dict[event.item_identifier] != event.identifier:
+
+            self.logger.debug("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.item_identifier))
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
-            # If event.target_identifier is
-            # shard.FLOOR and there is no Entity
-            # on it, pass event on to the Plugin.
-            #
+            self.logger.debug("looks OK, forwarding to plugin")
             kwargs["message"].event_list.append(event)
 
         return
@@ -678,21 +579,31 @@ class Server(shard.core.Engine):
         """Register the client in the room and forward the Event.
         """
 
-        # TODO: This is a hack. Implement correct handling of multiple rooms.
-        #
-        if kwargs["client_key"] in self.room.active_clients:
+        self.logger.debug("called, room: {}".format(event.room_identifier))
 
-            self.logger.debug("client %s already in current room, deregistering"
-                              % str(kwargs["client_key"]))
+        # TODO: Implement correct handling of multiple rooms.
 
-            self.room.active_clients.remove(kwargs["client_key"])
+        if self.room is None:
+
+            self.room = shard.Room(event.room_identifier)
+            self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
+            self.room.active_clients.append(kwargs["client_key"])
 
         else:
+            if event.room_identifier == self.room.identifier:
 
-            self.logger.debug("registering client %s in current room"
-                              % str(kwargs["client_key"]))
+                if kwargs["client_key"] in self.room.active_clients:
 
-            self.room.active_clients.append(kwargs["client_key"])
+                    self.logger.debug("client {} already in current room".format(str(kwargs["client_key"])))
+
+                else:
+                    self.logger.debug("registering client {} in current room".format(str(kwargs["client_key"])))
+                    self.room.active_clients.append(kwargs["client_key"])
+
+            else:
+                self.room = shard.Room(event.room_identifier)
+                self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
+                self.room.active_clients.append(kwargs["client_key"])
 
         kwargs["message"].event_list.append(event)
 
