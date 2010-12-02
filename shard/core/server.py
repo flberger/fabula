@@ -401,31 +401,35 @@ class Server(shard.core.Engine):
         return
 
     def process_TriesToLookAtEvent(self, event, **kwargs):
-        """Check what is being looked at and issue an according LookedAtEvent.
+        """Check what is being looked at, forward the Event and issue an according LookedAtEvent.
         """
 
-        new_event = None
-
         # TODO: contracts...
-        #
+
         if event.target_identifier in self.room.floor_plan:
 
-            for entity in self.room.floor_plan[event.target_identifier].entities:
+            new_events = [event]
+            entities = self.room.floor_plan[event.target_identifier].entities
+
+            for entity in entities:
 
                 if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
 
-                    new_event = shard.LookedAtEvent(entity.identifier,
-                                                    event.identifier)
+                    event.target_identifier = entity.identifier
 
-        if new_event == None:
+                    new_events = [event,
+                                  shard.LookedAtEvent(entity.identifier,
+                                                      event.identifier)]
 
-            # Nothing to look at.
+            self.logger.debug("forwarding event(s)")
+            kwargs["message"].event_list.extend(new_events)
+
+        else:
+            self.logger.debug("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+
             # Issue AttemptFailed to unblock client.
             #
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
-
-        else:
-            kwargs["message"].event_list.append(new_event)
 
         return
 
@@ -452,12 +456,14 @@ class Server(shard.core.Engine):
 
         if new_event == None:
 
-            # Nothing to manipulate.
+            self.logger.debug("AttemptFailed for {}".format(event))
+
             # Issue AttemptFailed to unblock client.
             #
             kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
 
         else:
+            self.logger.debug("forwarding event")
             kwargs["message"].event_list.append(new_event)
 
         return

@@ -518,7 +518,10 @@ class Editor(DefaultGame):
        Additional attributes:
 
        Editor.current_room
-           name of the current room
+           Name of the current room.
+
+       Editor.condition_response_list
+           A list containing tuples of (incoming_event, response_event).
     """
 
     # TODO: replace hardwired "player" with client id
@@ -534,6 +537,11 @@ class Editor(DefaultGame):
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
         #
         self.current_room = ''
+
+        # Conceptually this should be a dict, but Events are mutable and can
+        # thus not be used as dictionary keys.
+        #
+        self.condition_response_list = []
 
     def process_InitEvent(self, event):
         """Send a bare room, to be populated by the user.
@@ -623,9 +631,12 @@ class Editor(DefaultGame):
             self.message_for_host.event_list.append(event)
 
         else:
-            # Call base
+
+            # Pass event to Editor.respond()
             #
-            DefaultGame.process_TriesToTalkToEvent(self, event)
+            self.respond(event)
+
+        return
 
     def process_SaysEvent(self, event):
         """If the text matches a room file, load and send the room.
@@ -633,11 +644,8 @@ class Editor(DefaultGame):
 
         self.logger.debug("called")
 
-        if event.text + ".floorplan" not in os.listdir(os.getcwd()):
+        if event.text + ".floorplan" in os.listdir(os.getcwd()):
 
-            self.logger.debug("'{}.floorplan' not found, cannot load room".format(event.text))
-
-        else:
             self.logger.debug("'{}.floorplan' exists, attempting to load".format(event.text))
 
             event_list = load_room_from_file(event.text + ".floorplan")
@@ -648,5 +656,105 @@ class Editor(DefaultGame):
 
             else:
                 self.message_for_host.event_list = self.message_for_host.event_list + event_list
+
+        else:
+            # Pass event to Editor.respond()
+            #
+            self.respond(event)
+
+        return
+
+    def process_TriesToLookAtEvent(self, event):
+        """Pass event to Editor.respond().
+        """
+        self.logger.debug("called")
+
+        self.respond(event)
+
+        return
+
+#    def process_TriesToDropEvent(self, event):
+#        """Return a DropsEvent to the Server.
+#        """
+#
+#        # Restrict drops to tiles right next to the player.
+#        # TODO: copied from process_TriesToPickUpEvent
+#        #
+#        player_location = self.host.room.entity_locations[event.identifier]
+#
+#        surrounding_positions = [(player_location[0] - 1, player_location[1]),
+#                                 (player_location[0], player_location[1] - 1),
+#                                 (player_location[0] + 1, player_location[1]),
+#                                 (player_location[0], player_location[1] + 1)]
+#
+#        # Server.process_TriesToDropEvent() has already done some checks,
+#        # so we can be sure that target_identifier is either a valid
+#        # coordinate tuple or an instance of shard.Entity.
+#        #
+#
+#        if event.target_identifier in self.host.room.entity_dict.keys():
+#
+#            self.logger.debug("target '{}' is an entity identifier".format(event.target_identifier))
+#
+#            if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
+#
+#                self.logger.debug("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
+#                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+#
+#            else:
+#                self.logger.debug("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+#                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+#
+#        else:
+#            self.logger.debug("target '{}' is not an entity identifier".format(event.target_identifier))
+#
+#            if event.target_identifier not in surrounding_positions:
+#
+#                self.logger.debug("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
+#                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+#
+#            else:
+#                # Still, the Entity to be dropped may originate either from Room or from
+#                # Rack.
+#                #
+#                if event.item_identifier not in self.host.rack.entity_dict.keys():
+#                    self.logger.debug("item still in Room, returning PicksUpEvent")
+#                    self.message_for_host.event_list.append(shard.PicksUpEvent(event.identifier,
+#                                                                               event.item_identifier))
+#
+#                self.logger.debug("returning DropsEvent")
+#                self.message_for_host.event_list.append(shard.DropsEvent(event.identifier,
+#                                                                         event.item_identifier,
+#                                                                         event.target_identifier))
+#
+#        return
+
+    def process_TriesToManipulateEvent(self, event):
+        """Pass event to Editor.respond().
+        """
+        self.logger.debug("called")
+
+        self.respond(event)
+
+        return
+
+    def respond(self, event):
+        """Add an Event from condition_response_list corresponding to the Event given to message_for_host.
+        """
+        response_event = None
+
+        # Poor man's dict. See __init__() for explanation.
+        #
+        for tuple in self.condition_response_list:
+            if tuple[0] == event:
+                response_event = tuple[1]
+
+        if response_event is None:
+            self.logger.error("event not found in condition_response_list")
+            self.message_for_host.event_list.append(shard.PerceptionEvent("player", "no response for {}".format(event)))
+
+        else:
+            self.logger.error("returning corresponding event")
+            self.message_for_host.event_list.append([event])
 
         return

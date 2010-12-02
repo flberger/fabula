@@ -949,20 +949,23 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
+        # Although we know the Entity, the server determines what if being
+        # looked at. So send target identifiers instead of Entity identifiers.
+
         if dropped_plane.name == "look_at":
 
             event = shard.TriesToLookAtEvent(self.host.player_id,
-                                             plane.name)
+                                             self.host.room.entity_locations[plane.name])
 
         elif dropped_plane.name == "manipulate":
 
             event = shard.TriesToManipulateEvent(self.host.player_id,
-                                                 plane.name)
+                                                 self.host.room.entity_locations[plane.name])
 
         elif dropped_plane.name == "talk_to":
 
             event = shard.TriesToTalkToEvent(self.host.player_id,
-                                             plane.name)
+                                             self.host.room.entity_locations[plane.name])
 
         else:
             event = shard.TriesToDropEvent(self.host.player_id,
@@ -1550,6 +1553,8 @@ class PygameEditor(PygameUserInterface):
 
         for identifier in self.host.room.entity_locations.keys():
 
-            self.host.room.entity_dict[identifier].asset.draggable = True
+            if identifier != self.host.player_id:
+
+                self.host.room.entity_dict[identifier].asset.draggable = True
 
         return

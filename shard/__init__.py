@@ -39,6 +39,7 @@
 #
 # IMPROVEMENTS
 #
+# TODO: introduce a client-specific Server timeout when an Event which requires multiple frames has been sent. Possibly send action_time in InitEvent to Server.
 # TODO: readable __repr__ of shard objects: Rack
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 # TODO: per-player inventories in server... -.-
@@ -527,7 +528,7 @@ class ChangeMapElementEvent(ServerEvent):
        ChangeMapElementEvent.location
            A description as in the TriesToMoveEvent
     """
-    
+
     def __init__(self, tile, location):
         """Event initialisation.
            tile is a shard map object having a type (obstacle or floor) and an
@@ -579,7 +580,7 @@ class InitEvent(Event):
 class Message:
     """A Message manages an ordered list of shard events.
        Messages sent by the server describe the action of a certain time frame.
-       The UserInterface has to decide which events happen in parallel and which 
+       The UserInterface has to decide which events happen in parallel and which
        ones happen sequential. Instances of Message expose a single Python list
        object as Message.event_list.
 
@@ -603,8 +604,8 @@ class Message:
         return str(self.event_list)
 
 #    def queueAsFirstEvent(self, event):
-#        """This is a convenience method. Queue the event 
-#           given as the first event to be processed, 
+#        """This is a convenience method. Queue the event
+#           given as the first event to be processed,
 #           shifting other events already queued."""
 #        self.event_list = [event] + self.event_list
 
