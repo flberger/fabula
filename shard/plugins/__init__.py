@@ -3,7 +3,7 @@
 
 # Work started on 30. Sep 2009
 
-import shard           
+import shard
 import shard.eventprocessor
 
 class Plugin(shard.eventprocessor.EventProcessor):
@@ -14,24 +14,26 @@ class Plugin(shard.eventprocessor.EventProcessor):
 
        Attributes:
 
+       Plugin.host
+           The host of this plugin, an instance of shard.core.Engine.
+
        Plugin.logger
-           The host's logger
+           The host's logger.
 
        Plugin.message_for_host
-           Shard Message to be returned by Plugin.process_message()
-
-       Plugin.host
-           The host of this plugin, an instance of shard.core.Engine
+           Shard Message to be returned by Plugin.process_message().
     """
 
-    def __init__(self, logger):
+    def __init__(self, host):
         """Initialise the plugin.
-           logger is an instance of logging.Logger.
+           host is an instance of shard.core.Engine.
         """
 
         shard.eventprocessor.EventProcessor.__init__(self)
 
-        self.logger = logger
+        self.host = host
+
+        self.logger = host.logger
 
         self.message_for_host = shard.Message([])
 

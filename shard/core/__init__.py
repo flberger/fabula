@@ -20,6 +20,8 @@ class Engine(shard.eventprocessor.EventProcessor):
        Engine.interface
 
        Engine.plugin
+           This is None upon initialisation and must be set to an instance of
+           shard.plugins.Plugin using Engine.set_plugin().
 
        Engine.message_for_plugin
 
@@ -31,7 +33,7 @@ class Engine(shard.eventprocessor.EventProcessor):
        Engine.rack
     """
 
-    def __init__(self, interface_instance, plugin_instance, logger):
+    def __init__(self, interface_instance, logger):
         """Set up Engine attributes.
 
            Arguments:
@@ -40,10 +42,6 @@ class Engine(shard.eventprocessor.EventProcessor):
                An instance of a subclass of
                shard.interfaces.Interface to communicate
                with the remote host.
-
-           plugin_instance
-               Most Engines will deploy a plugin
-               engine to control or present the game.
 
            logger
                An instance of logging.Logger.
@@ -59,18 +57,13 @@ class Engine(shard.eventprocessor.EventProcessor):
 
         self.interface = interface_instance
 
-        self.plugin = plugin_instance
-
-        # Attach reference to this Engine
-        # to the Plugin.
-        #
-        self.plugin.host = self
+        self.plugin = None
 
         # The Engine examines the events of a received
         # Message and applies them. Events for special
         # consideration for the PluginEngine are collected
         # in a Message for the PluginEngine.
-        # The Engine has to empty the Message once 
+        # The Engine has to empty the Message once
         # the PluginEngine has processed all Events.
         #
         self.message_for_plugin = shard.Message([])
@@ -79,7 +72,7 @@ class Engine(shard.eventprocessor.EventProcessor):
         # sent to the remote host in each loop.
         #
         self.message_for_remote = shard.Message([])
-        
+
         # self.room keeps track of the map and active Entites.
         # An actual room is created when the first EnterRoomEvent is
         # encountered.
@@ -92,6 +85,15 @@ class Engine(shard.eventprocessor.EventProcessor):
         self.rack = shard.Rack()
 
         self.logger.info("complete")
+
+        return
+
+    def set_plugin(self, plugin_instance):
+        """Set the pluginto control or present the game.
+           plugin_instance must be an instance of shard.plugins.Plugin.
+        """
+
+        self.plugin = plugin_instance
 
         return
 
@@ -112,7 +114,7 @@ class Engine(shard.eventprocessor.EventProcessor):
             pass
 
         # exit has been requested
-        
+
         self.logger.info("exit requested from PluginEngine, shutting down interface...")
 
         # stop the Interface thread

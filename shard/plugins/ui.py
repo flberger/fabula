@@ -60,7 +60,7 @@ class UserInterface(shard.plugins.Plugin):
     ####################
     # Initialization
 
-    def __init__(self, assets, framerate, logger):
+    def __init__(self, assets, framerate, host):
         """This method initialises the UserInterface.
            assets must be an instance of shard.Assets or a subclass.
            framerate must be an integer and sets the maximum (not minimum ;-))
@@ -69,7 +69,7 @@ class UserInterface(shard.plugins.Plugin):
 
         # First set up the plugin
         #
-        shard.plugins.Plugin.__init__(self, logger)
+        shard.plugins.Plugin.__init__(self, host)
 
         # Set how long actions like a movement from
         # Map element to Map element take, in seconds.
@@ -135,10 +135,7 @@ class UserInterface(shard.plugins.Plugin):
     ####################
     # UserInterface Main Method
 
-    def process_message(self,
-                        message,
-                        room,
-                        player_id):
+    def process_message(self, message):
         """This is the main method of the UserInterface.
            You should normally not override this method unless you have to do
            some really advanced stuff. Overriding the other methods of this
@@ -154,8 +151,6 @@ class UserInterface(shard.plugins.Plugin):
            of Client.run().
         """
 
-        # TODO: do we still need to give room and player_id? The should be accessible via Plugin.host, and we can set up proxies here for faster access
-
         # *sigh* Design by contract is a really nice
         # thing. We really really should do some thorough
         # checks, like for duplicate RoomCompleteEvents,
@@ -168,11 +163,11 @@ class UserInterface(shard.plugins.Plugin):
         ####################
         # Initialise
 
-        self.room = room
-
-        # TODO: Do we need to transfer player_id on every call?
+        # TODO: Do we need to set player_id and room on every call?
         #
-        self.player_id = player_id
+        self.room = self.host.room
+
+        self.player_id = self.host.player_id
 
         # Reset the list of events triggered by
         # player actions

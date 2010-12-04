@@ -18,10 +18,10 @@ import pygame
 import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
-import os.path
+import os
 import re
 
-def open_image(title, logger):
+def load_image(title):
     """Auxiliary function to make the user open an image file.
        Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
     """
@@ -39,21 +39,18 @@ def open_image(title, logger):
                                                   title = title)
     tk.destroy()
 
-    if not fullpath:
+    if fullpath:
 
-        logger.debug("no filename selected")
-
-    else:
         filename = os.path.basename(fullpath)
-
-        logger.debug("open: {}".format(fullpath))
 
         try:
             surface = pygame.image.load(fullpath)
 
         except pygame.error:
 
-            self.logger.debug("could not load image '{}'".format(fullpath))
+            # This will return None
+            #
+            pass
 
     return (surface, filename)
 
@@ -213,7 +210,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
            A black pygame surface for fade effects
     """
 
-    def __init__(self, assets, framerate, logger):
+    def __init__(self, assets, framerate, host):
         """This method initialises the PygameUserInterface.
            assets must be an instance of shard.Assets or a subclass.
            framerate must be an integer and sets the maximum (not minimum ;-))
@@ -222,7 +219,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 
         # Call original __init__()
         #
-        shard.plugins.ui.UserInterface.__init__(self, assets, framerate, logger)
+        shard.plugins.ui.UserInterface.__init__(self, assets, framerate, host)
 
         self.logger.debug("called")
 
@@ -673,6 +670,11 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
                 self.logger.debug("found event.tile in self.room.tile_list")
                 tile_from_list = tile
 
+        if tile_from_list is None:
+
+            self.logger.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
+            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
+
         if tile_from_list.asset is not None:
 
             self.logger.debug("tile already has an asset: {}".format(tile_from_list))
@@ -888,7 +890,7 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         """Clicked callback to issue a TriesToMoveEvent.
         """
 
-        # TODO: This is so tile_drop_callback() that it should be unified.
+        # TODO: This is so much like tile_drop_callback() that it should be unified.
 
         self.logger.debug("called")
 
@@ -1026,6 +1028,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
 class PygameEditor(PygameUserInterface):
     """A Pygame-based user interface that serves as a map editor.
 
+       This Plugin is meant to be used by shard.serverside.Editor.
+
        Additional PygameEditor attributes:
 
        PygameUserInterface.window.buttons
@@ -1044,13 +1048,13 @@ class PygameEditor(PygameUserInterface):
            overlay
     """
 
-    def __init__(self, assets, framerate, logger):
+    def __init__(self, assets, framerate, host):
         """Call PygameUserInterface.__init__(), but set up different Planes.
         """
 
         # Call base class __init__()
         #
-        PygameUserInterface.__init__(self, assets, framerate, logger)
+        PygameUserInterface.__init__(self, assets, framerate, host)
 
         self.logger.debug("called")
 
@@ -1161,7 +1165,7 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        new_image = open_image("Open Background Image", self.logger)[0]
+        new_image, filename = load_image("Open Background Image")
 
         if new_image is not None:
 
@@ -1179,9 +1183,17 @@ class PygameEditor(PygameUserInterface):
             warning_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
             self.window.room.sub(warning_box)
 
+        else:
+            self.logger.error("could not load image '{}'".format(filename))
+
+        return
+
     def save_room(self, plane):
-        """Button callback to save the tile images, resend and save the whole Room.
+        """Button callback to save the tile images, resend and then save the Room to a local file.
         """
+
+        # Observe that this method adds Events to self.host.message_for_host,
+        # which is shard.plugins.serverside.Editor.message_for_host.
 
         self.logger.debug("called")
 
@@ -1200,11 +1212,16 @@ class PygameEditor(PygameUserInterface):
         #
         filename = os.path.splitext(filename)[0]
 
-        if filename:
+        if not filename:
 
+            self.logger.debug("no filename selected")
+
+        else:
             self.logger.debug("save to: {}".format(filename))
 
-            self.message_for_host.event_list.append(shard.EnterRoomEvent(filename))
+            self.host.message_for_host.event_list.append(shard.EnterRoomEvent(filename))
+
+            roomfile = open(filename + ".floorplan", "wt")
 
             # TODO: only save PNGs if they have actually changed
             #
@@ -1218,43 +1235,76 @@ class PygameEditor(PygameUserInterface):
                     pygame.image.save(self.window.room.subplanes[str((x, y))].image,
                                       os.path.join(path, current_file))
 
-                    # Send Tile to Server
+                    # Send renamed Tile to Server
                     #
-                    tile = shard.Tile(self.room.floor_plan[(x, y)].tile.tile_type,
+                    tile = shard.Tile(self.host.room.floor_plan[(x, y)].tile.tile_type,
                                       current_file)
 
                     event = shard.ChangeMapElementEvent(tile, (x, y))
 
-                    self.message_for_host.event_list.append(event)
+                    self.host.message_for_host.event_list.append(event)
 
-            # Now spawn all Entities in the Server
+                    # Save tile in floorplan file
+
+                    entities_string = ""
+
+                    for entity in self.host.room.floor_plan[(x, y)].entities:
+
+                        # TODO: make sure commas are not present in the other strings
+                        #
+                        entities_string = entities_string + "\t{},{},{}".format(entity.entity_type,
+                                                                                entity.identifier,
+                                                                                entity.asset_desc)
+
+                    roomfile.write("{}\t{}\t{}{}\n".format(repr((x, y)),
+                                                           tile.tile_type,
+                                                           tile.asset_desc,
+                                                           entities_string))
+
+            roomfile.close()
+
+            self.logger.debug("wrote {}".format(filename + ".floorplan"))
+
+            # Then respawn all current Entities in the Server since
+            # EnterRoomEvent will set up a new room
             #
-            for identifier in self.room.entity_dict.keys():
+            for identifier in self.host.room.entity_dict.keys():
 
                 # Create a new Entity which can be pickled by Event loggers
+                # TODO: still necessary?
                 #
-                entity = shard.Entity(self.room.entity_dict[identifier].entity_type,
+                entity = shard.Entity(self.host.room.entity_dict[identifier].entity_type,
                                       identifier,
-                                      self.room.entity_dict[identifier].asset_desc)
+                                      self.host.room.entity_dict[identifier].asset_desc)
 
                 event = shard.SpawnEvent(entity,
-                                         self.room.entity_locations[identifier])
+                                         self.host.room.entity_locations[identifier])
 
-                self.message_for_host.event_list.append(event)
+                self.host.message_for_host.event_list.append(event)
 
-            self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+            self.host.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
-        else:
-            self.logger.debug("no filename selected")
+        return
 
     def load_room(self, plane):
-        """Button callback to issue a TriesToTalkToEvent to receive a list of rooms to load from the Editor Plugin.
+        """Button callback to display a list of rooms to select from.
         """
+
         self.logger.debug("called")
 
-        event = shard.TriesToTalkToEvent(self.host.player_id, "load_room")
+        room_list = []
 
-        self.message_for_host.event_list.append(event)
+        for filename in os.listdir(os.getcwd()):
+
+            if filename.endswith(".floorplan"):
+
+                room_list.append(filename.split(".floorplan")[0])
+
+        option_list = clickndrag.gui.OptionList("select_room",
+                                                room_list,
+                                                self.host.send_room_events)
+
+        self.window.room.sub(option_list)
 
     def add_item(self, plane):
         """Button callback to request item identifier and image and add it to the rack.
@@ -1276,7 +1326,7 @@ class PygameEditor(PygameUserInterface):
 
         else:
 
-            image, filename = open_image("Image Of New Item", self.logger)
+            image, filename = load_image("Image Of New Item")
 
             if image is not None:
 
@@ -1286,18 +1336,21 @@ class PygameEditor(PygameUserInterface):
 
                 self.logger.debug("appending SpawnEvent and PicksUpEvent")
 
-                # TODO: revert to (0, 0) or another safe spawning location
+                # TODO: make sure to use a safe spawning location
+                # Observe: adding to self.host.message_for_host
                 #
-                self.message_for_host.event_list.append(shard.SpawnEvent(entity, (3, 3)))
+                self.host.message_for_host.event_list.append(shard.SpawnEvent(entity, (0, 0)))
 
-                self.message_for_host.event_list.append(shard.PicksUpEvent(self.host.player_id,
-                                                                           item_identifier))
+                self.host.message_for_host.event_list.append(shard.PicksUpEvent(self.host.player_id,
+                                                                                item_identifier))
+
+        return
 
     def quit(self, plane):
         """Button callback to set self.exit_requested = True
         """
         self.logger.debug("setting exit_requested = True")
-        self.exit_requested = True
+        self.host.host.exit_requested = True
 
     def edit_walls(self, plane):
         """Button callback to switch to wall edit mode.
@@ -1328,7 +1381,7 @@ class PygameEditor(PygameUserInterface):
         # Clear Entity planes from room, but cache them.
         # By convention the name of the Entity Plane is Entity.identifier.
         #
-        for identifier in self.room.entity_dict.keys():
+        for identifier in self.host.room.entity_dict.keys():
             self.plane_cache.append(self.window.room.subplanes[identifier])
             self.window.room.remove(identifier)
 
@@ -1349,9 +1402,9 @@ class PygameEditor(PygameUserInterface):
         # Finally, create overlays for OBSTACLE tiles.
         # TODO: slight duplicate from make_tile_obstacle
         #
-        for coordinates in self.room.floor_plan.keys():
+        for coordinates in self.host.room.floor_plan.keys():
 
-            if self.room.floor_plan[coordinates].tile.tile_type == shard.OBSTACLE:
+            if self.host.room.floor_plan[coordinates].tile.tile_type == shard.OBSTACLE:
 
                 overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
                                                  pygame.Rect(self.window.room.subplanes[str(coordinates)].rect),
@@ -1367,18 +1420,18 @@ class PygameEditor(PygameUserInterface):
            overlay is applied to visualize the OBSTACLE type.
         """
 
-        self.logger.debug("returning ChangeMapElementEvent and creating overlay for tile at {}".format(plane.name))
+        self.logger.debug("returning ChangeMapElementEvent to Server and creating overlay for tile at {}".format(plane.name))
 
         # The name of the clicked Plane is supposed to be a string representation
         # of a coordinate tuple.
         #
         coordinates = eval(plane.name)
-        asset_desc = self.room.floor_plan[coordinates].tile.asset_desc
+        asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
 
         event = shard.ChangeMapElementEvent(shard.Tile(shard.OBSTACLE, asset_desc),
                                             coordinates)
 
-        self.message_for_host.event_list.append(event)
+        self.host.message_for_host.event_list.append(event)
 
         # Draw an overlay indicating the OBSTACLE type.
         # rect can be taken from the Plane that received the click, but we make
@@ -1400,18 +1453,18 @@ class PygameEditor(PygameUserInterface):
 
         # Based on a copy-paste from make_tile_obstacle()
 
-        self.logger.debug("returning ChangeMapElementEvent and deleting '{}'".format(plane.name))
+        self.logger.debug("returning ChangeMapElementEvent to Server and deleting '{}'".format(plane.name))
 
-        # The clicked Plane is  the overlay. Its name is supposed to be a string
+        # The clicked Plane is the overlay. Its name is supposed to be a string
         # representation of a coordinate tuple plus "_overlay".
         #
         coordinates = eval(plane.name.split("_overlay")[0])
-        asset_desc = self.room.floor_plan[coordinates].tile.asset_desc
+        asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
 
         event = shard.ChangeMapElementEvent(shard.Tile(shard.FLOOR, asset_desc),
                                             coordinates)
 
-        self.message_for_host.event_list.append(event)
+        self.host.message_for_host.event_list.append(event)
 
         # Delete the overlay indicating the OBSTACLE type.
         #
@@ -1556,5 +1609,33 @@ class PygameEditor(PygameUserInterface):
             if identifier != self.host.player_id:
 
                 self.host.room.entity_dict[identifier].asset.draggable = True
+
+        return
+
+    def retrieve_response(self, event):
+        """Make the user specify an response Event to an action.
+        """
+
+        self.logger.debug("called")
+
+        event_list = ("CanSpeakEvent",
+                      "ManipulatesEvent",
+                      "MovesToEvent",
+                      "PerceptionEvent",
+                      "SaysEvent",
+                      "ChangeMapElementEvent",
+                      "DeleteEvent",
+                      "SpawnEvent",
+                      "ChangeStateEvent")
+
+        # TODO: EnterRoomEvent, RoomCompleteEvent, PicksUpEvent, DropsEvent, AttemptFailedEvent
+        # TODO: specify multiple Events as response
+
+        # !!!
+        option_list = clickndrag.gui.OptionList("select_response",
+                                                event_list,
+                                                lambda option: self.logger.critical("no callback defined!"))
+
+        self.window.room.sub(option_list)
 
         return

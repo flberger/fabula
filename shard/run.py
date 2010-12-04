@@ -14,7 +14,6 @@
 import shard.assets
 import shard.core.client
 import shard.core.server
-import shard.plugins
 import shard.plugins.ui
 import shard.interfaces
 
@@ -40,14 +39,14 @@ class ShardFileFormatter(logging.Formatter):
     def format(self, record):
         """Override logging.Formatter.format()
         """
-        
+
         # Reformat path to module information
         #
         record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
 
         # Fixed-length line number
         #
-        record.lineno = "{:3}".format(record.lineno)
+        #record.lineno = "{:3}".format(record.lineno)
 
         # Call base class implementation
         #
@@ -103,7 +102,7 @@ class App:
         # STDERR console handler
         #
         # Creating an instance without arguments defaults to STDERR.
-        # 
+        #
         self.stderr_handler = logging.StreamHandler()
 
         self.stderr_handler.setLevel(logging.DEBUG)
@@ -118,7 +117,7 @@ class App:
         #                                     + "%(funcName)s() "
         #                                     + "\x1b\x5b\x33\x39\x6d"
         #                                     + "%(message)s")
-        
+
         stderr_formatter = logging.Formatter("%(funcName)s() %(message)s")
 
         self.stderr_handler.setFormatter(stderr_formatter)
@@ -136,7 +135,7 @@ class App:
         # Loglevel:
         # + "%(levelname)-5s "
         # Line number:
-        # "[%(lineno)s]"
+        # %(lineno)s
 
         file_formatter = ShardFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s",
                                             "%Y-%m-%d %H:%M:%S")
@@ -166,14 +165,15 @@ class App:
 
         assets = self.assets_class(self.logger)
 
-        plugin = self.user_interface_class(assets,
-                                           framerate,
-                                           self.logger)
-
         client = shard.core.client.Client(interface,
-                                          plugin,
                                           self.logger,
                                           player_id)
+
+        plugin = self.user_interface_class(assets,
+                                           framerate,
+                                           client)
+
+        client.set_plugin(plugin)
 
         def exit():
             """Wait for some time given in App.__init__(), then emulate a server
@@ -193,16 +193,18 @@ class App:
         self.logger.info("running in server mode")
         self.logger.info("running with interval (framerate) {}/s".format(framerate))
 
-        plugin = self.server_plugin_class(self.logger)
-
         # Since the Server will run in the main thread, signal handlers can
         # be installed.
         #
         server = shard.core.server.Server(interface,
-                                          plugin,
                                           self.logger,
                                           framerate,
                                           threadsafe = False)
+
+        plugin = self.server_plugin_class(server)
+
+        server.set_plugin(plugin)
+
         def exit():
             """Wait for some time given in App.__init__(), then call
                server.handle_exit().
@@ -301,23 +303,26 @@ class App:
         #
         assets = self.assets_class(self.logger)
 
-        user_interface = self.user_interface_class(assets,
-                                                   framerate,
-                                                   self.logger)
-
         client = shard.core.client.Client(client_interface,
-                                          user_interface,
                                           self.logger,
                                           player_id)
+
+        user_interface = self.user_interface_class(assets,
+                                                   framerate,
+                                                   client)
+
+        client.set_plugin(user_interface)
+
         # Setting up server
         #
-        server_plugin = self.server_plugin_class(self.logger)
-
         server = shard.core.server.Server(server_interface,
-                                          server_plugin,
                                           self.logger,
                                           framerate,
                                           threadsafe = True)
+
+        server_plugin = self.server_plugin_class(server)
+
+        server.set_plugin(server_plugin)
 
         # Client exit function for testing
         #
