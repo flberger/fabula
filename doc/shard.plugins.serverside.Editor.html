@@ -27,12 +27,15 @@ Editor.current_room
     Name of the current room.
 
 Editor.condition_response_list
-    A list containing tuples of (incoming_event, response_event).</pre>
+    A list containing tuples of (incoming_event, response_event).
+
+Editor.pygame_editor
+    A PygameEditor where the editing is done.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id98">
+      <table class="children sortable" id="id101">
   
   
 <tr class="method">
@@ -45,32 +48,20 @@ Editor.condition_response_list
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.Editor.html#process_message">process_message</a></td>
+    <td><tt>Editor main method.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.serverside.Editor.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Send a bare room, to be populated by the user.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.serverside.Editor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Save the name of the room to be entered and forward the event to the Server to update the Room.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.Editor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Save the Room to a local file, then forward the event to the Server .</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.Editor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
-    <td><tt>Return the CanSpeakEvent to offer a selection to the player.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.Editor.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>If the text matches a room file, load and send the room.</tt></td>
+    <td><a href="shard.plugins.serverside.Editor.html#send_room_events">send_room_events</a></td>
+    <td><tt>OptionList callback to read a Room from a file and send it to the Server.</tt></td>
   </tr><tr class="method">
     
     
@@ -87,6 +78,18 @@ Editor.condition_response_list
     
     
     <td>Method</td>
+    <td><a href="shard.plugins.serverside.Editor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Return the CanSpeakEvent to offer a selection to the player.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.plugins.serverside.Editor.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>If the text matches a room file, load and send the room.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="shard.plugins.serverside.Editor.html#respond">respond</a></td>
     <td><tt>Add an Event from condition_response_list corresponding to the Event given to message_for_host.</tt></td>
   </tr>
@@ -96,16 +99,10 @@ Editor.condition_response_list
         <p>
           Inherited from <a href="shard.plugins.serverside.DefaultGame.html">DefaultGame</a>:
         </p>
-        <table class="children sortable" id="id99">
+        <table class="children sortable" id="id102">
   
   
 <tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_message">process_message</a></td>
-    <td><tt>DefaultGame main method.</tt></td>
-  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -127,91 +124,7 @@ Editor.condition_response_list
     
     
     <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="shard.plugins.serverside.DefaultGame.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Return the Event to the host.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="shard.plugins.serverside.DefaultGame.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Return the Event to the host.</tt></td>
   </tr><tr class="basemethod">
     
@@ -226,7 +139,7 @@ Editor.condition_response_list
         <p>
           Inherited from <a href="shard.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="shard.plugins.serverside.DefaultGame.html">DefaultGame</a>, <a href="shard.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id100">
+        <table class="children sortable" id="id103">
   
   
 <tr class="basemethod">
@@ -241,6 +154,102 @@ Editor.condition_response_list
     <td>Method</td>
     <td><a href="shard.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
     <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="shard.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
   </tr>
   
 </table>
@@ -261,13 +270,32 @@ Editor.condition_response_list
   <div class="functionHeader">
     
     def
-    __init__(self, logger):
+    __init__(self, host):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#__init__">shard.plugins.serverside.DefaultGame.__init__</a></div>
     <pre>Initialise.
         </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.Editor.process_message">
+    
+  </a>
+  <a name="process_message">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_message(self, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_message">shard.plugins.serverside.DefaultGame.process_message</a></div>
+    <pre>Editor main method.
+It calls the base class method, but before returning to the host
+it calls the local PygameUserInterface.</pre>
   </div>
 </div><div class="function">
   <a name="shard.plugins.serverside.Editor.process_InitEvent">
@@ -288,75 +316,21 @@ Editor.condition_response_list
         </pre>
   </div>
 </div><div class="function">
-  <a name="shard.plugins.serverside.Editor.process_EnterRoomEvent">
+  <a name="shard.plugins.serverside.Editor.send_room_events">
     
   </a>
-  <a name="process_EnterRoomEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_EnterRoomEvent(self, event):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_EnterRoomEvent">shard.plugins.serverside.DefaultGame.process_EnterRoomEvent</a></div>
-    <pre>Save the name of the room to be entered and forward the event to the Server to update the Room.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.serverside.Editor.process_RoomCompleteEvent">
-    
-  </a>
-  <a name="process_RoomCompleteEvent">
+  <a name="send_room_events">
     
   </a>
   <div class="functionHeader">
     
     def
-    process_RoomCompleteEvent(self, event):
+    send_room_events(self, option):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_RoomCompleteEvent">shard.plugins.serverside.DefaultGame.process_RoomCompleteEvent</a></div>
-    <pre>Save the Room to a local file, then forward the event to the Server .
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.serverside.Editor.process_TriesToTalkToEvent">
     
-  </a>
-  <a name="process_TriesToTalkToEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_TriesToTalkToEvent(self, event):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_TriesToTalkToEvent">shard.plugins.serverside.DefaultGame.process_TriesToTalkToEvent</a></div>
-    <pre>Return the CanSpeakEvent to offer a selection to the player.
-        </pre>
-  </div>
-</div><div class="function">
-  <a name="shard.plugins.serverside.Editor.process_SaysEvent">
-    
-  </a>
-  <a name="process_SaysEvent">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    process_SaysEvent(self, event):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_SaysEvent">shard.plugins.serverside.DefaultGame.process_SaysEvent</a></div>
-    <pre>If the text matches a room file, load and send the room.
+    <pre>OptionList callback to read a Room from a file and send it to the Server.
         </pre>
   </div>
 </div><div class="function">
@@ -396,6 +370,42 @@ Editor.condition_response_list
         </pre>
   </div>
 </div><div class="function">
+  <a name="shard.plugins.serverside.Editor.process_TriesToTalkToEvent">
+    
+  </a>
+  <a name="process_TriesToTalkToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToTalkToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.plugins.serverside.DefaultGame.html#process_TriesToTalkToEvent">shard.plugins.serverside.DefaultGame.process_TriesToTalkToEvent</a></div>
+    <pre>Return the CanSpeakEvent to offer a selection to the player.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="shard.plugins.serverside.Editor.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="shard.eventprocessor.EventProcessor.html#process_SaysEvent">shard.eventprocessor.EventProcessor.process_SaysEvent</a></div>
+    <pre>If the text matches a room file, load and send the room.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="shard.plugins.serverside.Editor.respond">
     
   </a>
@@ -415,7 +425,7 @@ Editor.condition_response_list
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-02 11:26:48.
+      <a href="index.html">API Documentation</a> for shard, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2010-12-04 12:12:32.
     </address>
   </body>
 </html>
