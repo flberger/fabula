@@ -567,11 +567,25 @@ class Editor(DefaultGame):
 
             self.logger.debug("event not found in condition_response_list")
 
-            self.pygame_editor.retrieve_response(event)
+            self.pygame_editor.select_event(event)
 
         else:
             self.logger.debug("returning corresponding event")
-            self.message_for_host.event_list.append([event])
+            self.message_for_host.event_list.append(response_event)
+
+        return
+
+    def add_response(self, trigger_event, response_event):
+        """Add the (trigger_event, response_event) tuple to
+           Editor.condition_response_list.
+        """
+
+        # This could also be done in self.pygame_editor.event_edit_done(), but
+        # it's cleaner to do here.
+        #
+        self.logger.debug("adding {}".format((trigger_event, response_event)))
+
+        self.condition_response_list.append((trigger_event, response_event))
 
         return
 

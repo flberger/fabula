@@ -1143,6 +1143,11 @@ class PygameEditor(PygameUserInterface):
                                                                   (88, 30)),
                                                       self.edit_walls))
 
+        self.window.buttons.sub(clickndrag.gui.Button("Save Logic",
+                                                      pygame.Rect((0, 0),
+                                                                  (88, 30)),
+                                                      lambda plane : self.logger.debug("no callback for '{}'".format(plane.name))))
+
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
                                                       pygame.Rect((0, 0),
                                                                   (88, 30)),
@@ -1612,30 +1617,79 @@ class PygameEditor(PygameUserInterface):
 
         return
 
-    def retrieve_response(self, event):
+    def select_event(self, event):
         """Make the user specify an response Event to an action.
         """
 
         self.logger.debug("called")
 
-        event_list = ("CanSpeakEvent",
-                      "ManipulatesEvent",
-                      "MovesToEvent",
-                      "PerceptionEvent",
-                      "SaysEvent",
-                      "ChangeMapElementEvent",
-                      "DeleteEvent",
-                      "SpawnEvent",
-                      "ChangeStateEvent")
+        event_list = ("Can Speak",
+                      "Moves To",
+                      "Perception",
+                      "Says",
+                      "Change Map Element",
+                      "Delete",
+                      "Spawn",
+                      "Attempt Failed")
 
-        # TODO: EnterRoomEvent, RoomCompleteEvent, PicksUpEvent, DropsEvent, AttemptFailedEvent
+        # TODO: ChangeStateEvent, ManipulatesEvent, EnterRoomEvent, RoomCompleteEvent, PicksUpEvent, DropsEvent
         # TODO: specify multiple Events as response
 
-        # !!!
         option_list = clickndrag.gui.OptionList("select_response",
                                                 event_list,
-                                                lambda option: self.logger.critical("no callback defined!"))
+                                                lambda option: self.edit_event(event, option))
 
         self.window.room.sub(option_list)
+
+        return
+
+    def edit_event(self, event, option):
+        """Let the user edit the attributes of the selected Event.
+        """
+
+        self.logger.debug("called")
+
+        if option.text == "Perception":
+
+            container = clickndrag.gui.Container("edit_event",
+                                                 padding = 5)
+
+            container.sub(clickndrag.gui.Label("title",
+                                               "Edit {}".format(option.text),
+                                               pygame.Rect((0, 0), (200, 30))))
+
+            textbox = clickndrag.gui.TextBox("textbox",
+                                             pygame.Rect((0, 0), (200, 30)))
+
+            self.window.key_sensitive(textbox)
+
+            container.sub(textbox)
+
+            container.sub(clickndrag.gui.Button("OK",
+                                                pygame.Rect((0, 0), (90, 30)),
+                                                lambda plane: self.event_edit_done(event, shard.PerceptionEvent(event.identifier, textbox.text))))
+
+            self.window.room.sub(container)
+
+        elif option.text == "Attempt Failed":
+
+            # Do nothing. AttemptFailedEvent is the default response.
+            #
+            pass
+
+        else:
+            self.logger.critical("handling of '{}' not implemented".format(option.text))
+
+        return
+
+    def event_edit_done(self, trigger_event, response_event):
+        """Button callback to call host.add_response() and destroy the Container.
+        """
+
+        self.logger.debug("called")
+
+        self.host.add_response(trigger_event, response_event)
+
+        self.window.room.edit_event.destroy()
 
         return

@@ -413,13 +413,11 @@ class Server(shard.core.Engine):
 
             for entity in entities:
 
-                if entity.entity_type in [shard.ITEM_BLOCK, shard.ITEM_NOBLOCK]:
+                event.target_identifier = entity.identifier
 
-                    event.target_identifier = entity.identifier
-
-                    new_events = [event,
-                                  shard.LookedAtEvent(entity.identifier,
-                                                      event.identifier)]
+                new_events = [event,
+                              shard.LookedAtEvent(entity.identifier,
+                                                  event.identifier)]
 
             self.logger.debug("forwarding event(s)")
             kwargs["message"].event_list.extend(new_events)
