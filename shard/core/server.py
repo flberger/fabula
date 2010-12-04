@@ -25,8 +25,7 @@ class Server(shard.core.Engine):
            Flag to be changed by signal handler
      """
 
-    def __init__(self, interface_instance, plugin_instance, logger, framerate,
-                 threadsafe = True):
+    def __init__(self, interface_instance, logger, framerate, threadsafe = True):
         """Initialise the Server.
            If threadsafe is True (default), no signal handlers are installed.
         """
@@ -36,7 +35,6 @@ class Server(shard.core.Engine):
         #
         shard.core.Engine.__init__(self,
                                    interface_instance,
-                                   plugin_instance,
                                    logger)
 
         # If framerate is 0, run as fast as possible
@@ -72,6 +70,8 @@ class Server(shard.core.Engine):
                 pass
 
             # TODO: restart plugin when SIGHUP is received
+
+        return
 
     def run(self):
         """Server main method, calling the Plugin in the process.

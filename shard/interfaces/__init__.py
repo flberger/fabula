@@ -21,7 +21,7 @@ import socketserver
 
 import pickle
 
-import time
+from time import sleep
 
 # Twisted has not yet been ported to Python 3.
 #
@@ -106,7 +106,10 @@ class Interface:
         # Run thread as long as no shutdown is requested
         #
         while not self.shutdown_flag:
-            pass
+
+            # No need to run as fast as possible
+            #
+            sleep(1/60)
 
         # Caught shutdown notification, stopping thread
         #
@@ -231,7 +234,7 @@ class UDPClientInterface(MessageBuffer, Interface):
     def handle_messages(self):
         """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
            It is meant to be the back end of send_message() and grab_message().
-           Put some networking code, a GUI or a random generator here. 
+           Put some networking code, a GUI or a random generator here.
            This method is put in a background thread automatically, so it can
            do all sorts of polling or blocking IO.
            It should regularly check whether shutdown() has been called, and
@@ -251,7 +254,7 @@ class UDPClientInterface(MessageBuffer, Interface):
 
                 # -1 = use highest available pickle protocol
                 #
-                self.sock.sendto(pickle.dumps(self.messages_for_remote.popleft(), -1), 
+                self.sock.sendto(pickle.dumps(self.messages_for_remote.popleft(), -1),
                                  self.address_port_tuple)
 
             # Now listen for incoming server
@@ -279,7 +282,7 @@ class UDPClientInterface(MessageBuffer, Interface):
 
                 # TODO: accepts data from *anywhere*
 
-                self.logger.debug("received server message (" 
+                self.logger.debug("received server message ("
                                   + str(len(data_received))
                                   + "/16384 bytes)")
 
@@ -321,7 +324,7 @@ class UDPServerInterface(Interface):
     def handle_messages(self):
         """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
            It is meant to be the back end of send_message() and grab_message().
-           Put some networking code, a GUI or a random generator here. 
+           Put some networking code, a GUI or a random generator here.
            This method is put in a background thread automatically, so it can
            do all sorts of polling or blocking IO.
            It should regularly check whether shutdown() has been called, and if
@@ -551,7 +554,7 @@ class UDPServerInterface(Interface):
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
 #           It is meant to be the back end of send_message() and grab_message().
-#           Put some networking code, a GUI or a random generator here. 
+#           Put some networking code, a GUI or a random generator here.
 #           This method is put in a background thread automatically, so it can
 #           do all sorts of polling or blocking IO.
 #           It should regularly check whether shutdown() has been called, and

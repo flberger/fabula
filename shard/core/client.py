@@ -44,13 +44,11 @@ class Client(shard.core.Engine):
     ####################
     # Init
 
-    def __init__(self, interface_instance, user_interface_instance, logger,
-                 player_id):
+    def __init__(self, interface_instance, logger, player_id):
         """Initalisation.
            The Client must be instantiated with an instance of a subclass of
            shard.interfaces.Interface which handles the connection to the server
-           or supplies events in some other way, and an instance of
-           UserInterface which presents the game action.
+           or supplies events in some other way.
         """
 
         # Save the player id for Server
@@ -66,7 +64,6 @@ class Client(shard.core.Engine):
         #
         shard.core.Engine.__init__(self,
                                    interface_instance,
-                                   user_interface_instance,
                                    logger)
 
         # Now we have:
@@ -132,7 +129,7 @@ class Client(shard.core.Engine):
         # TODO: The current implementation is too overtrustful.
         # It should check much more thoroughly if the
         # affected Entites exist at all and so on. Since
-        # this is a kind of precondition or even invariant, 
+        # this is a kind of precondition or even invariant,
         # it should be covered using a "design by contract"
         # approach to the whole thing instead of putting
         # neat "if" clauses here and there.
@@ -209,13 +206,13 @@ class Client(shard.core.Engine):
 
                 self.got_empty_message = True
 
-            # First handle the events in the Client, 
+            # First handle the events in the Client,
             # updating the room and preparing a Message for
             # the UserInterface
             #
             for current_event in server_message.event_list:
 
-                # This is a bit of Python magic. 
+                # This is a bit of Python magic.
                 # self.event_dict is a dict which maps classes to handling
                 # functions. We use the class of the event supplied as
                 # a key to call the appropriate handler, and hand over
@@ -238,9 +235,7 @@ class Client(shard.core.Engine):
             # regularly even if the server Message and
             # thus message_for_plugin  are empty.
             #
-            message_from_plugin = self.plugin.process_message(self.message_for_plugin,
-                                                              self.room,
-                                                              self.player_id)
+            message_from_plugin = self.plugin.process_message(self.message_for_plugin)
 
             # The UserInterface returned, the Server Message has
             # been applied and processed. Clean up.
@@ -282,10 +277,10 @@ class Client(shard.core.Engine):
 
                 else:
 
-                    # If we do not await a Confirmation anymore, 
+                    # If we do not await a Confirmation anymore,
                     # we evaluate the player input if any.
 
-                    # We queue player triggered events before 
+                    # We queue player triggered events before
                     # possible events from the Client.
                     # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the Client?
                     #
@@ -340,7 +335,7 @@ class Client(shard.core.Engine):
 
                                         moves_to_event = shard.MovesToEvent(event.identifier,
                                                                             event.target_identifier)
- 
+
                                         # Update room, needed for UserInterface
                                         #
                                         self.process_MovesToEvent(moves_to_event,
@@ -401,11 +396,11 @@ class Client(shard.core.Engine):
                 #
                 self.message_for_remote = shard.Message([])
 
-            # OK, iteration done. If no exit requested, 
+            # OK, iteration done. If no exit requested,
             # grab the next server message!
 
         # exit has been requested
-        
+
         self.logger.info("exit requested from "
               + "UserInterface, shutting down interface...")
 
@@ -571,7 +566,7 @@ class Client(shard.core.Engine):
                     self.await_confirmation = False
 
     def process_PicksUpEvent(self, event, **kwargs):
-        """The entity is deleted from the Room and added to Client.rack 
+        """The entity is deleted from the Room and added to Client.rack
         """
 
         # Call default
@@ -600,11 +595,11 @@ class Client(shard.core.Engine):
         # Call default implementation
         #
         shard.core.Engine.process_PerceptionEvent(self,
-                                                  event, 
+                                                  event,
                                                   message = kwargs["message"])
 
     #def process_SaysEvent(self, event, **kwargs):
-    #    """The UserInterface usually must display the 
+    #    """The UserInterface usually must display the
     #       spoken text. Thus the event is put in the
     #       event queue for the UserInterface.
     #       The UserInterface is going to notify

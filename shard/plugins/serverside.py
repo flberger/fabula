@@ -5,7 +5,8 @@
 
 # work started on 27. Oct 2010
 
-import shard.plugins
+import shard.plugins.pygameui
+import shard.assets
 import re
 import os
 import math
@@ -89,12 +90,12 @@ class DefaultGame(shard.plugins.Plugin):
            Dict mapping Entity identifiers to a list of coordinates walked so far.
     """
 
-    def __init__(self, logger):
+    def __init__(self, host):
         """Initialise.
         """
         # Call base class
         #
-        shard.plugins.Plugin.__init__(self, logger)
+        shard.plugins.Plugin.__init__(self, host)
 
         self.tries_to_move_dict = {}
         self.path_dict = {}
@@ -308,144 +309,7 @@ class DefaultGame(shard.plugins.Plugin):
         self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
         return
 
-    def process_MovesToEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_PicksUpEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_DropsEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_ManipulatesEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_CanSpeakEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
     def process_AttemptFailedEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_PerceptionEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_SaysEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_ChangeStateEvent(self, event):
-        """Return the Event to the host.
-        """
-        # ChangeState is based on a concept by Alexander Marbach.
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_PassedEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_LookedAtEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_PickedUpEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_DroppedEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_SpawnEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_DeleteEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_EnterRoomEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_RoomCompleteEvent(self, event):
-        """Return the Event to the host.
-        """
-
-        self.logger.debug("returning Event to host")
-        self.message_for_host.event_list.append(event)
-        return
-
-    def process_ChangeMapElementEvent(self, event):
         """Return the Event to the host.
         """
 
@@ -522,16 +386,21 @@ class Editor(DefaultGame):
 
        Editor.condition_response_list
            A list containing tuples of (incoming_event, response_event).
+
+       Editor.pygame_editor
+           A PygameEditor where the editing is done.
     """
 
     # TODO: replace hardwired "player" with client id
 
-    def __init__(self, logger):
+    def __init__(self, host):
         """Initialise.
         """
         # Call base class
         #
-        DefaultGame.__init__(self, logger)
+        DefaultGame.__init__(self, host)
+
+        self.logger.debug("called")
 
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
@@ -543,9 +412,62 @@ class Editor(DefaultGame):
         #
         self.condition_response_list = []
 
+        # Impersonate a decent host.
+        # self.room will point to self.host.room later, but chances are there
+        # is no host yet.
+        #
+        self.room = self.host.room
+        self.rack = self.host.rack
+        self.player_id = "player"
+
+        # Create a PygameEditor where the editing is done
+        # TODO: hardcoded framerate
+        #
+        self.pygame_editor = shard.plugins.pygameui.PygameEditor(shard.assets.Assets(self.logger),
+                                                                 60,
+                                                                 self)
+
+        self.logger.debug("complete")
+
+    def process_message(self, message):
+        """Editor main method.
+           It calls the base class method, but before returning to the host
+           it calls the local PygameUserInterface.
+        """
+
+        # Upon first call we have a host and thus a decent room and rack
+        # TODO: of course it is a waste to set that on every call
+        #
+        self.room = self.host.room
+        self.rack = self.host.rack
+
+        self.message_for_host = DefaultGame.process_message(self, message)
+
+        # By obscure means, retrieve Server outgoing Events from Server's MessageBuffer
+        # TODO: should this be done in Interface.handle_messages?
+        #
+        message = shard.Message([])
+
+        if list(self.host.interface.connections.values())[0].messages_for_remote:
+
+            message = list(self.host.interface.connections.values())[0].messages_for_remote.popleft()
+
+        self.pygame_editor.process_message(message)
+
+        # By similar obscure means, hand UserInterface Events over to the Server's MessageBuffer
+        # TODO: should this be done in Interface.handle_messages?
+        #
+        list(self.host.interface.connections.values())[0].messages_for_local.append(self.pygame_editor.message_for_host)
+
+        # Note: self.pygame_editor may have appended new Events
+        #
+        return self.message_for_host
+
     def process_InitEvent(self, event):
         """Send a bare room, to be populated by the user.
         """
+
+        # TODO: even InitEvent should call respond()
 
         self.logger.debug("called")
 
@@ -569,72 +491,53 @@ class Editor(DefaultGame):
 
             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
 
-    def process_EnterRoomEvent(self, event):
-        """Save the name of the room to be entered and forward the event to the Server to update the Room.
-        """
-        self.logger.debug(str(event))
-        self.current_room = event.room_identifier
-        self.message_for_host.event_list.append(event)
-
-    def process_RoomCompleteEvent(self, event):
-        """Save the Room to a local file, then forward the event to the Server .
+    def send_room_events(self, option):
+        """OptionList callback to read a Room from a file and send it to the Server.
         """
 
         self.logger.debug("called")
 
-        roomfile = open(self.current_room + ".floorplan", "wt")
+        event_list = load_room_from_file(option.text + ".floorplan")
 
-        for coordinates in self.host.room.floor_plan:
+        if event_list is None:
 
-            tile = self.host.room.floor_plan[coordinates].tile
+            self.logger.error("error opening file '{}.floorplan'".format(option.text + ".floorplan"))
 
-            entities_string = ""
+        else:
 
-            for entity in self.host.room.floor_plan[coordinates].entities:
+            self.message_for_host.event_list.extend(event_list)
 
-                # TODO: make sure commas are not present in the other strings
-                #
-                entities_string = entities_string + "\t{},{},{}".format(entity.entity_type,
-                                                                        entity.identifier,
-                                                                        entity.asset_desc)
+        self.logger.debug("complete")
 
-            roomfile.write("{}\t{}\t{}{}\n".format(repr(coordinates),
-                                                     tile.tile_type,
-                                                     tile.asset_desc,
-                                                     entities_string))
+        return
 
-            # TODO: save FloorPlanElement.entities = []
+    def process_TriesToLookAtEvent(self, event):
+        """Pass event to Editor.respond().
+        """
 
-        roomfile.close()
+        self.logger.debug("called")
 
-        self.logger.debug("wrote {}".format(self.current_room + ".floorplan"))
+        self.respond(event)
 
-        self.message_for_host.event_list.append(event)
+        return
+
+    def process_TriesToManipulateEvent(self, event):
+        """Pass event to Editor.respond().
+        """
+
+        self.logger.debug("called")
+
+        self.respond(event)
+
+        return
 
     def process_TriesToTalkToEvent(self, event):
         """Return the CanSpeakEvent to offer a selection to the player.
         """
+
         self.logger.debug("called")
 
-        if event.target_identifier == "load_room":
-
-            room_list = []
-
-            for filename in os.listdir(os.getcwd()):
-
-                if filename.endswith(".floorplan"):
-
-                    room_list.append(filename.split(".floorplan")[0])
-
-            event = shard.CanSpeakEvent(event.identifier, room_list)
-
-            self.message_for_host.event_list.append(event)
-
-        else:
-
-            # Pass event to Editor.respond()
-            #
-            self.respond(event)
+        self.respond(event)
 
         return
 
@@ -644,34 +547,35 @@ class Editor(DefaultGame):
 
         self.logger.debug("called")
 
-        if event.text + ".floorplan" in os.listdir(os.getcwd()):
-
-            self.logger.debug("'{}.floorplan' exists, attempting to load".format(event.text))
-
-            event_list = load_room_from_file(event.text + ".floorplan")
-
-            if event_list is None:
-
-                self.logger.error("error opening file 'default.floorplan'")
-
-            else:
-                self.message_for_host.event_list = self.message_for_host.event_list + event_list
-
-        else:
-            # Pass event to Editor.respond()
-            #
-            self.respond(event)
-
-        return
-
-    def process_TriesToLookAtEvent(self, event):
-        """Pass event to Editor.respond().
-        """
-        self.logger.debug("called")
-
         self.respond(event)
 
         return
+
+    def respond(self, event):
+        """Add an Event from condition_response_list corresponding to the Event given to message_for_host.
+        """
+
+        response_event = None
+
+        # Poor man's dict. See __init__() for explanation.
+        #
+        for tuple in self.condition_response_list:
+            if tuple[0] == event:
+                response_event = tuple[1]
+
+        if response_event is None:
+
+            self.logger.debug("event not found in condition_response_list")
+
+            self.pygame_editor.retrieve_response(event)
+
+        else:
+            self.logger.debug("returning corresponding event")
+            self.message_for_host.event_list.append([event])
+
+        return
+
+    # HERE BE DRAGONS #####################################################
 
 #    def process_TriesToDropEvent(self, event):
 #        """Return a DropsEvent to the Server.
@@ -728,33 +632,3 @@ class Editor(DefaultGame):
 #                                                                         event.target_identifier))
 #
 #        return
-
-    def process_TriesToManipulateEvent(self, event):
-        """Pass event to Editor.respond().
-        """
-        self.logger.debug("called")
-
-        self.respond(event)
-
-        return
-
-    def respond(self, event):
-        """Add an Event from condition_response_list corresponding to the Event given to message_for_host.
-        """
-        response_event = None
-
-        # Poor man's dict. See __init__() for explanation.
-        #
-        for tuple in self.condition_response_list:
-            if tuple[0] == event:
-                response_event = tuple[1]
-
-        if response_event is None:
-            self.logger.error("event not found in condition_response_list")
-            self.message_for_host.event_list.append(shard.PerceptionEvent("player", "no response for {}".format(event)))
-
-        else:
-            self.logger.error("returning corresponding event")
-            self.message_for_host.event_list.append([event])
-
-        return
