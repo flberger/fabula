@@ -10,6 +10,7 @@ import shard.assets
 import re
 import os
 import math
+import pickle
 
 def load_room_from_file(filename):
     """This function reads a Shard room from the file and returns a list of corresponding Events.
@@ -392,6 +393,7 @@ class Editor(DefaultGame):
     """
 
     # TODO: replace hardwired "player" with client id
+    # TODO: PygameEditor and serverside.Editor should each care for their own data structures. So separate methods where applicable.
 
     def __init__(self, host):
         """Initialise.
@@ -458,6 +460,12 @@ class Editor(DefaultGame):
         # TODO: should this be done in Interface.handle_messages?
         #
         list(self.host.interface.connections.values())[0].messages_for_local.append(self.pygame_editor.message_for_host)
+
+        # Check PygameEditor exit request
+        # TODO: Server does not check for Server.plugin.exit_requested
+        #
+        if self.pygame_editor.exit_requested:
+            self.host.exit_requested = True
 
         # Note: self.pygame_editor may have appended new Events
         #
@@ -586,6 +594,55 @@ class Editor(DefaultGame):
         self.logger.debug("adding {}".format((trigger_event, response_event)))
 
         self.condition_response_list.append((trigger_event, response_event))
+
+        return
+
+
+    def save_condition_response_list(self, filename):
+        """Save the response logic to the file given.
+        """
+
+        self.logger.debug("attempting to save to file '{}'".format(filename))
+
+        if filename:
+
+            file = open(filename, "wb")
+
+            file.write(pickle.dumps(self.condition_response_list, 0))
+
+            file.close()
+
+            # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
+            #
+            self.pygame_editor.window.room.sub(shard.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename)))
+
+        else:
+            self.logger.error("no filename given")
+
+        return
+
+    def load_condition_response_list(self, filename):
+        """Load response logic from the file given.
+        """
+
+        self.logger.debug("attempting to read from file'{}'".format(filename))
+
+        if filename:
+
+            file = open(filename, "rb")
+
+            # TODO: Check, check, check
+            #
+            self.condition_response_list = pickle.loads(file.read())
+
+            file.close()
+
+            # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
+            #
+            self.pygame_editor.window.room.sub(shard.plugins.pygameui.clickndrag.gui.OkBox("Logic read from file '{}'.".format(filename)))
+
+        else:
+            self.logger.error("no filename given")
 
         return
 

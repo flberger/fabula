@@ -80,6 +80,7 @@ class Server(shard.core.Engine):
         self.logger.info("starting")
 
         # MAIN LOOP
+        # TODO: Server.exit_requested is inconsistent with Client.plugin.exit_requested
         #
         while not self.exit_requested:
 
@@ -421,6 +422,36 @@ class Server(shard.core.Engine):
 
             self.logger.debug("forwarding event(s)")
             kwargs["message"].event_list.extend(new_events)
+
+        else:
+            self.logger.debug("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+
+            # Issue AttemptFailed to unblock client.
+            #
+            kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        return
+
+    def process_TriesToTalkToEvent(self, event, **kwargs):
+        """Check who is being talked to and forward the Event.
+        """
+
+        if event.target_identifier in self.room.floor_plan:
+
+            if not self.room.floor_plan[event.target_identifier].entities:
+
+                self.logger.debug("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
+
+                kwargs["message"].event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+            else:
+                # Pick last Entity
+                #
+                event.target_identifier = self.room.floor_plan[event.target_identifier].entities[-1].identifier
+
+                self.logger.debug("forwarding event")
+
+                kwargs["message"].event_list.append(event)
 
         else:
             self.logger.debug("AttemptFailed: {} not in floor_plan".format(event.target_identifier))

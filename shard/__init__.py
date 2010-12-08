@@ -29,7 +29,7 @@
 #
 # OPTIMISATION
 #
-# TODO: don't call base classes for trivial actions. Duplicate and save calls.
+# TODO: don't call base classes for trivial actions. Duplicate, and save calls.
 # TODO: string.format() / .join() instead of "%s" % s or "s" + "s" in the whole package!
 # TODO: use map() instead of "for" loops where applicable
 # TODO: "avoid dots" -> prefetch functions from.long.dotted.operations, especially in loops
@@ -45,6 +45,13 @@
 # TODO: per-player inventories in server... -.-
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
+
+# Shard will not work with Python versions prior to 3.x.
+#
+import sys
+
+if sys.version_info[0] != 3:
+    raise Exception("Shard needs Python 3 to work. Your Python version is: " + sys.version)
 
 import shard.eventprocessor
 
