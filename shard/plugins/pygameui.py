@@ -19,7 +19,6 @@ import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
 import os
-import re
 
 def load_image(title):
     """Auxiliary function to make the user open an image file.
@@ -895,9 +894,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
         self.logger.debug("called")
 
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
-        # Taken from shard.plugins.serverside
         #
-        if not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", plane.name):
+        if not shard.str_is_tuple(plane.name):
             self.logger.error("plane.name does not match coordinate tuple: '{}'".format(plane.name))
 
         else:
@@ -926,9 +924,8 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.logger.debug("ignoring drop of action icon")
 
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
-        # Taken from shard.plugins.serverside
         #
-        elif not re.match("^\([0-9]+\s*,\s*[0-9]+\)$", name):
+        elif not shard.str_is_tuple(name):
 
             self.logger.error("plane.name does not match coordinate tuple: '{}'".format(name))
 
@@ -1024,6 +1021,105 @@ class PygameUserInterface(shard.plugins.ui.UserInterface):
             self.logger.warning("'{}' not found in room, items are not made draggable".format("player"))
 
         return
+
+class EventEditor(clickndrag.gui.Container):
+    """A clickndrag Container that implements an editor for Shard Events.
+
+       Additional attributes:
+
+       EventEditor.title
+           A Label for the title. EventEditor.title.name is the class name of
+           the Event.
+
+       EventEditor.ATTRIBUTE_key_value
+           A Plane with the subplanes EventEditor.ATTRIBUTE_key_value.ATTRIBUTE
+           (Label) and EventEditor.ATTRIBUTE_key_value.ATTRIBUTE_value (TextBox).
+    """
+
+    def __init__(self, event, display):
+        """Initialise.
+        """
+        # This editor borrows a lot from Event.__repr__()
+
+        # Call base class
+        # We need a random and unique name - use the id of the Event.
+        #
+        clickndrag.gui.Container.__init__(self,
+                                          str(id(event)),
+                                          padding = 5)
+
+        # Title
+        #
+        self.sub(clickndrag.gui.Label("title",
+                                      event.__class__.__name__,
+                                      pygame.Rect((0, 0), (300, 25)),
+                                      color = clickndrag.gui.HIGHLIGHT_COLOR))
+
+        # Show Event attributes
+
+        # Keep order
+        #
+        keys = list(event.__dict__.keys())
+        keys.sort()
+
+        for key in keys:
+
+            key_label = clickndrag.gui.Label("key_{}".format(key),
+                                             "{}:".format(key),
+                                             pygame.Rect((0, 0), (150, 25)))
+
+            value_textbox = clickndrag.gui.TextBox("value_{}".format(key),
+                                                   pygame.Rect((key_label.rect.width, 0),
+                                                               (150, 25)))
+
+            value_textbox.text = str(event.__dict__[key])
+
+            # Upon clicked, register the TextBox for keyboard input
+            #
+            value_textbox.clicked_callback = lambda plane : display.key_sensitive(plane)
+
+            key_value = clickndrag.Plane("keyvalue_{}".format(key),
+                                         pygame.Rect((0, 0),
+                                                     (300, 25)))
+
+            key_value.sub(key_label)
+            key_value.sub(value_textbox)
+
+            self.sub(key_value)
+
+        return
+
+    def get_updated_event(self):
+        """Return an Event that incorporates the current user changes.
+        """
+        # The Event is built as a string and then pumped through eval()
+        # TODO: this should go to the Shard main package
+        #
+        class_str = "shard.{}(".format(self.title.text)
+
+        attribute_str_list = []
+
+        for name in self.subplanes_list:
+
+            if name.startswith("keyvalue_"):
+
+                # Stripping "keyvalue_" from name to obtain key.
+                #
+                key = name[9:]
+
+                value = self.subplanes[name].subplanes["value_{}".format(key)].text
+
+                if not shard.str_is_tuple(value):
+
+                    # Then it should be a string
+                    #
+                    value = "'{}'".format(value)
+
+                attribute_str_list.append("{} = {}".format(key, value))
+
+        event = eval("{}{})".format(class_str, ", ".join(attribute_str_list)))
+
+        return event
 
 class PygameEditor(PygameUserInterface):
     """A Pygame-based user interface that serves as a map editor.
@@ -1177,12 +1273,17 @@ class PygameEditor(PygameUserInterface):
         logic.sub(clickndrag.gui.Button("Save Logic",
                                         pygame.Rect((0, 0),
                                                     (80, 25)),
-                                        lambda plane : self.host.save_condition_response_list("default.logic")))
+                                        lambda plane : self.host.save_condition_response_dict("default.logic")))
 
         logic.sub(clickndrag.gui.Button("Load Logic",
                                         pygame.Rect((0, 0),
                                                     (80, 25)),
-                                        lambda plane: self.host.load_condition_response_list("default.logic")))
+                                        lambda plane: self.host.load_condition_response_dict("default.logic")))
+
+        logic.sub(clickndrag.gui.Button("Clear Logic",
+                                        pygame.Rect((0, 0),
+                                                    (80, 25)),
+                                        lambda plane: self.host.clear_condition_response_dict()))
 
         self.window.buttons.sub(background)
         self.window.buttons.sub(room)
@@ -1669,21 +1770,26 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        event_list = ("Can Speak",
-                      "Moves To",
-                      "Perception",
-                      "Says",
-                      "Change Map Element",
-                      "Delete",
-                      "Spawn",
-                      "Attempt Failed")
+        event_list = ("Attempt Failed",
+                      "Perception")
 
-        # TODO: ChangeStateEvent, ManipulatesEvent, EnterRoomEvent, RoomCompleteEvent, PicksUpEvent, DropsEvent
+        # TODO: "Can Speak"
+        # TODO: "Moves To"
+        # TODO: "Says"
+        # TODO: "Change Map Element"
+        # TODO: "Delete"
+        # TODO: "Spawn"
+        # TODO: ChangeStateEvent
+        # TODO: ManipulatesEvent
+        # TODO: EnterRoomEvent
+        # TODO: RoomCompleteEvent
+        # TODO: PicksUpEvent
+        # TODO: DropsEvent
         # TODO: specify multiple Events as response
 
         option_list = clickndrag.gui.OptionList("select_response",
                                                 event_list,
-                                                lambda option: self.edit_event(event, option),
+                                                lambda option : self.edit_event(event, option),
                                                 lineheight = 25)
 
         self.window.room.sub(option_list)
@@ -1698,11 +1804,19 @@ class PygameEditor(PygameUserInterface):
 
         if option.text == "Perception":
 
-            dialog = clickndrag.gui.GetStringDialog("Edit {}".format(option.text),
-                                                    lambda string: self.event_edit_done(event, shard.PerceptionEvent(event.identifier, string)),
-                                                    self.window)
+            # TODO: taken from update_logic(). Replace with a general Plane/Editor.
+            #
+            editor_window = clickndrag.gui.Container("edit_event", padding = 4)
 
-            self.window.room.sub(dialog)
+            event_editor = EventEditor(shard.PerceptionEvent(event.identifier, ""), self.window)
+
+            editor_window.sub(event_editor)
+
+            editor_window.sub(clickndrag.gui.Button("OK",
+                                                    pygame.Rect((0, 0), (100, 25)),
+                                                    lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
+
+            self.window.room.sub(editor_window)
 
         elif option.text == "Attempt Failed":
 
@@ -1721,6 +1835,8 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
+        self.window.room.edit_event.destroy()
+
         self.host.add_response(trigger_event, response_event)
 
         return
@@ -1731,30 +1847,68 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        container = clickndrag.gui.Container("display_logic", padding = 4)
+        editor_window = clickndrag.gui.Container("display_logic", padding = 4)
 
-        container.sub(clickndrag.gui.Label("title",
-                                           "Logic affecting Entity '{}'".format(identifier),
-                                           pygame.Rect((0, 0), (300, 25))))
+        editor_window.sub(clickndrag.gui.Label("title",
+                                               "Logic affecting Entity '{}'".format(identifier),
+                                               pygame.Rect((0, 0), (300, 25))))
 
-        for tuple in self.host.condition_response_list:
+        for trigger_event_str in self.host.condition_response_dict.keys():
 
-            if (tuple[0].identifier == identifier
-                or tuple[0].target_identifier == identifier
-                or tuple[1].identifier == identifier):
+            if (identifier in trigger_event_str
+                or self.host.condition_response_dict[trigger_event_str].identifier == identifier):
 
-                # Need a unique name
+                # TODO: eval() should be preceeded by thorough checks
                 #
-                container.sub(clickndrag.gui.Label(str(tuple),
-                                                   "{} : {}".format(tuple[0].__class__.__name__,
-                                                                    tuple[1].__class__.__name__),
-                                                   pygame.Rect((0, 0), (300, 25)),
-                                                   color = clickndrag.gui.HIGHLIGHT_COLOR))
+                trigger_editor = EventEditor(eval(trigger_event_str), self.window)
 
-        container.sub(clickndrag.gui.Button("OK",
+                response_editor = EventEditor(self.host.condition_response_dict[trigger_event_str],
+                                              self.window)
+
+                # Need a unique name.
+                # See below for width - 1
+                #
+                rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
+                                                  pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
+
+                rule_plane.image.fill(clickndrag.gui.BACKGROUND_COLOR)
+
+                # Make them overlap to have an 1px separating line
+                #
+                response_editor.rect.left = trigger_editor.rect.width - 1
+
+                rule_plane.sub(trigger_editor)
+                rule_plane.sub(response_editor)
+
+                self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
+                editor_window.sub(rule_plane)
+
+        editor_window.sub(clickndrag.gui.Button("Update",
                                             pygame.Rect((0, 0), (100, 25)),
-                                            lambda plane : container.destroy()))
+                                            self.update_logic))
 
-        self.window.room.sub(container)
+        self.window.room.sub(editor_window)
+
+        return
+
+    def update_logic(self, plane):
+        """Button callback to retrieve the updated game logic and send it to the host.
+        """
+
+        self.logger.debug("called")
+
+        for name in self.window.room.display_logic.subplanes_list:
+
+            if name.startswith("rule_"):
+
+                dummy, trigger_name, response_name = name.split("_")
+
+                trigger_event = self.window.room.display_logic.subplanes[name].subplanes[trigger_name].get_updated_event()
+
+                response_event = self.window.room.display_logic.subplanes[name].subplanes[response_name].get_updated_event()
+
+                self.host.add_response(trigger_event, response_event)
+
+        self.window.room.display_logic.destroy()
 
         return

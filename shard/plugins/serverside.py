@@ -7,7 +7,6 @@
 
 import shard.plugins.pygameui
 import shard.assets
-import re
 import os
 import math
 import pickle
@@ -50,7 +49,7 @@ def load_room_from_file(filename):
 
         # Match only "(x, y)" coordinates
         #
-        if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", coordiantes_string):
+        if shard.str_is_tuple(coordiantes_string):
 
             tile = shard.Tile(type, asset_desc)
 
@@ -89,6 +88,10 @@ class DefaultGame(shard.plugins.Plugin):
 
        DefaultGame.path_dict
            Dict mapping Entity identifiers to a list of coordinates walked so far.
+
+       DefaultGame.condition_response_dict
+           A dict mapping string representations of incoming Events to response
+           Events.
     """
 
     def __init__(self, host):
@@ -100,6 +103,14 @@ class DefaultGame(shard.plugins.Plugin):
 
         self.tries_to_move_dict = {}
         self.path_dict = {}
+        self.condition_response_dict = {}
+
+        # Load default logic.
+        #
+        self.logger.debug("loading default game logic from file 'default.logic'")
+        self.load_condition_response_dict("default.logic")
+
+        return
 
     def process_message(self, message):
         """DefaultGame main method.
@@ -122,9 +133,34 @@ class DefaultGame(shard.plugins.Plugin):
 
             for event in message.event_list:
 
-                # event_dict from EventProcessor base class
-                #
-                self.event_dict[event.__class__](event)
+                if event.__class__ in (shard.InitEvent,
+                                       shard.TriesToMoveEvent,
+                                       shard.TriesToPickUpEvent,
+                                       shard.TriesToDropEvent,
+                                       shard.AttemptFailedEvent):
+
+                    # These are handled by the according methods.
+                    # process_TriesToDropEvent() will call respond() if appropriate.
+                    # Use event_dict from EventProcessor base class.
+                    #
+                    self.event_dict[event.__class__](event)
+
+                elif event.__class__ in (shard.TriesToLookAtEvent,
+                                         shard.TriesToManipulateEvent,
+                                         shard.TriesToTalkToEvent):
+
+                    # These are handled by respond()
+                    #
+                    self.respond(event)
+
+                elif isinstance(event, shard.PassiveEvent):
+
+                    self.logger.debug("returning PassiveEvent instance to host")
+                    self.message_for_host.event_list.append(event)
+
+                else:
+                    self.logger.critical("don't know how to process '{}'".format(event))
+                    raise Exception("don't know how to process '{}'".format(event))
 
         # Process pending moves.
         # Create a new list to be able to change the dict during iteration.
@@ -165,6 +201,24 @@ class DefaultGame(shard.plugins.Plugin):
 
         return self.message_for_host
 
+    def respond(self, event):
+        """Add an Event from condition_response_dict corresponding to the Event given to message_for_host.
+           If the Event is not found, return AttemptFailedEvent.
+        """
+
+        event_str = str(event)
+
+        if event_str in self.condition_response_dict:
+
+            self.logger.debug("returning corresponding event")
+            self.message_for_host.event_list.append(self.condition_response_dict[event_str])
+
+        else:
+            self.logger.debug("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
+            self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+
+        return
+
     def process_InitEvent(self, event):
         """If there is no host.room yet, load default.floorplan and send it.
         """
@@ -199,14 +253,6 @@ class DefaultGame(shard.plugins.Plugin):
         self.tries_to_move_dict[event.identifier] = event.target_identifier
         self.path_dict[event.identifier] = []
 
-        return
-
-    def process_TriesToLookAtEvent(self, event):
-        """Return AttemptFailedEvent to the host.
-        """
-
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
         return
 
     def process_TriesToPickUpEvent(self, event):
@@ -267,8 +313,8 @@ class DefaultGame(shard.plugins.Plugin):
                 self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
 
             else:
-                self.logger.debug("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
-                self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
+                self.logger.debug("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
+                self.respond(event)
 
         else:
             self.logger.debug("target '{}' is not an entity identifier".format(event.target_identifier))
@@ -292,22 +338,6 @@ class DefaultGame(shard.plugins.Plugin):
                                                                          event.item_identifier,
                                                                          event.target_identifier))
 
-        return
-
-    def process_TriesToManipulateEvent(self, event):
-        """Return AttemptFailedEvent to the host.
-        """
-
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
-        return
-
-    def process_TriesToTalkToEvent(self, event):
-        """Return AttemptFailedEvent to the host.
-        """
-
-        self.logger.debug("returning AttemptFailedEvent to host")
-        self.message_for_host.event_list.append(shard.AttemptFailedEvent(event.identifier))
         return
 
     def process_AttemptFailedEvent(self, event):
@@ -377,6 +407,27 @@ class DefaultGame(shard.plugins.Plugin):
 
             return best_move
 
+    def load_condition_response_dict(self, filename):
+        """Load response logic from the file given.
+        """
+
+        self.logger.debug("attempting to read from file '{}'".format(filename))
+
+        if filename:
+
+            file = open(filename, "rb")
+
+            # TODO: Check, check, check
+            #
+            self.condition_response_dict = pickle.loads(file.read())
+
+            file.close()
+
+        else:
+            self.logger.error("no filename given")
+
+        return
+
 class Editor(DefaultGame):
     """This is the server-side Plugin for a Shard map editor.
 
@@ -384,9 +435,6 @@ class Editor(DefaultGame):
 
        Editor.current_room
            Name of the current room.
-
-       Editor.condition_response_list
-           A list containing tuples of (incoming_event, response_event).
 
        Editor.pygame_editor
            A PygameEditor where the editing is done.
@@ -408,11 +456,6 @@ class Editor(DefaultGame):
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
         #
         self.current_room = ''
-
-        # Conceptually this should be a dict, but Events are mutable and can
-        # thus not be used as dictionary keys.
-        #
-        self.condition_response_list = []
 
         # Impersonate a decent host.
         # self.room will point to self.host.room later, but chances are there
@@ -519,86 +562,38 @@ class Editor(DefaultGame):
 
         return
 
-    def process_TriesToLookAtEvent(self, event):
-        """Pass event to Editor.respond().
-        """
-
-        self.logger.debug("called")
-
-        self.respond(event)
-
-        return
-
-    def process_TriesToManipulateEvent(self, event):
-        """Pass event to Editor.respond().
-        """
-
-        self.logger.debug("called")
-
-        self.respond(event)
-
-        return
-
-    def process_TriesToTalkToEvent(self, event):
-        """Return the CanSpeakEvent to offer a selection to the player.
-        """
-
-        self.logger.debug("called")
-
-        self.respond(event)
-
-        return
-
-    def process_SaysEvent(self, event):
-        """If the text matches a room file, load and send the room.
-        """
-
-        self.logger.debug("called")
-
-        self.respond(event)
-
-        return
-
     def respond(self, event):
-        """Add an Event from condition_response_list corresponding to the Event given to message_for_host.
+        """Add an Event from condition_response_dict corresponding to the Event given to message_for_host.
+           If the Event is not found, make the user select a response.
         """
 
-        response_event = None
+        event_str = str(event)
 
-        # Poor man's dict. See __init__() for explanation.
-        #
-        for tuple in self.condition_response_list:
-            if tuple[0] == event:
-                response_event = tuple[1]
+        if event_str in self.condition_response_dict:
 
-        if response_event is None:
-
-            self.logger.debug("event not found in condition_response_list")
-
-            self.pygame_editor.select_event(event)
+            self.logger.debug("returning corresponding event")
+            self.message_for_host.event_list.append(self.condition_response_dict[event_str])
 
         else:
-            self.logger.debug("returning corresponding event")
-            self.message_for_host.event_list.append(response_event)
+            self.logger.debug("event '{}' not found in condition_response_dict, making user select a response".format(event_str))
+            self.pygame_editor.select_event(event)
 
         return
 
     def add_response(self, trigger_event, response_event):
-        """Add the (trigger_event, response_event) tuple to
-           Editor.condition_response_list.
+        """Set Editor.condition_response_dict[str(trigger_event)] = response_event.
         """
 
         # This could also be done in self.pygame_editor.event_edit_done(), but
         # it's cleaner to do here.
         #
-        self.logger.debug("adding {}".format((trigger_event, response_event)))
+        self.logger.debug("condition_response_dict[{}] = {}".format(trigger_event, response_event))
 
-        self.condition_response_list.append((trigger_event, response_event))
+        self.condition_response_dict[str(trigger_event)] = response_event
 
         return
 
-
-    def save_condition_response_list(self, filename):
+    def save_condition_response_dict(self, filename):
         """Save the response logic to the file given.
         """
 
@@ -608,7 +603,7 @@ class Editor(DefaultGame):
 
             file = open(filename, "wb")
 
-            file.write(pickle.dumps(self.condition_response_list, 0))
+            file.write(pickle.dumps(self.condition_response_dict, 0))
 
             file.close()
 
@@ -621,28 +616,17 @@ class Editor(DefaultGame):
 
         return
 
-    def load_condition_response_list(self, filename):
-        """Load response logic from the file given.
+    def clear_condition_response_dict(self):
+        """Clear the response logic.
         """
 
-        self.logger.debug("attempting to read from file'{}'".format(filename))
+        self.logger.debug("clearing condition_response_dict")
 
-        if filename:
+        self.condition_response_dict = {}
 
-            file = open(filename, "rb")
-
-            # TODO: Check, check, check
-            #
-            self.condition_response_list = pickle.loads(file.read())
-
-            file.close()
-
-            # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
-            #
-            self.pygame_editor.window.room.sub(shard.plugins.pygameui.clickndrag.gui.OkBox("Logic read from file '{}'.".format(filename)))
-
-        else:
-            self.logger.error("no filename given")
+        # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
+        #
+        self.pygame_editor.window.room.sub(shard.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared."))
 
         return
 

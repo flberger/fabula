@@ -54,6 +54,7 @@ if sys.version_info[0] != 3:
     raise Exception("Shard needs Python 3 to work. Your Python version is: " + sys.version)
 
 import shard.eventprocessor
+import re
 
 ############################################################
 # Events
@@ -118,14 +119,21 @@ class Event:
             return True
 
     def __repr__(self):
-        """Readable and informative string representation.
+        """String representation suitable to recreate the Event instance.
+           The attributes appear in sorted order.
         """
 
         # TODO: This is a duplicate of Tile.__repr__
 
         arguments = ""
 
-        for key in self.__dict__:
+        # Keep order
+        # Taken from shard.plugins.pygameui.EventEditor
+        #
+        keys = list(self.__dict__.keys())
+        keys.sort()
+
+        for key in keys:
 
             arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
 
@@ -133,7 +141,7 @@ class Event:
         #
         arguments = arguments[:-2]
 
-        return "<{0}.{1}({2})>".format(self.__module__,
+        return "{0}.{1}({2})".format(self.__module__,
                                        self.__class__.__name__,
                                        arguments)
 
@@ -1220,3 +1228,14 @@ def join_lists(first_list, second_list):
     new_list = new_list + longer_list[index:]
 
     return new_list
+
+def str_is_tuple(str):
+    """Return True if the string represents a (int, int) tuple.
+    """
+
+    if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", str):
+
+        return True
+
+    else:
+        return False

@@ -66,4 +66,4 @@ clean:
 	rm -vf */*/*.log
 
 zip: clean
-	cd .. ; rm -fv shard.zip ; zip -9 -r shard.zip pygame_ui -x '*bzr*'
+	cd .. ; rm -fv shard.zip ; zip -9 -r shard.zip main -x '*bzr*'
