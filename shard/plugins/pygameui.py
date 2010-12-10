@@ -1853,6 +1853,8 @@ class PygameEditor(PygameUserInterface):
                                                "Logic affecting Entity '{}'".format(identifier),
                                                pygame.Rect((0, 0), (300, 25))))
 
+        rules_container = clickndrag.gui.Container("rules", padding = 4)
+
         for trigger_event_str in self.host.condition_response_dict.keys():
 
             if (identifier in trigger_event_str
@@ -1881,7 +1883,12 @@ class PygameEditor(PygameUserInterface):
                 rule_plane.sub(response_editor)
 
                 self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
-                editor_window.sub(rule_plane)
+                rules_container.sub(rule_plane)
+
+        editor_window.sub(clickndrag.gui.ScrollingPlane("scrolling_rules",
+                                                        pygame.Rect((0, 0),
+                                                                    (rules_container.subplanes[rules_container.subplanes_list[0]].rect.width + 8, 400)),
+                                                        rules_container))
 
         editor_window.sub(clickndrag.gui.Button("Update",
                                             pygame.Rect((0, 0), (100, 25)),
