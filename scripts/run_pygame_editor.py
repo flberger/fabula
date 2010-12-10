@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 """Pygame Editor for Shard start script
 
    (c) Florian Berger <fberger@florian-berger.de>

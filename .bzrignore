@@ -3,9 +3,10 @@
 examples/shard
 commit.txt
 *.log
-clickndrag
 *.png
 *.jpg
 *.floorplan
 *.ttf
 *.logic
+dist/
+build

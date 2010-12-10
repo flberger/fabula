@@ -1,0 +1,15 @@
+setup.py
+scripts/run_pygame_editor.py
+scripts/run_pygame_game.py
+shard/__init__.py
+shard/assets.py
+shard/eventprocessor.py
+shard/run.py
+shard/core/__init__.py
+shard/core/client.py
+shard/core/server.py
+shard/interfaces/__init__.py
+shard/plugins/__init__.py
+shard/plugins/pygameui.py
+shard/plugins/serverside.py
+shard/plugins/ui.py
