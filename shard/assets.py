@@ -10,6 +10,7 @@
 
 import os.path
 import glob
+import site
 
 class Assets:
     """An assets manager which returns file-like objects for local files.
@@ -118,12 +119,35 @@ class Assets:
             #
             asset_desc = os.path.abspath(glob.glob("../*/" + asset_desc)[0])
 
+        # Look in user base directory
+        #
+        elif os.path.exists(os.path.join(site.USER_BASE, "share", "shard", asset_desc)):
+
+            asset_desc = os.path.join(site.USER_BASE, "share", "shard", asset_desc)
+
         else:
-            self.logger.critical("Could not open asset: '{}'".format(asset_desc))
 
-            raise Exception(errormessage)
+            # Up to now, nothing has been found.
+            #
+            found = False
 
-            return
+            # Check prefixes
+            #
+            for prefix in site.PREFIXES:
+
+                if os.path.exists(os.path.join(prefix, "share", "shard", asset_desc)):
+
+                    asset_desc = os.path.join(prefix, "share", "shard", asset_desc)
+
+                    found = True
+
+            if not found:
+
+                self.logger.critical("Could not open asset: '{}'".format(asset_desc))
+
+                raise Exception(errormessage)
+
+                return
 
         self.logger.debug("attempting to retrieve '{}' from local file".format(asset_desc))
 

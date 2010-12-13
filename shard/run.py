@@ -371,9 +371,10 @@ class App:
         server_thread.join()
 
         self.logger.info("server thread stopped, shutting down logger")
-
         if exception:
             self.logger.debug("exception in client.run() was:\n{}".format(exception))
+
+        self.logger.info("log file written to shard.log")
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

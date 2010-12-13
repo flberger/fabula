@@ -9,8 +9,8 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
+# TODO: always diplay and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
-#
 # TODO: render order top-down, following lines
 
 import shard.plugins.ui

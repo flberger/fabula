@@ -107,7 +107,7 @@ class DefaultGame(shard.plugins.Plugin):
 
         # Load default logic.
         #
-        self.logger.debug("loading default game logic from file 'default.logic'")
+        self.logger.debug("attempting to load default game logic")
         self.load_condition_response_dict("default.logic")
 
         return
@@ -415,13 +415,17 @@ class DefaultGame(shard.plugins.Plugin):
 
         if filename:
 
-            file = open(filename, "rb")
+            try:
+                file = open(filename, "rb")
 
-            # TODO: Check, check, check
-            #
-            self.condition_response_dict = pickle.loads(file.read())
+                # TODO: Check, check, check
+                #
+                self.condition_response_dict = pickle.loads(file.read())
 
-            file.close()
+                file.close()
+
+            except IOError:
+                self.logger.error("could not read from file '{}', game logic not updated".format(filename))
 
         else:
             self.logger.error("no filename given")
