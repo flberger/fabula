@@ -5,6 +5,13 @@
 
 # work started on 10. December 2010
 
+# Shard will not work with Python versions prior to 3.x.
+#
+import sys
+
+if sys.version_info[0] != 3:
+    raise Exception("Shard needs Python 3 to work. Your Python version is: " + sys.version)
+
 import distutils.core
 import glob
 import os.path

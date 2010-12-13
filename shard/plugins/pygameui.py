@@ -1446,12 +1446,18 @@ class PygameEditor(PygameUserInterface):
 
                 room_list.append(filename.split(".floorplan")[0])
 
-        option_list = clickndrag.gui.OptionList("select_room",
-                                                room_list,
-                                                self.host.send_room_events,
-                                                lineheight = 25)
+        if len(room_list):
+            option_list = clickndrag.gui.OptionList("select_room",
+                                                    room_list,
+                                                    self.host.send_room_events,
+                                                    lineheight = 25)
 
-        self.window.room.sub(option_list)
+            self.window.room.sub(option_list)
+
+        else:
+            self.logger.warning("no floorplan files found in '{}'".format(os.getcwd()))
+
+        return
 
     def add_item(self, item_identifier):
         """GetStringDialog callback to request an image and add the item to the rack.
@@ -1885,10 +1891,12 @@ class PygameEditor(PygameUserInterface):
                 self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
                 rules_container.sub(rule_plane)
 
-        editor_window.sub(clickndrag.gui.ScrollingPlane("scrolling_rules",
-                                                        pygame.Rect((0, 0),
-                                                                    (rules_container.subplanes[rules_container.subplanes_list[0]].rect.width + 8, 400)),
-                                                        rules_container))
+        if len(rules_container.subplanes_list):
+
+            editor_window.sub(clickndrag.gui.ScrollingPlane("scrolling_rules",
+                                                            pygame.Rect((0, 0),
+                                                                        (rules_container.subplanes[rules_container.subplanes_list[0]].rect.width + 8, 400)),
+                                                            rules_container))
 
         editor_window.sub(clickndrag.gui.Button("Update",
                                             pygame.Rect((0, 0), (100, 25)),

@@ -17,8 +17,8 @@ help:
 	@echo '    doctest'
 	@echo '    win2k_update'
 	@echo '    clean'
-	@echo '    zip'
 	@echo '    user_install'
+	@echo '    sdist'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -66,8 +66,8 @@ clean:
 	rm -vf */*.log
 	rm -vf */*/*.log
 
-zip: clean
-	cd .. ; rm -fv shard.zip ; zip -9 -r shard.zip main -x '*bzr*'
-
 user_install:
 	python3 setup.py install --user
+
+sdist:
+	python3 setup.py sdist --force-manifest --formats=bztar,zip
