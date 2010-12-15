@@ -18,6 +18,9 @@ import pygame
 import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
+# For cx_Freeze
+#
+import tkinter._fix
 import os
 
 def load_image(title):

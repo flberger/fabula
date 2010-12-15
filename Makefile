@@ -19,6 +19,7 @@ help:
 	@echo '    clean'
 	@echo '    user_install'
 	@echo '    sdist'
+	@echo '    exe'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -45,9 +46,28 @@ doctest: clean
 	$(PYTHON) -m doctest tests/pygame_user_interface.txt
 	$(PYTHON) -m doctest tests/tiles.txt
 
+user_install:
+	$(PYTHON) setup.py install --user
+
+sdist:
+	$(PYTHON) setup.py sdist --force-manifest --formats=bztar,zip
+
+exe: sdist
+	rm -rf build/exe.*
+	$(PYTHON) setup.py build
+
 else
 
 doctest:
+	@echo Please supply Python executable as PYTHON=executable.
+
+user_install:
+	@echo Please supply Python executable as PYTHON=executable.
+
+sdist:
+	@echo Please supply Python executable as PYTHON=executable.
+
+exe: sdist
 	@echo Please supply Python executable as PYTHON=executable.
 
 endif
@@ -65,9 +85,3 @@ clean:
 	rm -vf *.log
 	rm -vf */*.log
 	rm -vf */*/*.log
-
-user_install:
-	python3 setup.py install --user
-
-sdist:
-	python3 setup.py sdist --force-manifest --formats=bztar,zip
