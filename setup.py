@@ -10,7 +10,7 @@
 import sys
 
 if sys.version_info[0] != 3:
-    raise Exception("Fabula needs Python 3 to work. Your Python version is: " + sys.version)
+    raise Exception("fabula needs Python 3 to work. Your Python version is: " + sys.version)
 
 # Imported by cx_Freeze
 #
@@ -20,7 +20,7 @@ import glob
 import os.path
 
 PACKAGE = "fabula"
-VERSION = "0.1.0a1"
+VERSION = "0.1.0"
 
 INCLUDE_FILES = ["scripts/100x100-gray.png",
                  "scripts/look_at.png",

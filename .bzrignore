@@ -10,3 +10,4 @@ commit.txt
 *.logic
 dist/
 build
+MANIFEST
