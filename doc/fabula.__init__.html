@@ -1,0 +1,345 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.__init__&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="module">Module f.__init__</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a></span>
+      
+      
+    </p>
+    <div>
+      
+    </div>
+    <pre>Fabula - A Client-Server System for Interactive Storytelling by means of an Adventure Game Environment
+
+"Stories On A Grid"
+
+(c) Florian Berger &lt;fberger@florian-berger.de&gt;</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id3">
+  
+  
+<tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Event.html">Event</a></td>
+    <td><tt>Fabula event base class.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.AttemptEvent.html">AttemptEvent</a></td>
+    <td><tt>This is the base class for attempt events by the player or NPCs.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToMoveEvent.html">TriesToMoveEvent</a></td>
+    <td><tt>Issued when the player or an NPC wants to move, awaiting server confirmation.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToLookAtEvent.html">TriesToLookAtEvent</a></td>
+    <td><tt>Issued when the player or an NPC looks at a map element or an item.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToPickUpEvent.html">TriesToPickUpEvent</a></td>
+    <td><tt>Issued when the player or an NPC tries to pick up an item.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToDropEvent.html">TriesToDropEvent</a></td>
+    <td><tt>The player or NPC tries to drop an item.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToManipulateEvent.html">TriesToManipulateEvent</a></td>
+    <td><tt>Issued when the player or an NPC tries to manipulate an item.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.TriesToTalkToEvent.html">TriesToTalkToEvent</a></td>
+    <td><tt>Issued when the player or an NPC wants to start a conversation with another entity.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.ConfirmEvent.html">ConfirmEvent</a></td>
+    <td><tt>This is the base class for server confirmations of attempt events.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.MovesToEvent.html">MovesToEvent</a></td>
+    <td><tt>This is the server confirmation of a movement.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.PicksUpEvent.html">PicksUpEvent</a></td>
+    <td><tt>This is a server confirmation of a TriesToPickUpEvent</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.DropsEvent.html">DropsEvent</a></td>
+    <td><tt>This is the server confirmation for an attempt to drop an item</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.CanSpeakEvent.html">CanSpeakEvent</a></td>
+    <td><tt>This is a server invitation for the player or an NPC to speak.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.AttemptFailedEvent.html">AttemptFailedEvent</a></td>
+    <td><tt>Server announcement that the last AttemptEvent failed.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.PerceptionEvent.html">PerceptionEvent</a></td>
+    <td><tt>This is a perception for the player or an NPC issued by the server,</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.ManipulatesEvent.html">ManipulatesEvent</a></td>
+    <td><tt>This is a server confirmation of an item manipulation.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.SaysEvent.html">SaysEvent</a></td>
+    <td><tt>This normally is a reaction to the CanSpeakEvent, to be sent by the player.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.ChangeStateEvent.html">ChangeStateEvent</a></td>
+    <td><tt>This Event is issued to trigger a state change.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.PassiveEvent.html">PassiveEvent</a></td>
+    <td><tt>The base class for events when items or NPCs are being passed etc.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.PassedEvent.html">PassedEvent</a></td>
+    <td><tt>Issued by the server when an item or an NPC is being passed by the player or an NPC.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.LookedAtEvent.html">LookedAtEvent</a></td>
+    <td><tt>Issued by the server when an item or NPC is being looked at by the player or an NPC.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.PickedUpEvent.html">PickedUpEvent</a></td>
+    <td><tt>Issued by the server when an item is being picked up by the player or an NPC.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.DroppedEvent.html">DroppedEvent</a></td>
+    <td><tt>Issued by the server when an item is being dropped by the player or an NPC.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.ServerEvent.html">ServerEvent</a></td>
+    <td><tt>Base class for various events issued by the server</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.SpawnEvent.html">SpawnEvent</a></td>
+    <td><tt>This event creates the player / new item / NPC on the map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.DeleteEvent.html">DeleteEvent</a></td>
+    <td><tt>This event deletes an item or NPC from the map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.EnterRoomEvent.html">EnterRoomEvent</a></td>
+    <td><tt>This event announces that the player enters a new room.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.RoomCompleteEvent.html">RoomCompleteEvent</a></td>
+    <td><tt>Issued by the server after an EnterRoomEvent</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.ChangeMapElementEvent.html">ChangeMapElementEvent</a></td>
+    <td><tt>This event changes a single element of the two-dimensional map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.InitEvent.html">InitEvent</a></td>
+    <td><tt>This event is sent once by the client upon startup.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Message.html">Message</a></td>
+    <td><tt>A Message manages an ordered list of fabula events.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Entity.html">Entity</a></td>
+    <td><tt>An Entity is a Fabula game object.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Tile.html">Tile</a></td>
+    <td><tt>A Tile is an element of a two-dimensional map.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Room.html">Room</a></td>
+    <td><tt>A Room instance saves the map as well as Entities and their locations.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.FloorPlanElement.html">FloorPlanElement</a></td>
+    <td><tt>Convenience class for floor plan elements.</tt></td>
+  </tr><tr class="class">
+    
+    
+    <td>Class</td>
+    <td><a href="fabula.Rack.html">Rack</a></td>
+    <td><tt>A Rack stores Entities removed from a room.</tt></td>
+  </tr><tr class="function">
+    
+    
+    <td>Function</td>
+    <td><a href="fabula.html#difference_2d">difference_2d</a></td>
+    <td><tt>Return the difference vector between a 2D start and end position.</tt></td>
+  </tr><tr class="function">
+    
+    
+    <td>Function</td>
+    <td><a href="fabula.html#join_lists">join_lists</a></td>
+    <td><tt>Returns a list which is made up of the lists given following this scheme:</tt></td>
+  </tr><tr class="function">
+    
+    
+    <td>Function</td>
+    <td><a href="fabula.html#str_is_tuple">str_is_tuple</a></td>
+    <td><tt>Return True if the string represents a (int, int) tuple.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.difference_2d">
+    
+  </a>
+  <a name="difference_2d">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    difference_2d(start_tuple, end_tuple):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return the difference vector between a 2D start and end position.
+    </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.join_lists">
+    
+  </a>
+  <a name="join_lists">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    join_lists(first_list, second_list):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Returns a list which is made up of the lists given following this scheme:
+
+&gt;&gt;&gt; join_lists([1, 2], [3, 4])
+[[3, 1], [4, 2]]
+
+&gt;&gt;&gt; join_lists([1, 2], [[3, 4], 5])
+[[3, 4, 1], [5, 2]]
+
+&gt;&gt;&gt; join_lists([[1, 2], 3], [[4, 5], 6])
+[[4, 5, 1, 2], [6, 3]]</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.str_is_tuple">
+    
+  </a>
+  <a name="str_is_tuple">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    str_is_tuple(str):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return True if the string represents a (int, int) tuple.
+    </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+    </address>
+  </body>
+</html>

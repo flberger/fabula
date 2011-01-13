@@ -1,10 +1,10 @@
-Doctests for the Shard Package
+Doctests for the Fabula Package
 ==============================
 
 Standalone Execution (Client and Server)
 ----------------------------------------
 
-    >>> import shard.run
-    >>> app = shard.run.App("d", timeout = 5)
+    >>> import fabula.run
+    >>> app = fabula.run.App("d", timeout = 5)
     >>> app.run_standalone(60, "player")
     >>>

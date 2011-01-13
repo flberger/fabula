@@ -1,0 +1,802 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.core.Engine&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.c.Engine(<a href="fabula.eventprocessor.EventProcessor.html">fabula.eventprocessor.EventProcessor</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.core.html">core</a></span>
+      
+      <a href="classIndex.html#fabula.core.Engine">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></p>
+    </div>
+    <pre>Common base class for Fabula server and client engines.
+Most likely you will want to override all of the methods when subclassing
+Engine, so the use of this class is providing a structure for Engines.
+
+Attributes:
+
+Engine.logger
+
+Engine.interface
+
+Engine.plugin
+    This is None upon initialisation and must be set to an instance of
+    fabula.plugins.Plugin using Engine.set_plugin().
+
+Engine.message_for_plugin
+
+Engine.message_for_remote
+
+Engine.room
+    An instance of fabula.Room, initialy None.
+
+Engine.rack</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id60">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#__init__">__init__</a></td>
+    <td><tt>Set up Engine attributes.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#set_plugin">set_plugin</a></td>
+    <td><tt>Set the pluginto control or present the game.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#run">run</a></td>
+    <td><tt>This is the main loop of an Engine.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Let self.room process the event and pass it on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Save the Entity to be picked up in Engine.rack,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Let the Entity handle the Event. Then add the event to the message.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Let self.room process the event and pass it on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Save the Entity to be deleted in Engine.rack,</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>The default implementation simply forwards the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Let the fabula.Room instance in self.room process the Event</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.Engine.html#tile_is_walkable">tile_is_walkable</a></td>
+    <td><tt>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a>:
+        </p>
+        <table class="children sortable" id="id61">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.core.Engine.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, interface_instance, logger):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#__init__">fabula.eventprocessor.EventProcessor.__init__</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Set up Engine attributes.
+
+Arguments:
+
+interface_instance
+    An instance of a subclass of
+    fabula.interfaces.Interface to communicate
+    with the remote host.
+
+logger
+    An instance of logging.Logger.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.set_plugin">
+    
+  </a>
+  <a name="set_plugin">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    set_plugin(self, plugin_instance):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Set the pluginto control or present the game.
+plugin_instance must be an instance of fabula.plugins.Plugin.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.run">
+    
+  </a>
+  <a name="run">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    run(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>This is the main loop of an Engine.
+Put all the business logic here.
+This is a blocking method which should call all the process methods
+to process events.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToMoveEvent">
+    
+  </a>
+  <a name="process_TriesToMoveEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToMoveEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToLookAtEvent">
+    
+  </a>
+  <a name="process_TriesToLookAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToLookAtEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">fabula.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">fabula.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">fabula.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToManipulateEvent">
+    
+  </a>
+  <a name="process_TriesToManipulateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToManipulateEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">fabula.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_TriesToTalkToEvent">
+    
+  </a>
+  <a name="process_TriesToTalkToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToTalkToEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">fabula.eventprocessor.EventProcessor.process_TriesToTalkToEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">fabula.eventprocessor.EventProcessor.process_MovesToEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Let self.room process the event and pass it on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">fabula.eventprocessor.EventProcessor.process_PicksUpEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Save the Entity to be picked up in Engine.rack,
+delete the it from Engine.room and pass the
+PicksUpEvent on.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">fabula.eventprocessor.EventProcessor.process_DropsEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_ManipulatesEvent">
+    
+  </a>
+  <a name="process_ManipulatesEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ManipulatesEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">fabula.eventprocessor.EventProcessor.process_ManipulatesEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_CanSpeakEvent">
+    
+  </a>
+  <a name="process_CanSpeakEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_CanSpeakEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">fabula.eventprocessor.EventProcessor.process_CanSpeakEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">fabula.eventprocessor.EventProcessor.process_AttemptFailedEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">fabula.eventprocessor.EventProcessor.process_PerceptionEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_SaysEvent">fabula.eventprocessor.EventProcessor.process_SaysEvent</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangeStateEvent">fabula.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Let the Entity handle the Event. Then add the event to the message.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_PassedEvent">
+    
+  </a>
+  <a name="process_PassedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PassedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">fabula.eventprocessor.EventProcessor.process_PassedEvent</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_LookedAtEvent">
+    
+  </a>
+  <a name="process_LookedAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_LookedAtEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">fabula.eventprocessor.EventProcessor.process_LookedAtEvent</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_PickedUpEvent">
+    
+  </a>
+  <a name="process_PickedUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PickedUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">fabula.eventprocessor.EventProcessor.process_PickedUpEvent</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_DroppedEvent">
+    
+  </a>
+  <a name="process_DroppedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DroppedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">fabula.eventprocessor.EventProcessor.process_DroppedEvent</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">fabula.eventprocessor.EventProcessor.process_SpawnEvent</a></div>
+    <pre>Let self.room process the event and pass it on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">fabula.eventprocessor.EventProcessor.process_DeleteEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Save the Entity to be deleted in Engine.rack,
+delete the it from Engine.room and pass the DeleteEvent on.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">fabula.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>The default implementation simply forwards the Event.
+On the client side, an EnterRoomEvent means that the server is about
+to send a new map, respawn the player and send items and NPCs.
+On the server side, things may be a little more complicated. In a
+single player scenario the server might replace the current room or
+save it to be able to return to it later. In a multiplayer
+environment however the server has to set up another room to manage
+in parallel to the established rooms.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">fabula.eventprocessor.EventProcessor.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">fabula.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div>
+    <pre>Let the fabula.Room instance in self.room process the Event
+and add it to message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.process_InitEvent">
+    
+  </a>
+  <a name="process_InitEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_InitEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">fabula.eventprocessor.EventProcessor.process_InitEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <pre>Process the Event.
+The default implementation adds the event to the message.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.Engine.tile_is_walkable">
+    
+  </a>
+  <a name="tile_is_walkable">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    tile_is_walkable(self, target_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+    </address>
+  </body>
+</html>

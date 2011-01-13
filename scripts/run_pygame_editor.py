@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Pygame Editor for Shard start script
+"""Pygame Editor for Fabula start script
 
    (c) Florian Berger <fberger@florian-berger.de>
 """
@@ -9,27 +9,27 @@
 
 import sys
 
-# Add current and parent directory. One of them is supposed to contain the shard
+# Add current and parent directory. One of them is supposed to contain the fabula
 # package.
 #
 sys.path.append("../")
 sys.path.append("./")
 
-import shard.plugins.serverside
-import shard.interfaces
-import shard.run
+import fabula.plugins.serverside
+import fabula.interfaces
+import fabula.run
 
 def main():
-    app = shard.run.App("d", timeout = 0)
+    app = fabula.run.App("d", timeout = 0)
 
-    interface = shard.interfaces.Interface("dummy", app.logger)
+    interface = fabula.interfaces.Interface("dummy", app.logger)
 
-    message_buffer = shard.interfaces.MessageBuffer()
-    message_buffer.messages_for_local.append(shard.Message([shard.InitEvent("player")]))
+    message_buffer = fabula.interfaces.MessageBuffer()
+    message_buffer.messages_for_local.append(fabula.Message([fabula.InitEvent("player")]))
 
     interface.connections["dummy_client"] = message_buffer
 
-    app.server_plugin_class = shard.plugins.serverside.Editor
+    app.server_plugin_class = fabula.plugins.serverside.Editor
 
     app.run_server(60, interface)
 

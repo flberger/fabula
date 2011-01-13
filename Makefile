@@ -1,13 +1,13 @@
-FILES = shard/assetengine.py \
-        shard/clientcoreengine.py \
-        shard/coreengine.py \
-        shard/eventprocessor.py \
-        shard/__init__.py \
-        shard/interfaces.py \
-        shard/plugin.py \
-        shard/presentationengine.py \
-        shard/run.py \
-        shard/servercoreengine.py
+FILES = fabula/assetengine.py \
+        fabula/clientcoreengine.py \
+        fabula/coreengine.py \
+        fabula/eventprocessor.py \
+        fabula/__init__.py \
+        fabula/interfaces.py \
+        fabula/plugin.py \
+        fabula/presentationengine.py \
+        fabula/run.py \
+        fabula/servercoreengine.py
 
 help:
 	@echo Targets:
@@ -23,17 +23,17 @@ help:
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
-	                                                --add-package shard \
+	                                                --add-package fabula \
 	                                                --make-html \
 	                                                --html-output doc/
 
 check:
 	@echo WARNING: using pylint for Python 2.x instead of 3.x.
-	pylint shard
+	pylint fabula
 
 errors:
 	@echo WARNING: using pylint for Python 2.x instead of 3.x.
-	pylint --errors-only shard
+	pylint --errors-only fabula
 
 ifdef PYTHON
 

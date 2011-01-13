@@ -1,12 +1,12 @@
-Doctests for the Shard Package
+Doctests for the Fabula Package
 ==============================
 
 Server Execution
 ----------------
 
-    >>> import shard.interfaces
-    >>> import shard.run
-    >>> app = shard.run.App("d", timeout = 5)
-    >>> interface = shard.interfaces.Interface("dummy", app.logger)
+    >>> import fabula.interfaces
+    >>> import fabula.run
+    >>> app = fabula.run.App("d", timeout = 5)
+    >>> interface = fabula.interfaces.Interface("dummy", app.logger)
     >>> app.run_server(60, interface)
     >>>

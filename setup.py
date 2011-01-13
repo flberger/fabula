@@ -1,16 +1,16 @@
-"""Shard Setup Script
+"""Fabula Setup Script
 
    (c) Florian Berger <fberger@florian-berger.de>
 """
 
 # work started on 10. December 2010
 
-# Shard will not work with Python versions prior to 3.x.
+# Fabula will not work with Python versions prior to 3.x.
 #
 import sys
 
 if sys.version_info[0] != 3:
-    raise Exception("Shard needs Python 3 to work. Your Python version is: " + sys.version)
+    raise Exception("Fabula needs Python 3 to work. Your Python version is: " + sys.version)
 
 # Imported by cx_Freeze
 #
@@ -19,7 +19,7 @@ import cx_Freeze
 import glob
 import os.path
 
-PACKAGE = "shard"
+PACKAGE = "fabula"
 VERSION = "0.1.0a1"
 
 INCLUDE_FILES = ["scripts/100x100-gray.png",

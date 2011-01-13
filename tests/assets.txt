@@ -1,20 +1,20 @@
-Doctests for the Shard Package
+Doctests for the Fabula Package
 ==============================
 
 Asset Manager
 -------------
 
     >>> stream = open("temp.dat", mode="w")
-    >>> stream.write("shard")
-    5
+    >>> stream.write("fabula")
+    6
     >>> stream.close()
-    >>> import shard.assets
-    >>> import shard.run
-    >>> app = shard.run.App("d", timeout = 5)
-    >>> assets = shard.assets.Assets(app.logger)
+    >>> import fabula.assets
+    >>> import fabula.run
+    >>> app = fabula.run.App("d", timeout = 5)
+    >>> assets = fabula.assets.Assets(app.logger)
     >>> asset = assets.fetch("temp.dat")
     >>> asset.read()
-    b'shard'
+    b'fabula'
     >>> asset.close()
     >>> import os
     >>> os.remove("temp.dat")

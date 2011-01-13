@@ -1,0 +1,719 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.eventprocessor.EventProcessor&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.e.EventProcessor:</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.eventprocessor.html">eventprocessor</a></span>
+      
+      <a href="classIndex.html#fabula.eventprocessor.EventProcessor">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.Plugin.html">fabula.plugins.Plugin</a>, <a href="fabula.Room.html">fabula.Room</a></p>
+    </div>
+    <pre>This is the base class for all Fabula objects that process events.
+    </pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id109">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__init__">__init__</a></td>
+    <td><tt>Set up EventProcessor.event_dict</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.Plugin.html">fabula.plugins.Plugin</a>, <a href="fabula.Room.html">fabula.Room</a></div>
+    <pre>Set up EventProcessor.event_dict
+which maps event classes to functions to be called for
+the respective event.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.__getstate__">
+    
+  </a>
+  <a name="__getstate__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __getstate__(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.__setstate__">
+    
+  </a>
+  <a name="__setstate__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __setstate__(self, state_dict):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent">
+    
+  </a>
+  <a name="process_TriesToMoveEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToMoveEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.serverside.DefaultGame.html">fabula.plugins.serverside.DefaultGame</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToLookAtEvent">
+    
+  </a>
+  <a name="process_TriesToLookAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToLookAtEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.serverside.DefaultGame.html">fabula.plugins.serverside.DefaultGame</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.serverside.DefaultGame.html">fabula.plugins.serverside.DefaultGame</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToManipulateEvent">
+    
+  </a>
+  <a name="process_TriesToManipulateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToManipulateEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_TriesToTalkToEvent">
+    
+  </a>
+  <a name="process_TriesToTalkToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToTalkToEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a>, <a href="fabula.Room.html">fabula.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_ManipulatesEvent">
+    
+  </a>
+  <a name="process_ManipulatesEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ManipulatesEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_CanSpeakEvent">
+    
+  </a>
+  <a name="process_CanSpeakEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_CanSpeakEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.pygameui.PygameUserInterface.html">fabula.plugins.pygameui.PygameUserInterface</a>, <a href="fabula.plugins.serverside.DefaultGame.html">fabula.plugins.serverside.DefaultGame</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_PerceptionEvent">
+    
+  </a>
+  <a name="process_PerceptionEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PerceptionEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.Entity.html">fabula.Entity</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_PassedEvent">
+    
+  </a>
+  <a name="process_PassedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PassedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_LookedAtEvent">
+    
+  </a>
+  <a name="process_LookedAtEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_LookedAtEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_PickedUpEvent">
+    
+  </a>
+  <a name="process_PickedUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PickedUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_DroppedEvent">
+    
+  </a>
+  <a name="process_DroppedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DroppedEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a>, <a href="fabula.Room.html">fabula.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a>, <a href="fabula.Room.html">fabula.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_EnterRoomEvent">
+    
+  </a>
+  <a name="process_EnterRoomEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_EnterRoomEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.ui.UserInterface.html">fabula.plugins.ui.UserInterface</a>, <a href="fabula.Room.html">fabula.Room</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.eventprocessor.EventProcessor.process_InitEvent">
+    
+  </a>
+  <a name="process_InitEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_InitEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.core.Engine.html">fabula.core.Engine</a>, <a href="fabula.plugins.serverside.DefaultGame.html">fabula.plugins.serverside.DefaultGame</a></div>
+    <pre>Process the Event.
+The default implementation does nothing.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+    </address>
+  </body>
+</html>

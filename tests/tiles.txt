@@ -1,45 +1,45 @@
-Doctests for the Shard Package
+Doctests for the Fabula Package
 ==============================
 
 Tile Fetching and Display in PygameUserInterface
 ------------------------------------------------
 
-    >>> import shard.plugins
-    >>> import shard.plugins.pygameui
-    >>> import shard.run
-    >>> img = shard.plugins.pygameui.pygame.Surface((100, 100))
+    >>> import fabula.plugins
+    >>> import fabula.plugins.pygameui
+    >>> import fabula.run
+    >>> img = fabula.plugins.pygameui.pygame.Surface((100, 100))
     >>> img.fill((255, 0, 0))
     <rect(0, 0, 100, 100)>
-    >>> shard.plugins.pygameui.pygame.image.save(img, "red.png")
+    >>> fabula.plugins.pygameui.pygame.image.save(img, "red.png")
     >>> img.fill((0, 255, 0))
     <rect(0, 0, 100, 100)>
-    >>> shard.plugins.pygameui.pygame.image.save(img, "green.png")
-    >>> class MapTest(shard.plugins.Plugin):
+    >>> fabula.plugins.pygameui.pygame.image.save(img, "green.png")
+    >>> class MapTest(fabula.plugins.Plugin):
     ...     def process_message(self, message):
     ...         if len(message.event_list):
     ...             self.logger.debug("processing message {}".format(str(message.event_list)))
-    ...             tile_red = shard.Tile(shard.FLOOR, "red.png")
-    ...             tile_green = shard.Tile(shard.FLOOR, "green.png")
-    ...             self.message_for_host.event_list.append(shard.EnterRoomEvent("test"))
+    ...             tile_red = fabula.Tile(fabula.FLOOR, "red.png")
+    ...             tile_green = fabula.Tile(fabula.FLOOR, "green.png")
+    ...             self.message_for_host.event_list.append(fabula.EnterRoomEvent("test"))
     ...             for x in range(0, 8, 2):
     ...                 for y in range(0, 5, 2):
-    ...                     self.message_for_host.event_list.append(shard.ChangeMapElementEvent(tile_red, (x, y)))
-    ...                     self.message_for_host.event_list.append(shard.ChangeMapElementEvent(tile_green, (x + 1, y)))
-    ...                     self.message_for_host.event_list.append(shard.ChangeMapElementEvent(tile_green, (x, y + 1)))
-    ...                     self.message_for_host.event_list.append(shard.ChangeMapElementEvent(tile_red, (x + 1, y + 1)))
-    ...             self.message_for_host.event_list.append(shard.RoomCompleteEvent())
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x, y)))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x + 1, y)))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x, y + 1)))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x + 1, y + 1)))
+    ...             self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
     ...             return self.message_for_host
     ...         else:
-    ...             return shard.Message([])
+    ...             return fabula.Message([])
     ...
-    >>> class QuittingInterface(shard.plugins.pygameui.PygameUserInterface):
+    >>> class QuittingInterface(fabula.plugins.pygameui.PygameUserInterface):
     ...     def process_RoomCompleteEvent(self, event):
-    ...         shard.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent(self, event)
-    ...         quit_event = shard.plugins.pygameui.pygame.event.Event(shard.plugins.pygameui.pygame.QUIT)
-    ...         shard.plugins.pygameui.pygame.event.post(quit_event)
+    ...         fabula.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent(self, event)
+    ...         quit_event = fabula.plugins.pygameui.pygame.event.Event(fabula.plugins.pygameui.pygame.QUIT)
+    ...         fabula.plugins.pygameui.pygame.event.post(quit_event)
     ...         return
     ...
-    >>> app = shard.run.App("d", timeout = 0)
+    >>> app = fabula.run.App("d", timeout = 0)
     >>> app.user_interface_class = QuittingInterface
     >>> app.server_plugin_class = MapTest
     >>> app.run_standalone(60, "player")

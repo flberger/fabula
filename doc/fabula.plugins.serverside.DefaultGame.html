@@ -1,0 +1,442 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.serverside.DefaultGame&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.s.DefaultGame(<a href="fabula.plugins.Plugin.html">fabula.plugins.Plugin</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.serverside.html">serverside</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.serverside.DefaultGame">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></p>
+    </div>
+    <pre>This is an off-the-shelf server plugin, running a default Fabula game.
+
+Additional attributes:
+
+DefaultGame.tries_to_move_dict
+    Dict mapping Entity identifiers to target positions.
+
+DefaultGame.path_dict
+    Dict mapping Entity identifiers to a list of coordinates walked so far.
+
+DefaultGame.condition_response_dict
+    A dict mapping string representations of incoming Events to response
+    Events.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id100">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_message">process_message</a></td>
+    <td><tt>DefaultGame main method.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#respond">respond</a></td>
+    <td><tt>Add an Event from condition_response_dict corresponding to the Event given to message_for_host.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>If there is no host.room yet, load default.floorplan and send it.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Queue the target and make the Entity move one step at a time.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Return a PicksUpEvent to the Server.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Return a DropsEvent to the Server.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Return the Event to the host.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#move_towards">move_towards</a></td>
+    <td><tt>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#load_condition_response_dict">load_condition_response_dict</a></td>
+    <td><tt>Load response logic from the file given.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.Plugin.html">Plugin</a>):
+        </p>
+        <table class="children sortable" id="id101">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, host):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.Plugin.html#__init__">fabula.plugins.Plugin.__init__</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
+    <pre>Initialise.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_message">
+    
+  </a>
+  <a name="process_message">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_message(self, message):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.Plugin.html#process_message">fabula.plugins.Plugin.process_message</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
+    <pre>DefaultGame main method.
+
+It calls the respective functions for the Events in message,
+processes pending moves from DefaultGame.tries_to_move_dict
+and returns DefaultGame.message_for_host.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.respond">
+    
+  </a>
+  <a name="respond">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    respond(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
+    <pre>Add an Event from condition_response_dict corresponding to the Event given to message_for_host.
+If the Event is not found, return AttemptFailedEvent.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_InitEvent">
+    
+  </a>
+  <a name="process_InitEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_InitEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">fabula.eventprocessor.EventProcessor.process_InitEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
+    <pre>If there is no host.room yet, load default.floorplan and send it.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_TriesToMoveEvent">
+    
+  </a>
+  <a name="process_TriesToMoveEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToMoveEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div>
+    <pre>Queue the target and make the Entity move one step at a time.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_TriesToPickUpEvent">
+    
+  </a>
+  <a name="process_TriesToPickUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToPickUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">fabula.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div>
+    <pre>Return a PicksUpEvent to the Server.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_TriesToDropEvent">
+    
+  </a>
+  <a name="process_TriesToDropEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_TriesToDropEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">fabula.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div>
+    <pre>Return a DropsEvent to the Server.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.process_AttemptFailedEvent">
+    
+  </a>
+  <a name="process_AttemptFailedEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_AttemptFailedEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">fabula.eventprocessor.EventProcessor.process_AttemptFailedEvent</a></div>
+    <pre>Return the Event to the host.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.move_towards">
+    
+  </a>
+  <a name="move_towards">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    move_towards(self, identifier, target_identifier, forbidden_moves):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.
+forbidden_moves is a list of targets that should be considered as not walkable.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.load_condition_response_dict">
+    
+  </a>
+  <a name="load_condition_response_dict">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    load_condition_response_dict(self, filename):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Load response logic from the file given.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+    </address>
+  </body>
+</html>

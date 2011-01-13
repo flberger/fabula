@@ -1,4 +1,4 @@
-Doctests for the Shard Package
+Doctests for the Fabula Package
 ==============================
 
 Core Modules and Imports
@@ -6,15 +6,15 @@ Core Modules and Imports
 
 First, make sure all core modules import fine:
 
-    >>> import shard
-    >>> import shard.eventprocessor
-    >>> import shard.assets
-    >>> import shard.core
-    >>> import shard.core.client
-    >>> import shard.core.server
-    >>> import shard.interfaces
-    >>> import shard.plugins
-    >>> import shard.plugins.ui
-    >>> import shard.plugins.pygameui
-    >>> import shard.run
+    >>> import fabula
+    >>> import fabula.eventprocessor
+    >>> import fabula.assets
+    >>> import fabula.core
+    >>> import fabula.core.client
+    >>> import fabula.core.server
+    >>> import fabula.interfaces
+    >>> import fabula.plugins
+    >>> import fabula.plugins.ui
+    >>> import fabula.plugins.pygameui
+    >>> import fabula.run
     >>>

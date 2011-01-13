@@ -1,0 +1,414 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.Entity&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.Entity(<a href="fabula.eventprocessor.EventProcessor.html">fabula.eventprocessor.EventProcessor</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a></span>
+      
+      <a href="classIndex.html#fabula.Entity">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.plugins.pygameui.PygameEntity.html">fabula.plugins.pygameui.PygameEntity</a></p>
+    </div>
+    <pre>An Entity is a Fabula game object.
+This is the base class for the player, NPCs and items.
+An Entity holds information used by the Fabula game logic:
+
+Entity.entity_type
+    One of fabula.PLAYER, fabula.NPC, fabula.ITEM_BLOCK or
+    fabula.ITEM_NOBLOCK.
+
+Entity.identifier
+    Must be an object whose string representation yields an unique
+    identification.
+
+Entity.asset_desc
+    Preferably a string with a file name or an URI of a media file
+    containing the data for visualizing the Entity.
+
+Entity.asset
+    The actual asset, application-dependent. The UserInterface may fetch
+    the asset using Entity.asset_desc and attach it here.
+
+Entity.state
+    The state the Entity is in. Defaults to None.
+
+Entity.user_interface
+    Pointer to the UserInterface instance.
+
+A Fabula Client should use subclasses (possibly with multiple inheritance)
+or custom attachements to instances of this class to implement the game
+objects used by the rendering engine (2D sprites, 3D models). Usually the
+Client manages a list of Entity instances. Everything concernig the
+actual graphical representation is done by the UserInterface. Since this
+is very application dependent it is not covered in the base class. Check
+the documentation and source of the UserInterface for further insight on
+how it handles game objects.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id47">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>This method is called by the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.Entity.html#__repr__">__repr__</a></td>
+    <td><tt>Readable and informative string representation.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a>:
+        </p>
+        <table class="children sortable" id="id48">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.Entity.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, entity_type, identifier, asset_desc):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#__init__">fabula.eventprocessor.EventProcessor.__init__</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameEntity.html">fabula.plugins.pygameui.PygameEntity</a></div>
+    <pre>Initialise.
+This method sets up the following attributes from the values given:
+
+Entity.entity_type
+Entity.identifier
+Entity.asset_desc
+Entity.asset
+Entity.state</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">fabula.eventprocessor.EventProcessor.process_MovesToEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameEntity.html">fabula.plugins.pygameui.PygameEntity</a></div>
+    <pre>This method is called by the UserInterface.
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangeStateEvent">fabula.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div>
+    <pre>This method is called by the UserInterface.
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">fabula.eventprocessor.EventProcessor.process_DropsEvent</a></div>
+    <pre>This method is called by the UserInterface.
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">fabula.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
+    <pre>This method is called by the UserInterface.
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_SaysEvent">fabula.eventprocessor.EventProcessor.process_SaysEvent</a></div>
+    <pre>This method is called by the UserInterface.
+The Entity representation has to execute the according action over
+the course of Entity.action_frames frames. But it must du so in an
+non-blocking fashion - this method must return as soon as possible.
+So do set up counters or frame queues here. Your implementation may
+call another method once per frame, do the actual work there.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.Entity.__repr__">
+    
+  </a>
+  <a name="__repr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __repr__(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Readable and informative string representation.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+    </address>
+  </body>
+</html>
