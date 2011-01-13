@@ -1,0 +1,61 @@
+README for Fabula
+=================
+
+About
+-----
+
+Fabula is a framework and engine for interactive storytelling by means of an 
+adventure game environment.
+
+It offers a client-server architecture, an event-based protocol, multiplayer
+and networking capabilites, a multi-threaded server, an abstract, 
+visualisation-agnostic model of a game world, an asset manager and a plugin 
+system. Gameplay can be recorded and played back. The code is well documented 
+and runs on Linux and MS Windows (it should work on OS X, too, but this has
+not yet been tested).
+
+Fabula can be used as a library to develop your own adventure games. As an 
+alternative, you can use the Pygame-based graphical editor and the default
+game engine that come with fabula.
+
+You can find fabula on the web at http://florian-berger.de/software/fabula
+
+
+Prerequisites
+-------------
+
+Python >= 3.0      http://python.org/
+Pygame >= 1.9.1    http://pygame.org/
+
+
+Installation
+------------
+
+If you want to run the binary editor or game engine that come with fabula then 
+just unzip the archive and run one of the files ending with ".exe".
+
+Fabula uses the Python distutils module. If you want to install it as a library, 
+running
+
+    python3 setup.py install
+
+should do the job.
+
+
+License
+-------
+
+Fabula is Free Software under the General Public License (GPL) as published by 
+the Free Software Foundation.
+
+
+History
+-------
+
+"Fabula" used to be called "Shard" before being released to the public in 2011.
+
+
+Author & Copyright
+------------------
+
+Copyright 2010 Florian Berger <fberger@florian-berger.de>

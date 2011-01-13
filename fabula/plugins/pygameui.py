@@ -1,11 +1,26 @@
 """2D Fabula User Interface using PyGame
 
-   (c) Florian Berger <fberger@florian-berger.de>
+   Copyright 2010 Florian Berger <fberger@florian-berger.de>
 """
+
+# This file is part of Fabula.
+#
+# Fabula is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Fabula is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Fabula.  If not, see <http://www.gnu.org/licenses/>.
 
 # work started on 15. Oct 2010
 #
-# Partly based on the Fabula PresentationEngine for the "Runaway" game done in
+# Partly based on the Shard PresentationEngine for the "Runaway" game done in
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
