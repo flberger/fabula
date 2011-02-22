@@ -118,7 +118,8 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """This is the main loop of an Engine.
            Put all the business logic here.
            This is a blocking method which should call all the process methods
-           to process events.
+           to process events, and then call the plugin.
+           The default implementation waits for self.plugin.exit_requested to be True.
         """
 
         self.logger.info("starting")
@@ -340,7 +341,11 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """Let the Entity handle the Event. Then add the event to the message.
         """
 
-        self.logger.debug("called")
+        msg = "forwarding state change '{}'->'{}' to Entity '{}' in current room"
+
+        self.logger.debug(msg.format(event.state_key,
+                                     event.state_value,
+                                     event.identifier))
 
         self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
 

@@ -140,7 +140,7 @@ class Client(fabula.core.Engine):
     def run(self):
         """Main loop of the Client.
            This is a blocking method. It calls all the process
-           methods to process events.
+           methods to process events, and then the plugin.
         """
 
         # TODO: The current implementation is too overtrustful.
@@ -223,9 +223,8 @@ class Client(fabula.core.Engine):
 
                 self.got_empty_message = True
 
-            # First handle the events in the Client,
-            # updating the room and preparing a Message for
-            # the UserInterface
+            # First handle the events in the Client, updating the room and
+            # preparing self.message_for_plugin for the UserInterface
             #
             for current_event in server_message.event_list:
 

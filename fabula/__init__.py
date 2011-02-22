@@ -40,6 +40,8 @@
 # TODO: import fabula.xyz also imports fabula - so get rid of redundant imports
 # TODO: Clean up log levels: use debug(), info(), warning(), error(), critical()
 # TODO: is the default mirroring policy in Plugin OK? UserInterface also is a Plugin, after all, and it makes no sense here.
+# TODO: Entity.entity_type -> Entity.type? Tile.tile_type -> Tile.type?
+# TODO: nicer logging. Use the NullLogger and leave logging to the Fabula host. Use named calls to getLogger("somename") and repeat these calls whenever a Fabula logger is needed instead of passing them around.
 #
 #
 # OPTIMISATION
@@ -60,6 +62,7 @@
 # TODO: per-player inventories in server... -.-
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
+# TODO: join Tile and FloorPlanElement?
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -427,20 +430,26 @@ class ChangeStateEvent(Event):
        ChangeStateEvent.identifier
            identifier of the Entity to change state
 
-       ChangeStateEvent.state
-           A number or a verbose string
+       ChangeStateEvent.state_key
+           A string giving the name of the state.
+
+       ChangeStateEvent.state_value
+           A string giving the value of the state.
     """
 
     # ChangeState is based on a concept by Alexander Marbach.
 
-    def __init__(self, identifier, state):
+    def __init__(self, identifier, state_key, state_value):
         """Event initialisation.
-           state is the new state for the Entity identified by identifier.
-           In the simplest case state may be a number or a verbose string.
+           state is a new state for the Entity identified by identifier.
+           state_key and state_value must be strings.
         """
         self.identifier = identifier
 
-        self.state = state
+        self.state_key = state_key
+        self.state_value = state_value
+
+        return
 
 ####################
 # Passive events
@@ -657,14 +666,17 @@ class Entity(fabula.eventprocessor.EventProcessor):
 
        Entity.asset_desc
            Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the Entity.
+           containing the data for visualizing the Entity. Set upon
+           initialisation.
 
        Entity.asset
-           The actual asset, application-dependent. The UserInterface may fetch
-           the asset using Entity.asset_desc and attach it here.
+           The actual asset, application-dependent, initially None.
+           The UserInterface may fetch the asset using Entity.asset_desc and
+           attach it here.
 
        Entity.state
-           The state the Entity is in. Defaults to None.
+           A dict mapping strings to strings, holding the application-dependent
+           state of the Entity.
 
        Entity.user_interface
            Pointer to the UserInterface instance.
@@ -700,7 +712,7 @@ class Entity(fabula.eventprocessor.EventProcessor):
         self.identifier = identifier
         self.asset_desc = asset_desc
         self.asset = None
-        self.state = None
+        self.state = {}
 
         # Will be filled by the UserInterface at runtime
         #
@@ -724,13 +736,12 @@ class Entity(fabula.eventprocessor.EventProcessor):
 
     def process_ChangeStateEvent(self, event):
         """This method is called by the UserInterface.
-           The Entity representation has to execute the according action over
-           the course of Entity.action_frames frames. But it must du so in an
-           non-blocking fashion - this method must return as soon as possible.
-           So do set up counters or frame queues here. Your implementation may
-           call another method once per frame, do the actual work there.
+           The key 'event.state_key' in Entity.state dict is set to event.state_value.
         """
-        self.state = event.state
+
+        self.state[event.state_key] = event.state_value
+
+        return
 
     def process_DropsEvent(self, event):
         """This method is called by the UserInterface.

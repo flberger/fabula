@@ -26,9 +26,11 @@ import os
 import math
 import pickle
 
-def load_room_from_file(filename):
+def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
        Returns None upon failure.
+       If the complete argument is True, a RoomCompleteEvent will be added,
+       otherwise it will be left out.
 
        The file must consist of lines of tab-separated elements:
 
@@ -42,7 +44,7 @@ def load_room_from_file(filename):
 
         return None
 
-    event_list = [fabula.EnterRoomEvent(filename.split(".floorplan")[0])]
+    event_list = [fabula.EnterRoomEvent(os.path.splitext(os.path.basename(filename))[0])]
 
     for line in roomfile:
 
@@ -87,9 +89,10 @@ def load_room_from_file(filename):
 
                 event_list.append(fabula.SpawnEvent(entity, coordinates))
 
-    event_list.append(fabula.RoomCompleteEvent())
-
     roomfile.close()
+
+    if complete:
+        event_list.append(fabula.RoomCompleteEvent())
 
     return event_list
 
@@ -107,7 +110,11 @@ class DefaultGame(fabula.plugins.Plugin):
        DefaultGame.condition_response_dict
            A dict mapping string representations of incoming Events to response
            Events.
-    """
+
+       DefaultGame.talk_to_dict
+           A dict caching the source and targets of TriesToTalkToEvents,
+           mapping identifiers to identifiers.
+   """
 
     def __init__(self, host):
         """Initialise.
@@ -119,6 +126,7 @@ class DefaultGame(fabula.plugins.Plugin):
         self.tries_to_move_dict = {}
         self.path_dict = {}
         self.condition_response_dict = {}
+        self.talk_to_dict = {}
 
         # Load default logic.
         #
@@ -135,47 +143,10 @@ class DefaultGame(fabula.plugins.Plugin):
            and returns DefaultGame.message_for_host.
         """
 
-        # Copied from Plugin.process_message. We can not call the parent's
-        # method here since we need to add Events inbetween.
-
-        # Clear message for host
+        # Call base class method, which in turn calls the processing methods.
+        # Results are added to self.message_for_host.
         #
-        self.message_for_host = fabula.Message([])
-
-        if message.event_list:
-
-            self.logger.debug("processing message {}".format(message.event_list))
-
-            for event in message.event_list:
-
-                if event.__class__ in (fabula.InitEvent,
-                                       fabula.TriesToMoveEvent,
-                                       fabula.TriesToPickUpEvent,
-                                       fabula.TriesToDropEvent,
-                                       fabula.AttemptFailedEvent):
-
-                    # These are handled by the according methods.
-                    # process_TriesToDropEvent() will call respond() if appropriate.
-                    # Use event_dict from EventProcessor base class.
-                    #
-                    self.event_dict[event.__class__](event)
-
-                elif event.__class__ in (fabula.TriesToLookAtEvent,
-                                         fabula.TriesToManipulateEvent,
-                                         fabula.TriesToTalkToEvent):
-
-                    # These are handled by respond()
-                    #
-                    self.respond(event)
-
-                elif isinstance(event, fabula.PassiveEvent):
-
-                    self.logger.debug("returning PassiveEvent instance to host")
-                    self.message_for_host.event_list.append(event)
-
-                else:
-                    self.logger.critical("don't know how to process '{}'".format(event))
-                    raise Exception("don't know how to process '{}'".format(event))
+        fabula.plugins.Plugin.process_message(self, message)
 
         # Process pending moves.
         # Create a new list to be able to change the dict during iteration.
@@ -317,7 +288,6 @@ class DefaultGame(fabula.plugins.Plugin):
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of fabula.Entity.
         #
-
         if event.target_identifier in self.host.room.entity_dict.keys():
 
             self.logger.debug("target '{}' is an entity identifier".format(event.target_identifier))
@@ -361,6 +331,47 @@ class DefaultGame(fabula.plugins.Plugin):
 
         self.logger.debug("returning Event to host")
         self.message_for_host.event_list.append(event)
+        return
+
+    def process_SaysEvent(self, event):
+        """This is a convenience hook to override.
+           The default implementation calls DefaultGame.respond().
+        """
+
+        self.logger.debug("called")
+        self.respond(event)
+        return
+
+    def process_TriesToLookAtEvent(self, event):
+        """This is a convenience hook to override.
+           The default implementation calls DefaultGame.respond().
+        """
+
+        self.logger.debug("called")
+        self.respond(event)
+        return
+
+    def process_TriesToManipulateEvent(self, event):
+        """This is a convenience hook to override.
+           The default implementation calls DefaultGame.respond().
+        """
+
+        self.logger.debug("called")
+        self.respond(event)
+        return
+
+    def process_TriesToTalkToEvent(self, event):
+        """Cache source and target of the event in self.talk_to_dict, then call DefaultGame.respond().
+        """
+
+        self.logger.debug("called")
+
+        # Cache source and target
+        #
+        self.talk_to_dict[event.identifier] = event.target_identifier
+
+        self.respond(event)
+
         return
 
     def move_towards(self, identifier, target_identifier, forbidden_moves):

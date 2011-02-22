@@ -108,6 +108,12 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Open the senteces as an OptionList and return a SaysEvent to the host.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_SpawnEvent">process_SpawnEvent</a></td>
     <td><tt>Add a subplane to window.room, possibly fetching an asset before.</tt></td>
   </tr><tr class="method">
@@ -138,6 +144,12 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><tt>Call base class, update caption changes, then display a single frame to show the result.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_DropsEvent">process_DropsEvent</a></td>
     <td><tt>Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.</tt></td>
   </tr><tr class="method">
@@ -146,6 +158,12 @@ PygameUserInterface.fade_surface
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
     <td><tt>Move the item's Plane from window.room to window.inventory.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
+    <td><tt>Call the base class, then present the text to the user and wait some time.</tt></td>
   </tr><tr class="method">
     
     
@@ -208,26 +226,8 @@ PygameUserInterface.fade_surface
     
     
     <td>Method</td>
-    <td><a href="fabula.plugins.ui.UserInterface.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Called when the UserInterface needs to render a CanSpeakEvent.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
     <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.plugins.ui.UserInterface.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>Entity has already handled the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.plugins.ui.UserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>Called with an instance of SaysEvent</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -449,6 +449,24 @@ frames per second the client will run at.</pre>
         </pre>
   </div>
 </div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameUserInterface.process_CanSpeakEvent">
+    
+  </a>
+  <a name="process_CanSpeakEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_CanSpeakEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_CanSpeakEvent">fabula.plugins.ui.UserInterface.process_CanSpeakEvent</a></div>
+    <pre>Open the senteces as an OptionList and return a SaysEvent to the host.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.process_SpawnEvent">
     
   </a>
@@ -544,6 +562,24 @@ be derived from a single Tile.</pre>
         </pre>
   </div>
 </div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameUserInterface.process_ChangeStateEvent">
+    
+  </a>
+  <a name="process_ChangeStateEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeStateEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_ChangeStateEvent">fabula.plugins.ui.UserInterface.process_ChangeStateEvent</a></div>
+    <pre>Call base class, update caption changes, then display a single frame to show the result.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.process_DropsEvent">
     
   </a>
@@ -578,6 +614,24 @@ be derived from a single Tile.</pre>
     <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_PicksUpEvent">fabula.plugins.ui.UserInterface.process_PicksUpEvent</a></div>
     <pre>Move the item's Plane from window.room to window.inventory.
 Then call the base class implementation to notify the Entity.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameUserInterface.process_SaysEvent">
+    
+  </a>
+  <a name="process_SaysEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SaysEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_SaysEvent">fabula.plugins.ui.UserInterface.process_SaysEvent</a></div>
+    <pre>Call the base class, then present the text to the user and wait some time.
+        </pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.inventory_callback">
@@ -689,7 +743,7 @@ Adds appropriate Events to PygameUserInterface.message_for_host.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-01-13 14:27:20.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-02-22 08:18:58.
     </address>
   </body>
 </html>

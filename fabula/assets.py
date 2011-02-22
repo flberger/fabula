@@ -41,6 +41,7 @@ class Assets:
         self.logger = logger
 
         # TODO: Since an Assets instance is created only once, fetch() should do some asset caching (self.asset_dict) to prevent unnecessary file or network access. Problem: memory usage has to be limited. Probably use temporary files for downloaded assets?
+        # TODO: Add a function to cache an object associated with an asset description.
 
     def fetch(self, asset_desc):
         """This method retrieves the file specified in asset_desc and returns a file-like object.

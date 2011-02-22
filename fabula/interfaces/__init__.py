@@ -61,17 +61,19 @@ class Interface:
        Attributes:
 
            Interface.connector
-               Given in __init__()
+               An object that specifies how to connect to the remote host (for
+               clients) or where to listen for client messages (for the server),
+               for example a tuple (ip_address, port). Set in __init__().
 
            Interface.logger
-               Given in __init__()
+               Given in __init__().
 
            Interface.connections
-               A dict of connector objects mapping to MessageBuffer instances
+               A dict of connector objects mapping to MessageBuffer instances.
 
            Interface.shutdown_flag
            Interface.shutdown_confirmed
-               Flags for shutdown handling
+               Flags for shutdown handling.
     """
 
     def __init__(self, connector, logger):
@@ -168,8 +170,7 @@ class MessageBuffer:
         """
 
         # A hint from the Python documentation:
-        # deques are a fast, thread-safe replacement
-        # for queues.
+        # deques are a fast, thread-safe replacement for queues.
         # Use deque.append(x) and deque.popleft()
         #
         self.messages_for_local = deque()

@@ -149,10 +149,8 @@ class App:
 
         # Loglevel:
         # + "%(levelname)-5s "
-        # Line number:
-        # %(lineno)s
 
-        file_formatter = FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s",
+        file_formatter = FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s (l.%(lineno)s)",
                                             "%Y-%m-%d %H:%M:%S")
 
         self.file_handler.setFormatter(file_formatter)
@@ -288,6 +286,8 @@ class App:
             #
             while not (server_interface.shutdown_flag
                        or client_interface.shutdown_flag):
+
+                # TODO: while this is handy, it has a problem: client and server share Entity objects, which creates problems when client *and* server forward Events to the Entity.
 
                 if len(server_message_buffer.messages_for_remote):
                     message = server_message_buffer.messages_for_remote.popleft()

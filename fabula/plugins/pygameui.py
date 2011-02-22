@@ -72,7 +72,7 @@ def load_image(title):
     return (surface, filename)
 
 class EntityPlane(clickndrag.Plane):
-    """Subclass of Plane with an update() method that handles movement.
+    """Subclass of Plane with an extended update() method that handles movement.
 
        Additional attributes:
 
@@ -102,6 +102,10 @@ class EntityPlane(clickndrag.Plane):
         """If EntityPlane.target has not yet been reached, move to the positions given in EntityPlane.position_list.
         """
 
+        # Call base class to update() all subplanes
+        #
+        clickndrag.Plane.update(self)
+
         if self.position_list:
             new_position = self.position_list.pop(0)
             self.rect.centerx = new_position[0]
@@ -111,6 +115,10 @@ class EntityPlane(clickndrag.Plane):
 
 class PygameEntity(fabula.Entity):
     """Pygame-aware subclass of Entity to be used in PygameUserInterface.
+
+       PygameEntities support the key "caption" in the PygameEntity.state dict.
+       The value of PygameEntity.state["caption"] will be displayed above the
+       PygameEntity.
 
        Additional attributes:
 
@@ -179,6 +187,55 @@ class PygameEntity(fabula.Entity):
         position_list.append((future_x, future_y))
 
         self.asset.position_list.extend(position_list)
+
+        return
+
+    def process_ChangeStateEvent(self, event):
+        """Call base class and update caption changes.
+        """
+
+        # Call base class
+        #
+        fabula.Entity.process_ChangeStateEvent(self, event)
+
+        if self.asset is not None and event.state_key == "caption":
+
+            # Do we already have a caption?
+            #
+            if "caption" in self.asset.subplanes_list:
+
+                # Is there enough space?
+                # TODO: arbitrary width formula
+                #
+                if self.asset.subplanes["caption"].rect.width < len(event.state_value) * 10:
+
+                    # Destroy existing caption
+                    #
+                    self.asset.subplanes["caption"].destroy()
+
+                    # Call this method again, it will create a new Label.
+                    # Clever, eh? ;-)
+                    #
+                    self.process_ChangeStateEvent(event)
+
+                else:
+                    # Then only change the text.
+                    # Should be made visible with the next call to update().
+                    #
+                    self.asset.subplanes["caption"].text = event.state_value
+
+            else:
+                # Create a new caption Label
+                # TODO: arbitrary width formula
+                #
+                caption = clickndrag.gui.Label("caption",
+                                               event.state_value,
+                                               pygame.rect.Rect((0, 0),
+                                                                (len(event.state_value) * 10, 30)))
+
+                caption.rect.centerx = int(self.asset.rect.width / 2)
+
+                self.asset.sub(caption)
 
         return
 
@@ -560,7 +617,23 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-#    def process_CanSpeakEvent(self, event):
+    def process_CanSpeakEvent(self, event):
+        """Open the senteces as an OptionList and return a SaysEvent to the host.
+        """
+
+        self.logger.debug("called")
+
+        option_list = clickndrag.gui.OptionList("select_room",
+                                                event.sentences,
+                                                lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.player_id, option.text)),
+                                                lineheight = 25)
+
+        option_list.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+
+        self.window.room.sub(option_list)
+
+        return
+
 
     def process_SpawnEvent(self, event):
         """Add a subplane to window.room, possibly fetching an asset before.
@@ -643,9 +716,37 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # The Entity must be able to react to Events. These reactions are
             # Pygame specific and are thus not covered in the basic fabula.Entity
             # class. Thus, we exploit a Python feature here and change the
-            # Entity's class at runtime to a subclass that supports Pygame.
+            # Entity's class at runtime to a class that supports Pygame.
             #
-            event.entity.__class__ = PygameEntity
+            if event.entity.__class__ is PygameEntity or PygameEntity in event.entity.__class__.__bases__:
+
+                # PygameEntity already in use? Great!
+                #
+                pass
+
+            elif event.entity.__class__ is fabula.Entity:
+
+                # Oh well. Just swap.
+                #
+                self.logger.debug("changing class of '{}' from {} to {}".format(event.entity.identifier,
+                                                                                event.entity.__class__,
+                                                                                PygameEntity))
+
+                event.entity.__class__ = PygameEntity
+
+            else:
+                # To preserve the class, create a new class that inherits from
+                # the current one and from PygameEntity.
+                #
+                class ExtendedEntity(event.entity.__class__, PygameEntity):
+
+                    pass
+
+                self.logger.debug("changing class of '{}' from {} to bases {}".format(event.entity.identifier,
+                                                                                event.entity.__class__,
+                                                                                ExtendedEntity.__bases__))
+
+                event.entity.__class__ = ExtendedEntity
 
             # Since we do not call PygameEntity.__init__() to prevent messing
             # up already present data, we add required attributes
@@ -809,7 +910,30 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-#    def process_ChangeStateEvent(self, event):
+    def process_ChangeStateEvent(self, event):
+        """Call base class, update caption changes, then display a single frame to show the result.
+        """
+
+        self.logger.debug("called")
+
+        # Call base class
+        #
+        fabula.plugins.ui.UserInterface.process_ChangeStateEvent(self, event)
+
+        # In the case of a catpion change, the asset may not have been fetched
+        # when the Entity processed the state change in the Engine's loop.
+        #
+        entity = self.host.room.entity_dict[event.identifier]
+
+        if entity.asset is not None \
+           and event.state_key == "caption" \
+           and not "caption" in entity.asset.subplanes_list:
+
+            self.logger.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
+
+            entity.process_ChangeStateEvent(event)
+
+        return
 
     def process_DropsEvent(self, event):
         """Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.
@@ -872,7 +996,41 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_PicksUpEvent(self, event)
 
-#    def process_SaysEvent(self, event):
+    def process_SaysEvent(self, event):
+        """Call the base class, then present the text to the user and wait some time.
+        """
+
+        self.logger.debug("called")
+
+        # Call base class
+        #
+        fabula.plugins.ui.UserInterface.process_SaysEvent(self, event)
+
+        # TODO: replace with a nice speech balloon
+
+        # Taken from process_PerceptionEvent()
+        #
+        says_box = clickndrag.gui.Label("{}_says".format(event.identifier),
+                                        event.text,
+                                        pygame.Rect((0, 0),
+                                                    (len(event.text) * 10, 30)))
+
+        entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
+
+        # Display above Entity
+        #
+        says_box.rect.center = (entity_rect.centerx, entity_rect.top)
+
+        self.window.room.sub(says_box)
+
+        # Display 4 * action_time
+        #
+        for frame in range(4 * self.action_frames):
+            self.display_single_frame()
+
+        says_box.destroy()
+
+        return
 
     def inventory_callback(self, plane, dropped_plane, screen_coordinates):
         """Drop callback to issue a TriesToPickUpEvent if the item is not already in Rack.
@@ -1671,18 +1829,6 @@ class PygameEditor(PygameUserInterface):
         #
         while len(self.plane_cache):
             self.window.buttons.sub(self.plane_cache.pop(0))
-
-    def process_CanSpeakEvent(self, event):
-        """Open the senteces as an OptionList and return a SaysEvent to the host.
-        """
-
-        self.logger.debug("called")
-
-        self.window.room.sub(clickndrag.gui.OptionList("select_room",
-                                                       event.sentences,
-                                                       lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.player_id, option.text)),
-                                                       lineheight = 25))
-        return
 
     def process_SpawnEvent(self, event):
         """Call PygameUserInterface.process_SpawnEvent and add a clicked_callback to the Entity.

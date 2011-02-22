@@ -91,7 +91,9 @@ class Server(fabula.core.Engine):
         return
 
     def run(self):
-        """Server main method, calling the Plugin in the process.
+        """Main loop of the Server.
+           This is a blocking method. It calls all the process
+           methods to process events, and then the plugin.
         """
 
         self.logger.info("starting")

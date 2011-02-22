@@ -62,6 +62,9 @@ class Plugin(fabula.eventprocessor.EventProcessor):
            another instance of fabula.Message to be processed by the host and
            possibly to be sent to the remote host.
 
+           The host Engine will try hard to call this method on a regular base,
+           ideally once per frame. message.event_list thus might be empty.
+
            The default implementation calls the respective functions for the
            Events in message and returns Plugin.message_for_host.
         """

@@ -589,11 +589,10 @@ class UserInterface(fabula.plugins.Plugin):
         return
 
     def process_ChangeStateEvent(self, event):
-        """Entity has already handled the Event.
-           Display a single frame to show the result.
+        """Entity has already handled the Event. Display a single frame to show the result.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("Entity '{}' has already handled the Event, displaying a single frame to show the result".format(event.identifier))
 
         self.display_single_frame()
 
