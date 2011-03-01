@@ -30,15 +30,14 @@
 # Work on Fabula server interface started on 24. Sep 2009
 
 import fabula
-
 from collections import deque
-
-import socket
-import socketserver
-
-import pickle
-
 from time import sleep
+
+# For UDP
+#
+#import socket
+#import socketserver
+#import pickle
 
 # Twisted has not yet been ported to Python 3.
 #
@@ -50,8 +49,6 @@ from time import sleep
 # import twisted.internet.protocol
 # import twisted.internet.reactor
 # import twisted.internet.task
-
-# Base and helper classes
 
 class Interface:
     """This is a base class for Fabula interfaces which handle all the network traffic.
@@ -108,14 +105,18 @@ class Interface:
 
     def handle_messages(self):
         """This is the main method of an interface class.
+
            It must transfer all the messages between local and remote host.
+
            This method is put in a background thread by the startup script,
            so your implementation can do all sorts of polling or blocking IO.
+
            It should regularly check whether shutdown() has been called
            (checking self.shutdown_flag), and if so, it should notify
            shutdown() by setting self.shutdown_confirmed to true (so that
            method can return True itself), and then raise SystemExit to stop
            the thread.
+
            The default implementation does nothing, but will handle the
            shutdown as described.
         """
@@ -159,9 +160,16 @@ class Interface:
 
         return True
 
-
 class MessageBuffer:
     """Buffer messages received and to be sent over the network.
+
+       Attributes:
+
+       MessageBuffer.messages_for_local
+           A deque, buffering messages from the remote host.
+
+       MessageBuffer.messages_for_remote
+           A deque, buffering messages from the local host.
     """
 
     def __init__(self):
@@ -188,9 +196,9 @@ class MessageBuffer:
 
     def grab_message(self):
         """Called by the local engine to obtain a new buffered message from the remote host.
-           It must return an instance of fabula.Message, and it must
-           do so immediately to avoid blocking. If there is no new
-           message from remote, it must return an empty message.
+           It must return an instance of fabula.Message, and it must do so
+           immediately to avoid blocking. If there is no new message from
+           remote, it must return an empty message.
         """
 
         if self.messages_for_local:
@@ -198,244 +206,324 @@ class MessageBuffer:
             return self.messages_for_local.popleft()
 
         else:
-            # A Message must be returned, so create
-            # an empty one
+            # A Message must be returned, so create an empty one
             #
             return fabula.Message([])
 
+class StandaloneInterface(Interface):
+    """An Interface that is meant to be used in conjunction with run.App.run_standalone().
+    """
+
+    def __init__(self, logger, framerate):
+        """Initialise with StandaloneInterface.connections["peer"] = MessageBuffer().
+        """
+
+        # Call base class
+        #
+        Interface.__init__(self, "peer", logger)
+
+        self.connections["peer"] = MessageBuffer()
+
+        self.framerate = framerate
+
+        self.logger.debug("complete")
+
+    def handle_messages(self, remote_message_buffer):
+        """This background thread method transfers messages between local and remote MessageBuffer.
+           It uses representations of the Events being sent to create new copies
+           of the original ones.
+        """
+
+        self.logger.debug("starting up")
+
+        # Run thread as long as no shutdown is requested
+        #
+        while not self.shutdown_flag:
+
+            # Get messages from remote
+            #
+            if remote_message_buffer.messages_for_remote:
+
+                original_message = remote_message_buffer.messages_for_remote.popleft()
+
+                new_message = fabula.Message([])
+
+                for event in original_message.event_list:
+
+                    if isinstance(event, fabula.SpawnEvent) and event.entity.__class__ is not fabula.Entity:
+
+                        # These need special care. We need to have a canonic
+                        # fabula.Entity. Entity.clone() will produce one.
+                        #
+                        self.logger.debug("cloning canonical Entity from {}".format(event.entity))
+
+                        event = fabula.SpawnEvent(event.entity.clone(),
+                                                  event.location)
+
+                    # Create new instances from string representations to avoid
+                    # concurrent access of client and server to the object
+                    #
+                    self.logger.debug("evaluating: '{}'".format(repr(event)))
+
+                    try:
+                        new_message.event_list.append(eval(repr(event)))
+
+                    except SyntaxError:
+
+                        # Well, well, well. Some __repr__ does not return a
+                        # string that can be evaluated here!
+                        #
+                        self.logger.error("error: can not evaluate '{}', skipping".format(repr(event)))
+
+                self.connections["peer"].messages_for_local.append(new_message)
+
+            # No need to deliver messages to remote since it will grab them -
+            # see above.
+
+            # No need to run as fast as possible
+            #
+            sleep(1 / self.framerate)
+
+        # Caught shutdown notification, stopping thread
+        #
+        self.logger.info("shutting down")
+
+        self.shutdown_confirmed = True
+
+        raise SystemExit
 
 # UDP implementation
 #
 # TODO: This implementation may be defunct because of the Interface class refactoring. Check and refactor.
 
-class UDPClientInterface(MessageBuffer, Interface):
-    """This is the base class for a Fabula Client Interface.
-       Implementations should subclass this one an override
-       the default methods, which showcase a simple example.
-    """
+#class UDPClientInterface(MessageBuffer, Interface):
+#    """This is the base class for a Fabula Client Interface.
+#       Implementations should subclass this one an override
+#       the default methods, which showcase a simple example.
+#    """
 
-    def __init__(self, connector, logger):
-        """Interface initialization.
-        """
+#    def __init__(self, connector, logger):
+#        """Interface initialization.
+#        """
 
-        # First call __init__() from the base class
-        #
-        Interface.__init__(self, connector, logger)
+#        # First call __init__() from the base class
+#        #
+#        Interface.__init__(self, connector, logger)
 
-        # Convenience name to make code clearer
-        #
-        self.address_port_tuple = self.connector
+#        # Convenience name to make code clearer
+#        #
+#        self.address_port_tuple = self.connector
 
-        # This is a subclass of MessageBuffer, but
-        # since we override __init__(), we have to
-        # call the original method.
-        #
-        MessageBuffer.__init__(self)
+#        # This is a subclass of MessageBuffer, but
+#        # since we override __init__(), we have to
+#        # call the original method.
+#        #
+#        MessageBuffer.__init__(self)
 
-        # Set up UDP socket
-        # It wouldn't be unreasonable to also use
-        # a socketserver on the client side. But
-        # since the client is only ever supposed
-        # to handle one connection, direct socket
-        # handling may be just right.
-        #
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#        # Set up UDP socket
+#        # It wouldn't be unreasonable to also use
+#        # a socketserver on the client side. But
+#        # since the client is only ever supposed
+#        # to handle one connection, direct socket
+#        # handling may be just right.
+#        #
+#        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        # The socket timeout is used for
-        # socket.recv() operations, which
-        # take turns with socket.sendto().
-        #
-        self.sock.settimeout(0.3)
+#        # The socket timeout is used for
+#        # socket.recv() operations, which
+#        # take turns with socket.sendto().
+#        #
+#        self.sock.settimeout(0.3)
 
-        self.logger.info("complete")
+#        self.logger.info("complete")
 
-    def handle_messages(self):
-        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
-           It is meant to be the back end of send_message() and grab_message().
-           Put some networking code, a GUI or a random generator here.
-           This method is put in a background thread automatically, so it can
-           do all sorts of polling or blocking IO.
-           It should regularly check whether shutdown() has been called, and
-           if so, it should notify shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop the thread.
-        """
+#    def handle_messages(self):
+#        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
+#           It is meant to be the back end of send_message() and grab_message().
+#           Put some networking code, a GUI or a random generator here.
+#           This method is put in a background thread automatically, so it can
+#           do all sorts of polling or blocking IO.
+#           It should regularly check whether shutdown() has been called, and
+#           if so, it should notify shutdown() in some way (so that it can return
+#           True), and then raise SystemExit to stop the thread.
+#        """
 
-        self.logger.debug("starting up")
+#        self.logger.debug("starting up")
 
-        # Run thread as long as no shutdown is requested
-        #
-        while not self.shutdown_flag:
+#        # Run thread as long as no shutdown is requested
+#        #
+#        while not self.shutdown_flag:
 
-            if self.messages_for_remote:
+#            if self.messages_for_remote:
 
-                self.logger.debug("sending 1 message of " + str(len(self.messages_for_remote)))
+#                self.logger.debug("sending 1 message of " + str(len(self.messages_for_remote)))
 
-                # -1 = use highest available pickle protocol
-                #
-                self.sock.sendto(pickle.dumps(self.messages_for_remote.popleft(), -1),
-                                 self.address_port_tuple)
+#                # -1 = use highest available pickle protocol
+#                #
+#                self.sock.sendto(pickle.dumps(self.messages_for_remote.popleft(), -1),
+#                                 self.address_port_tuple)
 
-            # Now listen for incoming server
-            # messages for some time
-            # (set in __init__()). This will
-            # catch any messages received in
-            # the meantime by the OS (tested).
-            #
-            data_received = ""
+#            # Now listen for incoming server
+#            # messages for some time
+#            # (set in __init__()). This will
+#            # catch any messages received in
+#            # the meantime by the OS (tested).
+#            #
+#            data_received = ""
 
-            try:
+#            try:
 
-                # TODO: UDP sockets may lock up on large packets (tested). Use the struct module to encode events and messages.
-                #
-                data_received = self.sock.recv(16384)
+#                # TODO: UDP sockets may lock up on large packets (tested). Use the struct module to encode events and messages.
+#                #
+#                data_received = self.sock.recv(16384)
 
-            except socket.timeout:
+#            except socket.timeout:
 
-                # We do not log here since this
-                # happens too often
-                #
-                pass
+#                # We do not log here since this
+#                # happens too often
+#                #
+#                pass
 
-            if data_received:
+#            if data_received:
 
-                # TODO: accepts data from *anywhere*
+#                # TODO: accepts data from *anywhere*
 
-                self.logger.debug("received server message ("
-                                  + str(len(data_received))
-                                  + "/16384 bytes)")
+#                self.logger.debug("received server message ("
+#                                  + str(len(data_received))
+#                                  + "/16384 bytes)")
 
-                self.messages_for_local.append(pickle.loads(data_received))
+#                self.messages_for_local.append(pickle.loads(data_received))
 
-        # Caught shutdown notification, stopping thread
-        #
-        self.logger.info("shutting down")
+#        # Caught shutdown notification, stopping thread
+#        #
+#        self.logger.info("shutting down")
 
-        self.shutdown_confirmed = True
+#        self.shutdown_confirmed = True
 
-        raise SystemExit
+#        raise SystemExit
 
 
-class UDPServerInterface(Interface):
-    """This is the base class for a Fabula Server Interface.
-       Implementations should subclass this one an override
-       the default methods, which do nothing.
-    """
+#class UDPServerInterface(Interface):
+#    """This is the base class for a Fabula Server Interface.
+#       Implementations should subclass this one an override
+#       the default methods, which do nothing.
+#    """
 
-    def __init__(self, connector, logger):
-        """Interface initialization."""
+#    def __init__(self, connector, logger):
+#        """Interface initialization."""
 
-        # First call __init__() from the base class
-        #
-        Interface.__init__(self, connector, logger)
+#        # First call __init__() from the base class
+#        #
+#        Interface.__init__(self, connector, logger)
 
-        # Convenience name to make code clearer
-        #
-        self.address_port_tuple = self.connector
+#        # Convenience name to make code clearer
+#        #
+#        self.address_port_tuple = self.connector
 
-        # client_connections is a dict of MessageBuffer
-        # instances, indexed by (address, port) tuples.
-        #
-        self.client_connections = {}
+#        # client_connections is a dict of MessageBuffer
+#        # instances, indexed by (address, port) tuples.
+#        #
+#        self.client_connections = {}
 
-        self.logger.debug("complete")
+#        self.logger.debug("complete")
 
-    def handle_messages(self):
-        """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
-           It is meant to be the back end of send_message() and grab_message().
-           Put some networking code, a GUI or a random generator here.
-           This method is put in a background thread automatically, so it can
-           do all sorts of polling or blocking IO.
-           It should regularly check whether shutdown() has been called, and if
-           so, it should notify shutdown() in some way (so that it can return
-           True), and then raise SystemExit to stop the thread.
-        """
+#    def handle_messages(self):
+#        """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
+#           It is meant to be the back end of send_message() and grab_message().
+#           Put some networking code, a GUI or a random generator here.
+#           This method is put in a background thread automatically, so it can
+#           do all sorts of polling or blocking IO.
+#           It should regularly check whether shutdown() has been called, and if
+#           so, it should notify shutdown() in some way (so that it can return
+#           True), and then raise SystemExit to stop the thread.
+#        """
 
-        self.logger.debug("starting up")
+#        self.logger.debug("starting up")
 
-        client_connections_proxy = self.client_connections
-        logger_proxy = self.logger
+#        client_connections_proxy = self.client_connections
+#        logger_proxy = self.logger
 
-        # We define the class here to be able
-        # to access variables of the ServerInterface
-        # instance.
-        #
-        class FabulaRequestHandler(socketserver.BaseRequestHandler):
+#        # We define the class here to be able
+#        # to access variables of the ServerInterface
+#        # instance.
+#        #
+#        class FabulaRequestHandler(socketserver.BaseRequestHandler):
 
-            def handle(self):
+#            def handle(self):
 
-                logger_proxy.debug("called")
+#                logger_proxy.debug("called")
 
-                # Test for new client,
-                # i.e. not (address, port) tuple in keys
-                #
-                if not self.client_address in client_connections_proxy:
+#                # Test for new client,
+#                # i.e. not (address, port) tuple in keys
+#                #
+#                if not self.client_address in client_connections_proxy:
 
-                    # New client. Create a new MessageBuffer
-                    # and add it to the dict
-                    #
-                    client_connections_proxy[self.client_address] = MessageBuffer()
+#                    # New client. Create a new MessageBuffer
+#                    # and add it to the dict
+#                    #
+#                    client_connections_proxy[self.client_address] = MessageBuffer()
 
-                    logger_proxy.info("adding new client: "
-                                      + str(self.client_address))
+#                    logger_proxy.info("adding new client: "
+#                                      + str(self.client_address))
 
-                # Append the message.
-                # (inbetween steps to avoid a long line ;-) )
-                #
-                message = pickle.loads(self.request[0])
+#                # Append the message.
+#                # (inbetween steps to avoid a long line ;-) )
+#                #
+#                message = pickle.loads(self.request[0])
 
-                message_buffer = client_connections_proxy[self.client_address]
+#                message_buffer = client_connections_proxy[self.client_address]
 
-                message_buffer.messages_for_local.append(message)
+#                message_buffer.messages_for_local.append(message)
 
-                # End of handle() method.
+#                # End of handle() method.
 
-        # End of class.
+#        # End of class.
 
-        server = socketserver.UDPServer(self.address_port_tuple, FabulaRequestHandler)
+#        server = socketserver.UDPServer(self.address_port_tuple, FabulaRequestHandler)
 
-        # Server timeout, so server.handle_request()
-        # doesn't wait forever, which would prevent
-        # shutdown.
-        #
-        server.timeout = 0.1
+#        # Server timeout, so server.handle_request()
+#        # doesn't wait forever, which would prevent
+#        # shutdown.
+#        #
+#        server.timeout = 0.1
 
-        # Run thread as long as no shutdown is requested
-        #
-        while not self.shutdown_flag:
+#        # Run thread as long as no shutdown is requested
+#        #
+#        while not self.shutdown_flag:
 
-            # TODO: several threads for send and receive
+#            # TODO: several threads for send and receive
 
-            # wait at most server.timeout seconds
-            # until a request comes in:
-            #
-            server.handle_request()
+#            # wait at most server.timeout seconds
+#            # until a request comes in:
+#            #
+#            server.handle_request()
 
-            # Flush server event queues.
-            # Iterate over dict keys:
-            #
-            for address_port_tuple in self.client_connections:
+#            # Flush server event queues.
+#            # Iterate over dict keys:
+#            #
+#            for address_port_tuple in self.client_connections:
 
-                message_buffer = self.client_connections[address_port_tuple]
+#                message_buffer = self.client_connections[address_port_tuple]
 
-                if message_buffer.messages_for_remote:
+#                if message_buffer.messages_for_remote:
 
-                    self.logger.debug("sending 1 message of "
-                                      + str(len(message_buffer.messages_for_remote))
-                                      + " to client "
-                                      + str(address_port_tuple))
+#                    self.logger.debug("sending 1 message of "
+#                                      + str(len(message_buffer.messages_for_remote))
+#                                      + " to client "
+#                                      + str(address_port_tuple))
 
-                    # -1 = use highest available pickle protocol
-                    #
-                    server.socket.sendto(pickle.dumps(message_buffer.messages_for_remote.popleft(), -1),
-                                         address_port_tuple)
+#                    # -1 = use highest available pickle protocol
+#                    #
+#                    server.socket.sendto(pickle.dumps(message_buffer.messages_for_remote.popleft(), -1),
+#                                         address_port_tuple)
 
-        # Caught shutdown notification, stopping thread
-        #
-        self.logger.info("shutting down")
+#        # Caught shutdown notification, stopping thread
+#        #
+#        self.logger.info("shutting down")
 
-        self.shutdown_confirmed = True
+#        self.shutdown_confirmed = True
 
-        raise SystemExit
+#        raise SystemExit
 
 
 # TCP implementation using the Twisted framework

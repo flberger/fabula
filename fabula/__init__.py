@@ -137,31 +137,16 @@ class Event:
             return True
 
     def __repr__(self):
-        """String representation suitable to recreate the Event instance.
+        """Official string representation suitable to recreate the Event instance.
            The attributes appear in sorted order.
         """
 
-        # TODO: This is a duplicate of Tile.__repr__
-
-        arguments = ""
-
         # Keep order
-        # Taken from fabula.plugins.pygameui.EventEditor
         #
         keys = list(self.__dict__.keys())
         keys.sort()
 
-        for key in keys:
-
-            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
-
-        # Chop final ", "
-        #
-        arguments = arguments[:-2]
-
-        return "{0}.{1}({2})".format(self.__module__,
-                                       self.__class__.__name__,
-                                       arguments)
+        return representation(self, keys)
 
 ####################
 # Attempt events
@@ -637,10 +622,10 @@ class Message:
         self.event_list = event_list
 
     def __repr__(self):
-        """Readable and informative string representation.
+        """Official string representation.
         """
 
-        return str(self.event_list)
+        return representation(self, ("event_list",))
 
 #    def queueAsFirstEvent(self, event):
 #        """This is a convenience method. Queue the event
@@ -773,23 +758,25 @@ class Entity(fabula.eventprocessor.EventProcessor):
         """
         pass
 
-    def __repr__(self):
-        """Readable and informative string representation.
+    def clone(self):
+        """Return a new fabula.Entity instance, derived from this Entity.
+           Useful to create an Entity object from a subclass of Entity.
         """
 
-        arguments = ""
+        return Entity(self.entity_type, self.identifier, self.asset_desc)
 
-        for key in ("entity_type", "identifier", "asset_desc", "asset", "state"):
+    def __repr__(self):
+        """Official string representation.
+        """
 
-            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+        return representation(self, ("entity_type", "identifier", "asset_desc"))
 
-        # Chop final ", "
-        #
-        arguments = arguments[:-2]
-
-        return "<{0}.{1}({2})>".format(self.__module__,
-                                       self.__class__.__name__,
-                                       arguments)
+    def __str__(self):
+        """Informal string representation, including state and asset.
+        """
+        return "<{} state = {} asset = {}>".format(self.__repr__(),
+                                                   self.state,
+                                                   self.asset)
 
 ############################################################
 # Entity And Tile Types
@@ -804,6 +791,15 @@ ITEM_NOBLOCK = "ITEM_NOBLOCK"
 
 FLOOR = "FLOOR"
 OBSTACLE = "OBSTACLE"
+
+# For __repr__() methods
+#
+_constant_representations = {PLAYER : "fabula.PLAYER",
+                             NPC : "fabula.NPC",
+                             ITEM_BLOCK : "fabula.ITEM_BLOCK",
+                             ITEM_NOBLOCK : "fabula.ITEM_NOBLOCK",
+                             FLOOR : "fabula.FLOOR",
+                             OBSTACLE : "fabula.OBSTACLE"}
 
 ############################################################
 # Tiles
@@ -875,22 +871,19 @@ class Tile:
             return True
 
     def __repr__(self):
-        """Readable and informative string representation.
+        """Official string representation.
         """
 
-        arguments = ""
+        return representation(self, ("tile_type", "asset_desc"))
 
-        for key in self.__dict__:
+    def __str__(self):
+        """Informal string representation, including the asset.
+        """
 
-            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
+        # Taken from Entity.__str__()
 
-        # Chop final ", "
-        #
-        arguments = arguments[:-2]
-
-        return "<{0}.{1}({2})>".format(self.__module__,
-                                       self.__class__.__name__,
-                                       arguments)
+        return "<{} asset = {}>".format(self.__repr__(),
+                                        self.asset)
 
 ############################################################
 # Rooms
@@ -1053,24 +1046,10 @@ class Room(fabula.eventprocessor.EventProcessor):
         return
 
     def __repr__(self):
-        """Readable and informative string representation.
+        """Official string representation.
         """
 
-        # TODO: This is a duplicate of Tile.__repr__
-
-        arguments = ""
-
-        for key in self.__dict__:
-
-            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
-
-        # Chop final ", "
-        #
-        arguments = arguments[:-2]
-
-        return "<{0}.{1}({2})>".format(self.__module__,
-                                       self.__class__.__name__,
-                                       arguments)
+        return representation(self, ("identifier",))
 
 class FloorPlanElement:
     """Convenience class for floor plan elements.
@@ -1092,21 +1071,7 @@ class FloorPlanElement:
         """Readable and informative string representation.
         """
 
-        # TODO: This is a duplicate of Tile.__repr__
-
-        arguments = ""
-
-        for key in self.__dict__:
-
-            arguments = arguments + "{0} = {1}, ".format(key, repr(self.__dict__[key]))
-
-        # Chop final ", "
-        #
-        arguments = arguments[:-2]
-
-        return "<{0}.{1}({2})>".format(self.__module__,
-                                       self.__class__.__name__,
-                                       arguments)
+        return representation(self, ("tile",))
 
 ############################################################
 # Rack
@@ -1185,8 +1150,6 @@ class Rack:
 ############################################################
 # Utilities
 
-# Convenience function to compute differences
-#
 def difference_2d(start_tuple, end_tuple):
     """Return the difference vector between a 2D start and end position.
     """
@@ -1265,3 +1228,38 @@ def str_is_tuple(str):
 
     else:
         return False
+
+def representation(object, attributes):
+    """Compute an official string representation of object. eval(representation(object)) should recreate the object.
+       object_class is the class calling the function and the supposed base
+       class of object. It will be used if the actual class of the object is
+       not in the fabula package.
+       attributes is a list of strings giving the attributes to include.
+    """
+
+    arguments = []
+    value = None
+
+    for key in attributes:
+
+        try:
+            if object.__dict__[key] in _constant_representations.keys():
+
+                value = _constant_representations[object.__dict__[key]]
+
+            else:
+                value = repr(object.__dict__[key])
+
+        except TypeError:
+
+            # Most likely an "unhashable type". Well, then, forget it.
+            #
+            value = repr(object.__dict__[key])
+
+        arguments.append("{0} = {1}".format(key, value))
+
+    arguments = ", ".join(arguments)
+
+    return "{}.{}({})".format(object.__module__,
+                              object.__class__.__name__,
+                              arguments)

@@ -262,65 +262,25 @@ class App:
         """Run Fabula client and server on the local machine.
         """
 
-        # Setting up interfaces
-        #
-        server_interface = fabula.interfaces.Interface(None, self.logger)
-        server_message_buffer = fabula.interfaces.MessageBuffer()
-        server_interface.connections["client_connection"] = server_message_buffer
-
-        client_interface = fabula.interfaces.Interface(None, self.logger)
-        client_message_buffer = fabula.interfaces.MessageBuffer()
-        client_interface.connections["server_connection"] = client_message_buffer
-
-        # Proxy for use in functions
-        #
-        logger = self.logger
-
-        def handle_messages():
-            """Interconnect client and server Interface.
-            """
-
-            logger.debug("starting up, slowing down to {} fps".format(framerate))
-
-            # Run thread as long as no shutdown is requested
-            #
-            while not (server_interface.shutdown_flag
-                       or client_interface.shutdown_flag):
-
-                # TODO: while this is handy, it has a problem: client and server share Entity objects, which creates problems when client *and* server forward Events to the Entity.
-
-                if len(server_message_buffer.messages_for_remote):
-                    message = server_message_buffer.messages_for_remote.popleft()
-                    client_message_buffer.messages_for_local.append(message)
-
-                if len(client_message_buffer.messages_for_remote):
-                    message = client_message_buffer.messages_for_remote.popleft()
-                    server_message_buffer.messages_for_local.append(message)
-
-                # Slow down
-                #
-                sleep(1 / framerate)
-
-            # Caught shutdown notification, stopping thread
-            #
-            logger.info("shutting down")
-
-            server_interface.shutdown_confirmed = True
-            client_interface.shutdown_confirmed = True
-
-            raise SystemExit
-
         self.logger.info("running in standalone mode, logging client and server")
         self.logger.info("running with framerate {}/s".format(framerate))
         self.logger.info("player_id: {}".format(player_id))
+
+        # Setting up interfaces
+        #
+        server_interface = fabula.interfaces.StandaloneInterface(self.logger,
+                                                                 framerate)
+
+        client_interface = fabula.interfaces.StandaloneInterface(self.logger,
+                                                                 framerate)
 
         # Setting up client
         #
         assets = self.assets_class(self.logger)
 
         client = fabula.core.client.Client(client_interface,
-                                          self.logger,
-                                          player_id)
+                                           self.logger,
+                                           player_id)
 
         user_interface = self.user_interface_class(assets,
                                                    framerate,
@@ -331,9 +291,9 @@ class App:
         # Setting up server
         #
         server = fabula.core.server.Server(server_interface,
-                                          self.logger,
-                                          framerate,
-                                          threadsafe = True)
+                                           self.logger,
+                                           framerate,
+                                           threadsafe = True)
 
         server_plugin = self.server_plugin_class(server)
 
@@ -349,10 +309,19 @@ class App:
             user_interface.exit_requested = True
 
         # Starting threads
+        # Interconnecting client and server Interfaces here
         #
-        interface_thread = threading.Thread(target = handle_messages,
-                                            name = "handle_messages")
-        interface_thread.start()
+        client_interface_thread = threading.Thread(target = client_interface.handle_messages,
+                                                   name = "client_handle_messages",
+                                                   args = (server_interface.connections["peer"],))
+
+        client_interface_thread.start()
+
+        server_interface_thread = threading.Thread(target = server_interface.handle_messages,
+                                                   name = "server_handle_messages",
+                                                   args = (client_interface.connections["peer"],))
+
+        server_interface_thread.start()
 
         # Client must run in main thread to be able to interact properly
         # with the OS (think Pygame events). So we put the server in a thread.
@@ -373,8 +342,10 @@ class App:
         # are logged.
         #
         exception = ''
+
         try:
             client.run()
+
         except:
             exception = traceback.format_exc()
             self.logger.debug("exception in client.run():\n{}".format(exception))
@@ -386,6 +357,7 @@ class App:
         server_thread.join()
 
         self.logger.info("server thread stopped, shutting down logger")
+
         if exception:
             self.logger.debug("exception in client.run() was:\n{}".format(exception))
 
