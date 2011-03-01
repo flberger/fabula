@@ -544,7 +544,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Entities may have been spawned inbetween ChangeMapElementEvents, but
         # clickndrag requires their Planes to be the last ones in
         # window.room.subplanes_list to be rendered on top of the tiles. So,
-        # check if there are any entites in the wrong place and correct.
+        # check if there are any entities in the wrong place and correct.
 
         tiles = []
         entities = []
@@ -558,6 +558,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 tiles.append(name)
             else:
                 entities.append(name)
+
+        # Now for the entity planes: they should be rendered from top to bottom,
+        # so sort by y coordinate.
+        #
+        entities = sorted(entities,
+                          key = lambda name: self.host.room.entity_locations[name][1])
 
         self.window.room.subplanes_list = tiles + entities
 
@@ -645,6 +651,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """
 
         if event.entity.user_interface is None:
+
             # Call base class
             #
             fabula.plugins.ui.UserInterface.process_SpawnEvent(self, event)

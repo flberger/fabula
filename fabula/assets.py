@@ -28,6 +28,7 @@
 import os.path
 import glob
 import site
+import sys
 
 class Assets:
     """An assets manager which returns file-like objects for local files.
@@ -111,17 +112,23 @@ class Assets:
         """This method returns a a file-like object for the file specified.
         """
 
-        # TODO: check the script base directory? sys.path[0]
+        # TODO: check the script base directory?
 
         if os.path.exists(asset_desc):
 
             pass
 
+        # Look in script base directory
+        #
+        elif os.path.exists(os.path.join(sys.path[0], asset_desc)):
+
+            asset_desc = os.path.join(sys.path[0], asset_desc)
+
         # Look in parent directory
         #
-        elif os.path.exists(os.path.abspath("..") + asset_desc):
+        elif os.path.exists(os.path.join(os.path.abspath(".."), asset_desc)):
 
-            asset_desc = os.path.abspath("..") + asset_desc
+            asset_desc = os.path.join(os.path.abspath(".."), asset_desc)
 
         # Look in subdirectories
         #
@@ -163,7 +170,9 @@ class Assets:
 
             if not found:
 
-                self.logger.critical("Could not open asset: '{}'".format(asset_desc))
+                errormessage = "Could not open asset: '{}'".format(asset_desc)
+
+                self.logger.critical(errormessage)
 
                 raise Exception(errormessage)
 
