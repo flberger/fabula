@@ -108,8 +108,8 @@ class DefaultGame(fabula.plugins.Plugin):
            Dict mapping Entity identifiers to a list of coordinates walked so far.
 
        DefaultGame.condition_response_dict
-           A dict mapping string representations of incoming Events to response
-           Events.
+           A dict mapping then string representation of a trigger Event to a
+           tuple of response Events.
 
        DefaultGame.talk_to_dict
            A dict caching the source and targets of TriesToTalkToEvents,
@@ -196,8 +196,8 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if event_str in self.condition_response_dict:
 
-            self.logger.debug("returning corresponding event")
-            self.message_for_host.event_list.append(self.condition_response_dict[event_str])
+            self.logger.debug("returning corresponding events")
+            self.message_for_host.event_list = self.message_for_host.event_list + self.condition_response_dict[event_str]
 
         else:
             self.logger.debug("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
@@ -437,16 +437,25 @@ class DefaultGame(fabula.plugins.Plugin):
         if filename:
 
             try:
-                file = open(filename, "rb")
+                file = open(filename, "rt")
 
-                # TODO: Check, check, check
-                #
-                self.condition_response_dict = pickle.loads(file.read())
+                logic_textdump = file.read()
 
                 file.close()
 
+                # Remove formatting
+                #
+                logic_textdump = logic_textdump.replace('\n', '')
+
+                # TODO: Check, check, check
+                #
+                self.condition_response_dict = eval(logic_textdump)
+
             except IOError:
                 self.logger.error("could not read from file '{}', game logic not updated".format(filename))
+
+            except SyntaxError:
+                self.logger.error("SyntaxError in '{}', game logic not updated".format(filename))
 
         else:
             self.logger.error("no filename given")
@@ -596,8 +605,8 @@ class Editor(DefaultGame):
 
         if event_str in self.condition_response_dict:
 
-            self.logger.debug("returning corresponding event")
-            self.message_for_host.event_list.append(self.condition_response_dict[event_str])
+            self.logger.debug("returning corresponding events")
+            self.message_for_host.event_list = self.message_for_host.event_list + self.condition_response_dict[event_str]
 
         else:
             self.logger.debug("event '{}' not found in condition_response_dict, making user select a response".format(event_str))
@@ -606,15 +615,26 @@ class Editor(DefaultGame):
         return
 
     def add_response(self, trigger_event, response_event):
-        """Set Editor.condition_response_dict[str(trigger_event)] = response_event.
+        """Add the respone to Editor.condition_response_dict.
         """
 
         # This could also be done in self.pygame_editor.event_edit_done(), but
         # it's cleaner to do here.
         #
-        self.logger.debug("condition_response_dict[{}] = {}".format(trigger_event, response_event))
+        self.logger.debug("adding response: {} -> {}".format(trigger_event, response_event))
 
-        self.condition_response_dict[str(trigger_event)] = response_event
+        if str(trigger_event) in self.condition_response_dict.keys():
+
+            if response_event in self.condition_response_dict[str(trigger_event)]:
+
+                self.logger.debug("response already defined for this trigger")
+
+            else:
+
+                self.condition_response_dict[str(trigger_event)].append(response_event)
+
+        else:
+            self.condition_response_dict[str(trigger_event)] = [response_event]
 
         return
 
@@ -626,9 +646,19 @@ class Editor(DefaultGame):
 
         if filename:
 
-            file = open(filename, "wb")
+            logic_textdump = repr(self.condition_response_dict)
 
-            file.write(pickle.dumps(self.condition_response_dict, 0))
+            # Do a little neat wrapping
+            #
+            logic_textdump = logic_textdump.replace(')": ', ')":\n    ')
+            logic_textdump = logic_textdump.replace('),', '),\n    ')
+            logic_textdump = logic_textdump.replace(']', '\n    ]')
+            logic_textdump = logic_textdump.replace('],', '],\n')
+            logic_textdump = logic_textdump.replace('}', '\n}\n')
+
+            file = open(filename, "wt")
+
+            file.write(logic_textdump)
 
             file.close()
 
