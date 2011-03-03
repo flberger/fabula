@@ -133,7 +133,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         # exit has been requested
 
-        self.logger.info("exit requested from PluginEngine, shutting down interface...")
+        self.logger.info("exit requested from Plugin, shutting down interface...")
 
         # stop the Interface thread
         #

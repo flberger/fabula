@@ -318,7 +318,7 @@ class UserInterface(fabula.plugins.Plugin):
             # Join with event_queue
             #
             self.event_queue = fabula.join_lists(self.event_queue,
-                                                event_list_parallel)
+                                                 event_list_parallel)
 
             self.logger.debug("joined event queue: %s"
                               % self.event_queue)
@@ -466,7 +466,7 @@ class UserInterface(fabula.plugins.Plugin):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """Called when the UserInterface has encoutered an EnterRoomEvent.
+        """Called when the UserInterface has encountered an EnterRoomEvent.
            You should override it, blank the screen here and display a waiting
            message since the UserInterface is going to twiddle thumbs until
            it receives a RoomCompleteEvent.

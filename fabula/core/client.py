@@ -221,199 +221,250 @@ class Client(fabula.core.Engine):
 
                 self.logger.info("got an empty server_message.")
 
+                # Set to True to log empty messages only once
+                #
                 self.got_empty_message = True
 
-            # First handle the events in the Client, updating the room and
-            # preparing self.message_for_plugin for the UserInterface
-            #
-            for current_event in server_message.event_list:
+            # Before we process the Message, we must consider that it might
+            # contain an EnterRoomEvent. If in that case we handle the whole
+            # Message and then pass it on to the plugin, the Plugin will likely
+            # crash since all the data structures of the current room are
+            # already gone by then.
+            # So we split up the Message into separate Messages at
+            # EnterRoomEvents and process them one by one. But only upon the
+            # very last one we will accept user input.
 
-                # This is a bit of Python magic.
-                # self.event_dict is a dict which maps classes to handling
-                # functions. We use the class of the event supplied as
-                # a key to call the appropriate handler, and hand over
-                # the event.
-                # These methods may add events for the plugin engine
-                # to self.message_for_plugin
+            messages_split_by_room = [fabula.Message([])]
+
+            for event in server_message.event_list:
+
+                if isinstance(event, fabula.EnterRoomEvent) and len(messages_split_by_room[-1].event_list) > 0:
+
+                    # Append a fresh Message
+                    #
+                    messages_split_by_room.append(fabula.Message([event]))
+
+                else:
+                    # Append to existing Message
+                    #
+                    messages_split_by_room[-1].event_list.append(event)
+
+            if len(messages_split_by_room) > 1:
+
+                self.logger.debug("server message split into {}".format(messages_split_by_room))
+
+            # Processing them one by one.
+            #
+            while len(messages_split_by_room):
+
+                message = messages_split_by_room.pop(0)
+
+                # First handle the events in the Client, updating the room and
+                # preparing self.message_for_plugin for the UserInterface
                 #
-                # TODO: This really should return a message, instead of giving one to write to
+                for current_event in message.event_list:
+
+                    # This is a bit of Python magic.
+                    # self.event_dict is a dict which maps classes to handling
+                    # functions. We use the class of the event supplied as
+                    # a key to call the appropriate handler, and hand over
+                    # the event.
+                    # These methods may add events for the plugin engine
+                    # to self.message_for_plugin
+                    #
+                    # TODO: This really should return a message, instead of giving one to write to
+                    #
+                    self.event_dict[current_event.__class__](current_event,
+                                                             message = self.message_for_plugin)
+
+                # Now that everything is set and stored, call
+                # the UserInterface to process the messages.
+
+                # Ideally we want to call process_message()
+                # once per frame, but the call may take an
+                # almost arbitrary amount of time.
+                # At least process_message() must be called
+                # regularly even if the server Message and
+                # thus message_for_plugin  are empty.
                 #
-                self.event_dict[current_event.__class__](current_event,
-                                                         message = self.message_for_plugin)
+                message_from_plugin = self.plugin.process_message(self.message_for_plugin)
 
-            # Now that everything is set and stored, call
-            # the UserInterface to process the messages.
+                # The UserInterface returned, the Server Message has
+                # been applied and processed. Clean up.
+                #
+                self.message_for_plugin = fabula.Message([])
 
-            # Ideally we want to call process_message()
-            # once per frame, but the call may take an
-            # almost arbitrary amount of time.
-            # At least process_message() must be called
-            # regularly even if the server Message and
-            # thus message_for_plugin  are empty.
-            #
-            message_from_plugin = self.plugin.process_message(self.message_for_plugin)
+                # TODO: possibly unset "AwaitConfirmation" flag
+                # If there has been a Confirmation for a LookAt or
+                # TriesToManipulate, unset "AwaitConfirmation" flag
 
-            # The UserInterface returned, the Server Message has
-            # been applied and processed. Clean up.
-            #
-            self.message_for_plugin = fabula.Message([])
+                # Now evaluate user input, but only if we are at the very
+                # last message of messages_split_by_room.
+                #
+                if len(messages_split_by_room) == 0:
 
-            # TODO: possibly unset "AwaitConfirmation" flag
-            # If there has been a Confirmation for a LookAt or
-            # TriesToManipulate, unset "AwaitConfirmation" flag
+                    # TODO: these nesting levels are terrible. Clean up.
 
-            # The UserInterface might have collected some
-            # player input and converted it to events.
-            #
-            if message_from_plugin.event_list:
+                    # The UserInterface might have collected some player input
+                    # and converted it to events.
+                    #
+                    if message_from_plugin.event_list:
 
-                if self.await_confirmation:
+                        if self.await_confirmation:
 
-                    # Player input, but we still await confirmation.
+                            # Player input, but we still await confirmation.
 
-                    if self.timestamp == None:
+                            if self.timestamp == None:
 
-                        self.logger.debug("player attempt but still waiting - starting timer")
+                                self.logger.debug("player attempt but still waiting - starting timer")
 
-                        self.timestamp = datetime.datetime.today()
+                                self.timestamp = datetime.datetime.today()
 
-                    else:
+                            else:
 
-                        timedifference = datetime.datetime.today() - self.timestamp
+                                timedifference = datetime.datetime.today() - self.timestamp
 
-                        if timedifference.seconds >= 1:
+                                if timedifference.seconds >= 1:
 
-                            self.logger.warn("waited 1s, still no confirmation, resetting timer")
+                                    self.logger.warn("waited 1s, still no confirmation, resetting timer")
 
-                            self.timestamp = None
+                                    self.timestamp = None
+
+                                else:
+
+                                    self.logger.debug("still waiting for confirmation")
 
                         else:
 
-                            self.logger.debug("still waiting for confirmation")
+                            # If we do not await a Confirmation anymore, we
+                            # evaluate the player input if any.
 
-                else:
-
-                    # If we do not await a Confirmation anymore,
-                    # we evaluate the player input if any.
-
-                    # We queue player triggered events before
-                    # possible events from the Client.
-                    # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the Client?
-                    #
-                    self.message_for_remote.event_list = (message_from_plugin.event_list
-                                                          + self.message_for_remote.event_list)
-
-                    # Local movement tests
-                    #
-                    # TODO: Can't this be handled much easier by simply processing a MovesToEvent in UserInterface.collect_player_input? But then again, an UserInterface isn't supposed to check maps etc.
-                    #
-                    for event in message_from_plugin.event_list:
-
-                        if isinstance(event, fabula.TriesToMoveEvent):
-
-                            # TODO: similar to Server.process_TriesToMoveEvent()
-
-                            # Do we need to move / turn at all?
+                            # We queue player triggered events before possible
+                            # events from the Client.
+                            # TODO: Since MessageAppliedEvent is gone, are there any events left to be sent by the Client?
                             #
-                            location = self.room.entity_locations[event.identifier]
-                            difference = fabula.difference_2d(location,
-                                                             event.target_identifier)
+                            self.message_for_remote.event_list = (message_from_plugin.event_list
+                                                                  + self.message_for_remote.event_list)
 
-                            # In case of a TriesToMoveEvent, test and
-                            # approve the movement locally to allow
-                            # for a smooth user experience. We have
-                            # the current map information after all.
+                            # Local movement tests
                             #
-                            # Only allow certain vectors
+                            # TODO: Can't this be handled much easier by simply processing a MovesToEvent in UserInterface.collect_player_input? But then again, an UserInterface isn't supposed to check maps etc.
                             #
-                            if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+                            for event in message_from_plugin.event_list:
 
-                                self.logger.debug("applying TriesToMoveEvent locally")
+                                if isinstance(event, fabula.TriesToMoveEvent):
 
-                                # TODO: event.identifier in self.room.entity_dict? event.target_identifier in fabula.DIRECTION_VECTOR?
+                                    # TODO: similar to Server.process_TriesToMoveEvent()
 
-                                # TODO: code duplicated from Server.process_TriesToMoveEvent()
-
-                                # Test if a movement from the current
-                                # entity location to the new location
-                                # on the map is possible
-                                #
-                                # We queue the event in self.message_for_plugin,
-                                # so it will be rendered upon next call. That
-                                # way it bypasses the Client; its status
-                                # will be updated upon server confirmation. So
-                                # we will have a difference between client state
-                                # and presentation. We trust that it will be resolved
-                                # by the server in very short time.
-                                #
-                                try:
-                                    if self.tile_is_walkable(event.target_identifier):
-
-                                        moves_to_event = fabula.MovesToEvent(event.identifier,
-                                                                            event.target_identifier)
-
-                                        # Update room, needed for UserInterface
-                                        #
-                                        self.process_MovesToEvent(moves_to_event,
-                                                                  message = self.message_for_plugin)
-
-                                        # Remember event for crosscheck with
-                                        # event from Server
-                                        #
-                                        self.local_moves_to_event = moves_to_event
-
-                                    else:
-                                        # Instead of
-                                        #self.message_for_plugin.event_list.append(fabula.AttemptFailedEvent(event.identifier))
-                                        # we wait for the server to respond with
-                                        # AttemptFailedEvent
-                                        #
-                                        pass
-
-                                except KeyError:
-
-                                    # Instead of
-                                    #self.message_for_plugin.event_list.append(fabula.AttemptFailedEvent(event.identifier))
-                                    # we wait for the server to respond with
-                                    # AttemptFailedEvent
+                                    # Do we need to move / turn at all?
                                     #
-                                    pass
+                                    location = self.room.entity_locations[event.identifier]
+                                    difference = fabula.difference_2d(location,
+                                                                     event.target_identifier)
 
-                    # If any of the Events to be sent is an AttemptEvent, we now
-                    # await confirmation
+                                    # In case of a TriesToMoveEvent, test and
+                                    # approve the movement locally to allow for
+                                    # a smooth user experience. We have the
+                                    # current map information after all.
+                                    #
+                                    # Only allow certain vectors
+                                    #
+                                    if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+
+                                        self.logger.debug("applying TriesToMoveEvent locally")
+
+                                        # TODO: event.identifier in self.room.entity_dict? event.target_identifier in fabula.DIRECTION_VECTOR?
+
+                                        # TODO: code duplicated from Server.process_TriesToMoveEvent()
+
+                                        # Test if a movement from the current
+                                        # entity location to the new location
+                                        # on the map is possible
+                                        #
+                                        # We queue the event in
+                                        # self.message_for_plugin, so it will be
+                                        # rendered upon next call. That way it
+                                        # bypasses the Client; its status will
+                                        # be updated upon server confirmation.
+                                        # So we will have a difference between
+                                        # client state and presentation. We
+                                        # trust that it will be resolved by the
+                                        # server in very short time.
+                                        #
+                                        try:
+                                            if self.tile_is_walkable(event.target_identifier):
+
+                                                moves_to_event = fabula.MovesToEvent(event.identifier,
+                                                                                    event.target_identifier)
+
+                                                # Update room, needed for
+                                                # UserInterface
+                                                #
+                                                self.process_MovesToEvent(moves_to_event,
+                                                                          message = self.message_for_plugin)
+
+                                                # Remember event for crosscheck with
+                                                # event from Server
+                                                #
+                                                self.local_moves_to_event = moves_to_event
+
+                                            else:
+                                                # Instead of
+                                                #self.message_for_plugin.event_list.append(fabula.AttemptFailedEvent(event.identifier))
+                                                # we wait for the server to
+                                                # respond with AttemptFailedEvent
+                                                #
+                                                pass
+
+                                        except KeyError:
+
+                                            # Instead of
+                                            #self.message_for_plugin.event_list.append(fabula.AttemptFailedEvent(event.identifier))
+                                            # we wait for the server to respond
+                                            # with AttemptFailedEvent
+                                            #
+                                            pass
+
+                            # If any of the Events to be sent is an AttemptEvent,
+                            # we now await confirmation
+                            #
+                            # TODO: has_attempt_event is used nowhere else. Remove?
+                            #
+                            has_attempt_event = False
+
+                            for event in message_from_plugin.event_list:
+
+                                if isinstance(event, fabula.AttemptEvent):
+
+                                    self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+
+                                    self.await_confirmation = True
+
+                            # Reset dropout timer
+                            #
+                            self.timestamp = None
+
+                    # If this iteration yielded any events, send them.
                     #
-                    has_attempt_event = False
+                    if self.message_for_remote.event_list:
 
-                    for event in message_from_plugin.event_list:
+                        self.logger.debug("server outgoing: %s" % self.message_for_remote)
 
-                        if isinstance(event, fabula.AttemptEvent):
+                        self.message_buffer.send_message(self.message_for_remote)
 
-                            self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+                        # Save for possible re-send on dropout
+                        #
+                        self.last_message = self.message_for_remote
 
-                            self.await_confirmation = True
+                        # Clean up
+                        #
+                        self.message_for_remote = fabula.Message([])
 
-                    # Reset dropout timer
-                    #
-                    self.timestamp = None
+                # End of handling user input following the last rendered message.
+                # Getting next Message from messages_split_by_room.
 
-            # If this iteration yielded any events, send them.
-            #
-            if self.message_for_remote.event_list:
-
-                self.logger.debug("server outgoing: %s" % self.message_for_remote)
-
-                self.message_buffer.send_message(self.message_for_remote)
-
-                # Save for possible re-send on dropout
-                #
-                self.last_message = self.message_for_remote
-
-                # Clean up
-                #
-                self.message_for_remote = fabula.Message([])
-
-            # OK, iteration done. If no exit requested,
-            # grab the next server message!
+            # OK, done with the whole server message.
+            # If no exit requested, grab the next one!
 
         # exit has been requested
 

@@ -206,26 +206,21 @@ class DefaultGame(fabula.plugins.Plugin):
         return
 
     def process_InitEvent(self, event):
-        """If there is no host.room yet, load default.floorplan and send it.
+        """Load default.floorplan and send it.
         """
 
         self.logger.debug("called")
 
-        if self.host.room is not None:
+        self.logger.debug("attempting to load 'default.floorplan'")
 
-            self.logger.debug("room already loaded, current room: {}".format(self.host.room.identifier))
+        event_list = load_room_from_file("default.floorplan")
+
+        if event_list is None:
+
+            self.logger.error("error opening file 'default.floorplan'")
 
         else:
-            self.logger.debug("no room loaded yet, attempting to load 'default.floorplan'")
-
-            event_list = load_room_from_file("default.floorplan")
-
-            if event_list is None:
-
-                self.logger.error("error opening file 'default.floorplan'")
-
-            else:
-                self.message_for_host.event_list = self.message_for_host.event_list + event_list
+            self.message_for_host.event_list = self.message_for_host.event_list + event_list
 
         return
 

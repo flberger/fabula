@@ -1524,6 +1524,8 @@ class PygameEditor(PygameUserInterface):
         # Observe that this method adds Events to self.host.message_for_host,
         # which is fabula.plugins.serverside.Editor.message_for_host.
 
+        # TODO: Something goes wrong here: Loading a room and replacing the image leads to the *old* tile assets being loaded upon save.
+
         self.logger.debug("called")
 
         tk = tkinter.Tk()
