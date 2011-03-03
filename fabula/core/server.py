@@ -501,6 +501,9 @@ class Server(fabula.core.Engine):
 
                     new_event = fabula.TriesToManipulateEvent(event.identifier,
                                                              entity.identifier)
+                else:
+                    self.logger.debug("Entity type '{}' can not be manipulated".format(entity.entity_type))
+
 
         if new_event == None:
 

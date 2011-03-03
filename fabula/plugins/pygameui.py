@@ -2036,33 +2036,51 @@ class PygameEditor(PygameUserInterface):
 
         for trigger_event_str in self.host.condition_response_dict.keys():
 
-            if (identifier in trigger_event_str
-                or self.host.condition_response_dict[trigger_event_str].identifier == identifier):
+            # Check if "identifier" is affected by a trigger or response Event
+            #
+            identifier_affected = False
 
-                # TODO: eval() should be preceeded by thorough checks
-                #
-                trigger_editor = EventEditor(eval(trigger_event_str), self.window)
+            if identifier in trigger_event_str:
 
-                response_editor = EventEditor(self.host.condition_response_dict[trigger_event_str],
-                                              self.window)
+                identifier_affected = True
 
-                # Need a unique name.
-                # See below for width - 1
-                #
-                rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
-                                                  pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
+            else:
 
-                rule_plane.image.fill(clickndrag.gui.BACKGROUND_COLOR)
+                for response_event in self.host.condition_response_dict[trigger_event_str]:
 
-                # Make them overlap to have an 1px separating line
-                #
-                response_editor.rect.left = trigger_editor.rect.width - 1
+                    if response_event.identifier == identifier:
 
-                rule_plane.sub(trigger_editor)
-                rule_plane.sub(response_editor)
+                        identifier_affected = True
 
-                self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
-                rules_container.sub(rule_plane)
+            if identifier_affected:
+
+                for response_event in self.host.condition_response_dict[trigger_event_str]:
+
+                    # TODO: eval() should be preceeded by thorough checks
+                    #
+                    trigger_editor = EventEditor(eval(trigger_event_str),
+                                                 self.window)
+
+                    response_editor = EventEditor(response_event,
+                                                  self.window)
+
+                    # Need a unique name.
+                    # See below for width - 1
+                    #
+                    rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
+                                                      pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
+
+                    rule_plane.image.fill(clickndrag.gui.BACKGROUND_COLOR)
+
+                    # Make them overlap to have an 1px separating line
+                    #
+                    response_editor.rect.left = trigger_editor.rect.width - 1
+
+                    rule_plane.sub(trigger_editor)
+                    rule_plane.sub(response_editor)
+
+                    self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
+                    rules_container.sub(rule_plane)
 
         if len(rules_container.subplanes_list):
 
@@ -2072,8 +2090,8 @@ class PygameEditor(PygameUserInterface):
                                                             rules_container))
 
         editor_window.sub(clickndrag.gui.Button("Update",
-                                            pygame.Rect((0, 0), (100, 25)),
-                                            self.update_logic))
+                                                pygame.Rect((0, 0), (100, 25)),
+                                                self.update_logic))
 
         self.window.room.sub(editor_window)
 
@@ -2085,15 +2103,19 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        for name in self.window.room.display_logic.subplanes_list:
+        # ScrollingPlanes lead to long attribute traversals
+        #
+        rules_plane = self.window.room.display_logic.scrolling_rules.content.rules
+
+        for name in rules_plane.subplanes_list:
 
             if name.startswith("rule_"):
 
                 dummy, trigger_name, response_name = name.split("_")
 
-                trigger_event = self.window.room.display_logic.subplanes[name].subplanes[trigger_name].get_updated_event()
+                trigger_event = rules_plane.subplanes[name].subplanes[trigger_name].get_updated_event()
 
-                response_event = self.window.room.display_logic.subplanes[name].subplanes[response_name].get_updated_event()
+                response_event = rules_plane.subplanes[name].subplanes[response_name].get_updated_event()
 
                 self.host.add_response(trigger_event, response_event)
 
