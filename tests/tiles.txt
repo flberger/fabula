@@ -42,7 +42,7 @@ Tile Fetching and Display in PygameUserInterface
     >>> app = fabula.run.App("d", timeout = 0)
     >>> app.user_interface_class = QuittingInterface
     >>> app.server_plugin_class = MapTest
-    >>> app.run_standalone(60, "player")
+    >>> app.run_standalone(60, 0.5, "player")
     >>> import os
     >>> os.remove("red.png")
     >>> os.remove("green.png")

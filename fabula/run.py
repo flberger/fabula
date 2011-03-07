@@ -199,7 +199,7 @@ class App:
 
         self.run(interface, client, exit)
 
-    def run_server(self, framerate, interface):
+    def run_server(self, framerate, interface, action_time):
         """Run a Fabula server with the parameters given.
         """
 
@@ -212,6 +212,7 @@ class App:
         server = fabula.core.server.Server(interface,
                                           self.logger,
                                           framerate,
+                                          action_time,
                                           threadsafe = False)
 
         plugin = self.server_plugin_class(server)
@@ -258,7 +259,7 @@ class App:
         self.logger.removeHandler(self.file_handler)
         logging.shutdown()
 
-    def run_standalone(self, framerate, player_id):
+    def run_standalone(self, framerate, action_time, player_id):
         """Run Fabula client and server on the local machine.
         """
 
@@ -293,6 +294,7 @@ class App:
         server = fabula.core.server.Server(server_interface,
                                            self.logger,
                                            framerate,
+                                           action_time,
                                            threadsafe = True)
 
         server_plugin = self.server_plugin_class(server)

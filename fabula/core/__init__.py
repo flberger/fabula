@@ -56,9 +56,8 @@ class Engine(fabula.eventprocessor.EventProcessor):
            Arguments:
 
            interface_instance
-               An instance of a subclass of
-               fabula.interfaces.Interface to communicate
-               with the remote host.
+               An instance of a subclass of fabula.interfaces.Interface to
+               communicate with the remote host.
 
            logger
                An instance of logging.Logger.
@@ -106,9 +105,11 @@ class Engine(fabula.eventprocessor.EventProcessor):
         return
 
     def set_plugin(self, plugin_instance):
-        """Set the pluginto control or present the game.
+        """Set the Plugin which controls or presents the game.
            plugin_instance must be an instance of fabula.plugins.Plugin.
         """
+
+        self.logger.info("setting plugin to {}".format(plugin_instance))
 
         self.plugin = plugin_instance
 
@@ -481,6 +482,17 @@ class Engine(fabula.eventprocessor.EventProcessor):
         return
 
     def process_InitEvent(self, event, **kwargs):
+        """Process the Event.
+           The default implementation adds the event to the message.
+        """
+
+        self.logger.debug("called")
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_ServerParametersEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds the event to the message.
         """

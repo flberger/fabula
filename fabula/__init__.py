@@ -3,7 +3,48 @@
    "Stories On A Grid"
 
    Copyright 2010 Florian Berger <fberger@florian-berger.de>
+
+
+   Overview
+   --------
+
+   Fabula is a client-server application.
+
+   The server side consists of instances of:
+
+   - fabula.core.server.Server
+   - fabula.plugins.Plugin
+   - fabula.interfaces.Interface
+
+   The Server manages the authoritative game state and communicates with the
+   clients. The Plugin contains the actual game logic and controls the Server's
+   reactions. The Interface manages the actual communication.
+
+   fabula.plugins.serverside.DefaultGame contains a default game logic that
+   reads from configuration files.
+
+   The client side consists of instances of:
+
+   - fabula.core.client.Client
+   - fabula.plugins.ui.UserInterface
+   - fabula.interfaces.Interface
+
+   The Client communicates with the server and mirrors the Server game state.
+   The UserInterface presents the game to the player and collects player input.
+   The Interface manages the actual communication.
+
+   fabula.plugins.pygameui.PygameUserInterface contains a default 2D UserInterface.
+
+
+   Communication
+   -------------
+
+   Server and Client communicate by sending Events.
+
+   Events are bundles into Messages. A Message represents a set of Events that
+   happen in parallel.
 """
+# TODO: Could use the first sentences of the respective docstrings above (or vice versa).
 
 # This file is part of Fabula.
 #
@@ -598,15 +639,29 @@ class InitEvent(Event):
 
         self.identifier = identifier
 
+class ServerParametersEvent(Event):
+    """This Event is sent by the Server when an InitEvent has been received.
+       It informs the client about the Server parameters.
+
+       Attributes:
+
+       ServerParametersEvent.action_time
+           The time the Server waits between actions that do not happen instantly.
+    """
+
+    def __init__(self, action_time):
+        """action_time is the time the Server waits between actions that do not happen instantly.
+        """
+
+        self.action_time = action_time
+
 ############################################################
 # Message
 
 class Message:
-    """A Message manages an ordered list of fabula events.
-       Messages sent by the server describe the action of a certain time frame.
-       The UserInterface has to decide which events happen in parallel and which
-       ones happen sequential. Instances of Message expose a single Python list
-       object as Message.event_list.
+    """A Message represents a set of Events that happen in parallel.
+
+       Attributes:
 
        Message.event_list
            A list of fabula.Events
@@ -617,7 +672,7 @@ class Message:
            An empty list may be supplied.
         """
 
-        # TODO: check the list elements for being instances of fabula.Event here?
+        # TODO: check the list elements for being instances of fabula.Event here? But then, to be consistent, we would have to implement a method to add Events which checks them as well.
         #
         self.event_list = event_list
 

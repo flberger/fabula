@@ -84,6 +84,8 @@ class EventProcessor:
                                self.process_ChangeMapElementEvent,
                            fabula.InitEvent :
                                self.process_InitEvent,
+                           fabula.ServerParametersEvent :
+                               self.process_ServerParametersEvent,
                           }
 
     def __getstate__(self):
@@ -252,6 +254,12 @@ class EventProcessor:
         pass
 
     def process_InitEvent(self, event, **kwargs):
+        """Process the Event.
+           The default implementation does nothing.
+        """
+        pass
+
+    def process_ServerParametersEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """

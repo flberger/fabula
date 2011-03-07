@@ -35,6 +35,10 @@ class Server(fabula.core.Engine):
        Server.interval
            1.0 / framerate
 
+       Server.action_time
+           The time between actions that do not happen instantly.
+           Used by the Server Plugin.
+
        Server.message_for_all
            Message to be broadcasted to all clients
 
@@ -42,7 +46,7 @@ class Server(fabula.core.Engine):
            Flag to be changed by signal handler
      """
 
-    def __init__(self, interface_instance, logger, framerate, threadsafe = True):
+    def __init__(self, interface_instance, logger, framerate, action_time, threadsafe = True):
         """Initialise the Server.
            If threadsafe is True (default), no signal handlers are installed.
         """
@@ -60,6 +64,11 @@ class Server(fabula.core.Engine):
             self.interval = 1.0 / framerate
         else:
             self.interval = 0
+
+        # The time between actions that do not happen instantly. Used by the
+        # Server Plugin.
+        #
+        self.action_time = action_time
 
         # Message to be broadcasted to all clients
         #
@@ -360,7 +369,9 @@ class Server(fabula.core.Engine):
         """
         # TODO: update docstring
 
-        self.logger.debug("called")
+        self.logger.debug("sending Server parameters")
+
+        self.message_for_remote.event_list.append(fabula.ServerParametersEvent(self.action_time))
 
         if self.room is not None:
 

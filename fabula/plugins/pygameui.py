@@ -781,9 +781,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         tile_from_list = None
 
-        # The Client should have added the Tile to self.room.tile_list
+        # The Client should have added the Tile to self.host.room.tile_list
         #
-        for tile in self.room.tile_list:
+        for tile in self.host.room.tile_list:
 
             # This should succeed only once
             #
@@ -792,13 +792,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # Tiles may compare equal, but the may not refer to the same
                 # instance, so we use tile from tile_list.
                 #
-                self.logger.debug("found event.tile in self.room.tile_list")
+                self.logger.debug("found event.tile in self.host.room.tile_list")
                 tile_from_list = tile
 
         if tile_from_list is None:
 
-            self.logger.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
-            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
+            self.logger.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
+            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
 
         if tile_from_list.asset is not None:
 
@@ -1062,7 +1062,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.logger.debug("issuing TriesToPickUpEvent")
 
             event = fabula.TriesToPickUpEvent(self.host.player_id,
-                                             self.room.entity_locations[item_identifier])
+                                             self.host.room.entity_locations[item_identifier])
 
             self.message_for_host.event_list.append(event)
 
@@ -1871,9 +1871,9 @@ class PygameEditor(PygameUserInterface):
 
             self.window.properties.remove_all()
 
-            if plane.name in self.room.entity_dict.keys():
+            if plane.name in self.host.room.entity_dict.keys():
 
-                entity = self.room.entity_dict[plane.name]
+                entity = self.host.room.entity_dict[plane.name]
 
             elif plane.name in self.host.rack.entity_dict.keys():
 
