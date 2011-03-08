@@ -29,24 +29,13 @@ even a text interface.
 
 Attributes:
 
-UserInterface.action_time
-    Set how long actions like a movement from Map element to Map element
-    take, in seconds.
-
 UserInterface.framerate
 UserInterface.assets
     framerate and assets manager
 
 UserInterface.action_frames
-    The number of frames per action.
-
-UserInterface.action_countdown
-    A copy of action_frames used in UserInterface.process_message().
-
-UserInterface.event_queue
-    A queue for Events of a Message to be rendered later.
-    UserInterface.action_countdown will be counted down between
-    processing the Events.
+    The number of frames per action. This can only be set when a
+    ServerParametersEvent has been received, so it is initially None.
 
 UserInterface.exit_requested
     The UserInterface is responsible for catching an exit request by the
@@ -66,7 +55,7 @@ UserInterface.direction_vector_dict
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id103">
+      <table class="children sortable" id="id46">
   
   
 <tr class="method">
@@ -81,6 +70,12 @@ UserInterface.direction_vector_dict
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#process_message">process_message</a></td>
     <td><tt>This is the main method of the UserInterface.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.ui.UserInterface.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
+    <td><tt>Compute action_frames from event.action_time and UserInterface.framerate.</tt></td>
   </tr><tr class="method">
     
     
@@ -146,7 +141,7 @@ UserInterface.direction_vector_dict
     
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Called with a list of instances of PerceptionEvent.</tt></td>
+    <td><tt>Called with an instance of PerceptionEvent.</tt></td>
   </tr><tr class="method">
     
     
@@ -158,7 +153,7 @@ UserInterface.direction_vector_dict
     
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
-    <td><tt>Entity has already handled the Event. Display a single frame to show the result.</tt></td>
+    <td><tt>Entity has already handled the Event.</tt></td>
   </tr><tr class="method">
     
     
@@ -176,13 +171,7 @@ UserInterface.direction_vector_dict
     
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>Called with an instance of SaysEvent</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.plugins.ui.UserInterface.html#group_events">group_events</a></td>
-    <td><tt>Returns a list of lists of parallel events.</tt></td>
+    <td><tt>Called with an instance of SaysEvent.</tt></td>
   </tr>
   
 </table>
@@ -190,7 +179,7 @@ UserInterface.direction_vector_dict
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id104">
+        <table class="children sortable" id="id47">
   
   
 <tr class="basemethod">
@@ -329,18 +318,37 @@ frames per second the client will run in.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.Plugin.html#process_message">fabula.plugins.Plugin.process_message</a></div>
     <pre>This is the main method of the UserInterface.
+
 You should normally not override this method unless you have to do
 some really advanced stuff. Overriding the other methods of this
 class (which in turn are called from process_message()) should be
 just fine. See the other methods and the source code for details.
-This method is called regularly by the Client with a list of events
-to display (note: the list may be empty). It may take all the time it
-needs to render the action, just a couple or even hundreds of frames,
-but it must return once the events have been displayed.
-It must neither block completely nor run in a thread since the Client
+
+This method is called regularly by Client.run() with a Message to
+display (note: the Event list may be empty). It may take all the time
+it needs to render the action, just a couple or even hundreds of
+frames, but it must return once the events have been displayed. It
+must neither block completely nor run in a thread since the Client
 has to grab new events and change state between calls to
-process_message(). Put that way, process_message() is simply a part
-of Client.run().</pre>
+process_message().</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.ui.UserInterface.process_ServerParametersEvent">
+    
+  </a>
+  <a name="process_ServerParametersEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ServerParametersEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ServerParametersEvent">fabula.eventprocessor.EventProcessor.process_ServerParametersEvent</a></div>
+    <pre>Compute action_frames from event.action_time and UserInterface.framerate.
+        </pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.display_asset_exception">
@@ -422,20 +430,24 @@ display the game and accept input.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameUserInterface.html">fabula.plugins.pygameui.PygameUserInterface</a></div>
     <pre>Called when the UserInterface wants to capture the user's reaction.
-The module you use for actual graphics rendering most probably
-has a way to capture user input. When overriding this method,
-you have to convert the data provided by your module into Fabula
-events, most probably instances of fabula.AttemptEvent. You must
-append them to self.message_for_host which is evaluated by the
-ControlEngine.
-Note that your module might provide you with numerous user
-actions if the user clicked and typed a lot during the rendering.
-You should create a reasonable subset of those actions, e.g.
-select only the very last user input action.
-The UserInterface should only ever collect and send one
-single client event to prevent cheating and blocking other
-clients in the server. (hint by Alexander Marbach)
-The default implementation reads user input from the console.</pre>
+
+The module you use for actual graphics rendering most probably has a
+way to capture user input. When overriding this method, you have to
+convert the data provided by your module into Fabula events, most
+probably instances of fabula.AttemptEvent. You must append them to
+self.message_for_host which is evaluated by the ControlEngine.
+
+Note that your module might provide you with numerous user actions if
+the user clicked and typed a lot during the rendering. You should
+create a reasonable subset of those actions, e.g. select only the
+very last user input action.
+
+The UserInterface should only ever collect and send one single client
+event to prevent cheating and blocking other clients in the server.
+(hint by Alexander Marbach)
+
+The default implementation pretending player wants to quit and sets
+UserInterface.exit_requested to True.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.process_EnterRoomEvent">
@@ -476,8 +488,7 @@ The default implementation sets UserInterface.freeze = True.</pre>
     <pre>Called when everything is fetched and ready after a RoomCompleteEvent.
 Here you should set up the main screen and display some Map elements
 and Entities.
-The default implementation sets UserInterface.freeze = False and
-displays a single frame.</pre>
+The default implementation sets UserInterface.freeze = False.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.process_CanSpeakEvent">
@@ -536,10 +547,10 @@ visible Entities you might have set up and render a static frame.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">fabula.eventprocessor.EventProcessor.process_DeleteEvent</a></div>
     <pre>This method is called with an instance of DeleteEvent.
-You need to remove the Entites affected from your data
-structures and draw a frame without the deleted Entities.
-Note that the Entities to be removed are already gone
-in self.room.</pre>
+You need to remove the Entites affected from your data structures.
+Note that the Entities to be removed are already gone in
+self.host.room.
+The default implementation does nothing.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.process_ChangeMapElementEvent">
@@ -560,7 +571,8 @@ in self.room.</pre>
 In this method you must implement a major redraw of the display,
 updating all Map elements and after that all Entities.
 This is only a single frame though.
-Note that event may be empty.</pre>
+Note that event may be empty.
+The default implementation does nothing.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.process_PerceptionEvent">
@@ -577,12 +589,12 @@ Note that event may be empty.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">fabula.eventprocessor.EventProcessor.process_PerceptionEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameUserInterface.html">fabula.plugins.pygameui.PygameUserInterface</a></div>
-    <pre>Called with a list of instances of PerceptionEvent.
-You have to provide an implementation whicht displays them
-one by one, possibly awaiting user confirmation.
-event_list may be empty. Please do not continue animation
-of other Entities during the perception so there are no
-background actions which may pass unnoticed.</pre>
+    <pre>Called with an instance of PerceptionEvent.
+You have to provide an implementation whicht displays it, possibly
+awaiting user confirmation. event.event_list may be empty. Please do
+not continue animation of other Entities during the perception so
+there are no background actions which may pass unnoticed.
+The default implementation does nothing.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.ui.UserInterface.process_MovesToEvent">
@@ -617,7 +629,7 @@ background actions which may pass unnoticed.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangeStateEvent">fabula.eventprocessor.EventProcessor.process_ChangeStateEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameUserInterface.html">fabula.plugins.pygameui.PygameUserInterface</a></div>
-    <pre>Entity has already handled the Event. Display a single frame to show the result.
+    <pre>Entity has already handled the Event.
         </pre>
   </div>
 </div><div class="function">
@@ -672,38 +684,17 @@ client.rack.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_SaysEvent">fabula.eventprocessor.EventProcessor.process_SaysEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameUserInterface.html">fabula.plugins.pygameui.PygameUserInterface</a></div>
-    <pre>Called with an instance of SaysEvent
-when the UserInterface is ready to display what Entities say.
-In this method you have to compute a number of frames for
-displaying text and animation for each SaysEvent depending
-on how long the text is. Once you start displaying the text,
-you have to notify the affected Entity. You should catch
-some user confirmation. Consider not to continue  animation
-of other Entities so there are no background actions which may
-pass unnoticed.</pre>
-  </div>
-</div><div class="function">
-  <a name="fabula.plugins.ui.UserInterface.group_events">
-    
-  </a>
-  <a name="group_events">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    group_events(self, message):
-    
-  </div>
-  <div class="functionBody">
-    
-    <pre>Returns a list of lists of parallel events.
-The division is simple: group all subsequent events
-that do not affect the same identifier.</pre>
+    <pre>Called with an instance of SaysEvent.
+In this method you have to compute a number of frames for displaying
+text and animation for each SaysEvent depending on how long the text
+is. Once you start displaying the text, you have to notify the
+affected Entity. You should catch some user confirmation. Consider
+not to continue animation of other Entities so there are no
+background actions which may pass unnoticed.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-03 16:36:33.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-08 10:32:48.
     </address>
   </body>
 </html>

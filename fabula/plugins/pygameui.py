@@ -261,9 +261,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.room_plane
            Plane to display the room
 
-       PygameUserInterface.fps_log_counter
-           Counter to log actual fps every <framerate> frames
-
        PygameUserInterface.spacing
            Spacing between tiles.
 
@@ -303,7 +300,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Initialise the frame timing clock.
         #
         self.clock = pygame.time.Clock()
-        self.fps_log_counter = self.framerate
 
         # Spacing between tiles.
         #
@@ -406,22 +402,19 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.clock.tick(self.framerate)
 
-        if self.fps_log_counter:
+        return
 
-            self.fps_log_counter = self.fps_log_counter - 1
+    def display_stats(self):
+        """Display the actual framerate and various other statistics on screen.
+        """
 
-        else:
-            self.fps_log_counter = self.framerate
+        fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
+                                          self.framerate)
 
-            if not self.freeze:
-
-                fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
-                                                  self.framerate)
-
-                self.window.display.blit(self.small_font.render(fps_string, True,
-                                                                (127, 127, 127),
-                                                                (32, 32, 32)),
-                                         (700, 575))
+        self.window.display.blit(self.small_font.render(fps_string, True,
+                                                        (127, 127, 127),
+                                                        (32, 32, 32)),
+                                 (700, 575))
 
         return
 
@@ -433,6 +426,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.window.update()
             self.window.render()
+
+            self.display_stats()
 
             # TODO: replace with update(dirty_rect_list)
             #
@@ -781,9 +776,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         tile_from_list = None
 
-        # The Client should have added the Tile to self.room.tile_list
+        # The Client should have added the Tile to self.host.room.tile_list
         #
-        for tile in self.room.tile_list:
+        for tile in self.host.room.tile_list:
 
             # This should succeed only once
             #
@@ -792,13 +787,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # Tiles may compare equal, but the may not refer to the same
                 # instance, so we use tile from tile_list.
                 #
-                self.logger.debug("found event.tile in self.room.tile_list")
+                self.logger.debug("found event.tile in self.host.room.tile_list")
                 tile_from_list = tile
 
         if tile_from_list is None:
 
-            self.logger.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
-            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.room.identifier))
+            self.logger.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
+            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
 
         if tile_from_list.asset is not None:
 
@@ -1062,7 +1057,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.logger.debug("issuing TriesToPickUpEvent")
 
             event = fabula.TriesToPickUpEvent(self.host.player_id,
-                                             self.room.entity_locations[item_identifier])
+                                             self.host.room.entity_locations[item_identifier])
 
             self.message_for_host.event_list.append(event)
 
@@ -1871,9 +1866,9 @@ class PygameEditor(PygameUserInterface):
 
             self.window.properties.remove_all()
 
-            if plane.name in self.room.entity_dict.keys():
+            if plane.name in self.host.room.entity_dict.keys():
 
-                entity = self.room.entity_dict[plane.name]
+                entity = self.host.room.entity_dict[plane.name]
 
             elif plane.name in self.host.rack.entity_dict.keys():
 

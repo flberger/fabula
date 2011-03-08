@@ -1,0 +1,33 @@
+Doctests for the Fabula Package
+==============================
+
+Serverside Event Queue
+----------------------
+
+    >>> import fabula.plugins.serverside
+    >>> import fabula.interfaces
+    >>> import fabula.run
+    >>> class QueueTest(fabula.plugins.serverside.DefaultGame):
+    ...     def __init__(self, host):
+    ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)
+    ...         self.queue_messages(fabula.Message([fabula.EnterRoomEvent("test")]),
+    ...                             fabula.Message([fabula.RoomCompleteEvent()]),
+    ...                             fabula.Message([fabula.PerceptionEvent("player", "Test")]))
+    ...
+    ...     def process_message(self, message):
+    ...         fabula.plugins.serverside.DefaultGame.process_message(self, message)
+    ...         if len(self.message_for_host.event_list):
+    ...             print(self.message_for_host)
+    ...         return self.message_for_host
+    ...
+    >>> app = fabula.run.App("d", timeout = 5)
+    >>> app.server_plugin_class = QueueTest
+    >>> interface = fabula.interfaces.Interface("dummy", app.logger)
+    >>> interface.connections["dummy_client"] = fabula.interfaces.MessageBuffer()
+    >>> init_message = fabula.Message([fabula.InitEvent("dummy_client")])
+    >>> interface.connections["dummy_client"].messages_for_local.append(init_message)
+    >>> app.run_server(60, interface, 1.0)
+    fabula.Message(event_list = [fabula.EnterRoomEvent(room_identifier = 'test')])
+    fabula.Message(event_list = [fabula.RoomCompleteEvent()])
+    fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player', perception = 'Test')])
+    >>>

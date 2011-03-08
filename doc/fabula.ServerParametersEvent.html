@@ -3,50 +3,50 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.EnterRoomEvent&rdquo;</title>
+    <title>API docs for &ldquo;fabula.ServerParametersEvent&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.EnterRoomEvent(<a href="fabula.ServerEvent.html">ServerEvent</a>):</h1>
+    <h1 class="class">Class f.ServerParametersEvent(<a href="fabula.Event.html">Event</a>):</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a></span>
       
-      <a href="classIndex.html#fabula.EnterRoomEvent">View In Hierarchy</a>
+      <a href="classIndex.html#fabula.ServerParametersEvent">View In Hierarchy</a>
     </p>
     <div>
       
     </div>
-    <pre>This event announces that the player enters a new room.
-Events building the map and spawning the player, items and NPCs should
-follow. The room is done and can be used when the server issues
-RoomCompleteEvent.
+    <pre>This Event is sent by the Server when an InitEvent has been received.
+It informs the client about the Server parameters.
 
-EnterRoomEvent.room_identifier
-    The identifier of the Room to be entered.</pre>
+Attributes:
+
+ServerParametersEvent.action_time
+    The time the Server waits between actions that do not happen instantly.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id83">
+      <table class="children sortable" id="id91">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.EnterRoomEvent.html#__init__">__init__</a></td>
-    <td><tt>Event initialisation.</tt></td>
+    <td><a href="fabula.ServerParametersEvent.html#__init__">__init__</a></td>
+    <td><tt>action_time is the time the Server waits between actions that do not happen instantly.</tt></td>
   </tr>
   
 </table>
       
         <p>
-          Inherited from <a href="fabula.Event.html">Event</a> (via <a href="fabula.ServerEvent.html">ServerEvent</a>):
+          Inherited from <a href="fabula.Event.html">Event</a>:
         </p>
-        <table class="children sortable" id="id84">
+        <table class="children sortable" id="id92">
   
   
 <tr class="basemethod">
@@ -78,7 +78,7 @@ EnterRoomEvent.room_identifier
     
 
     <div class="function">
-  <a name="fabula.EnterRoomEvent.__init__">
+  <a name="fabula.ServerParametersEvent.__init__">
     
   </a>
   <a name="__init__">
@@ -87,13 +87,13 @@ EnterRoomEvent.room_identifier
   <div class="functionHeader">
     
     def
-    __init__(self, room_identifier):
+    __init__(self, action_time):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.Event.html#__init__">fabula.Event.__init__</a></div>
-    <pre>Event initialisation.
-room_identifier is the identifier of the Room to be entered.</pre>
+    <pre>action_time is the time the Server waits between actions that do not happen instantly.
+        </pre>
   </div>
 </div>
     <address>

@@ -39,24 +39,13 @@ class UserInterface(fabula.plugins.Plugin):
 
        Attributes:
 
-       UserInterface.action_time
-           Set how long actions like a movement from Map element to Map element
-           take, in seconds.
-
        UserInterface.framerate
        UserInterface.assets
            framerate and assets manager
 
        UserInterface.action_frames
-           The number of frames per action.
-
-       UserInterface.action_countdown
-           A copy of action_frames used in UserInterface.process_message().
-
-       UserInterface.event_queue
-           A queue for Events of a Message to be rendered later.
-           UserInterface.action_countdown will be counted down between
-           processing the Events.
+           The number of frames per action. This can only be set when a
+           ServerParametersEvent has been received, so it is initially None.
 
        UserInterface.exit_requested
            The UserInterface is responsible for catching an exit request by the
@@ -88,33 +77,14 @@ class UserInterface(fabula.plugins.Plugin):
         #
         fabula.plugins.Plugin.__init__(self, host)
 
-        # Set how long actions like a movement from
-        # Map element to Map element take, in seconds.
-        #
-        self.action_time = 0.5
-
         # Get framerate and assets from parameters
         #
         self.framerate = framerate
         self.assets = assets
 
-        # Compute the number of frames per action.
+        # See docstring
         #
-        self.action_frames = int(self.action_time * self.framerate)
-
-        self.logger.debug("action_time == {} s, action_frames == {}".format(self.action_time, self.action_frames))
-
-        # A copy to count down.
-        # Creates a copy since action_frames is immutable.
-        #
-        self.action_countdown = self.action_frames
-
-        # A queue for Events of a Message to be
-        # rendered later. self.action_countdown
-        # will be counted down between processing
-        # the Events.
-        #
-        self.event_queue = []
+        self.action_frames = None
 
         # Since it represents the GUI, the UserInterface
         # is responsible for catching an
@@ -128,11 +98,6 @@ class UserInterface(fabula.plugins.Plugin):
         #
         self.freeze = True
 
-        # Variables to be filled by the Client
-        # before each call to process_message()
-        #
-        self.room = None
-
         # Convenience dict converting symbolic
         # directions to a vector
         #
@@ -145,7 +110,7 @@ class UserInterface(fabula.plugins.Plugin):
                                       (0, 1) : "v",
                                       (-1, 0) : "<"}
 
-        self.logger.info("complete, now waiting for RoomCompleteEvent")
+        self.logger.info("complete")
 
         return
 
@@ -154,46 +119,27 @@ class UserInterface(fabula.plugins.Plugin):
 
     def process_message(self, message):
         """This is the main method of the UserInterface.
+
            You should normally not override this method unless you have to do
            some really advanced stuff. Overriding the other methods of this
            class (which in turn are called from process_message()) should be
            just fine. See the other methods and the source code for details.
-           This method is called regularly by the Client with a list of events
-           to display (note: the list may be empty). It may take all the time it
-           needs to render the action, just a couple or even hundreds of frames,
-           but it must return once the events have been displayed.
-           It must neither block completely nor run in a thread since the Client
+
+           This method is called regularly by Client.run() with a Message to
+           display (note: the Event list may be empty). It may take all the time
+           it needs to render the action, just a couple or even hundreds of
+           frames, but it must return once the events have been displayed. It
+           must neither block completely nor run in a thread since the Client
            has to grab new events and change state between calls to
-           process_message(). Put that way, process_message() is simply a part
-           of Client.run().
+           process_message().
         """
+        # TODO: update docstring
 
-        # *sigh* Design by contract is a really nice
-        # thing. We really really should do some thorough
-        # checks, like for duplicate RoomCompleteEvents,
-        # duplicate CanSpeakEvents and similar stuff.
-        # Below we assume that everyone behaves nicely.
-        # In some weird way we could sell that as
-        # "pythonic" ;-) Hey! Not a consenting adult,
-        # anyone?
-
-        ####################
-        # Initialise
-
-        # TODO: Do we need to set player_id and room on every call?
-        #
-        self.room = self.host.room
-
-        self.player_id = self.host.player_id
-
-        # Reset the list of events triggered by
-        # player actions
-        #
-        self.message_for_host = fabula.Message([])
-
-        # Proxy for faster access
-        #
-        event_list = message.event_list
+        # *sigh* Design by contract is a really nice thing. We really really
+        # should do some thorough checks, like for duplicate RoomCompleteEvents,
+        # duplicate CanSpeakEvents and similar stuff. Below we assume that
+        # everyone behaves nicely. In some weird way we could sell that as
+        # "pythonic" ;-) Hey! Not a consenting adult, anyone?
 
         # We used to check for EnterRoomEvent and RoomCompleteEvent here and
         # discard all inbetween since UserInterface.process_RoomCompleteEvent
@@ -202,156 +148,58 @@ class UserInterface(fabula.plugins.Plugin):
         # SpawnEvent - like any other event, which is much more in line with
         # Fabula plugin design. UserInterface.process_EnterRoomEvent is expected
         # to stall the game display.
-
-        ####################
-        # Countdown and rendering waiting Events
-
-        self.action_countdown = self.action_countdown - 1
-
-        if self.action_countdown == 0:
-
-            if len(self.event_queue):
-
-                self.logger.debug("countdown passed, event_queue now: %s" % self.event_queue)
-
-                list_item = self.event_queue.pop(0)
-
-                if isinstance(list_item, list):
-
-                    for event in list_item:
-
-                        self.event_dict[event.__class__](event)
-
-                else:
-
-                    self.event_dict[list_item.__class__](list_item)
-
-            self.action_countdown = self.action_frames
+        #
+        # We also used to queue subsequent events and let a countdown pass
+        # between them. This is gone in the UserInterface: the Server has the
+        # timing authority, we render everything as soon as we get it.
+        #
+        # And this finally means that we can just call the base class.
 
         ####################
         # Render Events
 
-        # Now it's no good, we finally have to render some
-        # frames!
-        # MovesTo, Drops and PicksUpEvents take the
-        # same number of frames to render, which is given by
-        # self.action_time * self.framerate. During a
-        # SaysEvent or a PerceptionEvent, animation may even
-        # stop for some time. These events are displayed last.
+        # Now it's no good, we finally have to render some frames!
+        # MovesTo, Drops and PicksUpEvents take the same number of frames to
+        # render, which is given by self.host.action_time * self.framerate. During a
+        # SaysEvent or a PerceptionEvent, animation may even stop for some time.
 
-        if not len(event_list):
+        # Results are added to self.message_for_host
+        #
+        fabula.plugins.Plugin.process_message(self, message)
 
-            # No events in event_list!
-            # See the method for explaination.
-            #
-            self.display_single_frame()
-
-        elif len(event_list) == 1:
-
-            # We have exacly one event.
-            # Process at once.
-            #
-            self.event_dict[event_list[0].__class__](event_list[0])
-
-        else:
-
-            # More than one Event.
-            #
-            self.logger.debug("queueing %s events for later rendering"
-                              % len(event_list))
-
-            # Parallelise subsequent ChangeMapElementEvents
-            #
-            event_list_parallel = []
-            change_map_list = []
-
-            for event in event_list:
-
-                if isinstance(event, fabula.ChangeMapElementEvent):
-
-                    change_map_list.append(event)
-
-                else:
-
-                    # If a change_map_list has been built,
-                    # the sequence is broken now. Append
-                    # the list and the event.
-                    #
-                    if len(change_map_list) == 1:
-
-                        # Append the single event as-is.
-                        #
-                        event_list_parallel.append(change_map_list[0])
-
-                        change_map_list = []
-
-                    elif len(change_map_list) > 1:
-
-                        event_list_parallel.append(change_map_list)
-
-                        change_map_list = []
-
-                    event_list_parallel.append(event)
-
-            # In case the last Event was an
-            # ChangeMapElementEvent: append
-            #
-            # TODO: Exact duplicate
-            #
-            if len(change_map_list) == 1:
-
-                # Append the single event as-is.
-                #
-                event_list_parallel.append(change_map_list[0])
-
-                change_map_list = []
-
-            elif len(change_map_list) > 1:
-
-                event_list_parallel.append(change_map_list)
-
-                change_map_list = []
-
-            self.logger.debug("event queue: %s, parallel events: %s"
-                              % (self.event_queue, event_list_parallel))
-
-            # Join with event_queue
-            #
-            self.event_queue = fabula.join_lists(self.event_queue,
-                                                 event_list_parallel)
-
-            self.logger.debug("joined event queue: %s"
-                              % self.event_queue)
-
-            # Render first Event at once
-            #
-            list_item = self.event_queue.pop(0)
-
-            if isinstance(list_item, list):
-
-                for event in list_item:
-
-                    self.event_dict[event.__class__](event)
-
-            else:
-
-                self.event_dict[list_item.__class__](list_item)
+        # Mandatory render a frame
+        #
+        self.display_single_frame()
 
         # All Events are rendered now.
 
         ####################
         # Player Input
 
-        # See the method for explaination.
+        # See the method for explanation.
         #
         self.collect_player_input()
 
         ####################
-        # Return to ControlEngine
+        # Return to Client
 
         return self.message_for_host
 
     # TODO: Most docstrings describe 2D stuff (images). Rewrite 2D-3D-agnostic.
+
+    def process_ServerParametersEvent(self, event, **kwargs):
+        """Compute action_frames from event.action_time and UserInterface.framerate.
+        """
+
+        self.action_frames = int(event.action_time * self.framerate)
+
+        msg = "{} s action_time from server * {} fps framerate = {} action_frames"
+
+        self.logger.debug(msg.format(event.action_time,
+                                     self.framerate,
+                                     self.action_frames))
+
+        return
 
     def display_asset_exception(self, asset):
         """Called when assets is unable to retrieve the asset.
@@ -397,70 +245,31 @@ class UserInterface(fabula.plugins.Plugin):
 
     def collect_player_input(self):
         """Called when the UserInterface wants to capture the user's reaction.
-           The module you use for actual graphics rendering most probably
-           has a way to capture user input. When overriding this method,
-           you have to convert the data provided by your module into Fabula
-           events, most probably instances of fabula.AttemptEvent. You must
-           append them to self.message_for_host which is evaluated by the
-           ControlEngine.
-           Note that your module might provide you with numerous user
-           actions if the user clicked and typed a lot during the rendering.
-           You should create a reasonable subset of those actions, e.g.
-           select only the very last user input action.
-           The UserInterface should only ever collect and send one
-           single client event to prevent cheating and blocking other
-           clients in the server. (hint by Alexander Marbach)
-           The default implementation reads user input from the console.
+
+           The module you use for actual graphics rendering most probably has a
+           way to capture user input. When overriding this method, you have to
+           convert the data provided by your module into Fabula events, most
+           probably instances of fabula.AttemptEvent. You must append them to
+           self.message_for_host which is evaluated by the ControlEngine.
+
+           Note that your module might provide you with numerous user actions if
+           the user clicked and typed a lot during the rendering. You should
+           create a reasonable subset of those actions, e.g. select only the
+           very last user input action.
+
+           The UserInterface should only ever collect and send one single client
+           event to prevent cheating and blocking other clients in the server.
+           (hint by Alexander Marbach)
+
+           The default implementation pretending player wants to quit and sets
+           UserInterface.exit_requested to True.
         """
 
-        self.logger.debug("called")
+        self.logger.debug("pretending player wants to quit")
 
-        user_input = input("Quit? (y/n):")
-
-        if user_input == "y":
-
-            self.exit_requested = True
+        self.exit_requested = True
 
         return
-
-    # TODO: remove following method if applicable
-    #
-    #def display_multiple_frame_action(self, MovesToEvent_list):
-    #    """Called when the UserInterface is ready to render Move, Drop or PickUp actions.
-    #       All visible Entities are already
-    #       notified about their state at this point.
-    #       This method must render exactly
-    #       self.action_frames frames. You have to
-    #       compute a movement for each Entity in the
-    #       list of MovesToEvent instances provided.
-    #       Note that this list may be empty, but even
-    #       then you have to render the full number of
-    #       frames to display PickUp and Drop animations.
-    #       You might get away with just changing the
-    #       screen coordinates and calling
-    #       self.display_single_frame()."""
-    #
-    #    self.logger.debug("called")
-    #
-    #    # Compute start and end position and movement per
-    #    # frame for all moving Entities
-    #
-    #    # This creates a copy since framerate is
-    #    # immutable.
-    #    #
-    #    i = self.action_frames
-    #
-    #    # for each frame:
-    #    #
-    #    while i:
-    #        # - move moving Entities by respective Movement
-    #        # - render a graphic for each visible entity
-    #        #   The should supply a new one on each call
-    #        # - update frame counter
-    #        #
-    #        self.display_single_frame()
-    #        i = i - 1
-    #    return
 
     ####################
     # Event handlers affecting presentation and management
@@ -485,15 +294,13 @@ class UserInterface(fabula.plugins.Plugin):
         """Called when everything is fetched and ready after a RoomCompleteEvent.
            Here you should set up the main screen and display some Map elements
            and Entities.
-           The default implementation sets UserInterface.freeze = False and
-           displays a single frame.
+           The default implementation sets UserInterface.freeze = False.
         """
 
         self.logger.debug("called")
 
         self.logger.debug("unfreezing")
         self.freeze = False
-        self.display_single_frame()
 
         return
 
@@ -513,8 +320,6 @@ class UserInterface(fabula.plugins.Plugin):
 
         self.message_for_host.event_list.append(event)
 
-        self.display_single_frame()
-
         return
 
     def process_SpawnEvent(self, event):
@@ -532,15 +337,13 @@ class UserInterface(fabula.plugins.Plugin):
 
     def process_DeleteEvent(self, event):
         """This method is called with an instance of DeleteEvent.
-           You need to remove the Entites affected from your data
-           structures and draw a frame without the deleted Entities.
-           Note that the Entities to be removed are already gone
-           in self.room.
+           You need to remove the Entites affected from your data structures.
+           Note that the Entities to be removed are already gone in
+           self.host.room.
+           The default implementation does nothing.
         """
 
         self.logger.debug("called")
-
-        self.display_single_frame()
 
         return
 
@@ -550,26 +353,23 @@ class UserInterface(fabula.plugins.Plugin):
            updating all Map elements and after that all Entities.
            This is only a single frame though.
            Note that event may be empty.
+           The default implementation does nothing.
         """
 
         self.logger.debug("called")
-
-        self.display_single_frame()
 
         return
 
     def process_PerceptionEvent(self, event):
-        """Called with a list of instances of PerceptionEvent.
-           You have to provide an implementation whicht displays them
-           one by one, possibly awaiting user confirmation.
-           event_list may be empty. Please do not continue animation
-           of other Entities during the perception so there are no
-           background actions which may pass unnoticed.
+        """Called with an instance of PerceptionEvent.
+           You have to provide an implementation whicht displays it, possibly
+           awaiting user confirmation. event.event_list may be empty. Please do
+           not continue animation of other Entities during the perception so
+           there are no background actions which may pass unnoticed.
+           The default implementation does nothing.
         """
 
         self.logger.debug("called")
-
-        self.display_single_frame()
 
         return
 
@@ -582,19 +382,15 @@ class UserInterface(fabula.plugins.Plugin):
 
         self.logger.debug("forwarding Event to Entity and displaying a single frame")
 
-        self.room.entity_dict[event.identifier].process_MovesToEvent(event)
-
-        self.display_single_frame()
+        self.host.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
         return
 
     def process_ChangeStateEvent(self, event):
-        """Entity has already handled the Event. Display a single frame to show the result.
+        """Entity has already handled the Event.
         """
 
-        self.logger.debug("Entity '{}' has already handled the Event, displaying a single frame to show the result".format(event.identifier))
-
-        self.display_single_frame()
+        self.logger.debug("Entity '{}' has already handled the Event".format(event.identifier))
 
         return
 
@@ -604,17 +400,15 @@ class UserInterface(fabula.plugins.Plugin):
 
         self.logger.debug("passing Event to '{}'".format(event.identifier))
 
-        self.room.entity_dict[event.identifier].process_DropsEvent(event)
+        self.host.room.entity_dict[event.identifier].process_DropsEvent(event)
 
         # Spawn the dropped Entity
         #
         self.logger.debug("spawning '{}' in room".format(event.item_identifier))
 
-        entity = self.room.entity_dict[event.item_identifier]
+        entity = self.host.room.entity_dict[event.item_identifier]
 
         self.process_SpawnEvent(fabula.SpawnEvent(entity, event.location))
-
-        self.display_single_frame()
 
         return
 
@@ -626,145 +420,33 @@ class UserInterface(fabula.plugins.Plugin):
 
         self.logger.debug("notifying Entity '{}'".format(event.identifier))
 
-        self.room.entity_dict[event.identifier].process_PicksUpEvent(event)
+        self.host.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
         return
 
     def process_SaysEvent(self, event):
-        """Called with an instance of SaysEvent
-           when the UserInterface is ready to display what Entities say.
-           In this method you have to compute a number of frames for
-           displaying text and animation for each SaysEvent depending
-           on how long the text is. Once you start displaying the text,
-           you have to notify the affected Entity. You should catch
-           some user confirmation. Consider not to continue  animation
-           of other Entities so there are no background actions which may
-           pass unnoticed.
+        """Called with an instance of SaysEvent.
+           In this method you have to compute a number of frames for displaying
+           text and animation for each SaysEvent depending on how long the text
+           is. Once you start displaying the text, you have to notify the
+           affected Entity. You should catch some user confirmation. Consider
+           not to continue animation of other Entities so there are no
+           background actions which may pass unnoticed.
         """
 
         try:
-            self.room.entity_dict[event.identifier].process_SaysEvent(event)
+            self.host.room.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.debug("forwarded SaysEvent(%s, '%s')"
-                             % (event.identifier, event.text))
+            self.logger.debug("forwarded SaysEvent({}, '{}')".format(event.identifier,
+                                                                     event.text))
 
         except KeyError:
 
-            # Entity has been deleted by an
-            # upcoming DeleteEvent
+            # Entity has been deleted by an upcoming DeleteEvent
             #
             self.host.rack.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.debug("forwarded SaysEvent(%s, '%s') to deleted entity"
-                             % (event.identifier, event.text))
-
-        self.display_single_frame()
+            self.logger.debug("forwarded SaysEvent({}, '{}') to deleted entity".format(event.identifier,
+                                                                                       event.text))
 
         return
-
-    ####################
-    # Auxiliary methods
-
-    def group_events(self, message):
-        """Returns a list of lists of parallel events.
-           The division is simple: group all subsequent events
-           that do not affect the same identifier.
-        """
-
-        # This method used to be a mandatory part
-        # of process_message().
-        # TODO: Kept for reference. Can possibly be removed.
-
-        ####################
-        # Grouping Event List
-
-        # If we arrive here, we are ready to render all the
-        # events that are left in the event_list.
-
-        # TODO:
-        # We could and perhaps should do some checks here
-        # to prevent nonsense:
-        # Added Entities may not do anything before they
-        # appear.
-        # Deleted Entites may act until they disappear.
-        # (Get the Entity from the deletedList then, since
-        # it is already deleted in the entity_dict.)
-
-        # Make up an empty list of IDs
-        #
-        collected_identifiers = []
-
-        # make up an empty list of event lists and add an
-        # empty list
-        #
-        grouped_events = [[]]
-
-        # make a buffer for the CanSpeakEvent
-        #
-        buffered_CanSpeakEvent = fabula.Event("dummy_identifier")
-
-        # buffer for an identifier
-        #
-        identifier = ''
-
-        for current_event in message.event_list:
-
-            if isinstance(current_event, fabula.CanSpeakEvent):
-
-                # CanSpeakEvent is taken out of the list
-                # to be appended at the very end.
-                # Note that this keeps only the very
-                # last CanSpeakEvent. There shouldn't be
-                # more than one in a message.
-                #
-                buffered_CanSpeakEvent = current_event
-
-            elif isinstance(current_event, fabula.ChangeMapElementEvent):
-
-                # All these happen in parallel, no identifier
-                # is recorded
-                #
-                grouped_events[-1].append(current_event)
-
-            else:
-                # Now follow the events where we can
-                # detect an identifier
-                #
-                if isinstance(current_event, fabula.SpawnEvent):
-
-                    identifier = current_event.entity.identifier
-
-                else:
-                    identifier = current_event.identifier
-
-                if identifier in collected_identifiers:
-
-                    # append an empty list to the list of
-                    # event lists
-                    # We've had that identifier before.
-                    # Start a new event group.
-                    #
-                    grouped_events.append([])
-
-                    # Start new
-                    #
-                    collected_identifiers = []
-
-                else:
-                    # identifier is not yet in
-                    # current group
-                    #
-                    collected_identifiers.append(identifier)
-
-                # Now append the event to the current group
-                #
-                grouped_events[-1].append(current_event)
-
-        # All parallel events are grouped now.
-        # Append the CanSpeakEvent if it is there.
-        #
-        if isinstance(buffered_CanSpeakEvent, fabula.CanSpeakEvent):
-
-            grouped_events.append([buffered_CanSpeakEvent])
-
-        return grouped_events

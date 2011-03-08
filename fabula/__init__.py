@@ -3,7 +3,48 @@
    "Stories On A Grid"
 
    Copyright 2010 Florian Berger <fberger@florian-berger.de>
+
+
+   Overview
+   --------
+
+   Fabula is a client-server application.
+
+   The server side consists of instances of:
+
+   - fabula.core.server.Server
+   - fabula.plugins.Plugin
+   - fabula.interfaces.Interface
+
+   The Server manages the authoritative game state and communicates with the
+   clients. The Plugin contains the actual game logic and controls the Server's
+   reactions. The Interface manages the actual communication.
+
+   fabula.plugins.serverside.DefaultGame contains a default game logic that
+   reads from configuration files.
+
+   The client side consists of instances of:
+
+   - fabula.core.client.Client
+   - fabula.plugins.ui.UserInterface
+   - fabula.interfaces.Interface
+
+   The Client communicates with the server and mirrors the Server game state.
+   The UserInterface presents the game to the player and collects player input.
+   The Interface manages the actual communication.
+
+   fabula.plugins.pygameui.PygameUserInterface contains a default 2D UserInterface.
+
+
+   Communication
+   -------------
+
+   Server and Client communicate by sending Events.
+
+   Events are bundles into Messages. A Message represents a set of Events that
+   happen in parallel.
 """
+# TODO: Could use the first sentences of the respective docstrings above (or vice versa).
 
 # This file is part of Fabula.
 #
@@ -598,15 +639,29 @@ class InitEvent(Event):
 
         self.identifier = identifier
 
+class ServerParametersEvent(Event):
+    """This Event is sent by the Server when an InitEvent has been received.
+       It informs the client about the Server parameters.
+
+       Attributes:
+
+       ServerParametersEvent.action_time
+           The time the Server waits between actions that do not happen instantly.
+    """
+
+    def __init__(self, action_time):
+        """action_time is the time the Server waits between actions that do not happen instantly.
+        """
+
+        self.action_time = action_time
+
 ############################################################
 # Message
 
 class Message:
-    """A Message manages an ordered list of fabula events.
-       Messages sent by the server describe the action of a certain time frame.
-       The UserInterface has to decide which events happen in parallel and which
-       ones happen sequential. Instances of Message expose a single Python list
-       object as Message.event_list.
+    """A Message represents a set of Events that happen in parallel.
+
+       Attributes:
 
        Message.event_list
            A list of fabula.Events
@@ -617,7 +672,7 @@ class Message:
            An empty list may be supplied.
         """
 
-        # TODO: check the list elements for being instances of fabula.Event here?
+        # TODO: check the list elements for being instances of fabula.Event here? But then, to be consistent, we would have to implement a method to add Events which checks them as well.
         #
         self.event_list = event_list
 
@@ -1156,67 +1211,6 @@ def difference_2d(start_tuple, end_tuple):
 
     return (end_tuple[0] - start_tuple[0],
             end_tuple[1] - start_tuple[1])
-
-def join_lists(first_list, second_list):
-    """Returns a list which is made up of the lists given following this scheme:
-
-       >>> join_lists([1, 2], [3, 4])
-       [[3, 1], [4, 2]]
-
-       >>> join_lists([1, 2], [[3, 4], 5])
-       [[3, 4, 1], [5, 2]]
-
-       >>> join_lists([[1, 2], 3], [[4, 5], 6])
-       [[4, 5, 1, 2], [6, 3]]
-    """
-
-    if len(first_list) > len(second_list):
-
-        longer_list = first_list
-        shorter_list = second_list
-
-    else:
-
-        # second longer or equal
-        #
-        longer_list = second_list
-        shorter_list = first_list
-
-    new_list = []
-    index = 0
-
-    while index < len(shorter_list):
-
-        if (isinstance(longer_list[index], list)
-            and
-            isinstance(shorter_list[index], list)):
-
-            new_list.append(longer_list[index] + shorter_list[index])
-
-        elif (isinstance(longer_list[index], list)
-              and
-              not isinstance(shorter_list[index], list)):
-
-            new_list.append(longer_list[index] + [shorter_list[index]])
-
-        elif (not isinstance(longer_list[index], list)
-              and
-              isinstance(shorter_list[index], list)):
-
-            new_list.append([longer_list[index]] + shorter_list[index])
-
-        else:
-
-            new_list.append([longer_list[index], shorter_list[index]])
-
-        index = index + 1
-
-    # now index >= len(shorter_list)
-    # Append remaining items
-    #
-    new_list = new_list + longer_list[index:]
-
-    return new_list
 
 def str_is_tuple(str):
     """Return True if the string represents a (int, int) tuple.

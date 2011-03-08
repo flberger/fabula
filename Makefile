@@ -38,13 +38,14 @@ errors:
 ifdef PYTHON
 
 doctest: clean
-	$(PYTHON) -m doctest tests/imports.txt
-	$(PYTHON) -m doctest tests/client.txt
-	$(PYTHON) -m doctest tests/server.txt
-	$(PYTHON) -m doctest tests/standalone.txt
-	$(PYTHON) -m doctest tests/assets.txt
-	$(PYTHON) -m doctest tests/pygame_user_interface.txt
-	$(PYTHON) -m doctest tests/tiles.txt
+	$(PYTHON) -m doctest tests/imports.txt && \
+	$(PYTHON) -m doctest tests/client.txt && \
+	$(PYTHON) -m doctest tests/server.txt && \
+	$(PYTHON) -m doctest tests/standalone.txt && \
+	$(PYTHON) -m doctest tests/assets.txt && \
+	$(PYTHON) -m doctest tests/pygame_user_interface.txt && \
+	$(PYTHON) -m doctest tests/tiles.txt && \
+	$(PYTHON) -m doctest tests/serverside_event_queue.txt
 
 user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt
