@@ -30,17 +30,25 @@ DefaultGame.path_dict
     Dict mapping Entity identifiers to a list of coordinates walked so far.
 
 DefaultGame.condition_response_dict
-    A dict mapping string representations of incoming Events to response
-    Events.
+    A dict mapping then string representation of a trigger Event to a
+    tuple of response Events.
 
 DefaultGame.talk_to_dict
     A dict caching the source and targets of TriesToTalkToEvents,
-    mapping identifiers to identifiers.</pre>
+    mapping identifiers to identifiers.
+
+DefaultGame.message_queue
+    A list queueing lists of Messages. Processed in
+    DefaultGame.next_action().
+
+DefaultGame.action_time_reference
+    A time value used as reference to compute time between calls to
+    DefaultGame.next_action().</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id97">
+      <table class="children sortable" id="id40">
   
   
 <tr class="method">
@@ -65,6 +73,18 @@ DefaultGame.talk_to_dict
     
     
     <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#next_action">next_action</a></td>
+    <td><tt>Called after after Server.action_time has passed to compute and return the next Events.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.serverside.DefaultGame.html#queue_messages">queue_messages</a></td>
+    <td><tt>Queue messages to be executed after host.action_time seconds have passed.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#process_InitEvent">process_InitEvent</a></td>
     <td><tt>Load default.floorplan and send it.</tt></td>
   </tr><tr class="method">
@@ -72,7 +92,7 @@ DefaultGame.talk_to_dict
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Queue the target and make the Entity move one step at a time.</tt></td>
+    <td><tt>Queue the target to make the Entity move one step at a time.</tt></td>
   </tr><tr class="method">
     
     
@@ -134,7 +154,7 @@ DefaultGame.talk_to_dict
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id98">
+        <table class="children sortable" id="id41">
   
   
 <tr class="basemethod">
@@ -245,6 +265,12 @@ DefaultGame.talk_to_dict
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Process the Event.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
+    <td><tt>Process the Event.</tt></td>
   </tr>
   
 </table>
@@ -290,9 +316,11 @@ DefaultGame.talk_to_dict
     <div class="interfaceinfo">overrides <a href="fabula.plugins.Plugin.html#process_message">fabula.plugins.Plugin.process_message</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
     <pre>DefaultGame main method.
 
-It calls the respective functions for the Events in message,
-processes pending moves from DefaultGame.tries_to_move_dict
-and returns DefaultGame.message_for_host.</pre>
+It calls the respective functions for the Events in message.
+
+It will call DefaultGame.next_action() every host.action_time seconds.
+
+Returns DefaultGame.message_for_host.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.serverside.DefaultGame.respond">
@@ -311,6 +339,44 @@ and returns DefaultGame.message_for_host.</pre>
     <div class="interfaceinfo">overridden in <a href="fabula.plugins.serverside.Editor.html">fabula.plugins.serverside.Editor</a></div>
     <pre>Add an Event from condition_response_dict corresponding to the Event given to message_for_host.
 If the Event is not found, return AttemptFailedEvent.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.next_action">
+    
+  </a>
+  <a name="next_action">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    next_action(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Called after after Server.action_time has passed to compute and return the next Events.
+The default implementation processes pending Entity movements and
+should be called from all subclasses of DefaultGame.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.serverside.DefaultGame.queue_messages">
+    
+  </a>
+  <a name="queue_messages">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    queue_messages(self, *messages):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Queue messages to be executed after host.action_time seconds have passed.
+If multiple messages are given, host.action_time will pass between
+each of them.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.serverside.DefaultGame.process_InitEvent">
@@ -345,7 +411,7 @@ If the Event is not found, return AttemptFailedEvent.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div>
-    <pre>Queue the target and make the Entity move one step at a time.
+    <pre>Queue the target to make the Entity move one step at a time.
         </pre>
   </div>
 </div><div class="function">
@@ -512,7 +578,7 @@ forbidden_moves is a list of targets that should be considered as not walkable.<
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-03 16:36:33.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-08 10:32:48.
     </address>
   </body>
 </html>
