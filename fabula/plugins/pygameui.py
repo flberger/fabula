@@ -261,9 +261,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.room_plane
            Plane to display the room
 
-       PygameUserInterface.fps_log_counter
-           Counter to log actual fps every <framerate> frames
-
        PygameUserInterface.spacing
            Spacing between tiles.
 
@@ -303,7 +300,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Initialise the frame timing clock.
         #
         self.clock = pygame.time.Clock()
-        self.fps_log_counter = self.framerate
 
         # Spacing between tiles.
         #
@@ -406,22 +402,19 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.clock.tick(self.framerate)
 
-        if self.fps_log_counter:
+        return
 
-            self.fps_log_counter = self.fps_log_counter - 1
+    def display_stats(self):
+        """Display the actual framerate and various other statistics on screen.
+        """
 
-        else:
-            self.fps_log_counter = self.framerate
+        fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
+                                          self.framerate)
 
-            if not self.freeze:
-
-                fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
-                                                  self.framerate)
-
-                self.window.display.blit(self.small_font.render(fps_string, True,
-                                                                (127, 127, 127),
-                                                                (32, 32, 32)),
-                                         (700, 575))
+        self.window.display.blit(self.small_font.render(fps_string, True,
+                                                        (127, 127, 127),
+                                                        (32, 32, 32)),
+                                 (700, 575))
 
         return
 
@@ -433,6 +426,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.window.update()
             self.window.render()
+
+            self.display_stats()
 
             # TODO: replace with update(dirty_rect_list)
             #

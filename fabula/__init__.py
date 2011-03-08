@@ -1212,67 +1212,6 @@ def difference_2d(start_tuple, end_tuple):
     return (end_tuple[0] - start_tuple[0],
             end_tuple[1] - start_tuple[1])
 
-def join_lists(first_list, second_list):
-    """Returns a list which is made up of the lists given following this scheme:
-
-       >>> join_lists([1, 2], [3, 4])
-       [[3, 1], [4, 2]]
-
-       >>> join_lists([1, 2], [[3, 4], 5])
-       [[3, 4, 1], [5, 2]]
-
-       >>> join_lists([[1, 2], 3], [[4, 5], 6])
-       [[4, 5, 1, 2], [6, 3]]
-    """
-
-    if len(first_list) > len(second_list):
-
-        longer_list = first_list
-        shorter_list = second_list
-
-    else:
-
-        # second longer or equal
-        #
-        longer_list = second_list
-        shorter_list = first_list
-
-    new_list = []
-    index = 0
-
-    while index < len(shorter_list):
-
-        if (isinstance(longer_list[index], list)
-            and
-            isinstance(shorter_list[index], list)):
-
-            new_list.append(longer_list[index] + shorter_list[index])
-
-        elif (isinstance(longer_list[index], list)
-              and
-              not isinstance(shorter_list[index], list)):
-
-            new_list.append(longer_list[index] + [shorter_list[index]])
-
-        elif (not isinstance(longer_list[index], list)
-              and
-              isinstance(shorter_list[index], list)):
-
-            new_list.append([longer_list[index]] + shorter_list[index])
-
-        else:
-
-            new_list.append([longer_list[index], shorter_list[index]])
-
-        index = index + 1
-
-    # now index >= len(shorter_list)
-    # Append remaining items
-    #
-    new_list = new_list + longer_list[index:]
-
-    return new_list
-
 def str_is_tuple(str):
     """Return True if the string represents a (int, int) tuple.
     """

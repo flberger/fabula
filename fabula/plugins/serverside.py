@@ -24,7 +24,7 @@ import fabula.plugins.pygameui
 import fabula.assets
 import os
 import math
-import pickle
+import time
 
 def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
@@ -114,6 +114,14 @@ class DefaultGame(fabula.plugins.Plugin):
        DefaultGame.talk_to_dict
            A dict caching the source and targets of TriesToTalkToEvents,
            mapping identifiers to identifiers.
+
+       DefaultGame.message_queue
+           A list queueing lists of Messages. Processed in
+           DefaultGame.next_action().
+
+       DefaultGame.action_time_reference
+           A time value used as reference to compute time between calls to
+           DefaultGame.next_action().
    """
 
     def __init__(self, host):
@@ -128,6 +136,10 @@ class DefaultGame(fabula.plugins.Plugin):
         self.condition_response_dict = {}
         self.talk_to_dict = {}
 
+        self.message_queue = []
+
+        self.action_time_reference = time.time()
+
         # Load default logic.
         #
         self.logger.debug("attempting to load default game logic")
@@ -138,9 +150,11 @@ class DefaultGame(fabula.plugins.Plugin):
     def process_message(self, message):
         """DefaultGame main method.
 
-           It calls the respective functions for the Events in message,
-           processes pending moves from DefaultGame.tries_to_move_dict
-           and returns DefaultGame.message_for_host.
+           It calls the respective functions for the Events in message.
+
+           It will call DefaultGame.next_action() every host.action_time seconds.
+
+           Returns DefaultGame.message_for_host.
         """
 
         # Call base class method, which in turn calls the processing methods.
@@ -148,42 +162,15 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         fabula.plugins.Plugin.process_message(self, message)
 
-        # Process pending moves.
-        # Create a new list to be able to change the dict during iteration.
+        # Check whether action_time has passed
         #
-        for identifier in list(self.tries_to_move_dict.keys()):
+        if time.time() - self.action_time_reference >= self.host.action_time:
 
-            target_identifier = self.tries_to_move_dict[identifier]
+            # Append events returned by next_action()
+            #
+            self.message_for_host.event_list.extend(self.next_action())
 
-            location = self.move_towards(identifier,
-                                        target_identifier,
-                                        self.path_dict[identifier])
-
-            if location is None:
-
-                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(identifier))
-
-                del self.tries_to_move_dict[identifier]
-                del self.path_dict[identifier]
-
-                self.logger.warning("AttemptFailed for '{}'".format(identifier))
-                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(identifier))
-
-            else:
-                self.logger.debug("movement pending for '{}', last positions {}, best move towards {} is {}".format(identifier, self.path_dict[identifier], target_identifier, location))
-
-                # Save current position before movement as last position
-                #
-                self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
-
-                self.message_for_host.event_list.append(fabula.MovesToEvent(identifier, location))
-
-                if location == target_identifier:
-
-                    self.logger.debug("target reached, removing from tries_to_move_dict")
-
-                    del self.tries_to_move_dict[identifier]
-                    del self.path_dict[identifier]
+            self.action_time_reference = time.time()
 
         return self.message_for_host
 
@@ -202,6 +189,102 @@ class DefaultGame(fabula.plugins.Plugin):
         else:
             self.logger.debug("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+        return
+
+    def next_action(self):
+        """Called after after Server.action_time has passed to compute and return the next Events.
+           The default implementation processes pending Entity movements and
+           should be called from all subclasses of DefaultGame.
+        """
+
+        event_list = []
+
+        # Create a new list to be able to change the dict during iteration.
+        #
+        for identifier in list(self.tries_to_move_dict.keys()):
+
+            target_identifier = self.tries_to_move_dict[identifier]
+
+            location = self.move_towards(identifier,
+                                         target_identifier,
+                                         self.path_dict[identifier])
+
+            if location is None:
+
+                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(identifier))
+
+                del self.tries_to_move_dict[identifier]
+                del self.path_dict[identifier]
+
+                self.logger.warning("AttemptFailed for '{}'".format(identifier))
+                event_list.append(fabula.AttemptFailedEvent(identifier))
+
+            else:
+                self.logger.debug("movement pending for '{}', last positions {}, best move towards {} is {}".format(identifier, self.path_dict[identifier], target_identifier, location))
+
+                # Save current position before movement as last position
+                #
+                self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
+
+                event_list.append(fabula.MovesToEvent(identifier, location))
+
+                if location == target_identifier:
+
+                    self.logger.debug("target reached, removing from tries_to_move_dict")
+
+                    del self.tries_to_move_dict[identifier]
+                    del self.path_dict[identifier]
+
+        # Process Message queue
+        #
+        if len(self.message_queue):
+
+            self.logger.debug("adding events from message_queue")
+
+            for message in self.message_queue.pop(0):
+
+                event_list.extend(message.event_list)
+
+        return event_list
+
+    def queue_messages(self, *messages):
+        """Queue messages to be executed after host.action_time seconds have passed.
+           If multiple messages are given, host.action_time will pass between
+           each of them.
+        """
+
+        # Superseding fabula.join_lists()
+
+        if len(messages):
+
+            for message in messages:
+
+                if not isinstance(message, fabula.Message):
+
+                    self.logger.error("cannot queue {}: not a Message instance".format(message))
+
+                    # TODO: exit properly
+                    #
+                    raise SystemExit
+
+            # Make a list to be able to extract elements
+            #
+            messages = list(messages)
+
+            self.logger.debug("got {}".format(messages))
+
+            # First append to existing Message lists
+            #
+            for message_list in self.message_queue:
+
+                message_list.append(messages.pop(0))
+
+            # Queue the rest as lists
+            #
+            self.message_queue.extend([[message] for message in messages])
+
+            self.logger.debug("message_queue is now {}".format(self.message_queue))
 
         return
 
@@ -225,14 +308,58 @@ class DefaultGame(fabula.plugins.Plugin):
         return
 
     def process_TriesToMoveEvent(self, event):
-        """Queue the target and make the Entity move one step at a time.
+        """Queue the target to make the Entity move one step at a time.
         """
 
-        self.logger.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
-                                                                          event.target_identifier))
+        if event.identifier in self.tries_to_move_dict.keys():
 
-        self.tries_to_move_dict[event.identifier] = event.target_identifier
+            self.logger.debug("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
+                                                                            event.identifier))
+
+            del self.tries_to_move_dict[event.identifier]
+
+        # Clear, whether the key exists or not
+        #
         self.path_dict[event.identifier] = []
+
+        # Partly copied from next_action()
+
+        location = self.move_towards(event.identifier,
+                                     event.target_identifier,
+                                     self.path_dict[event.identifier])
+
+        if location is None:
+
+            self.logger.warning("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
+
+            self.logger.warning("AttemptFailed for '{}'".format(event.identifier))
+            self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+        else:
+            msg = "movement requested for '{}', last positions, best move towards {} is {}"
+
+            self.logger.debug(msg.format(event.identifier,
+                                         event.target_identifier,
+                                         location))
+
+            # Save current position before movement as last position
+            #
+            self.path_dict[event.identifier].append(self.host.room.entity_locations[event.identifier])
+
+            self.message_for_host.event_list.append(fabula.MovesToEvent(event.identifier, location))
+
+            if location == event.target_identifier:
+
+                self.logger.debug("target reached, not recording in tries_to_move_dict")
+
+                del self.path_dict[event.identifier]
+
+            else:
+
+                self.logger.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
+                                                                                  event.target_identifier))
+
+                self.tries_to_move_dict[event.identifier] = event.target_identifier
 
         return
 
