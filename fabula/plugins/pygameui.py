@@ -309,19 +309,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.window = clickndrag.Display((800, 600))
 
-        # Initialise font instances.
-        # TODO: Use Assets to fetch the font
-        #
-        try:
-            self.big_font = pygame.font.Font("Vera.ttf", 30)
-            self.small_font = pygame.font.Font("Vera.ttf", 12)
-            self.logger.debug("Using font 'Vera.ttf'")
-
-        except:
-            self.logger.debug("Font 'Vera.ttf' not found, using default font '{}'".format(pygame.font.get_default_font()))
-            self.big_font = pygame.font.Font(None, 40)
-            self.small_font = pygame.font.Font(None, 20)
-
         # Create a black pygame surface for fade effects.
         # Do not use Surface.copy() since we do not want per-pixel alphas.
         #
@@ -329,7 +316,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
-        loading_surface = self.big_font.render("Loading, please wait...",
+        loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
                                                True,
                                                (255, 255, 255))
 
@@ -349,7 +336,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Add the standard action icons to the inventory
         #
-        for name, x in (("look_at", 0), ("manipulate", 100), ("talk_to", 200)):
+        for name, x in (("look_at", 0),
+                        ("manipulate", self.spacing),
+                        ("talk_to", 2 * self.spacing)):
 
             # Partly copied from process_SpawnEvent
             #
@@ -371,7 +360,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
 
-            rect.topleft = (x, 0)
+            rect.center = (x + int(self.spacing / 2), (self.inventory_plane.rect.height / 2))
 
             # Create Plane
             #
@@ -411,7 +400,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
                                           self.framerate)
 
-        self.window.display.blit(self.small_font.render(fps_string, True,
+        self.window.display.blit(clickndrag.gui.SMALL_FONT.render(fps_string, True,
                                                         (127, 127, 127),
                                                         (32, 32, 32)),
                                  (700, 575))
@@ -1161,7 +1150,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             displaystring = str(obj).center(32)
 
-            self.window.display.blit(self.small_font.render(displaystring,
+            self.window.display.blit(clickndrag.gui.SMALL_FONT.render(displaystring,
                                                             True,
                                                             (127, 127, 127),
                                                             (0, 0, 0)),
@@ -1357,7 +1346,7 @@ class PygameEditor(PygameUserInterface):
         self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
         self.fade_surface.fill((0, 0, 0))
 
-        loading_surface = self.big_font.render("Loading, please wait...",
+        loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
                                                True,
                                                (255, 255, 255))
 
@@ -1564,7 +1553,7 @@ class PygameEditor(PygameUserInterface):
                     # Send renamed Tile to Server
                     #
                     tile = fabula.Tile(self.host.room.floor_plan[(x, y)].tile.tile_type,
-                                      current_file)
+                                       current_file)
 
                     event = fabula.ChangeMapElementEvent(tile, (x, y))
 
@@ -2098,21 +2087,23 @@ class PygameEditor(PygameUserInterface):
 
         self.logger.debug("called")
 
-        # ScrollingPlanes lead to long attribute traversals
-        #
-        rules_plane = self.window.room.display_logic.scrolling_rules.content.rules
+        if "scrolling_rules" in self.window.room.display_logic.subplanes_list:
 
-        for name in rules_plane.subplanes_list:
+            # ScrollingPlanes lead to long attribute traversals
+            #
+            rules_plane = self.window.room.display_logic.scrolling_rules.content.rules
 
-            if name.startswith("rule_"):
+            for name in rules_plane.subplanes_list:
 
-                dummy, trigger_name, response_name = name.split("_")
+                if name.startswith("rule_"):
 
-                trigger_event = rules_plane.subplanes[name].subplanes[trigger_name].get_updated_event()
+                    dummy, trigger_name, response_name = name.split("_")
 
-                response_event = rules_plane.subplanes[name].subplanes[response_name].get_updated_event()
+                    trigger_event = rules_plane.subplanes[name].subplanes[trigger_name].get_updated_event()
 
-                self.host.add_response(trigger_event, response_event)
+                    response_event = rules_plane.subplanes[name].subplanes[response_name].get_updated_event()
+
+                    self.host.add_response(trigger_event, response_event)
 
         self.window.room.display_logic.destroy()
 

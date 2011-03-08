@@ -672,6 +672,10 @@ class Message:
            An empty list may be supplied.
         """
 
+        if not isinstance(event_list, list):
+
+            raise TypeError("argument event_list must be a list")
+
         # TODO: check the list elements for being instances of fabula.Event here? But then, to be consistent, we would have to implement a method to add Events which checks them as well.
         #
         self.event_list = event_list
@@ -681,12 +685,6 @@ class Message:
         """
 
         return representation(self, ("event_list",))
-
-#    def queueAsFirstEvent(self, event):
-#        """This is a convenience method. Queue the event
-#           given as the first event to be processed,
-#           shifting other events already queued."""
-#        self.event_list = [event] + self.event_list
 
 ############################################################
 # Entities

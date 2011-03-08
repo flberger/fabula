@@ -641,31 +641,13 @@ class Server(fabula.core.Engine):
         """Register the client in the room and forward the Event.
         """
 
-        self.logger.debug("called, room: {}".format(event.room_identifier))
-
         # TODO: Implement correct handling of multiple rooms.
 
-        if self.room is None:
+        self.room = fabula.Room(event.room_identifier)
 
-            self.room = fabula.Room(event.room_identifier)
-            self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
-            self.room.active_clients.append(kwargs["client_key"])
-
-        else:
-            if event.room_identifier == self.room.identifier:
-
-                if kwargs["client_key"] in self.room.active_clients:
-
-                    self.logger.debug("client {} already in current room".format(str(kwargs["client_key"])))
-
-                else:
-                    self.logger.debug("registering client {} in current room".format(str(kwargs["client_key"])))
-                    self.room.active_clients.append(kwargs["client_key"])
-
-            else:
-                self.room = fabula.Room(event.room_identifier)
-                self.logger.debug("registering client {} in new room".format(str(kwargs["client_key"])))
-                self.room.active_clients.append(kwargs["client_key"])
+        self.logger.debug("registering client {} in new room {}".format(str(kwargs["client_key"]),
+                                                                        event.room_identifier))
+        self.room.active_clients.append(kwargs["client_key"])
 
         kwargs["message"].event_list.append(event)
 

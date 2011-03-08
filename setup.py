@@ -41,8 +41,7 @@ INCLUDE_FILES = ["scripts/100x100-gray.png",
                  "scripts/look_at.png",
                  "scripts/manipulate.png",
                  "scripts/player.png",
-                 "scripts/talk_to.png",
-                 "scripts/Vera.ttf"]
+                 "scripts/talk_to.png"]
 
 if sys.platform == "win32":
     INCLUDE_FILES.append(os.path.join(sys.prefix, "tcl", "tcl8.5"))
