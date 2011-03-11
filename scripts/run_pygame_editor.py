@@ -37,12 +37,11 @@ import fabula.run
 def main():
     app = fabula.run.App("d", timeout = 0)
 
-    interface = fabula.interfaces.Interface("dummy", app.logger)
+    interface = fabula.interfaces.Interface(app.logger)
+    interface.connect("dummy_client")
 
-    message_buffer = fabula.interfaces.MessageBuffer()
-    message_buffer.messages_for_local.append(fabula.Message([fabula.InitEvent("player")]))
-
-    interface.connections["dummy_client"] = message_buffer
+    init_event = fabula.Message([fabula.InitEvent("player")])
+    interface.connections["dummy_client"].messages_for_local.append(init_event)
 
     app.server_plugin_class = fabula.plugins.serverside.Editor
 

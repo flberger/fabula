@@ -25,6 +25,7 @@ import fabula.assets
 import os
 import math
 import time
+import re
 
 def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
@@ -176,15 +177,27 @@ class DefaultGame(fabula.plugins.Plugin):
 
     def respond(self, event):
         """Add an Event from condition_response_dict corresponding to the Event given to message_for_host.
+
            If the Event is not found, return AttemptFailedEvent.
+
+           This method will replace the Entity identifier with the string
+           'player' before looking it up in condition_response_dict, and vice
+           versa for response Events.
         """
 
-        event_str = str(event)
+        # Replace 'player' with event.identifier for lookup
+        #
+        event_str = repr(self.replace_identifier([event],
+                                                 "player",
+                                                 event.identifier)[0])
 
         if event_str in self.condition_response_dict:
 
             self.logger.debug("returning corresponding events")
-            self.message_for_host.event_list = self.message_for_host.event_list + self.condition_response_dict[event_str]
+
+            self.message_for_host.event_list.extend(self.replace_identifier(self.condition_response_dict[event_str],
+                                                                            "player",
+                                                                            event.identifier))
 
         else:
             self.logger.debug("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
@@ -290,6 +303,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
     def process_InitEvent(self, event):
         """Load default.floorplan and send it.
+           Replace the Entity identifier "player" with event.identifier.
         """
 
         self.logger.debug("called")
@@ -303,7 +317,10 @@ class DefaultGame(fabula.plugins.Plugin):
             self.logger.error("error opening file 'default.floorplan'")
 
         else:
-            self.message_for_host.event_list = self.message_for_host.event_list + event_list
+
+            self.message_for_host.event_list.extend(self.replace_identifier(event_list,
+                                                                            "player",
+                                                                            event.identifier))
 
         return
 
@@ -587,7 +604,25 @@ class DefaultGame(fabula.plugins.Plugin):
         else:
             self.logger.error("no filename given")
 
+        self.logger.debug("{} condition-response records".format(len(self.condition_response_dict)))
+
         return
+
+    def replace_identifier(self, event_list, identifier, replacement):
+        """Return a list of Events where alle occurences of identifier are replaced by replacement.
+        """
+
+        self.logger.info("replacing identifier '{}' with '{}'".format(identifier, replacement))
+
+        list_repr, replacements = re.subn("[^_]identifier = '{}'".format(identifier),
+                                          "identifier = '{}'".format(replacement),
+                                          repr(event_list))
+
+        self.logger.debug("original: {}, replacement: {}".format(event_list, list_repr))
+
+        self.logger.info("made {} replacements".format(replacements))
+
+        return eval(list_repr)
 
 class Editor(DefaultGame):
     """This is the server-side Plugin for a Fabula map editor.
@@ -624,7 +659,7 @@ class Editor(DefaultGame):
         #
         self.room = self.host.room
         self.rack = self.host.rack
-        self.player_id = "player"
+        self.client_id = "player"
 
         # Create a PygameEditor where the editing is done
         # TODO: hardcoded framerate

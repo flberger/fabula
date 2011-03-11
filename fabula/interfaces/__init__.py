@@ -73,15 +73,9 @@ class Interface:
                Flags for shutdown handling.
     """
 
-    def __init__(self, connector, logger):
+    def __init__(self, logger):
         """Initialisation.
-           connector must be an object that specifies how to connect to the
-           remote host (for clients) or where to listen for client messages
-           (for the server), for example a tuple (ip_address, port).
-           A connector must be valid as a dictionary key.
         """
-
-        self.connector = connector
 
         # Attach logger
         #
@@ -102,6 +96,23 @@ class Interface:
         self.shutdown_confirmed = False
 
         self.logger.debug("complete")
+
+    def connect(self, connector):
+        """Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
+           connector must be an object that specifies how to connect to the
+           remote host (for clients) or where to listen for client messages
+           (for the server), for example a tuple (ip_address, port).
+           A connector must be valid as a dictionary key.
+           This method should not return until the connection is established.
+           The default implementation issues a warning and creates a dummy
+           MessageBuffer.
+        """
+
+        self.logger.warning("this is a dummy implementation, not actually connecting to '{}'".format(connector))
+
+        self.connections[connector] = MessageBuffer()
+
+        return
 
     def handle_messages(self):
         """This is the main method of an interface class.
@@ -215,14 +226,12 @@ class StandaloneInterface(Interface):
     """
 
     def __init__(self, logger, framerate):
-        """Initialise with StandaloneInterface.connections["peer"] = MessageBuffer().
+        """Initialise.
         """
 
         # Call base class
         #
-        Interface.__init__(self, "peer", logger)
-
-        self.connections["peer"] = MessageBuffer()
+        Interface.__init__(self, logger)
 
         self.framerate = framerate
 
@@ -275,7 +284,9 @@ class StandaloneInterface(Interface):
                         #
                         self.logger.error("error: can not evaluate '{}', skipping".format(repr(event)))
 
-                self.connections["peer"].messages_for_local.append(new_message)
+                # Blindly use the first connection
+                #
+                list(self.connections.values())[0].messages_for_local.append(new_message)
 
             # No need to deliver messages to remote since it will grab them -
             # see above.

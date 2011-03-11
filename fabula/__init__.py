@@ -36,10 +36,31 @@
    fabula.plugins.pygameui.PygameUserInterface contains a default 2D UserInterface.
 
 
+   Connection Procedure
+   --------------------
+
+   Before starting Client and Server, you must create one instance of
+   fabula.interfaces.Interface for each. Upon creation, these Interfaces are not
+   connected.
+
+   Once the Client.run() has been started, it will call
+   UserInterface.get_connection_details() to prompt the player for a client id
+   and information on how to connect to the Server Interface.
+
+   Given this information, Client.run() will call Interface.connect() which will
+   establish the actual network connection to the Server Interface and add an
+   according fabula.interfaces.MessageBuffer in Interface.connections.
+
+   When Interface.connect() returns, Client.run() send a fabula.InitEvent using
+   the client id given by the player. The Server will reply with a series of
+   Events that establish the first room.
+
+
    Communication
    -------------
 
-   Server and Client communicate by sending Events.
+   Server and Client communicate by sending Events, each using the MessageBuffer
+   instance in Interface.connections.
 
    Events are bundles into Messages. A Message represents a set of Events that
    happen in parallel.

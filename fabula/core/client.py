@@ -35,8 +35,8 @@ class Client(fabula.core.Engine):
 
        Additional attributes:
 
-       Client.player_id
-           The unique id for this Client.
+       Client.client_id
+           The unique id for this Client. Initially an empty string.
 
        Client.await_confirmation
        Client.got_empty_message
@@ -52,7 +52,8 @@ class Client(fabula.core.Engine):
            Timestamp for Message log
 
        Client.message_log_file
-           Open stream to record a list of Messages and time intervals
+           Open stream to record a list of Messages and time intervals.
+           Initially None.
 
        Client.local_moves_to_event
            Cache for the latest local MovesToEvent
@@ -61,17 +62,16 @@ class Client(fabula.core.Engine):
     ####################
     # Init
 
-    def __init__(self, interface_instance, logger, player_id):
+    def __init__(self, interface_instance, logger):
         """Initalisation.
            The Client must be instantiated with an instance of a subclass of
            fabula.interfaces.Interface which handles the connection to the server
            or supplies events in some other way.
         """
 
-        # Save the player id for Server
-        # and UserInterface.
+        # Save the player id for Server and UserInterface.
         #
-        self.player_id = player_id
+        self.client_id = ""
 
         # First setup base class
         #
@@ -123,10 +123,10 @@ class Client(fabula.core.Engine):
         #
         self.message_timestamp = None
 
-        # The message log file records
-        # a list of Messages and time intervals
+        # The message log file records a list of Messages and time intervals.
+        # It will be opened in run() once the client_id is known.
         #
-        self.message_log_file = open("messages-{}.log".format(player_id), "wb")
+        self.message_log_file = None
 
         # Remember the latest local MovesToEvent
         #
@@ -153,27 +153,55 @@ class Client(fabula.core.Engine):
 
         self.logger.info("starting")
 
-        self.logger.info("waiting for interface to connect")
+        # By now we should have self.plugin. This is the reason why we do not
+        # do this in __init__().
 
-        while not self.interface.connections:
+        self.logger.info("prompting the user for connection details")
 
-            self.logger.info("no connection yet, waiting 1s")
+        while self.client_id == "":
 
-            time.sleep(1.0)
+            self.client_id, connector = self.plugin.get_connection_details()
 
-        self.logger.info("connection found, sending InitEvent")
+        if len(self.interface.connections.keys()):
 
-        # There is only one connection in the ClientInterface
+            self.logger.debug("interface is already connected to '{}', using connection".format(list(self.interface.connections.keys())[0]))
+
+        else:
+
+            if connector is None:
+
+                msg = "can not connect to Server: client_id == '{}', connector == {}"
+
+                self.logger.critical(msg.format(self.client_id, connector))
+
+                # TODO: exit properly
+                #
+                raise Exception(msg.format(self.client_id, connector))
+
+            else:
+
+                self.logger.info("connecting Interface to '{}'".format(connector))
+
+                self.interface.connect(connector)
+
+        # Use only the first connection in the ClientInterface
         #
-        for message_buffer in self.interface.connections.values():
-            self.message_buffer = message_buffer
+        self.message_buffer = list(self.interface.connections.values())[0]
 
-        self.message_buffer.send_message(fabula.Message([fabula.InitEvent(self.player_id)]))
+        # Now open the messages log file. See __init__().
+        #
+        self.message_log_file = open("messages-{}.log".format(self.client_id), "wb")
+
+        self.logger.info("sending InitEvent")
+
+        self.message_buffer.send_message(fabula.Message([fabula.InitEvent(self.client_id)]))
 
         # Start Message log timer upon InitEvent
         #
         self.message_timestamp = datetime.datetime.today()
 
+        # Now loop
+        #
         while not self.plugin.exit_requested:
 
             # grab_message must and will return a Message, but
@@ -473,7 +501,7 @@ class Client(fabula.core.Engine):
                                                      event,
                                                      message = kwargs["message"])
 
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -489,7 +517,7 @@ class Client(fabula.core.Engine):
 
         # TriesToTalkTo confirmed
         #
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -509,7 +537,7 @@ class Client(fabula.core.Engine):
 
         # Drop confirmed
         #
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -525,7 +553,7 @@ class Client(fabula.core.Engine):
 
         # ChangeState confirmed
         #
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -535,7 +563,7 @@ class Client(fabula.core.Engine):
 
         # TODO: ManipulatesEvent is currently not passed to the UserInterface
 
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -560,7 +588,7 @@ class Client(fabula.core.Engine):
             #
             self.local_moves_to_event = fabula.MovesToEvent(None, None)
 
-            if event.identifier == self.player_id:
+            if event.identifier == self.client_id:
 
                 self.await_confirmation = False
 
@@ -579,7 +607,7 @@ class Client(fabula.core.Engine):
 
                 # TODO: check location == None as well?
                 #
-                if event.identifier == self.player_id:
+                if event.identifier == self.client_id:
 
                     self.await_confirmation = False
 
@@ -595,7 +623,7 @@ class Client(fabula.core.Engine):
 
         # picking up confirmed
         #
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 
@@ -606,7 +634,7 @@ class Client(fabula.core.Engine):
 
         # That is a confirmation
         #
-        if event.identifier == self.player_id:
+        if event.identifier == self.client_id:
 
             self.await_confirmation = False
 

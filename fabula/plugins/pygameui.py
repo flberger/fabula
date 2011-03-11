@@ -251,9 +251,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.small_font
            Pygame.font.Font instances
 
+       PygameUserInterface.fade_surface
+           A black pygame surface for fade effects.
+
        PygameUserInterface.loading_surface
-       PygameUserInterface.loading_surface_position
-           Surface and position for a loading message
+           A loading text surface to be used in process_EnterRoomEvent.
 
        PygameUserInterface.inventory_plane
            Plane to display the inventory
@@ -310,19 +312,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.window = clickndrag.Display((800, 600))
 
         # Create a black pygame surface for fade effects.
-        # Do not use Surface.copy() since we do not want per-pixel alphas.
         #
-        #self.fade_surface = self.window.image.copy()
-        self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
-        self.fade_surface.fill((0, 0, 0))
+        self.fade_surface = self.window.image.copy()
 
-        loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
-                                               True,
-                                               (255, 255, 255))
-
-        self.fade_surface.blit(loading_surface,
-                               (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
-                                int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
+        # Create loading text surface to be used in process_EnterRoomEvent
+        #
+        self.loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
+                                                              True,
+                                                              (255, 255, 255))
 
         # Create inventory plane.
         #
@@ -330,9 +327,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                 pygame.Rect((0, 500), (800, 100)),
                                                 dropped_upon_callback = self.inventory_callback)
 
-        self.window.sub(self.inventory_plane)
-
-        self.window.inventory.image.fill((32, 32, 32))
+        self.inventory_plane.image.fill((32, 32, 32))
 
         # Add the standard action icons to the inventory
         #
@@ -372,18 +367,95 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Finally create subplane
             #
-            self.window.inventory.sub(plane)
+            self.inventory_plane.sub(plane)
 
         # Create plane for the room.
         #
         self.room_plane = clickndrag.Plane("room",
                                            pygame.Rect((0, 0), (800, 500)))
 
-        self.window.sub(self.room_plane)
-
         self.logger.debug("complete")
 
         return
+
+    def get_connection_details(self):
+        """Display a splash screen, then get a connector to the Server and an identifier from the player.
+
+           Initially, the Client Interface is not connected to the Server. This
+           method should prompt the user for connection details.
+
+           It must return a tuple (identifier, connector).
+
+           connector will be used for Interface.connect(connector).
+           identifier will be used to send InitEvent(identifier) to the server.
+
+           The default implementation returns ("default_player", "dummy_connector")
+           for testing purposes.
+        """
+
+        self.logger.debug("called")
+
+        # Display the splash screen
+        #
+        # TODO: copied from above. Maybe an image loading routine would be good.
+
+        try:
+            file = self.assets.fetch("splash.png")
+
+            surface = pygame.image.load(file)
+
+            file.close()
+
+            # Convert to internal format suitable for blitting.
+            # Not using convert_alpha(), no RGBA support fo splash.
+            #
+            surface = surface.convert()
+
+            self.logger.warning("displaying splash.png")
+
+            self.window.image = surface
+
+        except:
+            self.logger.warning("splash.png not found, not displaying splash screen")
+
+        self.display_single_frame()
+
+        # Use a container so we can access it from an ad-hoc function.
+        # That's Python.
+        #
+        id_container = {"id" : None}
+
+        def set_client_id(input):
+
+            id_container["id"] = input
+
+        id_dialog = clickndrag.gui.GetStringDialog("Your Name:",
+                                                   set_client_id,
+                                                   self.window)
+
+        id_dialog.rect.center = self.window.rect.center
+
+        self.window.sub(id_dialog)
+
+        while id_container["id"] is None:
+
+            self.display_single_frame()
+
+            self.collect_player_input()
+
+            if self.exit_requested:
+
+                # Return anything to get out of the loop
+                #
+                id_container["id"] = "exit requested"
+
+        # We are done with the splash screen if there was one. Now make
+        # sure that there is no image for the window Plane left that would
+        # invisibly blitted below room and inventory planes.
+        #
+        self.window.image = self.window.display
+
+        return (id_container["id"], "dummy_connector")
 
     def update_frame_timer(self):
         """Use pygame.time.Clock.tick() to slow down to given framerate.
@@ -397,12 +469,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Display the actual framerate and various other statistics on screen.
         """
 
-        fps_string = "{}/{} fps  ".format(int(self.clock.get_fps()),
+        fps_string = " {}/{} fps ".format(int(self.clock.get_fps()),
                                           self.framerate)
 
         self.window.display.blit(clickndrag.gui.SMALL_FONT.render(fps_string, True,
-                                                        (127, 127, 127),
-                                                        (32, 32, 32)),
+                                                                  (0, 0, 0),
+                                                                  (240, 240, 240)),
                                  (700, 575))
 
         return
@@ -461,54 +533,66 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
     # Event handlers affecting presentation and management
 
     def process_EnterRoomEvent(self, event):
-        """Fade window to black and remove subplanes of PygameUserInterface.window.room
+        """Fade window to black and remove subplanes of PygameUserInterface.window.room.
+           Add room Plane if necessary.
         """
 
         self.logger.debug("entering room: {}".format(event.room_identifier))
 
-        # Only fade out if a room is already displayed.
+        if "room" not in self.window.subplanes_list:
+
+            self.logger.debug("no room plane yet, adding")
+
+            self.window.sub(self.room_plane)
+
+        self.logger.debug("fading out")
+
+        frames = self.action_frames
+
+        fadestep = int(255 / frames)
+
+        self.fade_surface.set_alpha(0)
+
+        # This is actually an exponential fade since the original surface is
+        # not restored before blitting the fading surface
         #
-        if not self.window.room.subplanes:
+        while frames:
+            # Bypassing display_single_frame()
 
-            self.logger.debug("not fading out. window.room.subplanes == {}".format(self.window.room.subplanes))
+            self.window.display.blit(self.fade_surface, (0, 0))
 
-        else:
-            self.logger.debug("room visible, fading out")
-
-            frames = self.action_frames
-
-            fadestep = int(255 / frames)
-
-            self.fade_surface.set_alpha(0)
-
-            # This is actually an exponential fade since the original surface is
-            # not restored before blitting the fading surface
+            # Blit loading message on top
             #
-            while frames:
-                # Bypassing display_single_frame()
+            self.window.display.blit(self.loading_surface,
+                                     (int(self.window.display.get_width() / 2 - self.loading_surface.get_width() / 2),
+                                      int(self.window.display.get_height() / 2 - self.loading_surface.get_height() / 2)))
 
-                self.window.display.blit(self.fade_surface, (0, 0))
+            pygame.display.flip()
 
-                pygame.display.flip()
+            self.update_frame_timer()
 
-                self.update_frame_timer()
+            # Pump the Pygame Event Queue
+            #
+            pygame.event.pump()
 
-                # Pump the Pygame Event Queue
-                #
-                pygame.event.pump()
+            self.fade_surface.set_alpha(self.fade_surface.get_alpha() + fadestep)
 
-                self.fade_surface.set_alpha(self.fade_surface.get_alpha() + fadestep)
-
-                frames = frames - 1
+            frames = frames - 1
 
         # Make sure the window is black now
         #
         self.fade_surface.set_alpha(255)
         self.window.display.blit(self.fade_surface, (0, 0))
 
+        # Blit loading message on top
+        #
+        self.window.display.blit(self.loading_surface,
+                                 (int(self.window.display.get_width() / 2 - self.loading_surface.get_width() / 2),
+                                  int(self.window.display.get_height() / 2 - self.loading_surface.get_height() / 2)))
+
         pygame.display.flip()
 
-        # Clear room
+        # Clear room in any case
         #
         self.window.room.remove_all()
 
@@ -521,6 +605,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def process_RoomCompleteEvent(self, event):
         """Update and render the Planes of the map elements and fade in the room.
+           Add the inventory Plane to window if it is not yet there.
         """
 
         self.logger.debug("rearranging tile and entity planes")
@@ -555,6 +640,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.make_items_draggable()
 
+        if "inventory" not in self.window.subplanes_list:
+
+            self.logger.debug("adding inventory plane to window")
+
+            self.window.sub(self.inventory_plane)
+
         # Display the game again and accept input
         #
         self.logger.debug("unfreezing")
@@ -580,6 +671,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.window.render(force = True)
 
             self.window.display.blit(self.fade_surface, (0, 0))
+
+            # Blit loading message on top
+            #
+            self.window.display.blit(self.loading_surface,
+                                     (int(self.window.display.get_width() / 2 - self.loading_surface.get_width() / 2),
+                                      int(self.window.display.get_height() / 2 - self.loading_surface.get_height() / 2)))
 
             pygame.display.flip()
 
@@ -615,7 +712,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         option_list = clickndrag.gui.OptionList("select_room",
                                                 event.sentences,
-                                                lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.player_id, option.text)),
+                                                lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
                                                 lineheight = 25)
 
         option_list.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
@@ -847,12 +944,20 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
-        # Using a OkBox for now.
-        # Taken from PygameEditor.open_image().
+        # If it's not for us, ignore.
+        # TODO: checking for client_id should be everywhere and be more structured
         #
-        perception_box = clickndrag.gui.OkBox(event.perception)
-        perception_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
-        self.window.room.sub(perception_box)
+        if event.identifier == self.host.client_id:
+
+            # Using a OkBox for now.
+            # Taken from PygameEditor.open_image().
+            #
+            perception_box = clickndrag.gui.OkBox(event.perception)
+            perception_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+            self.window.room.sub(perception_box)
+
+        else:
+            self.logger.debug("perception for '{}', not displaying".format(event.identifier))
 
         return
 
@@ -894,9 +999,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_MovesToEvent(self, event)
 
-        # TODO: use actual player identifier
-        #
-        if event.identifier == "player":
+        if event.identifier == self.host.client_id:
             self.make_items_draggable()
 
         return
@@ -1045,7 +1148,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.logger.debug("issuing TriesToPickUpEvent")
 
-            event = fabula.TriesToPickUpEvent(self.host.player_id,
+            event = fabula.TriesToPickUpEvent(self.host.client_id,
                                              self.host.room.entity_locations[item_identifier])
 
             self.message_for_host.event_list.append(event)
@@ -1069,7 +1172,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # The target identifier is a coordinate tuple in a Room which
             # can by convention be infered from the Plane's name.
             #
-            event = fabula.TriesToMoveEvent(self.host.player_id,
+            event = fabula.TriesToMoveEvent(self.host.client_id,
                                            eval(plane.name))
 
             self.message_for_host.event_list.append(event)
@@ -1100,7 +1203,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # The target identifier is a coordinate tuple in a Room which
             # can by convention be infered from the Plane's name.
             #
-            tries_to_drop_event = fabula.TriesToDropEvent(self.host.player_id,
+            tries_to_drop_event = fabula.TriesToDropEvent(self.host.client_id,
                                                          dropped_plane.name,
                                                          eval(name))
 
@@ -1120,21 +1223,21 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if dropped_plane.name == "look_at":
 
-            event = fabula.TriesToLookAtEvent(self.host.player_id,
+            event = fabula.TriesToLookAtEvent(self.host.client_id,
                                              self.host.room.entity_locations[plane.name])
 
         elif dropped_plane.name == "manipulate":
 
-            event = fabula.TriesToManipulateEvent(self.host.player_id,
+            event = fabula.TriesToManipulateEvent(self.host.client_id,
                                                  self.host.room.entity_locations[plane.name])
 
         elif dropped_plane.name == "talk_to":
 
-            event = fabula.TriesToTalkToEvent(self.host.player_id,
+            event = fabula.TriesToTalkToEvent(self.host.client_id,
                                              self.host.room.entity_locations[plane.name])
 
         else:
-            event = fabula.TriesToDropEvent(self.host.player_id,
+            event = fabula.TriesToDropEvent(self.host.client_id,
                                            dropped_plane.name,
                                            self.host.room.entity_locations[plane.name])
 
@@ -1164,11 +1267,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Auxiliary method to make items next to the player draggable.
         """
 
-        # TODO: use actual player identifier
-        #
-        if "player" in self.host.room.entity_dict.keys():
+        if self.host.client_id in self.host.room.entity_dict.keys():
 
-            player_location = self.host.room.entity_locations["player"]
+            player_location = self.host.room.entity_locations[self.host.client_id]
 
             surrounding_positions = [(player_location[0] - 1, player_location[1]),
                                      (player_location[0], player_location[1] - 1),
@@ -1185,7 +1286,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     self.host.room.entity_dict[identifier].asset.draggable = False
 
         else:
-            self.logger.warning("'{}' not found in room, items are not made draggable".format("player"))
+            self.logger.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
 
         return
 
@@ -1659,7 +1760,7 @@ class PygameEditor(PygameUserInterface):
                 #
                 self.host.message_for_host.event_list.append(fabula.SpawnEvent(entity, (0, 0)))
 
-                self.host.message_for_host.event_list.append(fabula.PicksUpEvent(self.host.player_id,
+                self.host.message_for_host.event_list.append(fabula.PicksUpEvent(self.host.client_id,
                                                                                 item_identifier))
 
         return
@@ -1877,7 +1978,7 @@ class PygameEditor(PygameUserInterface):
 
             # Entity.asset
             #
-            rect = pygame.Rect((0, 0), (98, entity.asset.image.get_rect().height))
+            rect = pygame.Rect((0, 0), entity.asset.image.get_rect().size)
 
             asset_plane = clickndrag.Plane("asset", rect)
 
@@ -1899,13 +2000,6 @@ class PygameEditor(PygameUserInterface):
                                                             pygame.Rect((0, 0), (80, 25)),
                                                             color = (120, 120, 120)))
 
-            # Entity.state
-            #
-            self.window.properties.sub(clickndrag.gui.Label("state",
-                                                            entity.state,
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            color = (120, 120, 120)))
-
             # Logic
             #
             self.window.properties.sub(clickndrag.gui.Button("Edit Logic",
@@ -1921,7 +2015,7 @@ class PygameEditor(PygameUserInterface):
 
         for identifier in self.host.room.entity_locations.keys():
 
-            if identifier != self.host.player_id:
+            if identifier != self.host.client_id:
 
                 self.host.room.entity_dict[identifier].asset.draggable = True
 

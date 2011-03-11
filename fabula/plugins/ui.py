@@ -52,8 +52,8 @@ class UserInterface(fabula.plugins.Plugin):
            user. This value is checked in the Client main loop.
 
        UserInterface.freeze
-           Flag whether to display the game and collect input.
-           True upon initialisation.
+           Flag whether to stop displaying the game and collect input.
+           False upon initialisation.
 
        UserInterface.room
            Variables to be filled by the Client before each call to
@@ -94,9 +94,9 @@ class UserInterface(fabula.plugins.Plugin):
         #
         self.exit_requested = False
 
-        # Flag whether to display the game and collect input
+        # Flag whether to stop displaying the game and collect input
         #
-        self.freeze = True
+        self.freeze = False
 
         # Convenience dict converting symbolic
         # directions to a vector
@@ -113,6 +113,25 @@ class UserInterface(fabula.plugins.Plugin):
         self.logger.info("complete")
 
         return
+
+    def get_connection_details(self):
+        """Get a connector to the Server and an identifier from the player.
+
+           Initially, the Client Interface is not connected to the Server. This
+           method should prompt the user for connection details.
+
+           It must return a tuple (identifier, connector).
+
+           connector will be used for Interface.connect(connector).
+           identifier will be used to send InitEvent(identifier) to the server.
+
+           The default implementation returns ("default_player", "dummy_connector")
+           for testing purposes.
+        """
+
+        self.logger.warning('this is a dummy implementation, returning ("default_player", "dummy_connector")')
+
+        return ("default_player", "dummy_connector")
 
     ####################
     # UserInterface Main Method

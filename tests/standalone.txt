@@ -6,5 +6,5 @@ Standalone Execution (Client and Server)
 
     >>> import fabula.run
     >>> app = fabula.run.App("d", timeout = 5)
-    >>> app.run_standalone(60, 0.5, "player")
+    >>> app.run_standalone(60, 0.5)
     >>>

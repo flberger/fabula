@@ -9,6 +9,6 @@ Client with PygameUserInterface
     >>> import fabula.run
     >>> app = fabula.run.App("d", timeout = 5)
     >>> app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
-    >>> interface = fabula.interfaces.Interface("dummy", app.logger)
-    >>> app.run_client(60, interface, "player")
+    >>> interface = fabula.interfaces.Interface(app.logger)
+    >>> app.run_client(60, interface)
     >>>

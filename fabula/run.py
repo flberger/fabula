@@ -168,19 +168,17 @@ class App:
         self.user_interface_class = fabula.plugins.ui.UserInterface
         self.server_plugin_class = fabula.plugins.Plugin
 
-    def run_client(self, framerate, interface, player_id):
+    def run_client(self, framerate, interface):
         """Run a Fabula client with the parameters given.
         """
 
         self.logger.info("running in client mode")
         self.logger.info("running with framerate {}/s".format(framerate))
-        self.logger.info("player_id: {}".format(player_id))
 
         assets = self.assets_class(self.logger)
 
         client = fabula.core.client.Client(interface,
-                                          self.logger,
-                                          player_id)
+                                          self.logger)
 
         plugin = self.user_interface_class(assets,
                                            framerate,
@@ -259,13 +257,12 @@ class App:
         self.logger.removeHandler(self.file_handler)
         logging.shutdown()
 
-    def run_standalone(self, framerate, action_time, player_id):
+    def run_standalone(self, framerate, action_time):
         """Run Fabula client and server on the local machine.
         """
 
         self.logger.info("running in standalone mode, logging client and server")
         self.logger.info("running with framerate {}/s".format(framerate))
-        self.logger.info("player_id: {}".format(player_id))
 
         # Setting up interfaces
         #
@@ -275,13 +272,15 @@ class App:
         client_interface = fabula.interfaces.StandaloneInterface(self.logger,
                                                                  framerate)
 
+        server_interface.connect("client")
+        client_interface.connect("server")
+
         # Setting up client
         #
         assets = self.assets_class(self.logger)
 
         client = fabula.core.client.Client(client_interface,
-                                           self.logger,
-                                           player_id)
+                                           self.logger)
 
         user_interface = self.user_interface_class(assets,
                                                    framerate,
@@ -315,13 +314,13 @@ class App:
         #
         client_interface_thread = threading.Thread(target = client_interface.handle_messages,
                                                    name = "client_handle_messages",
-                                                   args = (server_interface.connections["peer"],))
+                                                   args = (server_interface.connections["client"],))
 
         client_interface_thread.start()
 
         server_interface_thread = threading.Thread(target = server_interface.handle_messages,
                                                    name = "server_handle_messages",
-                                                   args = (client_interface.connections["peer"],))
+                                                   args = (client_interface.connections["server"],))
 
         server_interface_thread.start()
 
