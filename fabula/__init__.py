@@ -1,6 +1,4 @@
-"""Fabula - A Client-Server System for Interactive Storytelling by means of an Adventure Game Environment
-
-   "Stories On A Grid"
+"""Fabula  - An Open Source Python Game Engine
 
    Copyright 2010 Florian Berger <fberger@florian-berger.de>
 
@@ -65,6 +63,8 @@
    Events are bundles into Messages. A Message represents a set of Events that
    happen in parallel.
 """
+# "Stories On A Grid"
+
 # TODO: Could use the first sentences of the respective docstrings above (or vice versa).
 
 # This file is part of Fabula.

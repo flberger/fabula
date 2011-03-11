@@ -4,8 +4,8 @@ README for Fabula
 About
 -----
 
-Fabula is a framework and engine for interactive storytelling by means of an 
-adventure game environment.
+Fabula is an Open Source Python Game Engine suitable for adventure, role-playing 
+and strategy games and digital interactive storytelling.
 
 It offers a client-server architecture, an event-based protocol, multiplayer
 and networking capabilites, a multi-threaded server, an abstract, 
@@ -14,9 +14,9 @@ system. Gameplay can be recorded and played back. The code is well documented
 and runs on Linux and MS Windows (it should work on OS X, too, but this has
 not yet been tested).
 
-Fabula can be used as a library to develop your own adventure games. As an 
-alternative, you can use the Pygame-based graphical editor and the default
-game engine that come with fabula.
+Fabula can be used as a library to develop your own games. As an alternative, 
+you can use the Pygame-based graphical editor and the default game engine that 
+come with fabula.
 
 You can find fabula on the web at http://florian-berger.de/software/fabula
 
