@@ -41,7 +41,9 @@ INCLUDE_FILES = ["scripts/100x100-gray.png",
                  "scripts/look_at.png",
                  "scripts/manipulate.png",
                  "scripts/player.png",
-                 "scripts/talk_to.png"]
+                 "scripts/talk_to.png",
+                 "scripts/splash.png",
+                 "clickndrag/Vera.ttf"]
 
 if sys.platform == "win32":
     INCLUDE_FILES.append(os.path.join(sys.prefix, "tcl", "tcl8.5"))
@@ -55,19 +57,20 @@ cx_Freeze.setup(name = PACKAGE,
                 author = "Florian Berger",
                 author_email = "fberger@florian-berger.de",
                 url = "http://florian-berger.de/software/{}/".format(PACKAGE),
-                description = "A Client-Server System for Interactive Storytelling by means of an Adventure Game Environment - 'Stories On A Grid'",
+                description = "An Open Source Python Game Engine suitable for adventure, role-playing and strategy games and digital interactive storytelling.",
                 license = "GPL",
                 packages = [PACKAGE,
                             "{}.core".format(PACKAGE),
                             "{}.interfaces".format(PACKAGE),
-                            "{}.plugins".format(PACKAGE)],
-                requires = ["clickndrag",
-                            "clickndrag.gui",
-                            "pygame (>=1.9.1)"],
+                            "{}.plugins".format(PACKAGE),
+                            "clickndrag"],
+                requires = ["pygame (>=1.9.1)"],
                 provides = [PACKAGE,
                             "{}.core".format(PACKAGE),
                             "{}.interfaces".format(PACKAGE),
-                            "{}.plugins".format(PACKAGE)],
+                            "{}.plugins".format(PACKAGE),
+                            "clickndrag"],
+                package_data = {"clickndrag" : ["Vera.ttf"]},
                 scripts = ["scripts/run_pygame_editor.py",
                            "scripts/run_pygame_game.py"],
                 data_files = [("share/doc/{}-{}".format(PACKAGE, VERSION),
@@ -78,5 +81,6 @@ cx_Freeze.setup(name = PACKAGE,
                                cx_Freeze.Executable("scripts/run_pygame_game.py")],
                 options = {"build_exe" :
                            {"include_files" :
-                            list(map(lambda path : (path, os.path.basename(path)),
-                                     INCLUDE_FILES))}})
+                            [(path, os.path.basename(path)) for path in INCLUDE_FILES]
+                           }
+                          })
