@@ -4,6 +4,8 @@ NEWS for Fabula
 0.2.0
 -----
 
+Released on 11 March 2011.
+
 Refactoring of the client-server connection procedure. The User Interface now 
 displays a splash screen and then asks the player for a login and connection 
 details. Moved all timing and event queueing from client to server. The default 

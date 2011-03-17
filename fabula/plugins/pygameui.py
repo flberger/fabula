@@ -82,7 +82,8 @@ class EntityPlane(clickndrag.Plane):
 
     def __init__(self, name, rect, draggable = False,
                                    grab = False,
-                                   clicked_callback = None,
+                                   left_click_callback = None,
+                                   right_click_callback = None,
                                    dropped_upon_callback = None):
         """Initialise.
         """
@@ -91,7 +92,8 @@ class EntityPlane(clickndrag.Plane):
         #
         clickndrag.Plane.__init__(self, name, rect, draggable,
                                                     grab,
-                                                    clicked_callback,
+                                                    left_click_callback,
+                                                    right_click_callback,
                                                     dropped_upon_callback)
 
         self.position_list = []
@@ -925,7 +927,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                           pygame.Rect((event.location[0] * self.spacing,
                                                        event.location[1] * self.spacing),
                                                       (100, 100)),
-                                          clicked_callback = self.tile_clicked_callback,
+                                          left_click_callback = self.tile_clicked_callback,
                                           dropped_upon_callback = self.tile_drop_callback)
 
             self.window.room.sub(tile_plane)
@@ -1107,7 +1109,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         says_box = clickndrag.gui.Label("{}_says".format(event.identifier),
                                         event.text,
                                         pygame.Rect((0, 0),
-                                                    (len(event.text) * 10, 30)))
+                                                    (len(event.text) * 10, 30)),
+                                        color = (250, 250, 240))
+
+        clickndrag.gui.draw_border(says_box, (0, 0, 0))
 
         entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
 
@@ -1344,7 +1349,7 @@ class EventEditor(clickndrag.gui.Container):
 
             # Upon clicked, register the TextBox for keyboard input
             #
-            value_textbox.clicked_callback = lambda plane : display.key_sensitive(plane)
+            value_textbox.left_click_callback = lambda plane : display.key_sensitive(plane)
 
             key_value = clickndrag.Plane("keyvalue_{}".format(key),
                                          pygame.Rect((0, 0),
@@ -1816,7 +1821,7 @@ class PygameEditor(PygameUserInterface):
         # tiles left.
         #
         for plane in self.window.room.subplanes.values():
-            plane.clicked_callback = self.make_tile_obstacle
+            plane.left_click_callback = self.make_tile_obstacle
 
         # Finally, create overlays for OBSTACLE tiles.
         # TODO: slight duplicate from make_tile_obstacle
@@ -1827,7 +1832,7 @@ class PygameEditor(PygameUserInterface):
 
                 overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
                                                  pygame.Rect(self.window.room.subplanes[str(coordinates)].rect),
-                                                 clicked_callback = self.make_tile_floor)
+                                                 left_click_callback = self.make_tile_floor)
 
                 overlay_plane.image = self.overlay_surface
 
@@ -1858,7 +1863,7 @@ class PygameEditor(PygameUserInterface):
         #
         overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
                                          pygame.Rect(plane.rect),
-                                         clicked_callback = self.make_tile_floor)
+                                         left_click_callback = self.make_tile_floor)
 
         overlay_plane.image = self.overlay_surface
 
@@ -1905,7 +1910,7 @@ class PygameEditor(PygameUserInterface):
                 plane.destroy()
 
             else:
-                plane.clicked_callback = self.tile_clicked_callback
+                plane.left_click_callback = self.tile_clicked_callback
 
         # Restore Entity Planes in room
         #
@@ -1925,17 +1930,17 @@ class PygameEditor(PygameUserInterface):
             self.window.buttons.sub(self.plane_cache.pop(0))
 
     def process_SpawnEvent(self, event):
-        """Call PygameUserInterface.process_SpawnEvent and add a clicked_callback to the Entity.
+        """Call PygameUserInterface.process_SpawnEvent and add a left_click_callback to the Entity.
         """
 
         PygameUserInterface.process_SpawnEvent(self, event)
 
         plane = self.window.room.subplanes[event.entity.identifier]
 
-        if plane.clicked_callback is None:
+        if plane.left_click_callback is None:
 
-            self.logger.debug("clicked_callback of '{}' is still None, adding callback".format(event.entity.identifier))
-            plane.clicked_callback = self.show_properties
+            self.logger.debug("left_click_callback of '{}' is still None, adding callback".format(event.entity.identifier))
+            plane.left_click_callback = self.show_properties
 
         return
 

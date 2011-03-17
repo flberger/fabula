@@ -125,6 +125,7 @@
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
+# TODO: support the Tiled editor, http://www.mapeditor.org/
 
 # Fabula will not work with Python versions prior to 3.x.
 #

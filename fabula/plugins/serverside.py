@@ -185,11 +185,11 @@ class DefaultGame(fabula.plugins.Plugin):
            versa for response Events.
         """
 
-        # Replace 'player' with event.identifier for lookup
+        # Replace event.identifier with 'player' for lookup
         #
         event_str = repr(self.replace_identifier([event],
-                                                 "player",
-                                                 event.identifier)[0])
+                                                 event.identifier,
+                                                 "player")[0])
 
         if event_str in self.condition_response_dict:
 
@@ -614,8 +614,8 @@ class DefaultGame(fabula.plugins.Plugin):
 
         self.logger.info("replacing identifier '{}' with '{}'".format(identifier, replacement))
 
-        list_repr, replacements = re.subn("[^_]identifier = '{}'".format(identifier),
-                                          "identifier = '{}'".format(replacement),
+        list_repr, replacements = re.subn(r"([^_])identifier = '{}'".format(identifier),
+                                          r"\1identifier = '{}'".format(replacement),
                                           repr(event_list))
 
         self.logger.debug("original: {}, replacement: {}".format(event_list, list_repr))
