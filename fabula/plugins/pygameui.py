@@ -286,6 +286,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.attempt_icon_planes
            A list of Planes of attempt action icons.
+
+       PygameUserInterface.right_clicked_entity
+           Cache for the last right-clicked Entity.
     """
 
     def __init__(self, assets, framerate, host):
@@ -365,13 +368,19 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Create Plane
             #
-            plane = clickndrag.Plane(name, rect)
+            plane = clickndrag.Plane(name,
+                                     rect,
+                                     left_click_callback = self.attempt_icon_callback)
 
             plane.image = surface
 
             self.attempt_icon_planes.append(plane)
 
             self.logger.debug("loaded '{}': {}".format(name, plane))
+
+        # Cache for the last right-clicked Entity
+        #
+        self.right_clicked_entity = None
 
         # Create plane for the room.
         #
@@ -1225,28 +1234,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
-        # Although we know the Entity, the server determines what if being
-        # looked at. So send target identifiers instead of Entity identifiers.
-
-        if dropped_plane.name == "look_at":
-
-            event = fabula.TriesToLookAtEvent(self.host.client_id,
-                                             self.host.room.entity_locations[plane.name])
-
-        elif dropped_plane.name == "manipulate":
-
-            event = fabula.TriesToManipulateEvent(self.host.client_id,
-                                                 self.host.room.entity_locations[plane.name])
-
-        elif dropped_plane.name == "talk_to":
-
-            event = fabula.TriesToTalkToEvent(self.host.client_id,
-                                             self.host.room.entity_locations[plane.name])
-
-        else:
-            event = fabula.TriesToDropEvent(self.host.client_id,
-                                           dropped_plane.name,
-                                           self.host.room.entity_locations[plane.name])
+        event = fabula.TriesToDropEvent(self.host.client_id,
+                                        dropped_plane.name,
+                                        self.host.room.entity_locations[plane.name])
 
         self.message_for_host.event_list.append(event)
 
@@ -1302,6 +1292,49 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                       plane.rect.center[1] + 35)
 
             self.window.room.sub(icon_plane)
+
+            # Save Entity
+            #
+            self.right_clicked_entity = self.host.room.entity_dict[plane.name]
+
+        return
+
+    def attempt_icon_callback(self, plane):
+        """General left-click callback for attempt action icons.
+        """
+
+        self.logger.debug("called")
+
+        event = None
+
+        # Although we know the Entity, the server determines what if being
+        # looked at. So send target identifiers instead of Entity identifiers.
+
+        if plane.name == "attempt_manipulate":
+
+            event = fabula.TriesToManipulateEvent(self.host.client_id,
+                                                  self.host.room.entity_locations[self.right_clicked_entity.identifier])
+
+        elif plane.name == "attempt_talk_to":
+
+            event = fabula.TriesToTalkToEvent(self.host.client_id,
+                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
+
+        elif plane.name == "attempt_look_at":
+
+            event = fabula.TriesToLookAtEvent(self.host.client_id,
+                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
+
+        # Remove icons in any case. This also works if the "cancel" icon was
+        # clicked.
+        #
+        for icon_plane in self.attempt_icon_planes:
+
+            self.window.room.remove(icon_plane)
+
+        if event is not None:
+
+            self.message_for_host.event_list.append(event)
 
         return
 
