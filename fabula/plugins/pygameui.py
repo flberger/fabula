@@ -283,6 +283,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
+
+       PygameUserInterface.attempt_icon_planes
+           A list of Planes of attempt action icons.
+
+       PygameUserInterface.right_clicked_entity
+           Cache for the last right-clicked Entity.
     """
 
     def __init__(self, assets, framerate, host):
@@ -331,11 +337,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.inventory_plane.image.fill((32, 32, 32))
 
-        # Add the standard action icons to the inventory
+        # Load the standard attempt icons
         #
-        for name, x in (("look_at", 0),
-                        ("manipulate", self.spacing),
-                        ("talk_to", 2 * self.spacing)):
+        self.attempt_icon_planes = []
+
+        for name in ("attempt_manipulate",
+                     "attempt_talk_to",
+                     "attempt_look_at",
+                     "cancel"):
 
             # Partly copied from process_SpawnEvent
             #
@@ -357,19 +366,21 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
 
-            rect.center = (x + int(self.spacing / 2), (self.inventory_plane.rect.height / 2))
-
             # Create Plane
             #
-            plane = clickndrag.Plane(name, rect, draggable = True)
+            plane = clickndrag.Plane(name,
+                                     rect,
+                                     left_click_callback = self.attempt_icon_callback)
 
             plane.image = surface
 
-            self.logger.debug("adding {} to inventory".format(plane))
+            self.attempt_icon_planes.append(plane)
 
-            # Finally create subplane
-            #
-            self.inventory_plane.sub(plane)
+            self.logger.debug("loaded '{}': {}".format(name, plane))
+
+        # Cache for the last right-clicked Entity
+        #
+        self.right_clicked_entity = None
 
         # Create plane for the room.
         #
@@ -795,6 +806,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             plane = EntityPlane(event.entity.identifier,
                                 rect,
+                                right_click_callback = self.entity_right_click_callback,
                                 dropped_upon_callback = self.entity_dropped_callback)
 
             plane.image = surface
@@ -1071,10 +1083,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Append at the right of the inventory.
         # Since the item is already in self.host.rack.entity_dict, the position
         # is len - 1.
-        # + 300 for the standard action icons.
         #
         plane.rect.top = 0
-        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100 + 300
+        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
 
         # This will remove the plane from its current parent, window.room
         #
@@ -1139,13 +1150,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.logger.debug("'{}' dropped on inventory".format(item_identifier))
 
-        # Ignore drops of standard actions
-        #
-        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
-
-            self.logger.debug("ignoring drop of action icon")
-
-        elif item_identifier in self.host.rack.entity_dict.keys():
+        if item_identifier in self.host.rack.entity_dict.keys():
 
             self.logger.debug("'{}' already in Rack, skipping".format(item_identifier))
 
@@ -1192,15 +1197,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         name = plane.name
 
-        # Ignore drops of standard actions
-        #
-        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
-
-            self.logger.debug("ignoring drop of action icon")
-
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
         #
-        elif not fabula.str_is_tuple(name):
+        if not fabula.str_is_tuple(name):
 
             self.logger.error("plane.name does not match coordinate tuple: '{}'".format(name))
 
@@ -1223,30 +1222,107 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.logger.debug("called")
 
+        event = fabula.TriesToDropEvent(self.host.client_id,
+                                        dropped_plane.name,
+                                        self.host.room.entity_locations[plane.name])
+
+        self.message_for_host.event_list.append(event)
+
+        return
+
+    def entity_right_click_callback(self, plane):
+        """Right click callback for Entity Plane.
+        """
+
+        self.logger.debug("called")
+
+        if plane.name not in self.host.room.entity_dict.keys():
+
+            self.logger.debug("'{}' not in Room, ignoring right click".format(plane.name))
+
+        else:
+
+            # One
+            #
+            icon_plane = self.attempt_icon_planes[0]
+
+            icon_plane.rect.center = (plane.rect.center[0] - 35,
+                                      plane.rect.center[1])
+
+            # This will remove and re-add the Plane to room.
+            # <3 clickndrag :-)
+            #
+            self.window.room.sub(icon_plane)
+
+            # Two
+            #
+            icon_plane = self.attempt_icon_planes[1]
+
+            icon_plane.rect.center = (plane.rect.center[0] + 35,
+                                      plane.rect.center[1])
+
+            self.window.room.sub(icon_plane)
+
+            # Three
+            #
+            icon_plane = self.attempt_icon_planes[2]
+
+            icon_plane.rect.center = (plane.rect.center[0],
+                                      plane.rect.center[1] - 35)
+
+            self.window.room.sub(icon_plane)
+
+            # Four
+            #
+            icon_plane = self.attempt_icon_planes[3]
+
+            icon_plane.rect.center = (plane.rect.center[0],
+                                      plane.rect.center[1] + 35)
+
+            self.window.room.sub(icon_plane)
+
+            # Save Entity
+            #
+            self.right_clicked_entity = self.host.room.entity_dict[plane.name]
+
+        return
+
+    def attempt_icon_callback(self, plane):
+        """General left-click callback for attempt action icons.
+        """
+
+        self.logger.debug("called")
+
+        event = None
+
         # Although we know the Entity, the server determines what if being
         # looked at. So send target identifiers instead of Entity identifiers.
 
-        if dropped_plane.name == "look_at":
-
-            event = fabula.TriesToLookAtEvent(self.host.client_id,
-                                             self.host.room.entity_locations[plane.name])
-
-        elif dropped_plane.name == "manipulate":
+        if plane.name == "attempt_manipulate":
 
             event = fabula.TriesToManipulateEvent(self.host.client_id,
-                                                 self.host.room.entity_locations[plane.name])
+                                                  self.host.room.entity_locations[self.right_clicked_entity.identifier])
 
-        elif dropped_plane.name == "talk_to":
+        elif plane.name == "attempt_talk_to":
 
             event = fabula.TriesToTalkToEvent(self.host.client_id,
-                                             self.host.room.entity_locations[plane.name])
+                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
 
-        else:
-            event = fabula.TriesToDropEvent(self.host.client_id,
-                                           dropped_plane.name,
-                                           self.host.room.entity_locations[plane.name])
+        elif plane.name == "attempt_look_at":
 
-        self.message_for_host.event_list.append(event)
+            event = fabula.TriesToLookAtEvent(self.host.client_id,
+                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
+
+        # Remove icons in any case. This also works if the "cancel" icon was
+        # clicked.
+        #
+        for icon_plane in self.attempt_icon_planes:
+
+            self.window.room.remove(icon_plane)
+
+        if event is not None:
+
+            self.message_for_host.event_list.append(event)
 
         return
 
