@@ -331,11 +331,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.inventory_plane.image.fill((32, 32, 32))
 
-        # Add the standard action icons to the inventory
+        # Load the standard attempt icons
         #
-        for name, x in (("look_at", 0),
-                        ("manipulate", self.spacing),
-                        ("talk_to", 2 * self.spacing)):
+        for name in ("attempt_look_at",
+                     "attempt_manipulate",
+                     "attempt_talk_to",
+                     "cancel"):
 
             # Partly copied from process_SpawnEvent
             #
@@ -357,19 +358,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
 
-            rect.center = (x + int(self.spacing / 2), (self.inventory_plane.rect.height / 2))
-
             # Create Plane
             #
-            plane = clickndrag.Plane(name, rect, draggable = True)
+            plane = clickndrag.Plane(name, rect)
 
             plane.image = surface
 
-            self.logger.debug("adding {} to inventory".format(plane))
-
-            # Finally create subplane
-            #
-            self.inventory_plane.sub(plane)
+            self.logger.debug("loaded '{}': {}".format(name, plane))
 
         # Create plane for the room.
         #
