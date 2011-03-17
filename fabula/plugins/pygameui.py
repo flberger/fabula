@@ -1150,13 +1150,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.logger.debug("'{}' dropped on inventory".format(item_identifier))
 
-        # Ignore drops of standard actions
-        #
-        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
-
-            self.logger.debug("ignoring drop of action icon")
-
-        elif item_identifier in self.host.rack.entity_dict.keys():
+        if item_identifier in self.host.rack.entity_dict.keys():
 
             self.logger.debug("'{}' already in Rack, skipping".format(item_identifier))
 
@@ -1203,15 +1197,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         name = plane.name
 
-        # Ignore drops of standard actions
-        #
-        if dropped_plane.name in ("look_at", "manipulate", "talk_to"):
-
-            self.logger.debug("ignoring drop of action icon")
-
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
         #
-        elif not fabula.str_is_tuple(name):
+        if not fabula.str_is_tuple(name):
 
             self.logger.error("plane.name does not match coordinate tuple: '{}'".format(name))
 
