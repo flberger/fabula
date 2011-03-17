@@ -1066,10 +1066,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Append at the right of the inventory.
         # Since the item is already in self.host.rack.entity_dict, the position
         # is len - 1.
-        # + 300 for the standard action icons.
         #
         plane.rect.top = 0
-        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100 + 300
+        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
 
         # This will remove the plane from its current parent, window.room
         #
