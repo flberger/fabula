@@ -283,6 +283,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
+
+       PygameUserInterface.attempt_icon_planes
+           A list of Planes of attempt action icons.
     """
 
     def __init__(self, assets, framerate, host):
@@ -333,9 +336,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Load the standard attempt icons
         #
-        for name in ("attempt_look_at",
-                     "attempt_manipulate",
+        self.attempt_icon_planes = []
+
+        for name in ("attempt_manipulate",
                      "attempt_talk_to",
+                     "attempt_look_at",
                      "cancel"):
 
             # Partly copied from process_SpawnEvent
@@ -363,6 +368,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             plane = clickndrag.Plane(name, rect)
 
             plane.image = surface
+
+            self.attempt_icon_planes.append(plane)
 
             self.logger.debug("loaded '{}': {}".format(name, plane))
 
@@ -790,6 +797,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             plane = EntityPlane(event.entity.identifier,
                                 rect,
+                                right_click_callback = self.entity_right_click_callback,
                                 dropped_upon_callback = self.entity_dropped_callback)
 
             plane.image = surface
@@ -1241,6 +1249,59 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                            self.host.room.entity_locations[plane.name])
 
         self.message_for_host.event_list.append(event)
+
+        return
+
+    def entity_right_click_callback(self, plane):
+        """Right click callback for Entity Plane.
+        """
+
+        self.logger.debug("called")
+
+        if plane.name not in self.host.room.entity_dict.keys():
+
+            self.logger.debug("'{}' not in Room, ignoring right click".format(plane.name))
+
+        else:
+
+            # One
+            #
+            icon_plane = self.attempt_icon_planes[0]
+
+            icon_plane.rect.center = (plane.rect.center[0] - 35,
+                                      plane.rect.center[1])
+
+            # This will remove and re-add the Plane to room.
+            # <3 clickndrag :-)
+            #
+            self.window.room.sub(icon_plane)
+
+            # Two
+            #
+            icon_plane = self.attempt_icon_planes[1]
+
+            icon_plane.rect.center = (plane.rect.center[0] + 35,
+                                      plane.rect.center[1])
+
+            self.window.room.sub(icon_plane)
+
+            # Three
+            #
+            icon_plane = self.attempt_icon_planes[2]
+
+            icon_plane.rect.center = (plane.rect.center[0],
+                                      plane.rect.center[1] - 35)
+
+            self.window.room.sub(icon_plane)
+
+            # Four
+            #
+            icon_plane = self.attempt_icon_planes[3]
+
+            icon_plane.rect.center = (plane.rect.center[0],
+                                      plane.rect.center[1] + 35)
+
+            self.window.room.sub(icon_plane)
 
         return
 
