@@ -139,8 +139,9 @@ class Client(fabula.core.Engine):
 
     def run(self):
         """Main loop of the Client.
-           This is a blocking method. It calls all the process
-           methods to process events, and then the plugin.
+           This is a blocking method. It calls all the process methods to
+           process events, and then the plugin.
+           The loop will terminate when Client.plugin.exit_requested is True.
         """
 
         # TODO: The current implementation is too overtrustful.

@@ -158,20 +158,28 @@ class DefaultGame(fabula.plugins.Plugin):
            Returns DefaultGame.message_for_host.
         """
 
-        # Call base class method, which in turn calls the processing methods.
-        # Results are added to self.message_for_host.
+        # First check whether action_time has passed since we do not want to
+        # catch any Messages that are supposed to be processed in the next cycle.
+        #
+        next_action_events = []
+
+        if time.time() - self.action_time_reference >= self.host.action_time:
+
+            # Cache
+            #
+            next_action_events.extend(self.next_action())
+
+            self.action_time_reference = time.time()
+
+        # Now call the base class method, which in turn calls the processing
+        # methods. Results are added to self.message_for_host.
+        # Cave: wipes self.message_for_host, that's why we cache next_action_events
         #
         fabula.plugins.Plugin.process_message(self, message)
 
-        # Check whether action_time has passed
+        # Append events returned by next_action()
         #
-        if time.time() - self.action_time_reference >= self.host.action_time:
-
-            # Append events returned by next_action()
-            #
-            self.message_for_host.event_list.extend(self.next_action())
-
-            self.action_time_reference = time.time()
+        self.message_for_host.event_list.extend(next_action_events)
 
         return self.message_for_host
 

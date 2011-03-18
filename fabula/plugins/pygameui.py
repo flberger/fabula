@@ -337,6 +337,28 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.inventory_plane.image.fill((32, 32, 32))
 
+        # Copied from get_connection_details().
+        # TODO: Again a reason for an image loading routine.
+        #
+        try:
+            file = self.assets.fetch("inventory.png")
+
+            surface = pygame.image.load(file)
+
+            file.close()
+
+            # Convert to internal format suitable for blitting.
+            # Not using convert_alpha(), no RGBA support fo inventory.
+            #
+            surface = surface.convert()
+
+            self.logger.warning("using inventory.png")
+
+            self.inventory_plane.image = surface
+
+        except:
+            self.logger.warning("inventory.png not found, no inventory background")
+
         # Load the standard attempt icons
         #
         self.attempt_icon_planes = []
@@ -1120,7 +1142,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         says_box = clickndrag.gui.Label("{}_says".format(event.identifier),
                                         event.text,
                                         pygame.Rect((0, 0),
-                                                    (len(event.text) * 10, 30)),
+                                                    (len(event.text) * 8, 30)),
                                         color = (250, 250, 240))
 
         clickndrag.gui.draw_border(says_box, (0, 0, 0))
@@ -1133,9 +1155,17 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.window.room.sub(says_box)
 
-        # Display 4 * action_time
+        # Display for (action_time / 8) per character, but at least for
+        # 2 * action_time
         #
-        for frame in range(4 * self.action_frames):
+        frames = int(self.action_frames / 8 * len(event.text))
+
+        if frames < 2 * self.action_frames:
+
+            frames = 2 * self.action_frames
+
+        for frame in range(frames):
+
             self.display_single_frame()
 
         says_box.destroy()
