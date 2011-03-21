@@ -1050,7 +1050,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_ChangeStateEvent(self, event)
 
-        # In the case of a catpion change, the asset may not have been fetched
+        # In the case of a caption change, the asset may not have been fetched
         # when the Entity processed the state change in the Engine's loop.
         #
         entity = self.host.room.entity_dict[event.identifier]
@@ -1389,12 +1389,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             for identifier in self.host.room.entity_locations.keys():
 
-                if self.host.room.entity_locations[identifier] in surrounding_positions:
+                if self.host.room.entity_dict[identifier].entity_type in (fabula.ITEM_BLOCK, fabula.ITEM_NOBLOCK):
 
-                    self.host.room.entity_dict[identifier].asset.draggable = True
+                    if self.host.room.entity_locations[identifier] in surrounding_positions:
 
-                else:
-                    self.host.room.entity_dict[identifier].asset.draggable = False
+                        self.host.room.entity_dict[identifier].asset.draggable = True
+
+                    else:
+                        self.host.room.entity_dict[identifier].asset.draggable = False
 
         else:
             self.logger.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
