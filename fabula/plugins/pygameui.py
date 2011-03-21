@@ -682,6 +682,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         tiles = []
         entities = []
+        other = []
 
         for name in self.window.room.subplanes_list:
 
@@ -690,8 +691,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             if name.startswith("("):
                 tiles.append(name)
-            else:
+            elif name in self.host.room.entity_dict.keys():
                 entities.append(name)
+            else:
+                other.append(name)
 
         # Now for the entity planes: they should be rendered from top to bottom,
         # so sort by y coordinate.
@@ -699,7 +702,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         entities = sorted(entities,
                           key = lambda name: self.host.room.entity_locations[name][1])
 
-        self.window.room.subplanes_list = tiles + entities
+        self.window.room.subplanes_list = tiles + entities + other
 
         # Make items next to player draggable
         #
