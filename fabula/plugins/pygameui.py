@@ -134,7 +134,7 @@ class PygameEntity(fabula.Entity):
        PygameEntity.action_frames
            The number of frames per action.
 
-       PygameEntity.caption_label
+       PygameEntity.caption_plane
            A clickndrag.gui.Label with the caption for this PygameEntity.
            Initially None.
     """
@@ -152,7 +152,7 @@ class PygameEntity(fabula.Entity):
         self.spacing = spacing
         self.action_frames = action_frames
 
-        self.caption_label = None
+        self.caption_plane = None
 
         return
 
@@ -214,17 +214,17 @@ class PygameEntity(fabula.Entity):
 
             # Do we already have a caption?
             #
-            if self.caption_label is not None:
+            if self.caption_plane is not None:
 
                 # Is there enough space?
                 # TODO: arbitrary width formula
                 #
-                if self.caption_label.rect.width < len(event.state_value) * 10:
+                if self.caption_plane.rect.width < len(event.state_value) * 10:
 
                     # Destroy existing caption
                     #
-                    self.caption_label.destroy()
-                    self.caption_label = None
+                    self.caption_plane.destroy()
+                    self.caption_plane = None
 
                     # Call this method again, it will create a new Label.
                     # Clever, eh? ;-)
@@ -235,16 +235,14 @@ class PygameEntity(fabula.Entity):
                     # Then only change the text.
                     # Should be made visible with the next call to update().
                     #
-                    self.caption_label.text = event.state_value
+                    self.caption_plane.text = event.state_value
 
             else:
                 # Create a new caption Label
                 # TODO: arbitrary width formula
                 #
-                self.caption_label = clickndrag.gui.Label(self.identifier + "_caption",
-                                                          event.state_value,
-                                                          pygame.rect.Rect((0, 0),
-                                                                           (len(event.state_value) * PIX_PER_CHAR, 30)))
+                self.caption_plane = clickndrag.gui.OutlinedText(self.identifier + "_caption",
+                                                                 event.state_value)
 
             self.display_caption()
 
@@ -254,20 +252,20 @@ class PygameEntity(fabula.Entity):
         """Position the caption Plane and make it a subplane of the room.
         """
 
-        if self.caption_label is not None:
+        if self.caption_plane is not None:
 
-            self.caption_label.rect.center = self.asset.rect.midtop
+            self.caption_plane.rect.center = self.asset.rect.midtop
 
             # Sync movements to asset Plane
             #
-            self.caption_label.sync(self.asset)
+            self.caption_plane.sync(self.asset)
 
             # If we make the Label a subplane of the Entity.asset Plane,
             # it will be cropped at the width of Entity.asset. This is not
             # intendet. So we make it a subplane of window.room, which is
             # the parent of the asset.
             #
-            self.asset.parent.sub(self.caption_label)
+            self.asset.parent.sub(self.caption_plane)
 
         return
 
@@ -911,7 +909,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             event.entity.spacing = self.spacing
             event.entity.action_frames = self.action_frames
-            event.entity.caption_label = None
+            event.entity.caption_plane = None
 
         # Now there is a Plane for the Entity. Add to room.
         # This implicitly removes the Plane from the former parent plane.
