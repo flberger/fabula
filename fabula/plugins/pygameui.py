@@ -1186,7 +1186,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                         event.text,
                                         pygame.Rect((0, 0),
                                                     (len(event.text) * PIX_PER_CHAR, 30)),
-                                        color = (250, 250, 240))
+                                        background_color = (250, 250, 240))
 
         clickndrag.gui.draw_border(says_box, (0, 0, 0))
 
@@ -1477,7 +1477,7 @@ class EventEditor(clickndrag.gui.Container):
         self.sub(clickndrag.gui.Label("title",
                                       event.__class__.__name__,
                                       pygame.Rect((0, 0), (300, 25)),
-                                      color = clickndrag.gui.HIGHLIGHT_COLOR))
+                                      background_color = clickndrag.gui.HIGHLIGHT_COLOR))
 
         # Show Event attributes
 
@@ -1634,20 +1634,20 @@ class PygameEditor(PygameUserInterface):
         #
         container = clickndrag.gui.Container("buttons",
                                              padding = 4,
-                                             color = (120, 120, 120))
+                                             background_color = (120, 120, 120))
         self.window.sub(container)
 
         # Add buttons
 
         background = clickndrag.gui.Container("background",
                                               padding = 4,
-                                             color = (120, 120, 120))
+                                              background_color = (120, 120, 120))
 
         background.sub(clickndrag.gui.Label("title",
                                             "Background",
                                             pygame.Rect((0, 0),
                                                         (80, 25)),
-                                            color = (120, 120, 120)))
+                                            background_color = (120, 120, 120)))
 
         background.sub(clickndrag.gui.Button("Open Image",
                                              pygame.Rect((0, 0),
@@ -1656,13 +1656,13 @@ class PygameEditor(PygameUserInterface):
 
         room = clickndrag.gui.Container("room",
                                         padding = 4,
-                                        color = (120, 120, 120))
+                                        background_color = (120, 120, 120))
 
         room.sub(clickndrag.gui.Label("title",
                                       "Room",
                                       pygame.Rect((0, 0),
                                                   (80, 25)),
-                                      color = (120, 120, 120)))
+                                      background_color = (120, 120, 120)))
 
         room.sub(clickndrag.gui.Button("Load Room",
                                        pygame.Rect((0, 0),
@@ -1686,13 +1686,13 @@ class PygameEditor(PygameUserInterface):
 
         logic = clickndrag.gui.Container("logic",
                                          padding = 4,
-                                         color = (120, 120, 120))
+                                         background_color = (120, 120, 120))
 
         logic.sub(clickndrag.gui.Label("title",
                                        "Logic",
                                        pygame.Rect((0, 0),
                                                    (80, 25)),
-                                       color = (120, 120, 120)))
+                                       background_color = (120, 120, 120)))
 
         logic.sub(clickndrag.gui.Button("Save Logic",
                                         pygame.Rect((0, 0),
@@ -1721,7 +1721,7 @@ class PygameEditor(PygameUserInterface):
         # Create Container for the properties
         #
         container = clickndrag.gui.Container("properties",
-                                             color = (120, 120, 120))
+                                             background_color = (120, 120, 120))
         container.rect.topleft = (900, 0)
         self.window.sub(container)
 
@@ -1946,7 +1946,7 @@ class PygameEditor(PygameUserInterface):
                                                      "Edit Walls",
                                                       pygame.Rect((0, 0),
                                                                   (80, 25)),
-                                                      color = (120, 120, 120)))
+                                                      background_color = (120, 120, 120)))
 
         self.window.buttons.sub(clickndrag.gui.Button("Done",
                                                       pygame.Rect((5, 35),
@@ -2130,7 +2130,7 @@ class PygameEditor(PygameUserInterface):
             self.window.properties.sub(clickndrag.gui.Label("identifier",
                                                             entity.identifier,
                                                             pygame.Rect((0, 0), (80, 25)),
-                                                            color = (120, 120, 120)))
+                                                            background_color = (120, 120, 120)))
 
             # Entity.asset
             #
@@ -2147,14 +2147,14 @@ class PygameEditor(PygameUserInterface):
             self.window.properties.sub(clickndrag.gui.Label("asset_desc",
                                                             entity.asset_desc,
                                                             pygame.Rect((0, 0), (80, 25)),
-                                                            color = (120, 120, 120)))
+                                                            background_color = (120, 120, 120)))
 
             # Entity.entity_type
             #
             self.window.properties.sub(clickndrag.gui.Label("entity_type",
                                                             entity.entity_type,
                                                             pygame.Rect((0, 0), (80, 25)),
-                                                            color = (120, 120, 120)))
+                                                            background_color = (120, 120, 120)))
 
             # Logic
             #
