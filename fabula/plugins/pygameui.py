@@ -329,7 +329,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Call original __init__()
         #
-        fabula.plugins.ui.UserInterface.__init__(self, assets, framerate, host)
+        fabula.plugins.ui.UserInterface.__init__(self,
+                                                 assets,
+                                                 framerate,
+                                                 host,
+                                                 fullscreen)
 
         self.logger.debug("called")
 

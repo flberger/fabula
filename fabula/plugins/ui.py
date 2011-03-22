@@ -66,11 +66,14 @@ class UserInterface(fabula.plugins.Plugin):
     ####################
     # Initialization
 
-    def __init__(self, assets, framerate, host):
+    def __init__(self, assets, framerate, host, fullscreen = False):
         """This method initialises the UserInterface.
            assets must be an instance of fabula.Assets or a subclass.
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run in.
+           fullscreen is a Boolean flag that indicates whether the game should
+           run in a window or use the full screen. Its effect is implementation
+           dependent.
         """
 
         # First set up the plugin

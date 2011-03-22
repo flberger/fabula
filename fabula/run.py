@@ -168,7 +168,7 @@ class App:
         self.user_interface_class = fabula.plugins.ui.UserInterface
         self.server_plugin_class = fabula.plugins.Plugin
 
-    def run_client(self, framerate, interface):
+    def run_client(self, framerate, interface, fullscreen = False):
         """Run a Fabula client with the parameters given.
         """
 
@@ -178,11 +178,12 @@ class App:
         assets = self.assets_class(self.logger)
 
         client = fabula.core.client.Client(interface,
-                                          self.logger)
+                                           self.logger)
 
         plugin = self.user_interface_class(assets,
                                            framerate,
-                                           client)
+                                           client,
+                                           fullscreen)
 
         client.set_plugin(plugin)
 
@@ -257,7 +258,7 @@ class App:
         self.logger.removeHandler(self.file_handler)
         logging.shutdown()
 
-    def run_standalone(self, framerate, action_time):
+    def run_standalone(self, framerate, action_time, fullscreen = False):
         """Run Fabula client and server on the local machine.
         """
 
@@ -284,7 +285,8 @@ class App:
 
         user_interface = self.user_interface_class(assets,
                                                    framerate,
-                                                   client)
+                                                   client,
+                                                   fullscreen)
 
         client.set_plugin(user_interface)
 
