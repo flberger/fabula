@@ -319,11 +319,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Cache for the last right-clicked Entity.
     """
 
-    def __init__(self, assets, framerate, host):
+    def __init__(self, assets, framerate, host, fullscreen = False):
         """This method initialises the PygameUserInterface.
            assets must be an instance of fabula.Assets or a subclass.
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run at.
+           fullscreen is a Boolean flag.
         """
 
         # Call original __init__()
@@ -345,7 +346,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Open a click'n'drag window.
         #
-        self.window = clickndrag.Display((800, 600))
+        self.window = clickndrag.Display((800, 600), fullscreen)
 
         # Create a black pygame surface for fade effects.
         #
@@ -577,8 +578,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         for event in events:
 
-            if event.type == pygame.QUIT:
-                self.logger.debug("got pygame.QUIT")
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+
+                self.logger.debug("exit request from user")
                 self.exit_requested = True
 
                 # Quit pygame here, though there is still shutdown work to be
