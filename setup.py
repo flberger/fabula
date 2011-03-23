@@ -35,15 +35,18 @@ import glob
 import os.path
 
 PACKAGE = "fabula"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 INCLUDE_FILES = ["scripts/100x100-gray.png",
-                 "scripts/look_at.png",
-                 "scripts/manipulate.png",
+                 "scripts/attempt_look_at.png",
+                 "scripts/attempt_manipulate.png",
+                 "scripts/attempt_talk_to.png",
+                 "scripts/cancel.png",
                  "scripts/player.png",
-                 "scripts/talk_to.png",
                  "scripts/splash.png",
-                 "clickndrag/Vera.ttf"]
+                 "scripts/inventory.png",
+                 "clickndrag/Vera.ttf",
+                 "clickndrag/VeraBd.ttf"]
 
 if sys.platform == "win32":
     INCLUDE_FILES.append(os.path.join(sys.prefix, "tcl", "tcl8.5"))
@@ -70,11 +73,11 @@ cx_Freeze.setup(name = PACKAGE,
                             "{}.interfaces".format(PACKAGE),
                             "{}.plugins".format(PACKAGE),
                             "clickndrag"],
-                package_data = {"clickndrag" : ["Vera.ttf"]},
+                package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
                 scripts = ["scripts/run_pygame_editor.py",
                            "scripts/run_pygame_game.py"],
                 data_files = [("share/doc/{}-{}".format(PACKAGE, VERSION),
-                               glob.glob(os.path.join("doc", "*.*"))),
+                               glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
                               ("share/{}".format(PACKAGE),
                                INCLUDE_FILES)],
                 executables = [cx_Freeze.Executable("scripts/run_pygame_editor.py"),

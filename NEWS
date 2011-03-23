@@ -1,6 +1,20 @@
 NEWS for Fabula
 ===============
 
+0.3.0
+-----
+
+Released on 23 March 2011.
+
+Removed the action icons from the inventory. Instead, they pop up when 
+right-clicking an entity. Refactoring of PygameEntity captions. The inventory 
+now features a background image which can also be customised. Changes in the 
+display of SaysEvents. Adapted plugins.pygameui to clickndrag API changes. 
+Fabula games can now be played in full screen, and pressing ESCAPE will quit the 
+game. Several bug fixes in the DefaultGame server plugin and 
+PygameUserInterface.
+
+
 0.2.0
 -----
 
