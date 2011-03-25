@@ -122,8 +122,8 @@ class EntityPlane(clickndrag.Plane):
 class PygameEntity(fabula.Entity):
     """Pygame-aware subclass of Entity to be used in PygameUserInterface.
 
-       PygameEntities support the key "caption" in the PygameEntity.state dict.
-       The value of PygameEntity.state["caption"] will be displayed above the
+       PygameEntities support the key "caption" in PygameEntity.property_dict.
+       The value of PygameEntity.property_dict["caption"] will be displayed above the
        PygameEntity.
 
        Additional attributes:
@@ -202,15 +202,15 @@ class PygameEntity(fabula.Entity):
 
         return
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """Call base class and update caption changes.
         """
 
         # Call base class
         #
-        fabula.Entity.process_ChangeStateEvent(self, event)
+        fabula.Entity.process_ChangePropertyEvent(self, event)
 
-        if self.asset is not None and event.state_key == "caption":
+        if self.asset is not None and event.property_key == "caption":
 
             # Do we already have a caption?
             #
@@ -219,7 +219,7 @@ class PygameEntity(fabula.Entity):
                 # Is there enough space?
                 # TODO: arbitrary width formula
                 #
-                if self.caption_plane.rect.width < len(event.state_value) * 10:
+                if self.caption_plane.rect.width < len(event.property_value) * 10:
 
                     # Destroy existing caption
                     #
@@ -229,20 +229,20 @@ class PygameEntity(fabula.Entity):
                     # Call this method again, it will create a new Label.
                     # Clever, eh? ;-)
                     #
-                    self.process_ChangeStateEvent(event)
+                    self.process_ChangePropertyEvent(event)
 
                 else:
                     # Then only change the text.
                     # Should be made visible with the next call to update().
                     #
-                    self.caption_plane.text = event.state_value
+                    self.caption_plane.text = event.property_value
 
             else:
                 # Create a new caption Label
                 # TODO: arbitrary width formula
                 #
                 self.caption_plane = clickndrag.gui.OutlinedText(self.identifier + "_caption",
-                                                                 event.state_value)
+                                                                 event.property_value)
 
             self.display_caption()
 
@@ -1083,7 +1083,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """Call base class, update caption changes, then display a single frame to show the result.
         """
 
@@ -1091,20 +1091,20 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Call base class
         #
-        fabula.plugins.ui.UserInterface.process_ChangeStateEvent(self, event)
+        fabula.plugins.ui.UserInterface.process_ChangePropertyEvent(self, event)
 
         # In the case of a caption change, the asset may not have been fetched
-        # when the Entity processed the state change in the Engine's loop.
+        # when the Entity processed the property change in the Engine's loop.
         #
         entity = self.host.room.entity_dict[event.identifier]
 
         if entity.asset is not None \
-           and event.state_key == "caption" \
+           and event.property_key == "caption" \
            and not "caption" in entity.asset.subplanes_list:
 
             self.logger.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
 
-            entity.process_ChangeStateEvent(event)
+            entity.process_ChangePropertyEvent(event)
 
         return
 
@@ -2198,7 +2198,7 @@ class PygameEditor(PygameUserInterface):
         # TODO: "Change Map Element"
         # TODO: "Delete"
         # TODO: "Spawn"
-        # TODO: ChangeStateEvent
+        # TODO: ChangePropertyEvent
         # TODO: ManipulatesEvent
         # TODO: EnterRoomEvent
         # TODO: RoomCompleteEvent

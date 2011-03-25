@@ -542,17 +542,17 @@ class Client(fabula.core.Engine):
 
             self.await_confirmation = False
 
-    def process_ChangeStateEvent(self, event, **kwargs):
+    def process_ChangePropertyEvent(self, event, **kwargs):
         """Call default and unblock client.
         """
 
         # Call default.
         #
-        fabula.core.Engine.process_ChangeStateEvent(self,
+        fabula.core.Engine.process_ChangePropertyEvent(self,
                                                    event,
                                                    message = kwargs["message"])
 
-        # ChangeState confirmed
+        # ChangeProperty confirmed
         #
         if event.identifier == self.client_id:
 

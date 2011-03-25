@@ -127,7 +127,7 @@ class Server(fabula.core.Engine):
                         # block other clients. (hint by Alexander Marbach)
 
                         # Be sceptical. Only accept typical client events.
-                        # TODO: Include fabula.ChangeStateEvent?
+                        # TODO: Include fabula.ChangePropertyEvent?
                         #
                         if isinstance(event, (fabula.InitEvent,
                                               fabula.AttemptEvent,
@@ -299,7 +299,7 @@ class Server(fabula.core.Engine):
                                           fabula.SaysEvent,
                                           fabula.SpawnEvent,
                                           fabula.DeleteEvent,
-                                          fabula.ChangeStateEvent,
+                                          fabula.ChangePropertyEvent,
                                           fabula.ChangeMapElementEvent]):
 
                     self.message_for_all.event_list.append(event)
