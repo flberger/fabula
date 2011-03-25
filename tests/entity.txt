@@ -1,0 +1,28 @@
+Doctests for the Fabula Package
+===============================
+
+Entities
+--------
+
+    >>> import fabula
+    >>> player = fabula.Entity("test", fabula.PLAYER, True, False, "test.png")
+    >>> player
+    fabula.Entity(identifier = 'test', entity_type = fabula.PLAYER, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> item = fabula.Entity("test", fabula.ITEM, True, False, "test.png")
+    >>> item
+    fabula.Entity(identifier = 'test', entity_type = fabula.ITEM, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> npc = fabula.Entity("test", fabula.NPC, True, False, "test.png")
+    >>> npc
+    fabula.Entity(identifier = 'test', entity_type = fabula.NPC, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> eval(repr(npc))
+    fabula.Entity(identifier = 'test', entity_type = fabula.NPC, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> player.process_ChangePropertyEvent(fabula.ChangePropertyEvent("test", "test_key", "test_value"))
+    >>> player
+    fabula.Entity(identifier = 'test', entity_type = fabula.PLAYER, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> str(player)
+    "<fabula.Entity(identifier = 'test', entity_type = fabula.PLAYER, blocking = True, mobile = False, asset_desc = 'test.png') property_dict = {'test_key': 'test_value'} asset = None>"
+    >>> player.clone()
+    fabula.Entity(identifier = 'test', entity_type = fabula.PLAYER, blocking = True, mobile = False, asset_desc = 'test.png')
+    >>> str(player.clone())
+    "<fabula.Entity(identifier = 'test', entity_type = fabula.PLAYER, blocking = True, mobile = False, asset_desc = 'test.png') property_dict = {} asset = None>"
+

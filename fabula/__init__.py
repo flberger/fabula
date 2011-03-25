@@ -471,31 +471,31 @@ class SaysEvent(Event):
 
         self.text = text
 
-class ChangeStateEvent(Event):
-    """This Event is issued to trigger a state change.
-       Each instance of fabula.Entity has a state.
+class ChangePropertyEvent(Event):
+    """This Event is issued to trigger a property change.
+       Each instance of fabula.Entity has a property.
 
-       ChangeStateEvent.identifier
-           identifier of the Entity to change state
+       ChangePropertyEvent.identifier
+           identifier of the Entity to change property
 
-       ChangeStateEvent.state_key
-           A string giving the name of the state.
+       ChangePropertyEvent.property_key
+           A string giving the name of the property.
 
-       ChangeStateEvent.state_value
-           A string giving the value of the state.
+       ChangePropertyEvent.property_value
+           A string giving the value of the property.
     """
 
-    # ChangeState is based on a concept by Alexander Marbach.
+    # ChangeProperty is based on the state and ChangeState concept by Alexander Marbach.
 
-    def __init__(self, identifier, state_key, state_value):
+    def __init__(self, identifier, property_key, property_value):
         """Event initialisation.
-           state is a new state for the Entity identified by identifier.
-           state_key and state_value must be strings.
+           property is a new property for the Entity identified by identifier.
+           property_key and property_value must be strings.
         """
         self.identifier = identifier
 
-        self.state_key = state_key
-        self.state_value = state_value
+        self.property_key = property_key
+        self.property_value = property_value
 
         return
 
@@ -716,13 +716,20 @@ class Entity(fabula.eventprocessor.EventProcessor):
        This is the base class for the player, NPCs and items.
        An Entity holds information used by the Fabula game logic:
 
-       Entity.entity_type
-           One of fabula.PLAYER, fabula.NPC, fabula.ITEM_BLOCK or
-           fabula.ITEM_NOBLOCK.
-
        Entity.identifier
            Must be an object whose string representation yields an unique
            identification.
+
+       Entity.entity_type
+           One of fabula.PLAYER, fabula.NPC or fabula.ITEM.
+
+       Entity.blocking
+           Boolean flag, indicating whether the Entity blocks a location for
+           other Entities.
+
+       Entity.mobile
+           Boolean flag, indicating whether the Entity can be picked up and
+           dropped.
 
        Entity.asset_desc
            Preferably a string with a file name or an URI of a media file
@@ -734,12 +741,14 @@ class Entity(fabula.eventprocessor.EventProcessor):
            The UserInterface may fetch the asset using Entity.asset_desc and
            attach it here.
 
-       Entity.state
+       Entity.property_dict
            A dict mapping strings to strings, holding the application-dependent
-           state of the Entity.
+           properties of the Entity.
 
        Entity.user_interface
-           Pointer to the UserInterface instance.
+           Pointer to the UserInterface instance. Will be filled by the
+           UserInterface at runtime
+
 
        A Fabula Client should use subclasses (possibly with multiple inheritance)
        or custom attachements to instances of this class to implement the game
@@ -751,15 +760,8 @@ class Entity(fabula.eventprocessor.EventProcessor):
        how it handles game objects.
     """
 
-    def __init__(self, entity_type, identifier, asset_desc):
+    def __init__(self, identifier, entity_type, blocking, mobile, asset_desc):
         """Initialise.
-           This method sets up the following attributes from the values given:
-
-           Entity.entity_type
-           Entity.identifier
-           Entity.asset_desc
-           Entity.asset
-           Entity.state
         """
 
         fabula.eventprocessor.EventProcessor.__init__(self)
@@ -768,13 +770,16 @@ class Entity(fabula.eventprocessor.EventProcessor):
         # self.event_dict
         # which maps Event classes to handler methods
 
-        self.entity_type = entity_type
         self.identifier = identifier
+        self.entity_type = entity_type
+        self.blocking = blocking
+        self.mobile = mobile
         self.asset_desc = asset_desc
-        self.asset = None
-        self.state = {}
 
-        # Will be filled by the UserInterface at runtime
+        self.asset = None
+        self.property_dict = {}
+
+        # Will be filled by the UserInterface at runtime.
         #
         self.user_interface = None
 
@@ -794,12 +799,12 @@ class Entity(fabula.eventprocessor.EventProcessor):
         """
         pass
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """This method is called by the UserInterface.
-           The key 'event.state_key' in Entity.state dict is set to event.state_value.
+           The key 'event.property_key' in Entity.property_dict is set to event.property_value.
         """
 
-        self.state[event.state_key] = event.state_value
+        self.property_dict[event.property_key] = event.property_value
 
         return
 
@@ -838,19 +843,27 @@ class Entity(fabula.eventprocessor.EventProcessor):
            Useful to create an Entity object from a subclass of Entity.
         """
 
-        return Entity(self.entity_type, self.identifier, self.asset_desc)
+        return Entity(self.identifier,
+                      self.entity_type,
+                      self.blocking,
+                      self.mobile,
+                      self.asset_desc)
 
     def __repr__(self):
         """Official string representation.
         """
 
-        return representation(self, ("entity_type", "identifier", "asset_desc"))
+        return representation(self, ("identifier",
+                                     "entity_type",
+                                     "blocking",
+                                     "mobile",
+                                     "asset_desc"))
 
     def __str__(self):
-        """Informal string representation, including state and asset.
+        """Informal string representation, including property_dict and asset.
         """
-        return "<{} state = {} asset = {}>".format(self.__repr__(),
-                                                   self.state,
+        return "<{} property_dict = {} asset = {}>".format(self.__repr__(),
+                                                   self.property_dict,
                                                    self.asset)
 
 ############################################################
@@ -861,8 +874,7 @@ class Entity(fabula.eventprocessor.EventProcessor):
 
 PLAYER = "PLAYER"
 NPC = "NPC"
-ITEM_BLOCK = "ITEM_BLOCK"
-ITEM_NOBLOCK = "ITEM_NOBLOCK"
+ITEM = "ITEM"
 
 FLOOR = "FLOOR"
 OBSTACLE = "OBSTACLE"
@@ -871,8 +883,7 @@ OBSTACLE = "OBSTACLE"
 #
 _constant_representations = {PLAYER : "fabula.PLAYER",
                              NPC : "fabula.NPC",
-                             ITEM_BLOCK : "fabula.ITEM_BLOCK",
-                             ITEM_NOBLOCK : "fabula.ITEM_NOBLOCK",
+                             ITEM : "fabula.ITEM",
                              FLOOR : "fabula.FLOOR",
                              OBSTACLE : "fabula.OBSTACLE"}
 
@@ -1245,9 +1256,6 @@ def str_is_tuple(str):
 
 def representation(object, attributes):
     """Compute an official string representation of object. eval(representation(object)) should recreate the object.
-       object_class is the class calling the function and the supposed base
-       class of object. It will be used if the actual class of the object is
-       not in the fabula package.
        attributes is a list of strings giving the attributes to include.
     """
 

@@ -408,7 +408,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         return
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """Entity has already handled the Event.
         """
 

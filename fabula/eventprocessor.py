@@ -62,8 +62,8 @@ class EventProcessor:
                                self.process_PerceptionEvent,
                            fabula.SaysEvent :
                                self.process_SaysEvent,
-                           fabula.ChangeStateEvent :
-                               self.process_ChangeStateEvent,
+                           fabula.ChangePropertyEvent :
+                               self.process_ChangePropertyEvent,
                            fabula.PassedEvent :
                                self.process_PassedEvent,
                            fabula.LookedAtEvent :
@@ -190,12 +190,12 @@ class EventProcessor:
         """
         pass
 
-    def process_ChangeStateEvent(self, event, **kwargs):
+    def process_ChangePropertyEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
 
-        # ChangeState is based on a concept by Alexander Marbach.
+        # ChangeProperty is based on a concept by Alexander Marbach.
 
         pass
 

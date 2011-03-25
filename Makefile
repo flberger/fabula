@@ -39,6 +39,7 @@ ifdef PYTHON
 
 doctest: clean
 	$(PYTHON) -m doctest tests/imports.txt && \
+	$(PYTHON) -m doctest tests/entity.txt && \
 	$(PYTHON) -m doctest tests/client.txt && \
 	$(PYTHON) -m doctest tests/server.txt && \
 	$(PYTHON) -m doctest tests/standalone.txt && \

@@ -338,17 +338,17 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         return
 
-    def process_ChangeStateEvent(self, event, **kwargs):
+    def process_ChangePropertyEvent(self, event, **kwargs):
         """Let the Entity handle the Event. Then add the event to the message.
         """
 
-        msg = "forwarding state change '{}'->'{}' to Entity '{}' in current room"
+        msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
 
-        self.logger.debug(msg.format(event.state_key,
-                                     event.state_value,
+        self.logger.debug(msg.format(event.property_key,
+                                     event.property_value,
                                      event.identifier))
 
-        self.room.entity_dict[event.identifier].process_ChangeStateEvent(event)
+        self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
 
         kwargs["message"].event_list.append(event)
 
@@ -533,13 +533,13 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
                 for entity in floor_plan_element.entities:
 
-                    if entity.entity_type == fabula.ITEM_BLOCK:
+                    if entity.blocking:
 
                         occupied = True
 
                 if occupied:
 
-                    self.logger.debug("{} not walkable: target occupied by fabula.ITEM_BLOCK".format(target_identifier))
+                    self.logger.debug("{} not walkable: target occupied by blocking Entity".format(target_identifier))
 
                     return False
 

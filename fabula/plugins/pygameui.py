@@ -122,8 +122,8 @@ class EntityPlane(clickndrag.Plane):
 class PygameEntity(fabula.Entity):
     """Pygame-aware subclass of Entity to be used in PygameUserInterface.
 
-       PygameEntities support the key "caption" in the PygameEntity.state dict.
-       The value of PygameEntity.state["caption"] will be displayed above the
+       PygameEntities support the key "caption" in PygameEntity.property_dict.
+       The value of PygameEntity.property_dict["caption"] will be displayed above the
        PygameEntity.
 
        Additional attributes:
@@ -139,7 +139,7 @@ class PygameEntity(fabula.Entity):
            Initially None.
     """
 
-    def __init__(entity_type, identifier, asset_desc, spacing, action_frames):
+    def __init__(identifier, entity_type, blocking, mobile, asset_desc, spacing, action_frames):
         """Initialise.
            spacing is the spacing between tiles.
            action_frames is the number of frames per action.
@@ -147,7 +147,7 @@ class PygameEntity(fabula.Entity):
 
         # Call base class
         #
-        fabula.Entity.__init__(self, entity_type, identifier, asset_desc)
+        fabula.Entity.__init__(self, identifier, entity_type, blocking, mobile, asset_desc)
 
         self.spacing = spacing
         self.action_frames = action_frames
@@ -202,15 +202,15 @@ class PygameEntity(fabula.Entity):
 
         return
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """Call base class and update caption changes.
         """
 
         # Call base class
         #
-        fabula.Entity.process_ChangeStateEvent(self, event)
+        fabula.Entity.process_ChangePropertyEvent(self, event)
 
-        if self.asset is not None and event.state_key == "caption":
+        if self.asset is not None and event.property_key == "caption":
 
             # Do we already have a caption?
             #
@@ -219,7 +219,7 @@ class PygameEntity(fabula.Entity):
                 # Is there enough space?
                 # TODO: arbitrary width formula
                 #
-                if self.caption_plane.rect.width < len(event.state_value) * 10:
+                if self.caption_plane.rect.width < len(event.property_value) * 10:
 
                     # Destroy existing caption
                     #
@@ -229,20 +229,20 @@ class PygameEntity(fabula.Entity):
                     # Call this method again, it will create a new Label.
                     # Clever, eh? ;-)
                     #
-                    self.process_ChangeStateEvent(event)
+                    self.process_ChangePropertyEvent(event)
 
                 else:
                     # Then only change the text.
                     # Should be made visible with the next call to update().
                     #
-                    self.caption_plane.text = event.state_value
+                    self.caption_plane.text = event.property_value
 
             else:
                 # Create a new caption Label
                 # TODO: arbitrary width formula
                 #
                 self.caption_plane = clickndrag.gui.OutlinedText(self.identifier + "_caption",
-                                                                 event.state_value)
+                                                                 event.property_value)
 
             self.display_caption()
 
@@ -1083,7 +1083,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-    def process_ChangeStateEvent(self, event):
+    def process_ChangePropertyEvent(self, event):
         """Call base class, update caption changes, then display a single frame to show the result.
         """
 
@@ -1091,20 +1091,20 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Call base class
         #
-        fabula.plugins.ui.UserInterface.process_ChangeStateEvent(self, event)
+        fabula.plugins.ui.UserInterface.process_ChangePropertyEvent(self, event)
 
         # In the case of a caption change, the asset may not have been fetched
-        # when the Entity processed the state change in the Engine's loop.
+        # when the Entity processed the property change in the Engine's loop.
         #
         entity = self.host.room.entity_dict[event.identifier]
 
         if entity.asset is not None \
-           and event.state_key == "caption" \
+           and event.property_key == "caption" \
            and not "caption" in entity.asset.subplanes_list:
 
             self.logger.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
 
-            entity.process_ChangeStateEvent(event)
+            entity.process_ChangePropertyEvent(event)
 
         return
 
@@ -1438,14 +1438,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             for identifier in self.host.room.entity_locations.keys():
 
-                if self.host.room.entity_dict[identifier].entity_type in (fabula.ITEM_BLOCK, fabula.ITEM_NOBLOCK):
+                entity = self.host.room.entity_dict[identifier]
+
+                if entity.entity_type == fabula.ITEM and entity.mobile:
 
                     if self.host.room.entity_locations[identifier] in surrounding_positions:
 
-                        self.host.room.entity_dict[identifier].asset.draggable = True
+                        entity.asset.draggable = True
 
                     else:
-                        self.host.room.entity_dict[identifier].asset.draggable = False
+                        entity.asset.draggable = False
 
         else:
             self.logger.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
@@ -1829,10 +1831,15 @@ class PygameEditor(PygameUserInterface):
                     for entity in self.host.room.floor_plan[(x, y)].entities:
 
                         # TODO: make sure commas are not present in the other strings
+                        # TODO: port to new Entity API
                         #
-                        entities_string = entities_string + "\t{},{},{}".format(entity.entity_type,
-                                                                                entity.identifier,
-                                                                                entity.asset_desc)
+                        argument_list = ",".join([entity.identifier,
+                                                 entity.entity_type,
+                                                 repr(entity.blocking),
+                                                 repr(entity.mobile),
+                                                 entity.asset_desc])
+
+                        entities_string = entities_string + "\t{}".format(argument_list)
 
                     roomfile.write("{}\t{}\t{}{}\n".format(repr((x, y)),
                                                            tile.tile_type,
@@ -1851,9 +1858,11 @@ class PygameEditor(PygameUserInterface):
                 # Create a new Entity which can be pickled by Event loggers
                 # TODO: still necessary?
                 #
-                entity = fabula.Entity(self.host.room.entity_dict[identifier].entity_type,
-                                      identifier,
-                                      self.host.room.entity_dict[identifier].asset_desc)
+                entity = fabula.Entity(identifier,
+                                       self.host.room.entity_dict[identifier].entity_type,
+                                       self.host.room.entity_dict[identifier].blocking,
+                                       self.host.room.entity_dict[identifier].mobile,
+                                       self.host.room.entity_dict[identifier].asset_desc)
 
                 event = fabula.SpawnEvent(entity,
                                          self.host.room.entity_locations[identifier])
@@ -1911,9 +1920,11 @@ class PygameEditor(PygameUserInterface):
 
             if image is not None:
 
-                entity = fabula.Entity(fabula.ITEM_BLOCK,
-                                      item_identifier,
-                                      filename)
+                entity = fabula.Entity(identifier = item_identifier,
+                                       entity_type = fabula.ITEM,
+                                       blocking = True,
+                                       mobile = True,
+                                       asset_desc = filename)
 
                 self.logger.debug("appending SpawnEvent and PicksUpEvent")
 
@@ -2162,6 +2173,20 @@ class PygameEditor(PygameUserInterface):
                                                             pygame.Rect((0, 0), (80, 25)),
                                                             background_color = (120, 120, 120)))
 
+            # Entity.blocking
+            #
+            self.window.properties.sub(clickndrag.gui.Label("blocking",
+                                                            {True: "block", False: "no-block"}[entity.blocking],
+                                                            pygame.Rect((0, 0), (80, 25)),
+                                                            background_color = (120, 120, 120)))
+
+            # Entity.mobile
+            #
+            self.window.properties.sub(clickndrag.gui.Label("mobile",
+                                                            {True: "mobile", False: "immobile"}[entity.mobile],
+                                                            pygame.Rect((0, 0), (80, 25)),
+                                                            background_color = (120, 120, 120)))
+
             # Logic
             #
             self.window.properties.sub(clickndrag.gui.Button("Edit Logic",
@@ -2198,7 +2223,7 @@ class PygameEditor(PygameUserInterface):
         # TODO: "Change Map Element"
         # TODO: "Delete"
         # TODO: "Spawn"
-        # TODO: ChangeStateEvent
+        # TODO: ChangePropertyEvent
         # TODO: ManipulatesEvent
         # TODO: EnterRoomEvent
         # TODO: RoomCompleteEvent
