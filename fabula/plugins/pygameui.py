@@ -139,7 +139,7 @@ class PygameEntity(fabula.Entity):
            Initially None.
     """
 
-    def __init__(entity_type, identifier, asset_desc, spacing, action_frames):
+    def __init__(identifier, entity_type, blocking, mobile, asset_desc, spacing, action_frames):
         """Initialise.
            spacing is the spacing between tiles.
            action_frames is the number of frames per action.
@@ -147,7 +147,7 @@ class PygameEntity(fabula.Entity):
 
         # Call base class
         #
-        fabula.Entity.__init__(self, entity_type, identifier, asset_desc)
+        fabula.Entity.__init__(self, identifier, entity_type, blocking, mobile, asset_desc)
 
         self.spacing = spacing
         self.action_frames = action_frames
@@ -1438,14 +1438,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             for identifier in self.host.room.entity_locations.keys():
 
-                if self.host.room.entity_dict[identifier].entity_type in (fabula.ITEM_BLOCK, fabula.ITEM_NOBLOCK):
+                entity = self.host.room.entity_dict[identifier]
+
+                if entity.entity_type == fabula.ITEM and entity.mobile:
 
                     if self.host.room.entity_locations[identifier] in surrounding_positions:
 
-                        self.host.room.entity_dict[identifier].asset.draggable = True
+                        entity.asset.draggable = True
 
                     else:
-                        self.host.room.entity_dict[identifier].asset.draggable = False
+                        entity.asset.draggable = False
 
         else:
             self.logger.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
@@ -1829,10 +1831,15 @@ class PygameEditor(PygameUserInterface):
                     for entity in self.host.room.floor_plan[(x, y)].entities:
 
                         # TODO: make sure commas are not present in the other strings
+                        # TODO: port to new Entity API
                         #
-                        entities_string = entities_string + "\t{},{},{}".format(entity.entity_type,
-                                                                                entity.identifier,
-                                                                                entity.asset_desc)
+                        argument_list = ",".join([entity.identifier,
+                                                 entity.entity_type,
+                                                 repr(entity.blocking),
+                                                 repr(entity.mobile),
+                                                 entity.asset_desc])
+
+                        entities_string = entities_string + "\t{}".format(argument_list)
 
                     roomfile.write("{}\t{}\t{}{}\n".format(repr((x, y)),
                                                            tile.tile_type,
@@ -1851,9 +1858,11 @@ class PygameEditor(PygameUserInterface):
                 # Create a new Entity which can be pickled by Event loggers
                 # TODO: still necessary?
                 #
-                entity = fabula.Entity(self.host.room.entity_dict[identifier].entity_type,
-                                      identifier,
-                                      self.host.room.entity_dict[identifier].asset_desc)
+                entity = fabula.Entity(identifier,
+                                       self.host.room.entity_dict[identifier].entity_type,
+                                       self.host.room.entity_dict[identifier].blocking,
+                                       self.host.room.entity_dict[identifier].mobile,
+                                       self.host.room.entity_dict[identifier].asset_desc)
 
                 event = fabula.SpawnEvent(entity,
                                          self.host.room.entity_locations[identifier])
@@ -1911,9 +1920,11 @@ class PygameEditor(PygameUserInterface):
 
             if image is not None:
 
-                entity = fabula.Entity(fabula.ITEM_BLOCK,
-                                      item_identifier,
-                                      filename)
+                entity = fabula.Entity(identifier = item_identifier,
+                                       entity_type = fabula.ITEM,
+                                       blocking = True,
+                                       mobile = True,
+                                       asset_desc = filename)
 
                 self.logger.debug("appending SpawnEvent and PicksUpEvent")
 
@@ -2159,6 +2170,20 @@ class PygameEditor(PygameUserInterface):
             #
             self.window.properties.sub(clickndrag.gui.Label("entity_type",
                                                             entity.entity_type,
+                                                            pygame.Rect((0, 0), (80, 25)),
+                                                            background_color = (120, 120, 120)))
+
+            # Entity.blocking
+            #
+            self.window.properties.sub(clickndrag.gui.Label("blocking",
+                                                            {True: "block", False: "no-block"}[entity.blocking],
+                                                            pygame.Rect((0, 0), (80, 25)),
+                                                            background_color = (120, 120, 120)))
+
+            # Entity.mobile
+            #
+            self.window.properties.sub(clickndrag.gui.Label("mobile",
+                                                            {True: "mobile", False: "immobile"}[entity.mobile],
                                                             pygame.Rect((0, 0), (80, 25)),
                                                             background_color = (120, 120, 120)))
 

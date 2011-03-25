@@ -533,13 +533,13 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
                 for entity in floor_plan_element.entities:
 
-                    if entity.entity_type == fabula.ITEM_BLOCK:
+                    if entity.blocking:
 
                         occupied = True
 
                 if occupied:
 
-                    self.logger.debug("{} not walkable: target occupied by fabula.ITEM_BLOCK".format(target_identifier))
+                    self.logger.debug("{} not walkable: target occupied by blocking Entity".format(target_identifier))
 
                     return False
 

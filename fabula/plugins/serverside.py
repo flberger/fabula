@@ -84,9 +84,27 @@ def load_room_from_file(filename, complete = True):
 
             for comma_sep_entity in splitted_line:
 
-                entity_type, identifier, asset_desc = comma_sep_entity.split(",")
+                identifier, entity_type, blocking, mobile, asset_desc = comma_sep_entity.split(",")
 
-                entity = fabula.Entity(entity_type, identifier, asset_desc)
+                if blocking in ("True", "False"):
+
+                    blocking = eval(blocking)
+
+                else:
+                    blocking = "False"
+
+                if mobile in ("True", "False"):
+
+                    mobile = eval(mobile)
+
+                else:
+                    mobile = "True"
+
+                entity = fabula.Entity(identifier,
+                                       entity_type,
+                                       blocking,
+                                       mobile,
+                                       asset_desc)
 
                 event_list.append(fabula.SpawnEvent(entity, coordinates))
 
@@ -748,7 +766,11 @@ class Editor(DefaultGame):
                     event = fabula.ChangeMapElementEvent(tile, (x, y))
                     self.message_for_host.event_list.append(event)
 
-            entity = fabula.Entity(fabula.PLAYER, "player", "player.png")
+            entity = fabula.Entity(identifier = "player",
+                                   entity_type = fabula.PLAYER,
+                                   blocking = False,
+                                   mobile = False,
+                                   asset_desc = "player.png")
 
             self.message_for_host.event_list.append(fabula.SpawnEvent(entity,
                                                                      (0, 0)))

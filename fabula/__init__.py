@@ -721,8 +721,7 @@ class Entity(fabula.eventprocessor.EventProcessor):
            identification.
 
        Entity.entity_type
-           One of fabula.PLAYER, fabula.NPC, fabula.ITEM_BLOCK or
-           fabula.ITEM_NOBLOCK.
+           One of fabula.PLAYER, fabula.NPC or fabula.ITEM.
 
        Entity.blocking
            Boolean flag, indicating whether the Entity blocks a location for

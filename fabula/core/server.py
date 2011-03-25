@@ -508,7 +508,7 @@ class Server(fabula.core.Engine):
 
             for entity in self.room.floor_plan[event.target_identifier].entities:
 
-                if entity.entity_type in [fabula.ITEM_BLOCK, fabula.ITEM_NOBLOCK]:
+                if entity.entity_type == fabula.ITEM:
 
                     new_event = fabula.TriesToManipulateEvent(event.identifier,
                                                              entity.identifier)
@@ -534,8 +534,6 @@ class Server(fabula.core.Engine):
         """Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
         """
 
-        # TODO: duplicate from TriesToManipulateEvent
-
         self.logger.debug("called")
 
         new_event = None
@@ -548,7 +546,7 @@ class Server(fabula.core.Engine):
             #
             for entity in self.room.floor_plan[event.target_identifier].entities:
 
-                if entity.entity_type in [fabula.ITEM_BLOCK, fabula.ITEM_NOBLOCK]:
+                if entity.entity_type == fabula.ITEM and entity.mobile:
 
                     self.logger.debug("trying to pick up '{}' at {}".format(entity.identifier,
                                                                             event.target_identifier))
@@ -556,7 +554,7 @@ class Server(fabula.core.Engine):
                     new_event = fabula.TriesToPickUpEvent(event.identifier,
                                                          entity.identifier)
 
-        if new_event == None:
+        if new_event is None:
 
             # Nothing to pick up.
             # Issue AttemptFailed to unblock client.
