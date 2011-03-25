@@ -35,7 +35,7 @@ import glob
 import os.path
 
 PACKAGE = "fabula"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 INCLUDE_FILES = ["scripts/100x100-gray.png",
                  "scripts/attempt_look_at.png",

@@ -1,6 +1,18 @@
 NEWS for Fabula
 ===============
 
+0.4.0
+-----
+
+Released on 25 March 2011.
+
+Added Entity.blocking and Entity.mobile flags, to be evaluated by the server 
+when processing attempt events. Code processing pick up attempts now checks 
+whether Entity.mobile is True. Improved pathfinding, preventing entities from 
+wandering around when the target is blocked. Minor fixes and documentation 
+update.
+
+
 0.3.0
 -----
 
