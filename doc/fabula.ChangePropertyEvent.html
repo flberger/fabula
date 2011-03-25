@@ -3,44 +3,45 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.SaysEvent&rdquo;</title>
+    <title>API docs for &ldquo;fabula.ChangePropertyEvent&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.SaysEvent(<a href="fabula.Event.html">Event</a>):</h1>
+    <h1 class="class">Class f.ChangePropertyEvent(<a href="fabula.Event.html">Event</a>):</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a></span>
       
-      <a href="classIndex.html#fabula.SaysEvent">View In Hierarchy</a>
+      <a href="classIndex.html#fabula.ChangePropertyEvent">View In Hierarchy</a>
     </p>
     <div>
       
     </div>
-    <pre>This normally is a reaction to the CanSpeakEvent, to be sent by the player.
-NPCs can speak spontanously, in that case a SaysEvent is issued by he
-Story Engine. Players usually have to send an TriesToTalkToEvent before
-they are allowed to speak.
+    <pre>This Event is issued to trigger a property change.
+Each instance of fabula.Entity has a property.
 
-SaysEvent.identifier
-    identifier of the speaking Entity
+ChangePropertyEvent.identifier
+    identifier of the Entity to change property
 
-SaysEvent.text
-    A string to be spoken by the entity</pre>
+ChangePropertyEvent.property_key
+    A string giving the name of the property.
+
+ChangePropertyEvent.property_value
+    A string giving the value of the property.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id71">
+      <table class="children sortable" id="id73">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.SaysEvent.html#__init__">__init__</a></td>
+    <td><a href="fabula.ChangePropertyEvent.html#__init__">__init__</a></td>
     <td><tt>Event initialisation.</tt></td>
   </tr>
   
@@ -49,7 +50,7 @@ SaysEvent.text
         <p>
           Inherited from <a href="fabula.Event.html">Event</a>:
         </p>
-        <table class="children sortable" id="id72">
+        <table class="children sortable" id="id74">
   
   
 <tr class="basemethod">
@@ -81,7 +82,7 @@ SaysEvent.text
     
 
     <div class="function">
-  <a name="fabula.SaysEvent.__init__">
+  <a name="fabula.ChangePropertyEvent.__init__">
     
   </a>
   <a name="__init__">
@@ -90,13 +91,14 @@ SaysEvent.text
   <div class="functionHeader">
     
     def
-    __init__(self, identifier, text):
+    __init__(self, identifier, property_key, property_value):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.Event.html#__init__">fabula.Event.__init__</a></div>
     <pre>Event initialisation.
-text is a string to be spoken by the entity.</pre>
+property is a new property for the Entity identified by identifier.
+property_key and property_value must be strings.</pre>
   </div>
 </div>
     <address>

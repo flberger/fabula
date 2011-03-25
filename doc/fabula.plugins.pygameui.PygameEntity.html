@@ -21,8 +21,8 @@
     </div>
     <pre>Pygame-aware subclass of Entity to be used in PygameUserInterface.
 
-PygameEntities support the key "caption" in the PygameEntity.state dict.
-The value of PygameEntity.state["caption"] will be displayed above the
+PygameEntities support the key "caption" in PygameEntity.property_dict.
+The value of PygameEntity.property_dict["caption"] will be displayed above the
 PygameEntity.
 
 Additional attributes:
@@ -40,7 +40,7 @@ PygameEntity.caption_plane
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id87">
+      <table class="children sortable" id="id29">
   
   
 <tr class="method">
@@ -59,7 +59,7 @@ PygameEntity.caption_plane
     
     
     <td>Method</td>
-    <td><a href="fabula.plugins.pygameui.PygameEntity.html#process_ChangeStateEvent">process_ChangeStateEvent</a></td>
+    <td><a href="fabula.plugins.pygameui.PygameEntity.html#process_ChangePropertyEvent">process_ChangePropertyEvent</a></td>
     <td><tt>Call base class and update caption changes.</tt></td>
   </tr><tr class="method">
     
@@ -74,7 +74,7 @@ PygameEntity.caption_plane
         <p>
           Inherited from <a href="fabula.Entity.html">Entity</a>:
         </p>
-        <table class="children sortable" id="id88">
+        <table class="children sortable" id="id30">
   
   
 <tr class="basemethod">
@@ -112,155 +112,7 @@ PygameEntity.caption_plane
     
     <td>Method</td>
     <td><a href="fabula.Entity.html#__str__">__str__</a></td>
-    <td><tt>Informal string representation, including state and asset.</tt></td>
-  </tr>
-  
-</table>
-      
-        <p>
-          Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.Entity.html">Entity</a>):
-        </p>
-        <table class="children sortable" id="id89">
-  
-  
-<tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
-    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
-    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Informal string representation, including property_dict and asset.</tt></td>
   </tr>
   
 </table>
@@ -281,7 +133,7 @@ PygameEntity.caption_plane
   <div class="functionHeader">
     
     def
-    __init__(entity_type, identifier, asset_desc, spacing, action_frames):
+    __init__(identifier, entity_type, blocking, mobile, asset_desc, spacing, action_frames):
     
   </div>
   <div class="functionBody">
@@ -309,20 +161,20 @@ action_frames is the number of frames per action.</pre>
         </pre>
   </div>
 </div><div class="function">
-  <a name="fabula.plugins.pygameui.PygameEntity.process_ChangeStateEvent">
+  <a name="fabula.plugins.pygameui.PygameEntity.process_ChangePropertyEvent">
     
   </a>
-  <a name="process_ChangeStateEvent">
+  <a name="process_ChangePropertyEvent">
     
   </a>
   <div class="functionHeader">
     
     def
-    process_ChangeStateEvent(self, event):
+    process_ChangePropertyEvent(self, event):
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.Entity.html#process_ChangeStateEvent">fabula.Entity.process_ChangeStateEvent</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.Entity.html#process_ChangePropertyEvent">fabula.Entity.process_ChangePropertyEvent</a></div>
     <pre>Call base class and update caption changes.
         </pre>
   </div>
@@ -346,7 +198,7 @@ action_frames is the number of frames per action.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-23 17:20:44.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-25 17:09:17.
     </address>
   </body>
 </html>
