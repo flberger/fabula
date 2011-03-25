@@ -539,6 +539,15 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 possible_moves.append(possible_move)
 
+            elif possible_move == target_identifier:
+
+                # This means we are next to the target, but it is either
+                # forbidden or blocked by an entity. Don't go wandering, stop.
+                #
+                self.logger.debug("next to target {}, but target is blocked. Stopping movement.".format(target_identifier))
+
+                return None
+
         if len(possible_moves) == 0:
 
             return None
