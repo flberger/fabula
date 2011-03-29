@@ -11,7 +11,7 @@ Asset Manager
     >>> import fabula.assets
     >>> import fabula.run
     >>> app = fabula.run.App("i", timeout = 5)
-    >>> assets = fabula.assets.Assets(app.logger)
+    >>> assets = fabula.assets.Assets()
     >>> asset = assets.fetch("temp.dat")
     >>> asset.read()
     b'fabula'

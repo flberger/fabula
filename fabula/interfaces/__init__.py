@@ -62,9 +62,6 @@ class Interface:
                clients) or where to listen for client messages (for the server),
                for example a tuple (ip_address, port). Set in __init__().
 
-           Interface.logger
-               Given in __init__().
-
            Interface.connections
                A dict of connector objects mapping to MessageBuffer instances.
 
@@ -73,13 +70,9 @@ class Interface:
                Flags for shutdown handling.
     """
 
-    def __init__(self, logger):
+    def __init__(self):
         """Initialisation.
         """
-
-        # Attach logger
-        #
-        self.logger = logger
 
         # connections is a dict of MessageBuffer
         # instances, indexed by connectors.
@@ -95,7 +88,7 @@ class Interface:
         #
         self.shutdown_confirmed = False
 
-        self.logger.debug("complete")
+        fabula.LOGGER.debug("complete")
 
     def connect(self, connector):
         """Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
@@ -108,7 +101,7 @@ class Interface:
            MessageBuffer.
         """
 
-        self.logger.warning("this is a dummy implementation, not actually connecting to '{}'".format(connector))
+        fabula.LOGGER.warning("this is a dummy implementation, not actually connecting to '{}'".format(connector))
 
         self.connections[connector] = MessageBuffer()
 
@@ -132,7 +125,7 @@ class Interface:
            shutdown as described.
         """
 
-        self.logger.info("starting up")
+        fabula.LOGGER.info("starting up")
 
         # Run thread as long as no shutdown is requested
         #
@@ -144,7 +137,7 @@ class Interface:
 
         # Caught shutdown notification, stopping thread
         #
-        self.logger.info("shutting down")
+        fabula.LOGGER.info("shutting down")
 
         self.shutdown_confirmed = True
 
@@ -158,7 +151,7 @@ class Interface:
            notification and is about to exit.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Set the flag to be caught by handle_messages()
         #
@@ -225,17 +218,17 @@ class StandaloneInterface(Interface):
     """An Interface that is meant to be used in conjunction with run.App.run_standalone().
     """
 
-    def __init__(self, logger, framerate):
+    def __init__(self, framerate):
         """Initialise.
         """
 
         # Call base class
         #
-        Interface.__init__(self, logger)
+        Interface.__init__(self)
 
         self.framerate = framerate
 
-        self.logger.debug("complete")
+        fabula.LOGGER.debug("complete")
 
     def handle_messages(self, remote_message_buffer):
         """This background thread method transfers messages between local and remote MessageBuffer.
@@ -243,7 +236,7 @@ class StandaloneInterface(Interface):
            of the original ones.
         """
 
-        self.logger.info("starting up")
+        fabula.LOGGER.info("starting up")
 
         # Run thread as long as no shutdown is requested
         #
@@ -264,7 +257,7 @@ class StandaloneInterface(Interface):
                         # These need special care. We need to have a canonic
                         # fabula.Entity. Entity.clone() will produce one.
                         #
-                        self.logger.debug("cloning canonical Entity from {}".format(event.entity))
+                        fabula.LOGGER.debug("cloning canonical Entity from {}".format(event.entity))
 
                         event = fabula.SpawnEvent(event.entity.clone(),
                                                   event.location)
@@ -272,7 +265,7 @@ class StandaloneInterface(Interface):
                     # Create new instances from string representations to avoid
                     # concurrent access of client and server to the object
                     #
-                    self.logger.debug("evaluating: '{}'".format(repr(event)))
+                    fabula.LOGGER.debug("evaluating: '{}'".format(repr(event)))
 
                     try:
                         new_message.event_list.append(eval(repr(event)))
@@ -282,7 +275,7 @@ class StandaloneInterface(Interface):
                         # Well, well, well. Some __repr__ does not return a
                         # string that can be evaluated here!
                         #
-                        self.logger.error("error: can not evaluate '{}', skipping".format(repr(event)))
+                        fabula.LOGGER.error("error: can not evaluate '{}', skipping".format(repr(event)))
 
                 # Blindly use the first connection
                 #
@@ -297,7 +290,7 @@ class StandaloneInterface(Interface):
 
         # Caught shutdown notification, stopping thread
         #
-        self.logger.info("shutting down")
+        fabula.LOGGER.info("shutting down")
 
         self.shutdown_confirmed = True
 
@@ -346,7 +339,7 @@ class StandaloneInterface(Interface):
 #        #
 #        self.sock.settimeout(0.3)
 
-#        self.logger.debug("complete")
+#        fabula.LOGGER.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
@@ -359,7 +352,7 @@ class StandaloneInterface(Interface):
 #           True), and then raise SystemExit to stop the thread.
 #        """
 
-#        self.logger.info("starting up")
+#        fabula.LOGGER.info("starting up")
 
 #        # Run thread as long as no shutdown is requested
 #        #
@@ -367,7 +360,7 @@ class StandaloneInterface(Interface):
 
 #            if self.messages_for_remote:
 
-#                self.logger.info("sending 1 message of " + str(len(self.messages_for_remote)))
+#                fabula.LOGGER.info("sending 1 message of " + str(len(self.messages_for_remote)))
 
 #                # -1 = use highest available pickle protocol
 #                #
@@ -399,7 +392,7 @@ class StandaloneInterface(Interface):
 
 #                # TODO: accepts data from *anywhere*
 
-#                self.logger.info("received server message ("
+#                fabula.LOGGER.info("received server message ("
 #                                  + str(len(data_received))
 #                                  + "/16384 bytes)")
 
@@ -407,7 +400,7 @@ class StandaloneInterface(Interface):
 
 #        # Caught shutdown notification, stopping thread
 #        #
-#        self.logger.info("shutting down")
+#        fabula.LOGGER.info("shutting down")
 
 #        self.shutdown_confirmed = True
 
@@ -436,7 +429,7 @@ class StandaloneInterface(Interface):
 #        #
 #        self.client_connections = {}
 
-#        self.logger.debug("complete")
+#        fabula.LOGGER.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
@@ -449,7 +442,7 @@ class StandaloneInterface(Interface):
 #           True), and then raise SystemExit to stop the thread.
 #        """
 
-#        self.logger.info("starting up")
+#        fabula.LOGGER.info("starting up")
 
 #        client_connections_proxy = self.client_connections
 #        logger_proxy = self.logger
@@ -518,7 +511,7 @@ class StandaloneInterface(Interface):
 
 #                if message_buffer.messages_for_remote:
 
-#                    self.logger.info("sending 1 message of "
+#                    fabula.LOGGER.info("sending 1 message of "
 #                                      + str(len(message_buffer.messages_for_remote))
 #                                      + " to client "
 #                                      + str(address_port_tuple))
@@ -530,7 +523,7 @@ class StandaloneInterface(Interface):
 
 #        # Caught shutdown notification, stopping thread
 #        #
-#        self.logger.info("shutting down")
+#        fabula.LOGGER.info("shutting down")
 
 #        self.shutdown_confirmed = True
 
@@ -565,14 +558,14 @@ class StandaloneInterface(Interface):
 
 #        self.connection_made = False
 
-#        self.logger.debug("complete")
+#        fabula.LOGGER.debug("complete")
 
 #    def connectionMade(self):
 #        """Standard Twisted Protocol method.
 #           Now ProtocolMessageBuffer.transport is ready to be used.
 #        """
 
-#        self.logger.debug("called")
+#        fabula.LOGGER.debug("called")
 
 #        self.connection_made = True
 
@@ -587,7 +580,7 @@ class StandaloneInterface(Interface):
 #        #   this method with differing chunk sises, down to
 #        #   one byte at a time."
 
-#        self.logger.info("received message: %s characters" % len(data))
+#        fabula.LOGGER.info("received message: %s characters" % len(data))
 
 #        # Keep buffering data until we find a
 #        # dot (the pickle STOP opcode) followed
@@ -609,7 +602,7 @@ class StandaloneInterface(Interface):
 
 #            self.data_buffer = self.data_buffer[double_newline_index + 3:]
 
-#            self.logger.info("message complete at %s characters, %s left in buffer"
+#            fabula.LOGGER.info("message complete at %s characters, %s left in buffer"
 #                               % (len(message),
 #                                  len(self.data_buffer)))
 
@@ -628,7 +621,7 @@ class StandaloneInterface(Interface):
 
 #        if self.connection_made and self.messages_for_remote:
 
-#            self.logger.info("sending 1 message of %s to %s"
+#            fabula.LOGGER.info("sending 1 message of %s to %s"
 #                              % (len(self.messages_for_remote),
 #                                 address_port_tuple))
 
@@ -643,7 +636,7 @@ class StandaloneInterface(Interface):
 
 #            self.transport.write(pickled_message + "\n\n")
 
-#            self.logger.info("sent %s characters" % len(pickled_message))
+#            fabula.LOGGER.info("sent %s characters" % len(pickled_message))
 
 #class TCPInterface(Interface):
 #    """A generic Fabula Interface using TCP, built upon the Twisted framework.
@@ -666,7 +659,7 @@ class StandaloneInterface(Interface):
 
 #        self.send_interval = send_interval
 
-#        self.logger.debug("complete")
+#        fabula.LOGGER.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
@@ -681,7 +674,7 @@ class StandaloneInterface(Interface):
 
 #        # TODO: remove connections that caused an error?
 
-#        self.logger.info("starting up")
+#        fabula.LOGGER.info("starting up")
 
 #        # We do all the Twisted setup here so
 #        # class instances can use the proxies
@@ -735,7 +728,7 @@ class StandaloneInterface(Interface):
 
 #            if self.shutdown_flag:
 
-#                self.logger.info("caught shutdown_flag, closing connection and stopping reactor")
+#                fabula.LOGGER.info("caught shutdown_flag, closing connection and stopping reactor")
 
 #                self.shutdown_confirmed = True
 
@@ -775,14 +768,14 @@ class StandaloneInterface(Interface):
 #        #
 #        if self.interface_type == "client":
 
-#            self.logger.info("running in client mode")
+#            fabula.LOGGER.info("running in client mode")
 
 #            twisted.internet.reactor.connectTCP(self.address_port_tuple[0],
 #                                                self.address_port_tuple[1],
 #                                                MessageProtocolFactory())
 #        else:
 
-#            self.logger.info("running in server mode")
+#            fabula.LOGGER.info("running in server mode")
 
 #            twisted.internet.reactor.listenTCP(self.address_port_tuple[1],
 #                                               MessageProtocolFactory(),
@@ -797,6 +790,6 @@ class StandaloneInterface(Interface):
 
 #        # twisted.internet.reactor.run() returned
 #        #
-#        self.logger.info("connection closed, reactor stopped, stopping thread")
+#        fabula.LOGGER.info("connection closed, reactor stopped, stopping thread")
 
 #        raise SystemExit

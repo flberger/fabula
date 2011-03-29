@@ -40,40 +40,10 @@ import sys
 import traceback
 import re
 
-class FabulaFileFormatter(logging.Formatter):
-    """Subclass of Formatter with reasonable module information.
-    """
-
-    def __init__(self, fmt, datefmt):
-        """Compile a regular expression object, then call base class __init__().
-        """
-        logging.Formatter.__init__(self, fmt, datefmt)
-
-        self.module_re = re.compile("^.*fabula/([^/]+/)*?([^/]+)(/__init__)*.py$")
-
-    def format(self, record):
-        """Override logging.Formatter.format()
-        """
-
-        # Reformat path to module information
-        #
-        record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
-
-        # Fixed-length line number
-        #
-        #record.lineno = "{:3}".format(record.lineno)
-
-        # Call base class implementation
-        #
-        return logging.Formatter.format(self, record)
-
 class App:
     """An App instance represents a Fabula client or server application.
 
        Attributes:
-
-       App.logger
-           Supply this to other instances of Fabula classes.
 
        App.assets_class
            Class of the asset engine to be used.
@@ -102,65 +72,15 @@ class App:
            will run for an unlimited time.
         """
 
-        ### Set up logging
-
-        self.logger = logging.getLogger()
-
+        # Set up logger level, now that we know it
+        #
         leveldict = {"d" : logging.DEBUG,
                      "i" : logging.INFO,
                      "w" : logging.WARNING,
                      "e" : logging.ERROR,
                      "c" : logging.CRITICAL}
 
-        self.logger.setLevel(leveldict[loglevel])
-
-        # STDERR console handler
-        #
-        # Creating an instance without arguments defaults to STDERR.
-        #
-        self.stderr_handler = logging.StreamHandler()
-
-        self.stderr_handler.setLevel(leveldict[loglevel])
-
-        # Loglevel:
-        # "\x1b\x5b\x33\x32\x6d"
-        # + "%(levelname)-5s "
-        # + "\x1b\x5b\x33\x39\x6d"
-
-        # Fancy coloring for Unix terminals:
-        #stderr_formatter = logging.Formatter("\x1b\x5b\x33\x36\x6d"
-        #                                     + "%(funcName)s() "
-        #                                     + "\x1b\x5b\x33\x39\x6d"
-        #                                     + "%(message)s")
-
-        stderr_formatter = logging.Formatter("%(funcName)s() %(message)s")
-
-        self.stderr_handler.setFormatter(stderr_formatter)
-
-        # File handler
-        #
-        # TODO: Different file names for client and server?
-        # TODO: Checking for existing file, creating a new one?
-        #
-        self.file_handler = logging.FileHandler(filename = "fabula.log",
-                                           mode = "w")
-
-        self.file_handler.setLevel(leveldict[loglevel])
-
-        # Loglevel:
-        # + "%(levelname)-5s "
-
-        file_formatter = FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s (l.%(lineno)s)",
-                                             "%Y-%m-%d %H:%M:%S")
-
-        self.file_handler.setFormatter(file_formatter)
-
-        # Add handlers
-        #
-        self.logger.addHandler(self.stderr_handler)
-        self.logger.addHandler(self.file_handler)
-
-        # Done with logging setup.
+        fabula.LOGGER.setLevel(leveldict[loglevel])
 
         self.timeout = timeout
 
@@ -172,13 +92,12 @@ class App:
         """Run a Fabula client with the parameters given.
         """
 
-        self.logger.info("running in client mode")
-        self.logger.info("running with framerate {}/s".format(framerate))
+        fabula.LOGGER.info("running in client mode")
+        fabula.LOGGER.info("running with framerate {}/s".format(framerate))
 
-        assets = self.assets_class(self.logger)
+        assets = self.assets_class()
 
-        client = fabula.core.client.Client(interface,
-                                           self.logger)
+        client = fabula.core.client.Client(interface)
 
         plugin = self.user_interface_class(assets,
                                            framerate,
@@ -202,14 +121,13 @@ class App:
         """Run a Fabula server with the parameters given.
         """
 
-        self.logger.info("running in server mode")
-        self.logger.info("running with interval (framerate) {}/s".format(framerate))
+        fabula.LOGGER.info("running in server mode")
+        fabula.LOGGER.info("running with interval (framerate) {}/s".format(framerate))
 
         # Since the Server will run in the main thread, signal handlers can
         # be installed.
         #
         server = fabula.core.server.Server(interface,
-                                          self.logger,
                                           framerate,
                                           action_time,
                                           threadsafe = False)
@@ -254,34 +172,31 @@ class App:
         # Explicitly remove handlers to avoid multiple handlers
         # when recreating the instance.
         #
-        self.logger.removeHandler(self.stderr_handler)
-        self.logger.removeHandler(self.file_handler)
+        fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
+        fabula.LOGGER.removeHandler(fabula.FILE_HANDLER)
         logging.shutdown()
 
     def run_standalone(self, framerate, action_time, fullscreen = False):
         """Run Fabula client and server on the local machine.
         """
 
-        self.logger.info("running in standalone mode, logging client and server")
-        self.logger.info("running with framerate {}/s".format(framerate))
+        fabula.LOGGER.info("running in standalone mode, logging client and server")
+        fabula.LOGGER.info("running with framerate {}/s".format(framerate))
 
         # Setting up interfaces
         #
-        server_interface = fabula.interfaces.StandaloneInterface(self.logger,
-                                                                 framerate)
+        server_interface = fabula.interfaces.StandaloneInterface(framerate)
 
-        client_interface = fabula.interfaces.StandaloneInterface(self.logger,
-                                                                 framerate)
+        client_interface = fabula.interfaces.StandaloneInterface(framerate)
 
         server_interface.connect("client")
         client_interface.connect("server")
 
         # Setting up client
         #
-        assets = self.assets_class(self.logger)
+        assets = self.assets_class()
 
-        client = fabula.core.client.Client(client_interface,
-                                           self.logger)
+        client = fabula.core.client.Client(client_interface)
 
         user_interface = self.user_interface_class(assets,
                                                    framerate,
@@ -293,7 +208,6 @@ class App:
         # Setting up server
         #
         server = fabula.core.server.Server(server_interface,
-                                           self.logger,
                                            framerate,
                                            action_time,
                                            threadsafe = True)
@@ -351,25 +265,25 @@ class App:
 
         except:
             exception = traceback.format_exc()
-            self.logger.info("exception in client.run():\n{}".format(exception))
+            fabula.LOGGER.info("exception in client.run():\n{}".format(exception))
 
-        self.logger.info("client exited, calling server.handle_exit()")
+        fabula.LOGGER.info("client exited, calling server.handle_exit()")
         server.handle_exit(2, None)
 
-        self.logger.info("waiting for server thread to stop")
+        fabula.LOGGER.info("waiting for server thread to stop")
         server_thread.join()
 
-        self.logger.info("server thread stopped, shutting down logger")
+        fabula.LOGGER.info("server thread stopped, shutting down logger")
 
         if exception:
-            self.logger.info("exception in client.run() was:\n{}".format(exception))
+            fabula.LOGGER.info("exception in client.run() was:\n{}".format(exception))
 
-        self.logger.info("log file written to fabula.log")
+        fabula.LOGGER.info("log file written to fabula.log")
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
         # when recreating the instance.
         #
-        self.logger.removeHandler(self.stderr_handler)
-        self.logger.removeHandler(self.file_handler)
+        fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
+        fabula.LOGGER.removeHandler(fabula.FILE_HANDLER)
         logging.shutdown()

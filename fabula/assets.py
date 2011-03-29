@@ -25,6 +25,7 @@
 # in turn was based on the LocalFileAssetEngine from the CharanisMLClient
 # developed in May 2008.
 
+import fabula
 import os.path
 import glob
 import site
@@ -35,14 +36,14 @@ class Assets:
        It is used to retrieve media data - images, animations, 3D models, sound.
     """
 
-    def __init__(self, logger):
+    def __init__(self):
         """Initialise.
         """
 
-        self.logger = logger
-
         # TODO: Since an Assets instance is created only once, fetch() should do some asset caching (self.asset_dict) to prevent unnecessary file or network access. Problem: memory usage has to be limited. Probably use temporary files for downloaded assets?
         # TODO: Add a function to cache an object associated with an asset description.
+
+        return
 
     def fetch(self, asset_desc):
         """This method retrieves the file specified in asset_desc and returns a file-like object.
@@ -51,7 +52,7 @@ class Assets:
            This method actually is a dispatcher to more specialised methods.
         """
 
-        self.logger.debug("unknown asset '{}', attempting to fetch".format(asset_desc))
+        fabula.LOGGER.debug("unknown asset '{}', attempting to fetch".format(asset_desc))
 
         if (asset_desc.startswith("http://") or asset_desc.startswith("ftp://")):
 
@@ -71,7 +72,7 @@ class Assets:
 
         errormessage = ("Assets.fetch_uri() is not implemented")
 
-        self.logger.critical(errormessage)
+        fabula.LOGGER.critical(errormessage)
 
         raise Exception(errormessage)
 
@@ -87,7 +88,7 @@ class Assets:
 #
 #        for name in zip_file.namelist():
 #
-#            self.logger.info("retrieving %s from ZIP file %s" % (name, asset_desc))
+#            fabula.LOGGER.info("retrieving %s from ZIP file %s" % (name, asset_desc))
 #
 #            string_io = StringIO.StringIO(zip_file.read(name))
 #
@@ -104,7 +105,7 @@ class Assets:
 
         errormessage = ("Assets.fetch_zip_file() is not implemented")
 
-        self.logger.critical(errormessage)
+        fabula.LOGGER.critical(errormessage)
 
         raise Exception(errormessage)
 
@@ -172,16 +173,16 @@ class Assets:
 
                 errormessage = "Could not open asset: '{}'".format(asset_desc)
 
-                self.logger.critical(errormessage)
+                fabula.LOGGER.critical(errormessage)
 
                 raise Exception(errormessage)
 
                 return
 
-        self.logger.info("attempting to retrieve '{}' from local file".format(asset_desc))
+        fabula.LOGGER.info("attempting to retrieve '{}' from local file".format(asset_desc))
 
         file = open(asset_desc, mode='rb')
 
-        self.logger.debug("returning {}".format(file))
+        fabula.LOGGER.debug("returning {}".format(file))
 
         return file

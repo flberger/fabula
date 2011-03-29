@@ -161,7 +161,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         # Load default logic.
         #
-        self.logger.info("attempting to load default game logic")
+        fabula.LOGGER.info("attempting to load default game logic")
         self.load_condition_response_dict("default.logic")
 
         return
@@ -219,14 +219,14 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if event_str in self.condition_response_dict:
 
-            self.logger.info("returning corresponding events")
+            fabula.LOGGER.info("returning corresponding events")
 
             self.message_for_host.event_list.extend(self.replace_identifier(self.condition_response_dict[event_str],
                                                                             "player",
                                                                             event.identifier))
 
         else:
-            self.logger.info("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
+            fabula.LOGGER.info("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         return
@@ -251,17 +251,17 @@ class DefaultGame(fabula.plugins.Plugin):
 
             if location is None:
 
-                self.logger.warning("no possible move for '{}', removing from tries_to_move_dict".format(identifier))
+                fabula.LOGGER.warning("no possible move for '{}', removing from tries_to_move_dict".format(identifier))
 
                 del self.tries_to_move_dict[identifier]
                 del self.path_dict[identifier]
 
-                self.logger.warning("AttemptFailed for '{}'".format(identifier))
+                fabula.LOGGER.warning("AttemptFailed for '{}'".format(identifier))
                 event_list.append(fabula.AttemptFailedEvent(identifier))
 
             else:
-                self.logger.info("movement pending for '{}'".format(identifier))
-                self.logger.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
+                fabula.LOGGER.info("movement pending for '{}'".format(identifier))
+                fabula.LOGGER.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
 
                 # Save current position before movement as last position
                 #
@@ -271,7 +271,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 if location == target_identifier:
 
-                    self.logger.info("target reached, removing from tries_to_move_dict")
+                    fabula.LOGGER.info("target reached, removing from tries_to_move_dict")
 
                     del self.tries_to_move_dict[identifier]
                     del self.path_dict[identifier]
@@ -280,7 +280,7 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         if len(self.message_queue):
 
-            self.logger.info("adding events from message_queue")
+            fabula.LOGGER.info("adding events from message_queue")
 
             for message in self.message_queue.pop(0):
 
@@ -302,7 +302,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 if not isinstance(message, fabula.Message):
 
-                    self.logger.error("cannot queue {}: not a Message instance".format(message))
+                    fabula.LOGGER.error("cannot queue {}: not a Message instance".format(message))
 
                     # TODO: exit properly
                     #
@@ -312,7 +312,7 @@ class DefaultGame(fabula.plugins.Plugin):
             #
             messages = list(messages)
 
-            self.logger.debug("got {}".format(messages))
+            fabula.LOGGER.debug("got {}".format(messages))
 
             # First append to existing Message lists
             #
@@ -324,7 +324,7 @@ class DefaultGame(fabula.plugins.Plugin):
             #
             self.message_queue.extend([[message] for message in messages])
 
-            self.logger.debug("message_queue is now {}".format(self.message_queue))
+            fabula.LOGGER.debug("message_queue is now {}".format(self.message_queue))
 
         return
 
@@ -333,15 +333,15 @@ class DefaultGame(fabula.plugins.Plugin):
            Replace the Entity identifier "player" with event.identifier.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
-        self.logger.info("attempting to load 'default.floorplan'")
+        fabula.LOGGER.info("attempting to load 'default.floorplan'")
 
         event_list = load_room_from_file("default.floorplan")
 
         if event_list is None:
 
-            self.logger.error("error opening file 'default.floorplan'")
+            fabula.LOGGER.error("error opening file 'default.floorplan'")
 
         else:
 
@@ -357,7 +357,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if event.identifier in self.tries_to_move_dict.keys():
 
-            self.logger.debug("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
+            fabula.LOGGER.debug("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
                                                                             event.identifier))
 
             del self.tries_to_move_dict[event.identifier]
@@ -374,15 +374,15 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if location is None:
 
-            self.logger.warning("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
+            fabula.LOGGER.warning("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
 
-            self.logger.warning("AttemptFailed for '{}'".format(event.identifier))
+            fabula.LOGGER.warning("AttemptFailed for '{}'".format(event.identifier))
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
             msg = "movement requested for '{}', last positions, best move towards {} is {}"
 
-            self.logger.debug(msg.format(event.identifier,
+            fabula.LOGGER.debug(msg.format(event.identifier,
                                         event.target_identifier,
                                         location))
 
@@ -394,13 +394,13 @@ class DefaultGame(fabula.plugins.Plugin):
 
             if location == event.target_identifier:
 
-                self.logger.debug("target reached, not recording in tries_to_move_dict")
+                fabula.LOGGER.debug("target reached, not recording in tries_to_move_dict")
 
                 del self.path_dict[event.identifier]
 
             else:
 
-                self.logger.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
+                fabula.LOGGER.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
                                                                                   event.target_identifier))
 
                 self.tries_to_move_dict[event.identifier] = event.target_identifier
@@ -411,7 +411,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return a PicksUpEvent to the Server.
         """
 
-        self.logger.info("returning PicksUpEvent")
+        fabula.LOGGER.info("returning PicksUpEvent")
 
         # The Server has performed basic sanity checks.
         # In addition, we restrict picking up to items right next to the player.
@@ -430,7 +430,7 @@ class DefaultGame(fabula.plugins.Plugin):
                                                                        event.target_identifier))
 
         else:
-            self.logger.info("AttemptFailed: '{}' not next to player".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: '{}' not next to player".format(event.target_identifier))
 
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -456,23 +456,23 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         if event.target_identifier in self.host.room.entity_dict.keys():
 
-            self.logger.debug("target '{}' is an entity identifier".format(event.target_identifier))
+            fabula.LOGGER.debug("target '{}' is an entity identifier".format(event.target_identifier))
 
             if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
 
-                self.logger.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
+                fabula.LOGGER.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
                 self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
-                self.logger.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
+                fabula.LOGGER.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
                 self.respond(event)
 
         else:
-            self.logger.debug("target '{}' is not an entity identifier".format(event.target_identifier))
+            fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier))
 
             if event.target_identifier not in surrounding_positions:
 
-                self.logger.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
+                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
                 self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
@@ -480,11 +480,11 @@ class DefaultGame(fabula.plugins.Plugin):
                 # Rack.
                 #
                 if event.item_identifier not in self.host.rack.entity_dict.keys():
-                    self.logger.info("item still in Room, returning PicksUpEvent")
+                    fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
                     self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
                                                                                event.item_identifier))
 
-                self.logger.info("returning DropsEvent")
+                fabula.LOGGER.info("returning DropsEvent")
                 self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
                                                                          event.item_identifier,
                                                                          event.target_identifier))
@@ -495,7 +495,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return the Event to the host.
         """
 
-        self.logger.info("returning Event to host")
+        fabula.LOGGER.info("returning Event to host")
         self.message_for_host.event_list.append(event)
         return
 
@@ -504,7 +504,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
         self.respond(event)
         return
 
@@ -513,7 +513,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
         self.respond(event)
         return
 
@@ -522,7 +522,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
         self.respond(event)
         return
 
@@ -530,7 +530,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Cache source and target of the event in self.talk_to_dict, then call DefaultGame.respond().
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Cache source and target
         #
@@ -563,7 +563,7 @@ class DefaultGame(fabula.plugins.Plugin):
                 # This means we are next to the target, but it is either
                 # forbidden or blocked by an entity. Don't go wandering, stop.
                 #
-                self.logger.info("next to target {}, but target is blocked. Stopping movement.".format(target_identifier))
+                fabula.LOGGER.info("next to target {}, but target is blocked. Stopping movement.".format(target_identifier))
 
                 return None
 
@@ -576,7 +576,7 @@ class DefaultGame(fabula.plugins.Plugin):
             return possible_moves[0]
 
         else:
-            # self.logger.debug("possible_moves == {}".format(possible_moves))
+            # fabula.LOGGER.debug("possible_moves == {}".format(possible_moves))
 
             # Taking first as reference
             #
@@ -587,7 +587,7 @@ class DefaultGame(fabula.plugins.Plugin):
             shortest_distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                           + distance_vector[1] * distance_vector[1])
 
-            # self.logger.debug("move {} has distance {}".format(best_move, shortest_distance))
+            # fabula.LOGGER.debug("move {} has distance {}".format(best_move, shortest_distance))
 
             # Examine remaining
             #
@@ -598,13 +598,13 @@ class DefaultGame(fabula.plugins.Plugin):
                 distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                      + distance_vector[1] * distance_vector[1])
 
-                # self.logger.debug("move {} has distance {}".format(move, distance))
+                # fabula.LOGGER.debug("move {} has distance {}".format(move, distance))
 
                 if distance < shortest_distance:
                     shortest_distance = distance
                     best_move = move
 
-            # self.logger.debug("choosing move {} with distance {}".format(best_move, shortest_distance))
+            # fabula.LOGGER.debug("choosing move {} with distance {}".format(best_move, shortest_distance))
 
             return best_move
 
@@ -612,7 +612,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Load response logic from the file given.
         """
 
-        self.logger.info("attempting to read from file '{}'".format(filename))
+        fabula.LOGGER.info("attempting to read from file '{}'".format(filename))
 
         if filename:
 
@@ -632,15 +632,15 @@ class DefaultGame(fabula.plugins.Plugin):
                 self.condition_response_dict = eval(logic_textdump)
 
             except IOError:
-                self.logger.error("could not read from file '{}', game logic not updated".format(filename))
+                fabula.LOGGER.error("could not read from file '{}', game logic not updated".format(filename))
 
             except SyntaxError:
-                self.logger.error("SyntaxError in '{}', game logic not updated".format(filename))
+                fabula.LOGGER.error("SyntaxError in '{}', game logic not updated".format(filename))
 
         else:
-            self.logger.error("no filename given")
+            fabula.LOGGER.error("no filename given")
 
-        self.logger.debug("{} condition-response records".format(len(self.condition_response_dict)))
+        fabula.LOGGER.debug("{} condition-response records".format(len(self.condition_response_dict)))
 
         return
 
@@ -648,15 +648,15 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return a list of Events where alle occurences of identifier are replaced by replacement.
         """
 
-        self.logger.debug("replacing identifier '{}' with '{}'".format(identifier, replacement))
+        fabula.LOGGER.debug("replacing identifier '{}' with '{}'".format(identifier, replacement))
 
         list_repr, replacements = re.subn(r"([^_])identifier = '{}'".format(identifier),
                                           r"\1identifier = '{}'".format(replacement),
                                           repr(event_list))
 
-        self.logger.debug("original: {}, replacement: {}".format(event_list, list_repr))
+        fabula.LOGGER.debug("original: {}, replacement: {}".format(event_list, list_repr))
 
-        self.logger.debug("made {} replacements".format(replacements))
+        fabula.LOGGER.debug("made {} replacements".format(replacements))
 
         return eval(list_repr)
 
@@ -682,7 +682,7 @@ class Editor(DefaultGame):
         #
         DefaultGame.__init__(self, host)
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
@@ -700,11 +700,11 @@ class Editor(DefaultGame):
         # Create a PygameEditor where the editing is done
         # TODO: hardcoded framerate
         #
-        self.pygame_editor = fabula.plugins.pygameui.PygameEditor(fabula.assets.Assets(self.logger),
-                                                                 60,
-                                                                 self)
+        self.pygame_editor = fabula.plugins.pygameui.PygameEditor(fabula.assets.Assets(),
+                                                                  60,
+                                                                  self)
 
-        self.logger.debug("complete")
+        fabula.LOGGER.debug("complete")
 
     def process_message(self, message):
         """Editor main method.
@@ -752,11 +752,11 @@ class Editor(DefaultGame):
 
         # TODO: even InitEvent should call respond()
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         if self.host.room is None:
 
-            self.logger.info("no room sent yet, sending initial room")
+            fabula.LOGGER.info("no room sent yet, sending initial room")
 
             self.message_for_host.event_list.append(fabula.EnterRoomEvent("edit_this"))
 
@@ -782,19 +782,19 @@ class Editor(DefaultGame):
         """OptionList callback to read a Room from a file and send it to the Server.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         event_list = load_room_from_file(option.text + ".floorplan")
 
         if event_list is None:
 
-            self.logger.error("error opening file '{}.floorplan'".format(option.text + ".floorplan"))
+            fabula.LOGGER.error("error opening file '{}.floorplan'".format(option.text + ".floorplan"))
 
         else:
 
             self.message_for_host.event_list.extend(event_list)
 
-        self.logger.debug("complete")
+        fabula.LOGGER.debug("complete")
 
         return
 
@@ -807,11 +807,11 @@ class Editor(DefaultGame):
 
         if event_str in self.condition_response_dict:
 
-            self.logger.info("returning corresponding events")
+            fabula.LOGGER.info("returning corresponding events")
             self.message_for_host.event_list = self.message_for_host.event_list + self.condition_response_dict[event_str]
 
         else:
-            self.logger.info("event '{}' not found in condition_response_dict, making user select a response".format(event_str))
+            fabula.LOGGER.info("event '{}' not found in condition_response_dict, making user select a response".format(event_str))
             self.pygame_editor.select_event(event)
 
         return
@@ -823,13 +823,13 @@ class Editor(DefaultGame):
         # This could also be done in self.pygame_editor.event_edit_done(), but
         # it's cleaner to do here.
         #
-        self.logger.info("adding response: {} -> {}".format(trigger_event, response_event))
+        fabula.LOGGER.info("adding response: {} -> {}".format(trigger_event, response_event))
 
         if str(trigger_event) in self.condition_response_dict.keys():
 
             if response_event in self.condition_response_dict[str(trigger_event)]:
 
-                self.logger.info("response already defined for this trigger")
+                fabula.LOGGER.info("response already defined for this trigger")
 
             else:
 
@@ -844,7 +844,7 @@ class Editor(DefaultGame):
         """Save the response logic to the file given.
         """
 
-        self.logger.info("attempting to save to file '{}'".format(filename))
+        fabula.LOGGER.info("attempting to save to file '{}'".format(filename))
 
         if filename:
 
@@ -869,7 +869,7 @@ class Editor(DefaultGame):
             self.pygame_editor.window.room.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename)))
 
         else:
-            self.logger.error("no filename given")
+            fabula.LOGGER.error("no filename given")
 
         return
 
@@ -877,7 +877,7 @@ class Editor(DefaultGame):
         """Clear the response logic.
         """
 
-        self.logger.info("clearing condition_response_dict")
+        fabula.LOGGER.info("clearing condition_response_dict")
 
         self.condition_response_dict = {}
 
@@ -910,23 +910,23 @@ class Editor(DefaultGame):
 #
 #        if event.target_identifier in self.host.room.entity_dict.keys():
 #
-#            self.logger.info("target '{}' is an entity identifier".format(event.target_identifier))
+#            fabula.LOGGER.info("target '{}' is an entity identifier".format(event.target_identifier))
 #
 #            if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
 #
-#                self.logger.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
+#                fabula.LOGGER.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
 #                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 #
 #            else:
-#                self.logger.info("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
+#                fabula.LOGGER.info("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
 #                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 #
 #        else:
-#            self.logger.info("target '{}' is not an entity identifier".format(event.target_identifier))
+#            fabula.LOGGER.info("target '{}' is not an entity identifier".format(event.target_identifier))
 #
 #            if event.target_identifier not in surrounding_positions:
 #
-#                self.logger.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
+#                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
 #                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 #
 #            else:
@@ -934,11 +934,11 @@ class Editor(DefaultGame):
 #                # Rack.
 #                #
 #                if event.item_identifier not in self.host.rack.entity_dict.keys():
-#                    self.logger.info("item still in Room, returning PicksUpEvent")
+#                    fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
 #                    self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
 #                                                                               event.item_identifier))
 #
-#                self.logger.info("returning DropsEvent")
+#                fabula.LOGGER.info("returning DropsEvent")
 #                self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
 #                                                                         event.item_identifier,
 #                                                                         event.target_identifier))

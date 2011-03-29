@@ -17,7 +17,7 @@ Tile Fetching and Display in PygameUserInterface
     >>> class MapTest(fabula.plugins.Plugin):
     ...     def process_message(self, message):
     ...         if len(message.event_list):
-    ...             self.logger.debug("processing message {}".format(str(message.event_list)))
+    ...             fabula.LOGGER.debug("processing message {}".format(str(message.event_list)))
     ...             tile_red = fabula.Tile(fabula.FLOOR, "red.png")
     ...             tile_green = fabula.Tile(fabula.FLOOR, "green.png")
     ...             self.message_for_host.event_list.append(fabula.EnterRoomEvent("test"))

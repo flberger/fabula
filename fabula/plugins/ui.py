@@ -113,7 +113,7 @@ class UserInterface(fabula.plugins.Plugin):
                                       (0, 1) : "v",
                                       (-1, 0) : "<"}
 
-        self.logger.debug("complete")
+        fabula.LOGGER.debug("complete")
 
         return
 
@@ -132,7 +132,7 @@ class UserInterface(fabula.plugins.Plugin):
            for testing purposes.
         """
 
-        self.logger.warning('this is a dummy implementation, returning ("default_player", "dummy_connector")')
+        fabula.LOGGER.warning('this is a dummy implementation, returning ("default_player", "dummy_connector")')
 
         return ("default_player", "dummy_connector")
 
@@ -217,7 +217,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         msg = "{} s action_time from server * {} fps framerate = {} action_frames"
 
-        self.logger.debug(msg.format(event.action_time,
+        fabula.LOGGER.debug(msg.format(event.action_time,
                                      self.framerate,
                                      self.action_frames))
 
@@ -230,7 +230,7 @@ class UserInterface(fabula.plugins.Plugin):
            or network connection.
         """
 
-        self.logger.critical("Asset could not be fetched: {}. Aborting.".format(asset))
+        fabula.LOGGER.critical("Asset could not be fetched: {}. Aborting.".format(asset))
 
         raise SystemExit
 
@@ -287,7 +287,7 @@ class UserInterface(fabula.plugins.Plugin):
            UserInterface.exit_requested to True.
         """
 
-        self.logger.warning("pretending player wants to quit")
+        fabula.LOGGER.warning("pretending player wants to quit")
 
         self.exit_requested = True
 
@@ -304,9 +304,9 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation sets UserInterface.freeze = True.
         """
 
-        self.logger.info("entering room: {}".format(event.room_identifier))
+        fabula.LOGGER.info("entering room: {}".format(event.room_identifier))
 
-        self.logger.info("freezing")
+        fabula.LOGGER.info("freezing")
         self.freeze = True
         # TODO: make sure the user can interact with the game (close etc.) even if frozen
 
@@ -319,9 +319,9 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation sets UserInterface.freeze = False.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
-        self.logger.info("unfreezing")
+        fabula.LOGGER.info("unfreezing")
         self.freeze = False
 
         return
@@ -336,7 +336,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         # TODO: Make sure that this is the last event rendered before returning to the ControlEngine?
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         event = fabula.SaysEvent(self.player_id, "blah")
 
@@ -351,7 +351,7 @@ class UserInterface(fabula.plugins.Plugin):
            visible Entities you might have set up and render a static frame.
         """
 
-        self.logger.info("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
+        fabula.LOGGER.info("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
 
         event.entity.user_interface = self
 
@@ -365,7 +365,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         return
 
@@ -378,7 +378,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         return
 
@@ -391,7 +391,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         return
 
@@ -402,7 +402,7 @@ class UserInterface(fabula.plugins.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.debug("forwarding Event to Entity and displaying a single frame")
+        fabula.LOGGER.debug("forwarding Event to Entity and displaying a single frame")
 
         self.host.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
@@ -412,7 +412,7 @@ class UserInterface(fabula.plugins.Plugin):
         """Entity has already handled the Event.
         """
 
-        self.logger.debug("Entity '{}' has already handled the Event".format(event.identifier))
+        fabula.LOGGER.debug("Entity '{}' has already handled the Event".format(event.identifier))
 
         return
 
@@ -420,13 +420,13 @@ class UserInterface(fabula.plugins.Plugin):
         """Pass the Event to the dropping Entity and spawn the dropped Entity.
         """
 
-        self.logger.debug("passing Event to '{}'".format(event.identifier))
+        fabula.LOGGER.debug("passing Event to '{}'".format(event.identifier))
 
         self.host.room.entity_dict[event.identifier].process_DropsEvent(event)
 
         # Spawn the dropped Entity
         #
-        self.logger.info("spawning '{}' in room".format(event.item_identifier))
+        fabula.LOGGER.info("spawning '{}' in room".format(event.item_identifier))
 
         entity = self.host.room.entity_dict[event.item_identifier]
 
@@ -440,7 +440,7 @@ class UserInterface(fabula.plugins.Plugin):
            client.rack.
         """
 
-        self.logger.debug("notifying Entity '{}'".format(event.identifier))
+        fabula.LOGGER.debug("notifying Entity '{}'".format(event.identifier))
 
         self.host.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
@@ -459,7 +459,7 @@ class UserInterface(fabula.plugins.Plugin):
         try:
             self.host.room.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.debug("forwarded SaysEvent({}, '{}')".format(event.identifier,
+            fabula.LOGGER.debug("forwarded SaysEvent({}, '{}')".format(event.identifier,
                                                                      event.text))
 
         except KeyError:
@@ -468,7 +468,7 @@ class UserInterface(fabula.plugins.Plugin):
             #
             self.host.rack.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.warning("forwarded SaysEvent({}, '{}') to deleted entity".format(event.identifier,
+            fabula.LOGGER.warning("forwarded SaysEvent({}, '{}') to deleted entity".format(event.identifier,
                                                                                        event.text))
 
         return

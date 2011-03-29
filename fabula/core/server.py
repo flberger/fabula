@@ -46,7 +46,7 @@ class Server(fabula.core.Engine):
            Flag to be changed by signal handler
      """
 
-    def __init__(self, interface_instance, logger, framerate, action_time, threadsafe = True):
+    def __init__(self, interface_instance, framerate, action_time, threadsafe = True):
         """Initialise the Server.
            If threadsafe is True (default), no signal handlers are installed.
         """
@@ -55,8 +55,7 @@ class Server(fabula.core.Engine):
         # Engine.__init__() calls EventProcessor.__init__()
         #
         fabula.core.Engine.__init__(self,
-                                   interface_instance,
-                                   logger)
+                                   interface_instance)
 
         # If framerate is 0, run as fast as possible
         #
@@ -105,7 +104,7 @@ class Server(fabula.core.Engine):
            methods to process events, and then the plugin.
         """
 
-        self.logger.info("starting")
+        fabula.LOGGER.info("starting")
 
         # MAIN LOOP
         # TODO: Server.exit_requested is inconsistent with Client.plugin.exit_requested
@@ -118,7 +117,7 @@ class Server(fabula.core.Engine):
 
                 if len(message.event_list):
 
-                    self.logger.debug("{0} incoming: {1}".format(address_port_tuple, message))
+                    fabula.LOGGER.debug("{0} incoming: {1}".format(address_port_tuple, message))
 
                     for event in message.event_list:
 
@@ -152,7 +151,7 @@ class Server(fabula.core.Engine):
                             # Looks like the Client sent an Event typically
                             # issued by the Server. Let the Plugin handle that.
                             #
-                            self.logger.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
+                            fabula.LOGGER.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
                             self.message_for_plugin.event_list.append(event)
 
                         # Contrary to the Client, the Server calls its plugin
@@ -182,17 +181,17 @@ class Server(fabula.core.Engine):
 
             # reiterate over client connections
             #
-            #self.logger.info("reading client messages")
+            #fabula.LOGGER.info("reading client messages")
 
         # exit has been requested
         #
-        self.logger.info("exit flag set, shutting down interface")
+        fabula.LOGGER.info("exit flag set, shutting down interface")
 
         # stop the Interface thread
         #
         self.interface.shutdown()
 
-        self.logger.info("shutdown confirmed")
+        fabula.LOGGER.info("shutdown confirmed")
 
         # TODO: possibly exit cleanly from the plugin here
 
@@ -234,7 +233,7 @@ class Server(fabula.core.Engine):
         #
         if self.message_for_remote.event_list:
 
-            self.logger.debug("{0} outgoing: {1}".format(address_port_tuple,
+            fabula.LOGGER.debug("{0} outgoing: {1}".format(address_port_tuple,
                                                          self.message_for_remote))
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
@@ -257,13 +256,13 @@ class Server(fabula.core.Engine):
 
                 if isinstance(event, fabula.RoomCompleteEvent):
 
-                    self.logger.info("found RoomCompleteEvent, will skip room events")
+                    fabula.LOGGER.info("found RoomCompleteEvent, will skip room events")
 
                     skip_room_events = True
 
             if not skip_room_events:
 
-                self.logger.info("no RoomCompleteEvent found, broadcasting all events")
+                fabula.LOGGER.info("no RoomCompleteEvent found, broadcasting all events")
 
             for event in self.message_for_remote.event_list:
 
@@ -279,7 +278,7 @@ class Server(fabula.core.Engine):
                     and
                     isinstance(event, fabula.EnterRoomEvent)):
 
-                    self.logger.info("EnterRoomEvent found, starting to skip")
+                    fabula.LOGGER.info("EnterRoomEvent found, starting to skip")
 
                     skip_room_events = "now"
 
@@ -287,7 +286,7 @@ class Server(fabula.core.Engine):
                       and
                       isinstance(event, fabula.RoomCompleteEvent)):
 
-                    self.logger.info("RoomCompleteEvent found, stopping to skip")
+                    fabula.LOGGER.info("RoomCompleteEvent found, stopping to skip")
 
                     skip_room_events = False
 
@@ -308,7 +307,7 @@ class Server(fabula.core.Engine):
             #
             if len(self.message_for_all.event_list):
 
-                self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
+                fabula.LOGGER.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
                 for client_key in self.room.active_clients:
 
@@ -336,7 +335,7 @@ class Server(fabula.core.Engine):
                        3 : "SIGQUIT",
                        15 : "SIGTERM"}
 
-        self.logger.info("caught signal {0} ({1}), setting exit flag".format(signalnum, signal_dict[signalnum]))
+        fabula.LOGGER.info("caught signal {0} ({1}), setting exit flag".format(signalnum, signal_dict[signalnum]))
 
         self.exit_requested = True
 
@@ -348,16 +347,16 @@ class Server(fabula.core.Engine):
 
         # TODO: design by contract: entity in entity_dict? Target a tuple? ...
 
-        self.logger.info("{0} -> {1}".format(event.identifier, event.target_identifier))
+        fabula.LOGGER.info("{0} -> {1}".format(event.identifier, event.target_identifier))
 
         if not self.tile_is_walkable(event.target_identifier):
 
-            self.logger.info("{} not walkable".format(event.target_identifier))
+            fabula.LOGGER.info("{} not walkable".format(event.target_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
-            self.logger.info("target clear, forwarding event to plugin")
+            fabula.LOGGER.info("target clear, forwarding event to plugin")
 
             kwargs["message"].event_list.append(event)
 
@@ -369,13 +368,13 @@ class Server(fabula.core.Engine):
         """
         # TODO: update docstring
 
-        self.logger.info("sending Server parameters")
+        fabula.LOGGER.info("sending Server parameters")
 
         self.message_for_remote.event_list.append(fabula.ServerParametersEvent(self.action_time))
 
         if self.room is not None:
 
-            self.logger.info("sending existing floor_plan and entities")
+            fabula.LOGGER.info("sending existing floor_plan and entities")
 
             # TODO: The following is even worse in terms on consistency. :-) Replace with a clean, room-oriented design.
             #
@@ -406,7 +405,7 @@ class Server(fabula.core.Engine):
 
         if len(self.rack.entity_dict):
 
-            self.logger.info("sending Spawn and PickUpEvents from existing rack")
+            fabula.LOGGER.info("sending Spawn and PickUpEvents from existing rack")
 
             for identifier in self.rack.entity_dict:
 
@@ -450,11 +449,11 @@ class Server(fabula.core.Engine):
                               fabula.LookedAtEvent(entity.identifier,
                                                   event.identifier)]
 
-            self.logger.info("forwarding event(s)")
+            fabula.LOGGER.info("forwarding event(s)")
             kwargs["message"].event_list.extend(new_events)
 
         else:
-            self.logger.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
 
             # Issue AttemptFailed to unblock client.
             #
@@ -470,7 +469,7 @@ class Server(fabula.core.Engine):
 
             if not self.room.floor_plan[event.target_identifier].entities:
 
-                self.logger.info("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
+                fabula.LOGGER.info("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
 
                 kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -479,12 +478,12 @@ class Server(fabula.core.Engine):
                 #
                 event.target_identifier = self.room.floor_plan[event.target_identifier].entities[-1].identifier
 
-                self.logger.info("forwarding event")
+                fabula.LOGGER.info("forwarding event")
 
                 kwargs["message"].event_list.append(event)
 
         else:
-            self.logger.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
 
             # Issue AttemptFailed to unblock client.
             #
@@ -513,19 +512,19 @@ class Server(fabula.core.Engine):
                     new_event = fabula.TriesToManipulateEvent(event.identifier,
                                                              entity.identifier)
                 else:
-                    self.logger.info("Entity type '{}' can not be manipulated".format(entity.entity_type))
+                    fabula.LOGGER.info("Entity type '{}' can not be manipulated".format(entity.entity_type))
 
 
         if new_event == None:
 
-            self.logger.info("AttemptFailed for {}".format(event))
+            fabula.LOGGER.info("AttemptFailed for {}".format(event))
 
             # Issue AttemptFailed to unblock client.
             #
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
-            self.logger.info("forwarding event")
+            fabula.LOGGER.info("forwarding event")
             kwargs["message"].event_list.append(new_event)
 
         return
@@ -534,7 +533,7 @@ class Server(fabula.core.Engine):
         """Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         new_event = None
 
@@ -548,7 +547,7 @@ class Server(fabula.core.Engine):
 
                 if entity.entity_type == fabula.ITEM and entity.mobile:
 
-                    self.logger.info("trying to pick up '{}' at {}".format(entity.identifier,
+                    fabula.LOGGER.info("trying to pick up '{}' at {}".format(entity.identifier,
                                                                             event.target_identifier))
 
                     new_event = fabula.TriesToPickUpEvent(event.identifier,
@@ -559,11 +558,11 @@ class Server(fabula.core.Engine):
             # Nothing to pick up.
             # Issue AttemptFailed to unblock client.
             #
-            self.logger.info("AttemptFailed for {}".format(event))
+            fabula.LOGGER.info("AttemptFailed for {}".format(event))
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
-            self.logger.info("forwarding event")
+            fabula.LOGGER.info("forwarding event")
             kwargs["message"].event_list.append(new_event)
 
         return
@@ -581,13 +580,13 @@ class Server(fabula.core.Engine):
 
         # TODO: What about Entities in walls?
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Check target
         #
         if event.target_identifier not in self.room.floor_plan:
 
-            self.logger.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -595,7 +594,7 @@ class Server(fabula.core.Engine):
 
         elif self.room.floor_plan[event.target_identifier].tile.tile_type != fabula.FLOOR:
 
-            self.logger.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -617,20 +616,20 @@ class Server(fabula.core.Engine):
         if event.item_identifier not in self.rack.entity_dict.keys():
 
             if event.item_identifier in self.room.entity_dict.keys():
-                self.logger.info("'{}' not in rack but in room, forwarding event to plugin".format(event.item_identifier))
+                fabula.LOGGER.info("'{}' not in rack but in room, forwarding event to plugin".format(event.item_identifier))
                 kwargs["message"].event_list.append(event)
 
             else:
-                self.logger.info("AttemptFailed: '{}' neither in rack nor in room".format(event.item_identifier))
+                fabula.LOGGER.info("AttemptFailed: '{}' neither in rack nor in room".format(event.item_identifier))
                 kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         elif self.rack.owner_dict[event.item_identifier] != event.identifier:
 
-            self.logger.info("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.item_identifier))
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
-            self.logger.info("looks OK, forwarding to plugin")
+            fabula.LOGGER.info("looks OK, forwarding to plugin")
             kwargs["message"].event_list.append(event)
 
         return
@@ -643,7 +642,7 @@ class Server(fabula.core.Engine):
 
         self.room = fabula.Room(event.room_identifier)
 
-        self.logger.info("registering client {} in new room {}".format(str(kwargs["client_key"]),
+        fabula.LOGGER.info("registering client {} in new room {}".format(str(kwargs["client_key"]),
                                                                         event.room_identifier))
         self.room.active_clients.append(kwargs["client_key"])
 

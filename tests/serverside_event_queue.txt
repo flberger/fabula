@@ -22,7 +22,7 @@ Serverside Event Queue
     ...
     >>> app = fabula.run.App("i", timeout = 5)
     >>> app.server_plugin_class = QueueTest
-    >>> interface = fabula.interfaces.Interface(app.logger)
+    >>> interface = fabula.interfaces.Interface()
     >>> interface.connect("dummy_client")
     >>> init_message = fabula.Message([fabula.InitEvent("dummy_client")])
     >>> interface.connections["dummy_client"].messages_for_local.append(init_message)

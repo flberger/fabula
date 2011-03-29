@@ -37,7 +37,7 @@ import fabula.run
 def main():
     app = fabula.run.App("i", timeout = 0)
 
-    interface = fabula.interfaces.Interface(app.logger)
+    interface = fabula.interfaces.Interface()
     interface.connect("dummy_client")
 
     init_event = fabula.Message([fabula.InitEvent("player")])
