@@ -335,9 +335,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                  host,
                                                  fullscreen)
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
-        self.logger.debug("initialising pygame")
+        self.logger.info("initialising pygame")
         pygame.init()
 
         # Initialise the frame timing clock.
@@ -431,7 +431,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.attempt_icon_planes.append(plane)
 
-            self.logger.debug("loaded '{}': {}".format(name, plane))
+            self.logger.info("loaded '{}': {}".format(name, plane))
 
         # Cache for the last right-clicked Entity
         #
@@ -442,7 +442,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.room_plane = clickndrag.Plane("room",
                                            pygame.Rect((0, 0), (800, 500)))
 
-        self.logger.debug("complete")
+        self.logger.info("complete")
 
         return
 
@@ -461,7 +461,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            for testing purposes.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Display the splash screen
         #
@@ -584,7 +584,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
 
-                self.logger.debug("exit request from user")
+                self.logger.info("exit request from user")
                 self.exit_requested = True
 
                 # Quit pygame here, though there is still shutdown work to be
@@ -606,15 +606,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Add room Plane if necessary.
         """
 
-        self.logger.debug("entering room: {}".format(event.room_identifier))
+        self.logger.info("entering room: {}".format(event.room_identifier))
 
         if "room" not in self.window.subplanes_list:
 
-            self.logger.debug("no room plane yet, adding")
+            self.logger.info("no room plane yet, adding")
 
             self.window.sub(self.room_plane)
 
-        self.logger.debug("fading out")
+        self.logger.info("fading out")
 
         frames = self.action_frames
 
@@ -667,7 +667,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # No more rendering until RoomComplete
         #
-        self.logger.debug("freezing")
+        self.logger.info("freezing")
         self.freeze = True
 
         return
@@ -677,7 +677,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Add the inventory Plane to window if it is not yet there.
         """
 
-        self.logger.debug("rearranging tile and entity planes")
+        self.logger.info("rearranging tile and entity planes")
 
         # Entities may have been spawned inbetween ChangeMapElementEvents, but
         # clickndrag requires their Planes to be the last ones in
@@ -714,13 +714,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if "inventory" not in self.window.subplanes_list:
 
-            self.logger.debug("adding inventory plane to window")
+            self.logger.info("adding inventory plane to window")
 
             self.window.sub(self.inventory_plane)
 
         # Display the game again and accept input
         #
-        self.logger.debug("unfreezing")
+        self.logger.info("unfreezing")
         self.freeze = False
 
         # process_ChangeMapElementEvent and process_SpawnEvent should have
@@ -734,7 +734,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.fade_surface.set_alpha(255)
 
-        self.logger.debug("fading in over {} frames, stepping {}".format(frames, fadestep))
+        self.logger.info("fading in over {} frames, stepping {}".format(frames, fadestep))
 
         while frames:
             # Bypassing display_single_frame()
@@ -780,7 +780,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Open the senteces as an OptionList and return a SaysEvent to the host.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         option_list = clickndrag.gui.OptionList("select_room",
                                                 event.sentences,
@@ -815,7 +815,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if event.entity.asset is not None:
 
             msg = "Entity '{}' already has an asset, updating position to {}"
-            self.logger.debug(msg.format(event.entity.identifier,
+            self.logger.info(msg.format(event.entity.identifier,
                                          event.location))
 
             x = event.location[0] * self.spacing + self.spacing / 2
@@ -829,7 +829,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             event.entity.asset.dropped_upon_callback = self.entity_dropped_callback
 
         else:
-            self.logger.debug("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
+            self.logger.info("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
 
             # Assets are entirely up to the UserInterface, so we fetch the asset
             # here
@@ -889,7 +889,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 # Oh well. Just swap.
                 #
-                self.logger.debug("changing class of '{}' from {} to {}".format(event.entity.identifier,
+                self.logger.info("changing class of '{}' from {} to {}".format(event.entity.identifier,
                                                                                 event.entity.__class__,
                                                                                 PygameEntity))
 
@@ -903,7 +903,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                     pass
 
-                self.logger.debug("changing class of '{}' from {} to bases {}".format(event.entity.identifier,
+                self.logger.info("changing class of '{}' from {} to bases {}".format(event.entity.identifier,
                                                                                 event.entity.__class__,
                                                                                 ExtendedEntity.__bases__))
 
@@ -920,7 +920,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Now there is a Plane for the Entity. Add to room.
         # This implicitly removes the Plane from the former parent plane.
         #
-        self.logger.debug("adding '{}' to window.room".format(event.entity.asset.name))
+        self.logger.info("adding '{}' to window.room".format(event.entity.asset.name))
         self.window.room.sub(event.entity.asset)
 
         # If the PygameEntity has a caption Plane, add it as well.
@@ -937,7 +937,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            be derived from a single Tile.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         tile_from_list = None
 
@@ -952,7 +952,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # Tiles may compare equal, but the may not refer to the same
                 # instance, so we use tile from tile_list.
                 #
-                self.logger.debug("found event.tile in self.host.room.tile_list")
+                self.logger.info("found event.tile in self.host.room.tile_list")
                 tile_from_list = tile
 
         if tile_from_list is None:
@@ -962,13 +962,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if tile_from_list.asset is not None:
 
-            self.logger.debug("tile already has an asset: {}".format(tile_from_list))
+            self.logger.info("tile already has an asset: {}".format(tile_from_list))
 
         else:
             # Assets are entirely up to the UserInterface, so we fetch
             # the asset here
             #
-            self.logger.debug("no asset for {}, attempting to fetch".format(tile_from_list))
+            self.logger.info("no asset for {}, attempting to fetch".format(tile_from_list))
 
             try:
                 # Get a file-like object from asset manager
@@ -980,7 +980,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.display_loading_progress(tile_from_list.asset_desc)
 
-            self.logger.debug("loading Surface from {}".format(file))
+            self.logger.info("loading Surface from {}".format(file))
 
             surface = pygame.image.load(file)
 
@@ -1011,7 +1011,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Update image regardless whether the tile existed or not
         #
-        self.logger.debug("changing image for tile at {0} to {1}".format(str(event.location),
+        self.logger.info("changing image for tile at {0} to {1}".format(str(event.location),
                                                                         tile_from_list.asset))
         self.window.room.subplanes[str(event.location)].image = tile_from_list.asset
 
@@ -1021,7 +1021,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Display the perception.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # If it's not for us, ignore.
         # TODO: checking for client_id should be everywhere and be more structured
@@ -1036,7 +1036,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.window.room.sub(perception_box)
 
         else:
-            self.logger.debug("perception for '{}', not displaying".format(event.identifier))
+            self.logger.info("perception for '{}', not displaying".format(event.identifier))
 
         return
 
@@ -1044,7 +1044,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Flash the screen.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Flash very short
         #
@@ -1072,7 +1072,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Make EntityPlanes surrounding the new position draggable and call the base class method.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Call base class
         #
@@ -1087,7 +1087,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Call base class, update caption changes, then display a single frame to show the result.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Call base class
         #
@@ -1102,7 +1102,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            and event.property_key == "caption" \
            and not "caption" in entity.asset.subplanes_list:
 
-            self.logger.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
+            self.logger.info("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
 
             entity.process_ChangePropertyEvent(event)
 
@@ -1112,7 +1112,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Call base class process_DropsEvent, clean up the inventory plane and adjust draggable flags.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         fabula.plugins.ui.UserInterface.process_DropsEvent(self, event)
 
@@ -1135,7 +1135,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Then call the base class implementation to notify the Entity.
         """
 
-        self.logger.debug("moving Plane from window.room to window.inventory")
+        self.logger.info("moving Plane from window.room to window.inventory")
 
         # The Client has already put the item from Client.room to Client.rack.
         # We have to update the display accordingly, so move the item plane
@@ -1178,7 +1178,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Call the base class, then present the text to the user and wait some time.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Call base class
         #
@@ -1227,15 +1227,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         item_identifier = dropped_plane.name
 
-        self.logger.debug("'{}' dropped on inventory".format(item_identifier))
+        self.logger.info("'{}' dropped on inventory".format(item_identifier))
 
         if item_identifier in self.host.rack.entity_dict.keys():
 
-            self.logger.debug("'{}' already in Rack, skipping".format(item_identifier))
+            self.logger.info("'{}' already in Rack, skipping".format(item_identifier))
 
         else:
 
-            self.logger.debug("issuing TriesToPickUpEvent")
+            self.logger.info("issuing TriesToPickUpEvent")
 
             event = fabula.TriesToPickUpEvent(self.host.client_id,
                                              self.host.room.entity_locations[item_identifier])
@@ -1250,7 +1250,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # TODO: This is so much like tile_drop_callback() that it should be unified.
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Just to be sure, check if the Plane's name matches a "(x, y)" string.
         #
@@ -1272,7 +1272,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Drop callback to issue a TriesToDropEvent.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         name = plane.name
 
@@ -1299,7 +1299,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Adds appropriate Events to PygameUserInterface.message_for_host.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         event = fabula.TriesToDropEvent(self.host.client_id,
                                         dropped_plane.name,
@@ -1313,11 +1313,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Right click callback for Entity Plane.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         if plane.name not in self.host.room.entity_dict.keys():
 
-            self.logger.debug("'{}' not in Room, ignoring right click".format(plane.name))
+            self.logger.info("'{}' not in Room, ignoring right click".format(plane.name))
 
         else:
 
@@ -1370,7 +1370,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """General left-click callback for attempt action icons.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         event = None
 
@@ -1586,7 +1586,7 @@ class PygameEditor(PygameUserInterface):
         #
         PygameUserInterface.__init__(self, assets, framerate, host)
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Spacing is a little larger here to show grid lines.
         #
@@ -1733,7 +1733,7 @@ class PygameEditor(PygameUserInterface):
         container.rect.topleft = (900, 0)
         self.window.sub(container)
 
-        self.logger.debug("complete")
+        self.logger.info("complete")
 
         return
 
@@ -1741,7 +1741,7 @@ class PygameEditor(PygameUserInterface):
         """Button callback to prompt the user for a room background image, load it and assign it to tiles.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         new_image, filename = load_image("Open Background Image")
 
@@ -1775,7 +1775,7 @@ class PygameEditor(PygameUserInterface):
 
         # TODO: Something goes wrong here: Loading a room and replacing the image leads to the *old* tile assets being loaded upon save.
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         tk = tkinter.Tk()
         tk.withdraw()
@@ -1794,10 +1794,10 @@ class PygameEditor(PygameUserInterface):
 
         if not filename:
 
-            self.logger.debug("no filename selected")
+            self.logger.info("no filename selected")
 
         else:
-            self.logger.debug("save to: {}".format(filename))
+            self.logger.info("save to: {}".format(filename))
 
             self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(filename))
 
@@ -1811,7 +1811,7 @@ class PygameEditor(PygameUserInterface):
                     # Save image file
                     #
                     current_file = filename + "-{0}_{1}.png".format(x, y)
-                    self.logger.debug(current_file)
+                    self.logger.info(current_file)
                     pygame.image.save(self.window.room.subplanes[str((x, y))].image,
                                       os.path.join(path, current_file))
 
@@ -1848,7 +1848,7 @@ class PygameEditor(PygameUserInterface):
 
             roomfile.close()
 
-            self.logger.debug("wrote {}".format(filename + ".floorplan"))
+            self.logger.info("wrote {}".format(filename + ".floorplan"))
 
             # Then respawn all current Entities in the Server since
             # EnterRoomEvent will set up a new room
@@ -1877,7 +1877,7 @@ class PygameEditor(PygameUserInterface):
         """Button callback to display a list of rooms to select from.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         room_list = []
 
@@ -1904,7 +1904,7 @@ class PygameEditor(PygameUserInterface):
         """GetStringDialog callback to request an image and add the item to the rack.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Update to clean up already destroyed GetStringDialog
         #
@@ -1912,7 +1912,7 @@ class PygameEditor(PygameUserInterface):
 
         if item_identifier == '' or item_identifier is None:
 
-            self.logger.debug("no item identifer given")
+            self.logger.info("no item identifer given")
 
         else:
 
@@ -1926,7 +1926,7 @@ class PygameEditor(PygameUserInterface):
                                        mobile = True,
                                        asset_desc = filename)
 
-                self.logger.debug("appending SpawnEvent and PicksUpEvent")
+                self.logger.info("appending SpawnEvent and PicksUpEvent")
 
                 # TODO: make sure to use a safe spawning location
                 # Observe: adding to self.host.message_for_host
@@ -1941,13 +1941,13 @@ class PygameEditor(PygameUserInterface):
     def quit(self, plane):
         """Button callback to set self.exit_requested = True
         """
-        self.logger.debug("setting exit_requested = True")
+        self.logger.info("setting exit_requested = True")
         self.host.host.exit_requested = True
 
     def edit_walls(self, plane):
         """Button callback to switch to wall edit mode.
         """
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Cache button planes from sidebar...
         # Use subplanes_list to keep order
@@ -1977,7 +1977,7 @@ class PygameEditor(PygameUserInterface):
             self.plane_cache.append(self.window.room.subplanes[identifier])
             self.window.room.remove(identifier)
 
-        self.logger.debug("{} Plane(s) in plane_cache now".format(len(self.plane_cache)))
+        self.logger.info("{} Plane(s) in plane_cache now".format(len(self.plane_cache)))
 
         # Make Entity planes in inventory insensitive to drags
         #
@@ -2012,7 +2012,7 @@ class PygameEditor(PygameUserInterface):
            overlay is applied to visualize the OBSTACLE type.
         """
 
-        self.logger.debug("returning ChangeMapElementEvent to Server and creating overlay for tile at {}".format(plane.name))
+        self.logger.info("returning ChangeMapElementEvent to Server and creating overlay for tile at {}".format(plane.name))
 
         # The name of the clicked Plane is supposed to be a string representation
         # of a coordinate tuple.
@@ -2045,7 +2045,7 @@ class PygameEditor(PygameUserInterface):
 
         # Based on a copy-paste from make_tile_obstacle()
 
-        self.logger.debug("returning ChangeMapElementEvent to Server and deleting '{}'".format(plane.name))
+        self.logger.info("returning ChangeMapElementEvent to Server and deleting '{}'".format(plane.name))
 
         # The clicked Plane is the overlay. Its name is supposed to be a string
         # representation of a coordinate tuple plus "_overlay".
@@ -2065,7 +2065,7 @@ class PygameEditor(PygameUserInterface):
     def wall_edit_done(self, plane):
         """Button callback which restores the editor to the state before edit_walls().
         """
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Remove all wall marker overlays.
         # Restore Tile clicked callbacks along the way.
@@ -2107,7 +2107,7 @@ class PygameEditor(PygameUserInterface):
 
         if plane.left_click_callback is None:
 
-            self.logger.debug("left_click_callback of '{}' is still None, adding callback".format(event.entity.identifier))
+            self.logger.info("left_click_callback of '{}' is still None, adding callback".format(event.entity.identifier))
             plane.left_click_callback = self.show_properties
 
         return
@@ -2116,16 +2116,16 @@ class PygameEditor(PygameUserInterface):
         """Click callback for entities which shows their properties in the properties Plane.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         # Only update if not already visible
         #
         if self.window.properties.subplanes_list and self.window.properties.identifier.text == plane.name:
 
-            self.logger.debug("properties for '{}' already displayed".format(plane.name))
+            self.logger.info("properties for '{}' already displayed".format(plane.name))
 
         else:
-            self.logger.debug("showing properties of '{}'".format(plane.name))
+            self.logger.info("showing properties of '{}'".format(plane.name))
 
             self.window.properties.remove_all()
 
@@ -2212,7 +2212,7 @@ class PygameEditor(PygameUserInterface):
         """Make the user specify an response Event to an action.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         event_list = ("Attempt Failed",
                       "Perception")
@@ -2244,7 +2244,7 @@ class PygameEditor(PygameUserInterface):
         """Let the user edit the attributes of the selected Event.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         if option.text == "Perception":
 
@@ -2277,7 +2277,7 @@ class PygameEditor(PygameUserInterface):
         """Button callback to call host.add_response() and destroy the Container.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         self.window.room.edit_event.destroy()
 
@@ -2289,7 +2289,7 @@ class PygameEditor(PygameUserInterface):
         """Display the current game logic affecting the Entity identified by identifier.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         editor_window = clickndrag.gui.Container("display_logic", padding = 4)
 
@@ -2344,7 +2344,7 @@ class PygameEditor(PygameUserInterface):
                     rule_plane.sub(trigger_editor)
                     rule_plane.sub(response_editor)
 
-                    self.logger.debug("Adding rule Plane '{}'".format(rule_plane.name))
+                    self.logger.info("Adding rule Plane '{}'".format(rule_plane.name))
                     rules_container.sub(rule_plane)
 
         if len(rules_container.subplanes_list):
@@ -2366,7 +2366,7 @@ class PygameEditor(PygameUserInterface):
         """Button callback to retrieve the updated game logic and send it to the host.
         """
 
-        self.logger.debug("called")
+        self.logger.info("called")
 
         if "scrolling_rules" in self.window.room.display_logic.subplanes_list:
 

@@ -51,7 +51,7 @@ class Assets:
            This method actually is a dispatcher to more specialised methods.
         """
 
-        self.logger.debug("unknown asset '{}', attempting to fetch".format(asset_desc))
+        self.logger.info("unknown asset '{}', attempting to fetch".format(asset_desc))
 
         if (asset_desc.startswith("http://") or asset_desc.startswith("ftp://")):
 
@@ -87,7 +87,7 @@ class Assets:
 #
 #        for name in zip_file.namelist():
 #
-#            self.logger.debug("retrieving %s from ZIP file %s" % (name, asset_desc))
+#            self.logger.info("retrieving %s from ZIP file %s" % (name, asset_desc))
 #
 #            string_io = StringIO.StringIO(zip_file.read(name))
 #
@@ -178,10 +178,10 @@ class Assets:
 
                 return
 
-        self.logger.debug("attempting to retrieve '{}' from local file".format(asset_desc))
+        self.logger.info("attempting to retrieve '{}' from local file".format(asset_desc))
 
         file = open(asset_desc, mode='rb')
 
-        self.logger.debug("returning {}".format(file))
+        self.logger.info("returning {}".format(file))
 
         return file

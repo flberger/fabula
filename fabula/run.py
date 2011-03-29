@@ -351,18 +351,18 @@ class App:
 
         except:
             exception = traceback.format_exc()
-            self.logger.debug("exception in client.run():\n{}".format(exception))
+            self.logger.info("exception in client.run():\n{}".format(exception))
 
-        self.logger.debug("client exited, calling server.handle_exit()")
+        self.logger.info("client exited, calling server.handle_exit()")
         server.handle_exit(2, None)
 
-        self.logger.debug("waiting for server thread to stop")
+        self.logger.info("waiting for server thread to stop")
         server_thread.join()
 
         self.logger.info("server thread stopped, shutting down logger")
 
         if exception:
-            self.logger.debug("exception in client.run() was:\n{}".format(exception))
+            self.logger.info("exception in client.run() was:\n{}".format(exception))
 
         self.logger.info("log file written to fabula.log")
 

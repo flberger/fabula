@@ -165,7 +165,7 @@ class Client(fabula.core.Engine):
 
         if len(self.interface.connections.keys()):
 
-            self.logger.debug("interface is already connected to '{}', using connection".format(list(self.interface.connections.keys())[0]))
+            self.logger.info("interface is already connected to '{}', using connection".format(list(self.interface.connections.keys())[0]))
 
         else:
 
@@ -230,7 +230,7 @@ class Client(fabula.core.Engine):
                                                              0))
                 except:
                     exception = traceback.format_exc()
-                    self.logger.debug("exception trying to pickle server message {}:\n{}".format(server_message, exception))
+                    self.logger.info("exception trying to pickle server message {}:\n{}".format(server_message, exception))
 
                 # Add double newline as separator
                 #
@@ -302,7 +302,7 @@ class Client(fabula.core.Engine):
 
                     if self.timestamp == None:
 
-                        self.logger.debug("player attempt but still waiting - starting timer")
+                        self.logger.info("player attempt but still waiting - starting timer")
 
                         self.timestamp = datetime.datetime.today()
 
@@ -318,7 +318,7 @@ class Client(fabula.core.Engine):
 
                         else:
 
-                            self.logger.debug("still waiting for confirmation")
+                            self.logger.info("still waiting for confirmation")
 
                 else:
 
@@ -357,7 +357,7 @@ class Client(fabula.core.Engine):
                             #
                             if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
-                                self.logger.debug("applying TriesToMoveEvent locally")
+                                self.logger.info("applying TriesToMoveEvent locally")
 
                                 # TODO: event.identifier in self.room.entity_dict? event.target_identifier in fabula.DIRECTION_VECTOR?
 
@@ -419,7 +419,7 @@ class Client(fabula.core.Engine):
 
                         if isinstance(event, fabula.AttemptEvent):
 
-                            self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+                            self.logger.info("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
 
                             self.await_confirmation = True
 
@@ -431,7 +431,7 @@ class Client(fabula.core.Engine):
             #
             if self.message_for_remote.event_list:
 
-                self.logger.debug("server outgoing: %s" % self.message_for_remote)
+                self.logger.info("server outgoing: %s" % self.message_for_remote)
 
                 self.message_buffer.send_message(self.message_for_remote)
 
@@ -472,7 +472,7 @@ class Client(fabula.core.Engine):
         """Possibly revert movement or call default, then unblock the client.
         """
 
-        self.logger.debug("attempt failed for '{}'".format(event.identifier))
+        self.logger.info("attempt failed for '{}'".format(event.identifier))
 
         # Did this fail for the Entity we just moved locally?
         #
@@ -481,7 +481,7 @@ class Client(fabula.core.Engine):
             entity = self.room.entity_dict[event.identifier]
             location = self.room.entity_locations[event.identifier]
 
-            self.logger.debug("attempt failed for %s, now at %s"
+            self.logger.info("attempt failed for %s, now at %s"
                               % (event.identifier, location))
 
             # TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
@@ -494,7 +494,7 @@ class Client(fabula.core.Engine):
             self.room.process_MovesToEvent(fabula.MovesToEvent(event.identifier,
                                                               (restored_x, restored_y)))
 
-            self.logger.debug("%s now reverted to %s" % (event.identifier,
+            self.logger.info("%s now reverted to %s" % (event.identifier,
                                                          (restored_x, restored_y)))
         # Call default to forward to the Plugin.
         #
@@ -568,7 +568,7 @@ class Client(fabula.core.Engine):
 
             self.await_confirmation = False
 
-        self.logger.debug("await_confirmation unset")
+        self.logger.info("await_confirmation unset")
 
     def process_MovesToEvent(self, event, **kwargs):
         """Notify the Room and add the event to the message.
@@ -582,7 +582,7 @@ class Client(fabula.core.Engine):
 
             # Fine, we already had that.
             #
-            self.logger.debug("server issued MovesToEvent already applied: ('%s', '%s')"
+            self.logger.info("server issued MovesToEvent already applied: ('%s', '%s')"
                               % (event.identifier, event.location))
 
             # Reset copy of local event
