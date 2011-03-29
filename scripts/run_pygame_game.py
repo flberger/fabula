@@ -35,7 +35,7 @@ import fabula.plugins.serverside
 import fabula.run
 
 def main():
-    app = fabula.run.App("d", timeout = 0)
+    app = fabula.run.App("i", timeout = 0)
     app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
     app.run_standalone(60, 0.5)

@@ -120,7 +120,7 @@ class App:
         #
         self.stderr_handler = logging.StreamHandler()
 
-        self.stderr_handler.setLevel(logging.DEBUG)
+        self.stderr_handler.setLevel(leveldict[loglevel])
 
         # Loglevel:
         # "\x1b\x5b\x33\x32\x6d"
@@ -145,13 +145,13 @@ class App:
         self.file_handler = logging.FileHandler(filename = "fabula.log",
                                            mode = "w")
 
-        self.file_handler.setLevel(logging.DEBUG)
+        self.file_handler.setLevel(leveldict[loglevel])
 
         # Loglevel:
         # + "%(levelname)-5s "
 
         file_formatter = FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s (l.%(lineno)s)",
-                                            "%Y-%m-%d %H:%M:%S")
+                                             "%Y-%m-%d %H:%M:%S")
 
         self.file_handler.setFormatter(file_formatter)
 
