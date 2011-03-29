@@ -6,7 +6,7 @@ Server Execution
 
     >>> import fabula.interfaces
     >>> import fabula.run
-    >>> app = fabula.run.App("d", timeout = 5)
-    >>> interface = fabula.interfaces.Interface(app.logger)
+    >>> app = fabula.run.App("i", timeout = 5)
+    >>> interface = fabula.interfaces.Interface()
     >>> app.run_server(60, interface, 0.5)
     >>>

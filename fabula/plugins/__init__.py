@@ -34,9 +34,6 @@ class Plugin(fabula.eventprocessor.EventProcessor):
        Plugin.host
            The host of this plugin, an instance of fabula.core.Engine.
 
-       Plugin.logger
-           The host's logger.
-
        Plugin.message_for_host
            Fabula Message to be returned by Plugin.process_message().
     """
@@ -49,8 +46,6 @@ class Plugin(fabula.eventprocessor.EventProcessor):
         fabula.eventprocessor.EventProcessor.__init__(self)
 
         self.host = host
-
-        self.logger = host.logger
 
         self.message_for_host = fabula.Message([])
 
@@ -75,7 +70,7 @@ class Plugin(fabula.eventprocessor.EventProcessor):
 
         if message.event_list:
 
-            self.logger.debug("processing message {}".format(message.event_list))
+            fabula.LOGGER.debug("processing message {}".format(message.event_list))
 
             for event in message.event_list:
 

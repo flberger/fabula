@@ -32,8 +32,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
        Attributes:
 
-       Engine.logger
-
        Engine.interface
 
        Engine.plugin
@@ -50,7 +48,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
        Engine.rack
     """
 
-    def __init__(self, interface_instance, logger):
+    def __init__(self, interface_instance):
         """Set up Engine attributes.
 
            Arguments:
@@ -58,18 +56,11 @@ class Engine(fabula.eventprocessor.EventProcessor):
            interface_instance
                An instance of a subclass of fabula.interfaces.Interface to
                communicate with the remote host.
-
-           logger
-               An instance of logging.Logger.
         """
 
         # First setup base class
         #
         fabula.eventprocessor.EventProcessor.__init__(self)
-
-        # Attach logger
-        #
-        self.logger = logger
 
         self.interface = interface_instance
 
@@ -100,7 +91,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
         #
         self.rack = fabula.Rack()
 
-        self.logger.info("complete")
+        fabula.LOGGER.debug("complete")
 
         return
 
@@ -109,7 +100,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            plugin_instance must be an instance of fabula.plugins.Plugin.
         """
 
-        self.logger.info("setting plugin to {}".format(plugin_instance))
+        fabula.LOGGER.info("setting plugin to {}".format(plugin_instance))
 
         self.plugin = plugin_instance
 
@@ -123,7 +114,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation waits for self.plugin.exit_requested to be True.
         """
 
-        self.logger.info("starting")
+        fabula.LOGGER.info("starting")
 
         # You will probably want to run until the
         # plugin engine decides that the game is
@@ -134,13 +125,13 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         # exit has been requested
 
-        self.logger.info("exit requested from Plugin, shutting down interface...")
+        fabula.LOGGER.info("exit requested from Plugin, shutting down interface...")
 
         # stop the Interface thread
         #
         self.interface.shutdown()
 
-        self.logger.info("shutdown confirmed.")
+        fabula.LOGGER.info("shutdown confirmed.")
 
         # TODO: possibly exit cleanly from the Plugin here
 
@@ -151,7 +142,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -162,7 +153,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -173,7 +164,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -184,7 +175,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -195,7 +186,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -206,7 +197,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -216,13 +207,13 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """Let self.room process the event and pass it on.
         """
 
-        self.logger.debug("%s location before: %s "
+        fabula.LOGGER.debug("%s location before: %s "
                           % (event.identifier,
                              self.room.entity_locations[event.identifier]))
 
         self.room.process_MovesToEvent(event)
 
-        self.logger.debug("%s location after: %s "
+        fabula.LOGGER.info("%s location after: %s "
                           % (event.identifier,
                              self.room.entity_locations[event.identifier]))
 
@@ -236,7 +227,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            PicksUpEvent on.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Save the Entity to be picked up in Engine.rack
         #
@@ -262,14 +253,14 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Respawn the Entity to be dropped in Engine.room
         # Delete it from Engine.rack
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
-        self.logger.debug("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
 
         dropped_entity = self.rack.retrieve(event.item_identifier)
 
@@ -288,7 +279,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -299,7 +290,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -310,7 +301,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -321,7 +312,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -332,7 +323,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -344,7 +335,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
 
-        self.logger.debug(msg.format(event.property_key,
+        fabula.LOGGER.info(msg.format(event.property_key,
                                      event.property_value,
                                      event.identifier))
 
@@ -359,7 +350,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -370,7 +361,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -381,7 +372,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -392,7 +383,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -402,7 +393,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """Let self.room process the event and pass it on.
         """
 
-        self.logger.debug("spawning entity '%s', type %s, location %s"
+        fabula.LOGGER.info("spawning entity '%s', type %s, location %s"
                           % (event.entity.identifier,
                              event.entity.entity_type,
                              event.location))
@@ -420,7 +411,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         # TODO: very similar to PicksUpEvent
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         # Save the Entity to be deleted in Engine.rack
         #
@@ -451,7 +442,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            in parallel to the established rooms.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -462,7 +453,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -473,7 +464,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            and add it to message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         self.room.process_ChangeMapElementEvent(event)
 
@@ -486,7 +477,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -497,7 +488,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            The default implementation adds the event to the message.
         """
 
-        self.logger.debug("called")
+        fabula.LOGGER.debug("called")
 
         kwargs["message"].event_list.append(event)
 
@@ -509,13 +500,13 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         if self.room is None:
 
-            self.logger.debug("not walkable: room is None")
+            fabula.LOGGER.debug("not walkable: room is None")
 
             return False
 
         elif target_identifier not in self.room.floor_plan.keys():
 
-            self.logger.debug("{} not walkable: not in floor_plan".format(target_identifier))
+            fabula.LOGGER.debug("{} not walkable: not in floor_plan".format(target_identifier))
 
             return False
 
@@ -524,7 +515,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
             if floor_plan_element.tile.tile_type != fabula.FLOOR:
 
-                self.logger.debug("{} not walkable: target tile_type != fabula.FLOOR".format(target_identifier))
+                fabula.LOGGER.debug("{} not walkable: target tile_type != fabula.FLOOR".format(target_identifier))
 
                 return False
 
@@ -539,7 +530,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
                 if occupied:
 
-                    self.logger.debug("{} not walkable: target occupied by blocking Entity".format(target_identifier))
+                    fabula.LOGGER.debug("{} not walkable: target occupied by blocking Entity".format(target_identifier))
 
                     return False
 

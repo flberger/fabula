@@ -62,7 +62,7 @@ class Client(fabula.core.Engine):
     ####################
     # Init
 
-    def __init__(self, interface_instance, logger):
+    def __init__(self, interface_instance):
         """Initalisation.
            The Client must be instantiated with an instance of a subclass of
            fabula.interfaces.Interface which handles the connection to the server
@@ -80,8 +80,7 @@ class Client(fabula.core.Engine):
         # Then setup Engine internals
         #
         fabula.core.Engine.__init__(self,
-                                   interface_instance,
-                                   logger)
+                                   interface_instance)
 
         # Now we have:
         #
@@ -132,7 +131,7 @@ class Client(fabula.core.Engine):
         #
         self.local_moves_to_event = fabula.MovesToEvent(None, None)
 
-        self.logger.info("complete")
+        fabula.LOGGER.debug("complete")
 
     ####################
     # Main Loop
@@ -152,12 +151,12 @@ class Client(fabula.core.Engine):
         # approach to the whole thing instead of putting
         # neat "if" clauses here and there.
 
-        self.logger.info("starting")
+        fabula.LOGGER.info("starting")
 
         # By now we should have self.plugin. This is the reason why we do not
         # do this in __init__().
 
-        self.logger.info("prompting the user for connection details")
+        fabula.LOGGER.info("prompting the user for connection details")
 
         while self.client_id == "":
 
@@ -165,7 +164,7 @@ class Client(fabula.core.Engine):
 
         if len(self.interface.connections.keys()):
 
-            self.logger.debug("interface is already connected to '{}', using connection".format(list(self.interface.connections.keys())[0]))
+            fabula.LOGGER.info("interface is already connected to '{}', using connection".format(list(self.interface.connections.keys())[0]))
 
         else:
 
@@ -173,7 +172,7 @@ class Client(fabula.core.Engine):
 
                 msg = "can not connect to Server: client_id == '{}', connector == {}"
 
-                self.logger.critical(msg.format(self.client_id, connector))
+                fabula.LOGGER.critical(msg.format(self.client_id, connector))
 
                 # TODO: exit properly
                 #
@@ -181,7 +180,7 @@ class Client(fabula.core.Engine):
 
             else:
 
-                self.logger.info("connecting Interface to '{}'".format(connector))
+                fabula.LOGGER.info("connecting Interface to '{}'".format(connector))
 
                 self.interface.connect(connector)
 
@@ -193,7 +192,7 @@ class Client(fabula.core.Engine):
         #
         self.message_log_file = open("messages-{}.log".format(self.client_id), "wb")
 
-        self.logger.info("sending InitEvent")
+        fabula.LOGGER.info("sending InitEvent")
 
         self.message_buffer.send_message(fabula.Message([fabula.InitEvent(self.client_id)]))
 
@@ -212,7 +211,7 @@ class Client(fabula.core.Engine):
 
             if server_message.event_list:
 
-                self.logger.info("server incoming: %s"
+                fabula.LOGGER.debug("server incoming: %s"
                                  % server_message)
 
                 # Loggin a tuple of time difference
@@ -230,7 +229,7 @@ class Client(fabula.core.Engine):
                                                              0))
                 except:
                     exception = traceback.format_exc()
-                    self.logger.debug("exception trying to pickle server message {}:\n{}".format(server_message, exception))
+                    fabula.LOGGER.error("exception trying to pickle server message {}:\n{}".format(server_message, exception))
 
                 # Add double newline as separator
                 #
@@ -248,7 +247,7 @@ class Client(fabula.core.Engine):
 
                 # TODO: The UserInterface currently locks up when there are no answers from the server. The Client should time out and exit politely if there is no initial answer from the server or there has been no answer for some time.
 
-                self.logger.info("got an empty server_message.")
+                fabula.LOGGER.debug("got an empty server_message.")
 
                 # Set to True to log empty messages only once
                 #
@@ -302,7 +301,7 @@ class Client(fabula.core.Engine):
 
                     if self.timestamp == None:
 
-                        self.logger.debug("player attempt but still waiting - starting timer")
+                        fabula.LOGGER.warning("player attempt but still waiting - starting timer")
 
                         self.timestamp = datetime.datetime.today()
 
@@ -312,13 +311,13 @@ class Client(fabula.core.Engine):
 
                         if timedifference.seconds >= 1:
 
-                            self.logger.warn("waited 1s, still no confirmation, resetting timer")
+                            fabula.LOGGER.warning("waited 1s, still no confirmation, resetting timer")
 
                             self.timestamp = None
 
                         else:
 
-                            self.logger.debug("still waiting for confirmation")
+                            fabula.LOGGER.info("still waiting for confirmation")
 
                 else:
 
@@ -357,7 +356,7 @@ class Client(fabula.core.Engine):
                             #
                             if difference in ((0, 1), (0, -1), (1, 0), (-1, 0)):
 
-                                self.logger.debug("applying TriesToMoveEvent locally")
+                                fabula.LOGGER.info("applying TriesToMoveEvent locally")
 
                                 # TODO: event.identifier in self.room.entity_dict? event.target_identifier in fabula.DIRECTION_VECTOR?
 
@@ -419,7 +418,7 @@ class Client(fabula.core.Engine):
 
                         if isinstance(event, fabula.AttemptEvent):
 
-                            self.logger.debug("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+                            fabula.LOGGER.info("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
 
                             self.await_confirmation = True
 
@@ -431,7 +430,7 @@ class Client(fabula.core.Engine):
             #
             if self.message_for_remote.event_list:
 
-                self.logger.debug("server outgoing: %s" % self.message_for_remote)
+                fabula.LOGGER.debug("server outgoing: %s" % self.message_for_remote)
 
                 self.message_buffer.send_message(self.message_for_remote)
 
@@ -448,18 +447,17 @@ class Client(fabula.core.Engine):
 
         # exit has been requested
 
-        self.logger.info("exit requested from "
-              + "UserInterface, shutting down interface...")
+        fabula.LOGGER.info("exit requested from UserInterface, shutting down interface...")
 
         # stop the Client Interface thread
         #
         self.interface.shutdown()
 
-        self.logger.info("closing message log file")
+        fabula.LOGGER.debug("closing message log file")
 
         self.message_log_file.close()
 
-        self.logger.info("shutdown confirmed.")
+        fabula.LOGGER.info("shutdown confirmed.")
 
         # TODO: possibly exit cleanly from the UserInterface here
 
@@ -472,7 +470,7 @@ class Client(fabula.core.Engine):
         """Possibly revert movement or call default, then unblock the client.
         """
 
-        self.logger.debug("attempt failed for '{}'".format(event.identifier))
+        fabula.LOGGER.info("attempt failed for '{}'".format(event.identifier))
 
         # Did this fail for the Entity we just moved locally?
         #
@@ -481,7 +479,7 @@ class Client(fabula.core.Engine):
             entity = self.room.entity_dict[event.identifier]
             location = self.room.entity_locations[event.identifier]
 
-            self.logger.debug("attempt failed for %s, now at %s"
+            fabula.LOGGER.warning("attempt failed for %s, now at %s"
                               % (event.identifier, location))
 
             # TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
@@ -494,7 +492,7 @@ class Client(fabula.core.Engine):
             self.room.process_MovesToEvent(fabula.MovesToEvent(event.identifier,
                                                               (restored_x, restored_y)))
 
-            self.logger.debug("%s now reverted to %s" % (event.identifier,
+            fabula.LOGGER.info("%s now reverted to %s" % (event.identifier,
                                                          (restored_x, restored_y)))
         # Call default to forward to the Plugin.
         #
@@ -568,7 +566,7 @@ class Client(fabula.core.Engine):
 
             self.await_confirmation = False
 
-        self.logger.debug("await_confirmation unset")
+        fabula.LOGGER.debug("await_confirmation unset")
 
     def process_MovesToEvent(self, event, **kwargs):
         """Notify the Room and add the event to the message.
@@ -582,7 +580,7 @@ class Client(fabula.core.Engine):
 
             # Fine, we already had that.
             #
-            self.logger.debug("server issued MovesToEvent already applied: ('%s', '%s')"
+            fabula.LOGGER.info("server issued MovesToEvent already applied: ('%s', '%s')"
                               % (event.identifier, event.location))
 
             # Reset copy of local event
@@ -672,7 +670,7 @@ class Client(fabula.core.Engine):
                                                   message = kwargs["message"])
 
         else:
-            self.logger.warn("Entity to delete does not exist.")
+            fabula.LOGGER.warning("Entity to delete does not exist.")
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """This method empties all data structures and passes the event on

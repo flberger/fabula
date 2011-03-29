@@ -10,8 +10,8 @@ Asset Manager
     >>> stream.close()
     >>> import fabula.assets
     >>> import fabula.run
-    >>> app = fabula.run.App("d", timeout = 5)
-    >>> assets = fabula.assets.Assets(app.logger)
+    >>> app = fabula.run.App("i", timeout = 5)
+    >>> assets = fabula.assets.Assets()
     >>> asset = assets.fetch("temp.dat")
     >>> asset.read()
     b'fabula'
