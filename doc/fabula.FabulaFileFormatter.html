@@ -3,47 +3,43 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.Message&rdquo;</title>
+    <title>API docs for &ldquo;fabula.FabulaFileFormatter&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.Message:</h1>
+    <h1 class="class">Class f.FabulaFileFormatter(<span title="logging.Formatter">logging.Formatter</span>):</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a></span>
       
-      <a href="classIndex.html#fabula.Message">View In Hierarchy</a>
+      <a href="classIndex.html#fabula.FabulaFileFormatter">View In Hierarchy</a>
     </p>
     <div>
       
     </div>
-    <pre>A Message represents a set of Events that happen in parallel.
-
-Attributes:
-
-Message.event_list
-    A list of fabula.Events</pre>
+    <pre>Subclass of Formatter with reasonable module information.
+    </pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id93">
+      <table class="children sortable" id="id99">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.Message.html#__init__">__init__</a></td>
-    <td><tt>Initialise the Message with a list of objects derived from fabula.Event.</tt></td>
+    <td><a href="fabula.FabulaFileFormatter.html#__init__">__init__</a></td>
+    <td><tt>Compile a regular expression object, then call base class __init__().</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.Message.html#__repr__">__repr__</a></td>
-    <td><tt>Official string representation.</tt></td>
+    <td><a href="fabula.FabulaFileFormatter.html#format">format</a></td>
+    <td><tt>Override logging.Formatter.format()</tt></td>
   </tr>
   
 </table>
@@ -55,7 +51,7 @@ Message.event_list
     
 
     <div class="function">
-  <a name="fabula.Message.__init__">
+  <a name="fabula.FabulaFileFormatter.__init__">
     
   </a>
   <a name="__init__">
@@ -64,30 +60,30 @@ Message.event_list
   <div class="functionHeader">
     
     def
-    __init__(self, event_list):
+    __init__(self, fmt, datefmt):
     
   </div>
   <div class="functionBody">
     
-    <pre>Initialise the Message with a list of objects derived from fabula.Event.
-An empty list may be supplied.</pre>
+    <pre>Compile a regular expression object, then call base class __init__().
+        </pre>
   </div>
 </div><div class="function">
-  <a name="fabula.Message.__repr__">
+  <a name="fabula.FabulaFileFormatter.format">
     
   </a>
-  <a name="__repr__">
+  <a name="format">
     
   </a>
   <div class="functionHeader">
     
     def
-    __repr__(self):
+    format(self, record):
     
   </div>
   <div class="functionBody">
     
-    <pre>Official string representation.
+    <pre>Override logging.Formatter.format()
         </pre>
   </div>
 </div>
