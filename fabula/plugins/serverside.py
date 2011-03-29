@@ -260,7 +260,8 @@ class DefaultGame(fabula.plugins.Plugin):
                 event_list.append(fabula.AttemptFailedEvent(identifier))
 
             else:
-                self.logger.info("movement pending for '{}', last positions {}, best move towards {} is {}".format(identifier, self.path_dict[identifier], target_identifier, location))
+                self.logger.info("movement pending for '{}'".format(identifier))
+                self.logger.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
 
                 # Save current position before movement as last position
                 #
@@ -311,7 +312,7 @@ class DefaultGame(fabula.plugins.Plugin):
             #
             messages = list(messages)
 
-            self.logger.info("got {}".format(messages))
+            self.logger.debug("got {}".format(messages))
 
             # First append to existing Message lists
             #
@@ -323,7 +324,7 @@ class DefaultGame(fabula.plugins.Plugin):
             #
             self.message_queue.extend([[message] for message in messages])
 
-            self.logger.info("message_queue is now {}".format(self.message_queue))
+            self.logger.debug("message_queue is now {}".format(self.message_queue))
 
         return
 
@@ -332,7 +333,7 @@ class DefaultGame(fabula.plugins.Plugin):
            Replace the Entity identifier "player" with event.identifier.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.logger.info("attempting to load 'default.floorplan'")
 
@@ -356,7 +357,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if event.identifier in self.tries_to_move_dict.keys():
 
-            self.logger.info("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
+            self.logger.debug("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
                                                                             event.identifier))
 
             del self.tries_to_move_dict[event.identifier]
@@ -381,9 +382,9 @@ class DefaultGame(fabula.plugins.Plugin):
         else:
             msg = "movement requested for '{}', last positions, best move towards {} is {}"
 
-            self.logger.info(msg.format(event.identifier,
-                                         event.target_identifier,
-                                         location))
+            self.logger.debug(msg.format(event.identifier,
+                                        event.target_identifier,
+                                        location))
 
             # Save current position before movement as last position
             #
@@ -393,13 +394,13 @@ class DefaultGame(fabula.plugins.Plugin):
 
             if location == event.target_identifier:
 
-                self.logger.info("target reached, not recording in tries_to_move_dict")
+                self.logger.debug("target reached, not recording in tries_to_move_dict")
 
                 del self.path_dict[event.identifier]
 
             else:
 
-                self.logger.info("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
+                self.logger.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
                                                                                   event.target_identifier))
 
                 self.tries_to_move_dict[event.identifier] = event.target_identifier
@@ -455,7 +456,7 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         if event.target_identifier in self.host.room.entity_dict.keys():
 
-            self.logger.info("target '{}' is an entity identifier".format(event.target_identifier))
+            self.logger.debug("target '{}' is an entity identifier".format(event.target_identifier))
 
             if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
 
@@ -467,7 +468,7 @@ class DefaultGame(fabula.plugins.Plugin):
                 self.respond(event)
 
         else:
-            self.logger.info("target '{}' is not an entity identifier".format(event.target_identifier))
+            self.logger.debug("target '{}' is not an entity identifier".format(event.target_identifier))
 
             if event.target_identifier not in surrounding_positions:
 
@@ -503,7 +504,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
         self.respond(event)
         return
 
@@ -512,7 +513,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
         self.respond(event)
         return
 
@@ -521,7 +522,7 @@ class DefaultGame(fabula.plugins.Plugin):
            The default implementation calls DefaultGame.respond().
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
         self.respond(event)
         return
 
@@ -529,7 +530,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Cache source and target of the event in self.talk_to_dict, then call DefaultGame.respond().
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         # Cache source and target
         #
@@ -575,7 +576,7 @@ class DefaultGame(fabula.plugins.Plugin):
             return possible_moves[0]
 
         else:
-            # self.logger.info("possible_moves == {}".format(possible_moves))
+            # self.logger.debug("possible_moves == {}".format(possible_moves))
 
             # Taking first as reference
             #
@@ -586,7 +587,7 @@ class DefaultGame(fabula.plugins.Plugin):
             shortest_distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                           + distance_vector[1] * distance_vector[1])
 
-            # self.logger.info("move {} has distance {}".format(best_move, shortest_distance))
+            # self.logger.debug("move {} has distance {}".format(best_move, shortest_distance))
 
             # Examine remaining
             #
@@ -597,13 +598,13 @@ class DefaultGame(fabula.plugins.Plugin):
                 distance = math.sqrt(distance_vector[0] * distance_vector[0]
                                      + distance_vector[1] * distance_vector[1])
 
-                # self.logger.info("move {} has distance {}".format(move, distance))
+                # self.logger.debug("move {} has distance {}".format(move, distance))
 
                 if distance < shortest_distance:
                     shortest_distance = distance
                     best_move = move
 
-            # self.logger.info("choosing move {} with distance {}".format(best_move, shortest_distance))
+            # self.logger.debug("choosing move {} with distance {}".format(best_move, shortest_distance))
 
             return best_move
 
@@ -639,7 +640,7 @@ class DefaultGame(fabula.plugins.Plugin):
         else:
             self.logger.error("no filename given")
 
-        self.logger.info("{} condition-response records".format(len(self.condition_response_dict)))
+        self.logger.debug("{} condition-response records".format(len(self.condition_response_dict)))
 
         return
 
@@ -647,15 +648,15 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return a list of Events where alle occurences of identifier are replaced by replacement.
         """
 
-        self.logger.info("replacing identifier '{}' with '{}'".format(identifier, replacement))
+        self.logger.debug("replacing identifier '{}' with '{}'".format(identifier, replacement))
 
         list_repr, replacements = re.subn(r"([^_])identifier = '{}'".format(identifier),
                                           r"\1identifier = '{}'".format(replacement),
                                           repr(event_list))
 
-        self.logger.info("original: {}, replacement: {}".format(event_list, list_repr))
+        self.logger.debug("original: {}, replacement: {}".format(event_list, list_repr))
 
-        self.logger.info("made {} replacements".format(replacements))
+        self.logger.debug("made {} replacements".format(replacements))
 
         return eval(list_repr)
 
@@ -681,7 +682,7 @@ class Editor(DefaultGame):
         #
         DefaultGame.__init__(self, host)
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
@@ -703,7 +704,7 @@ class Editor(DefaultGame):
                                                                  60,
                                                                  self)
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
     def process_message(self, message):
         """Editor main method.
@@ -751,7 +752,7 @@ class Editor(DefaultGame):
 
         # TODO: even InitEvent should call respond()
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         if self.host.room is None:
 
@@ -781,7 +782,7 @@ class Editor(DefaultGame):
         """OptionList callback to read a Room from a file and send it to the Server.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         event_list = load_room_from_file(option.text + ".floorplan")
 
@@ -793,7 +794,7 @@ class Editor(DefaultGame):
 
             self.message_for_host.event_list.extend(event_list)
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
         return
 

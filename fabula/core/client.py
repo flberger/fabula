@@ -132,7 +132,7 @@ class Client(fabula.core.Engine):
         #
         self.local_moves_to_event = fabula.MovesToEvent(None, None)
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
     ####################
     # Main Loop
@@ -212,7 +212,7 @@ class Client(fabula.core.Engine):
 
             if server_message.event_list:
 
-                self.logger.info("server incoming: %s"
+                self.logger.debug("server incoming: %s"
                                  % server_message)
 
                 # Loggin a tuple of time difference
@@ -230,7 +230,7 @@ class Client(fabula.core.Engine):
                                                              0))
                 except:
                     exception = traceback.format_exc()
-                    self.logger.info("exception trying to pickle server message {}:\n{}".format(server_message, exception))
+                    self.logger.error("exception trying to pickle server message {}:\n{}".format(server_message, exception))
 
                 # Add double newline as separator
                 #
@@ -248,7 +248,7 @@ class Client(fabula.core.Engine):
 
                 # TODO: The UserInterface currently locks up when there are no answers from the server. The Client should time out and exit politely if there is no initial answer from the server or there has been no answer for some time.
 
-                self.logger.info("got an empty server_message.")
+                self.logger.debug("got an empty server_message.")
 
                 # Set to True to log empty messages only once
                 #
@@ -302,7 +302,7 @@ class Client(fabula.core.Engine):
 
                     if self.timestamp == None:
 
-                        self.logger.info("player attempt but still waiting - starting timer")
+                        self.logger.warning("player attempt but still waiting - starting timer")
 
                         self.timestamp = datetime.datetime.today()
 
@@ -312,7 +312,7 @@ class Client(fabula.core.Engine):
 
                         if timedifference.seconds >= 1:
 
-                            self.logger.warn("waited 1s, still no confirmation, resetting timer")
+                            self.logger.warning("waited 1s, still no confirmation, resetting timer")
 
                             self.timestamp = None
 
@@ -431,7 +431,7 @@ class Client(fabula.core.Engine):
             #
             if self.message_for_remote.event_list:
 
-                self.logger.info("server outgoing: %s" % self.message_for_remote)
+                self.logger.debug("server outgoing: %s" % self.message_for_remote)
 
                 self.message_buffer.send_message(self.message_for_remote)
 
@@ -448,14 +448,13 @@ class Client(fabula.core.Engine):
 
         # exit has been requested
 
-        self.logger.info("exit requested from "
-              + "UserInterface, shutting down interface...")
+        self.logger.info("exit requested from UserInterface, shutting down interface...")
 
         # stop the Client Interface thread
         #
         self.interface.shutdown()
 
-        self.logger.info("closing message log file")
+        self.logger.debug("closing message log file")
 
         self.message_log_file.close()
 
@@ -481,7 +480,7 @@ class Client(fabula.core.Engine):
             entity = self.room.entity_dict[event.identifier]
             location = self.room.entity_locations[event.identifier]
 
-            self.logger.info("attempt failed for %s, now at %s"
+            self.logger.warning("attempt failed for %s, now at %s"
                               % (event.identifier, location))
 
             # TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
@@ -568,7 +567,7 @@ class Client(fabula.core.Engine):
 
             self.await_confirmation = False
 
-        self.logger.info("await_confirmation unset")
+        self.logger.debug("await_confirmation unset")
 
     def process_MovesToEvent(self, event, **kwargs):
         """Notify the Room and add the event to the message.
@@ -672,7 +671,7 @@ class Client(fabula.core.Engine):
                                                   message = kwargs["message"])
 
         else:
-            self.logger.warn("Entity to delete does not exist.")
+            self.logger.warning("Entity to delete does not exist.")
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """This method empties all data structures and passes the event on

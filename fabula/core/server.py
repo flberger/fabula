@@ -118,7 +118,7 @@ class Server(fabula.core.Engine):
 
                 if len(message.event_list):
 
-                    self.logger.info("{0} incoming: {1}".format(address_port_tuple, message))
+                    self.logger.debug("{0} incoming: {1}".format(address_port_tuple, message))
 
                     for event in message.event_list:
 
@@ -152,7 +152,7 @@ class Server(fabula.core.Engine):
                             # Looks like the Client sent an Event typically
                             # issued by the Server. Let the Plugin handle that.
                             #
-                            self.logger.info("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
+                            self.logger.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
                             self.message_for_plugin.event_list.append(event)
 
                         # Contrary to the Client, the Server calls its plugin
@@ -234,7 +234,7 @@ class Server(fabula.core.Engine):
         #
         if self.message_for_remote.event_list:
 
-            self.logger.info("{0} outgoing: {1}".format(address_port_tuple,
+            self.logger.debug("{0} outgoing: {1}".format(address_port_tuple,
                                                          self.message_for_remote))
 
             self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
@@ -308,7 +308,7 @@ class Server(fabula.core.Engine):
             #
             if len(self.message_for_all.event_list):
 
-                self.logger.info("message for all clients in current room: {}".format(self.message_for_all.event_list))
+                self.logger.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
                 for client_key in self.room.active_clients:
 
@@ -534,7 +534,7 @@ class Server(fabula.core.Engine):
         """Check what is being picked up, replace event.target_identifier with the identifier of the Entity to be picked up, then let the Plugin handle the Event.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         new_event = None
 
@@ -581,7 +581,7 @@ class Server(fabula.core.Engine):
 
         # TODO: What about Entities in walls?
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         # Check target
         #

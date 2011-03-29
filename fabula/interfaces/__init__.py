@@ -95,7 +95,7 @@ class Interface:
         #
         self.shutdown_confirmed = False
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
     def connect(self, connector):
         """Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
@@ -158,7 +158,7 @@ class Interface:
            notification and is about to exit.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         # Set the flag to be caught by handle_messages()
         #
@@ -235,7 +235,7 @@ class StandaloneInterface(Interface):
 
         self.framerate = framerate
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
     def handle_messages(self, remote_message_buffer):
         """This background thread method transfers messages between local and remote MessageBuffer.
@@ -264,7 +264,7 @@ class StandaloneInterface(Interface):
                         # These need special care. We need to have a canonic
                         # fabula.Entity. Entity.clone() will produce one.
                         #
-                        self.logger.info("cloning canonical Entity from {}".format(event.entity))
+                        self.logger.debug("cloning canonical Entity from {}".format(event.entity))
 
                         event = fabula.SpawnEvent(event.entity.clone(),
                                                   event.location)
@@ -272,7 +272,7 @@ class StandaloneInterface(Interface):
                     # Create new instances from string representations to avoid
                     # concurrent access of client and server to the object
                     #
-                    self.logger.info("evaluating: '{}'".format(repr(event)))
+                    self.logger.debug("evaluating: '{}'".format(repr(event)))
 
                     try:
                         new_message.event_list.append(eval(repr(event)))
@@ -346,7 +346,7 @@ class StandaloneInterface(Interface):
 #        #
 #        self.sock.settimeout(0.3)
 
-#        self.logger.info("complete")
+#        self.logger.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
@@ -436,7 +436,7 @@ class StandaloneInterface(Interface):
 #        #
 #        self.client_connections = {}
 
-#        self.logger.info("complete")
+#        self.logger.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send server messages and obtain client messages.
@@ -462,7 +462,7 @@ class StandaloneInterface(Interface):
 
 #            def handle(self):
 
-#                logger_proxy.info("called")
+#                logger_proxy.debug("called")
 
 #                # Test for new client,
 #                # i.e. not (address, port) tuple in keys
@@ -565,14 +565,14 @@ class StandaloneInterface(Interface):
 
 #        self.connection_made = False
 
-#        self.logger.info("complete")
+#        self.logger.debug("complete")
 
 #    def connectionMade(self):
 #        """Standard Twisted Protocol method.
 #           Now ProtocolMessageBuffer.transport is ready to be used.
 #        """
 
-#        self.logger.info("called")
+#        self.logger.debug("called")
 
 #        self.connection_made = True
 
@@ -666,7 +666,7 @@ class StandaloneInterface(Interface):
 
 #        self.send_interval = send_interval
 
-#        self.logger.info("complete")
+#        self.logger.debug("complete")
 
 #    def handle_messages(self):
 #        """The task of this method is to do whatever is necessary to send client messages and obtain server messages.
@@ -723,7 +723,7 @@ class StandaloneInterface(Interface):
 
 #            #def startedConnecting(self, address_port_tuple):
 #            #
-#            #    logger_proxy.info("called")
+#            #    logger_proxy.debug("called")
 
 #            # End of MessageProtocolFactory class
 

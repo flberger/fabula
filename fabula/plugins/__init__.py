@@ -75,7 +75,7 @@ class Plugin(fabula.eventprocessor.EventProcessor):
 
         if message.event_list:
 
-            self.logger.info("processing message {}".format(message.event_list))
+            self.logger.debug("processing message {}".format(message.event_list))
 
             for event in message.event_list:
 

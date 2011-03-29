@@ -51,7 +51,7 @@ class Assets:
            This method actually is a dispatcher to more specialised methods.
         """
 
-        self.logger.info("unknown asset '{}', attempting to fetch".format(asset_desc))
+        self.logger.debug("unknown asset '{}', attempting to fetch".format(asset_desc))
 
         if (asset_desc.startswith("http://") or asset_desc.startswith("ftp://")):
 
@@ -182,6 +182,6 @@ class Assets:
 
         file = open(asset_desc, mode='rb')
 
-        self.logger.info("returning {}".format(file))
+        self.logger.debug("returning {}".format(file))
 
         return file

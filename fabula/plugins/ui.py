@@ -113,7 +113,7 @@ class UserInterface(fabula.plugins.Plugin):
                                       (0, 1) : "v",
                                       (-1, 0) : "<"}
 
-        self.logger.info("complete")
+        self.logger.debug("complete")
 
         return
 
@@ -217,7 +217,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         msg = "{} s action_time from server * {} fps framerate = {} action_frames"
 
-        self.logger.info(msg.format(event.action_time,
+        self.logger.debug(msg.format(event.action_time,
                                      self.framerate,
                                      self.action_frames))
 
@@ -287,7 +287,7 @@ class UserInterface(fabula.plugins.Plugin):
            UserInterface.exit_requested to True.
         """
 
-        self.logger.info("pretending player wants to quit")
+        self.logger.warning("pretending player wants to quit")
 
         self.exit_requested = True
 
@@ -319,7 +319,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation sets UserInterface.freeze = False.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         self.logger.info("unfreezing")
         self.freeze = False
@@ -336,7 +336,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         # TODO: Make sure that this is the last event rendered before returning to the ControlEngine?
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         event = fabula.SaysEvent(self.player_id, "blah")
 
@@ -365,7 +365,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         return
 
@@ -378,7 +378,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         return
 
@@ -391,7 +391,7 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation does nothing.
         """
 
-        self.logger.info("called")
+        self.logger.debug("called")
 
         return
 
@@ -402,7 +402,7 @@ class UserInterface(fabula.plugins.Plugin):
         """Let the Entity handle the Event.
         """
 
-        self.logger.info("forwarding Event to Entity and displaying a single frame")
+        self.logger.debug("forwarding Event to Entity and displaying a single frame")
 
         self.host.room.entity_dict[event.identifier].process_MovesToEvent(event)
 
@@ -412,7 +412,7 @@ class UserInterface(fabula.plugins.Plugin):
         """Entity has already handled the Event.
         """
 
-        self.logger.info("Entity '{}' has already handled the Event".format(event.identifier))
+        self.logger.debug("Entity '{}' has already handled the Event".format(event.identifier))
 
         return
 
@@ -420,7 +420,7 @@ class UserInterface(fabula.plugins.Plugin):
         """Pass the Event to the dropping Entity and spawn the dropped Entity.
         """
 
-        self.logger.info("passing Event to '{}'".format(event.identifier))
+        self.logger.debug("passing Event to '{}'".format(event.identifier))
 
         self.host.room.entity_dict[event.identifier].process_DropsEvent(event)
 
@@ -440,7 +440,7 @@ class UserInterface(fabula.plugins.Plugin):
            client.rack.
         """
 
-        self.logger.info("notifying Entity '{}'".format(event.identifier))
+        self.logger.debug("notifying Entity '{}'".format(event.identifier))
 
         self.host.room.entity_dict[event.identifier].process_PicksUpEvent(event)
 
@@ -459,7 +459,7 @@ class UserInterface(fabula.plugins.Plugin):
         try:
             self.host.room.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.info("forwarded SaysEvent({}, '{}')".format(event.identifier,
+            self.logger.debug("forwarded SaysEvent({}, '{}')".format(event.identifier,
                                                                      event.text))
 
         except KeyError:
@@ -468,7 +468,7 @@ class UserInterface(fabula.plugins.Plugin):
             #
             self.host.rack.entity_dict[event.identifier].process_SaysEvent(event)
 
-            self.logger.info("forwarded SaysEvent({}, '{}') to deleted entity".format(event.identifier,
+            self.logger.warning("forwarded SaysEvent({}, '{}') to deleted entity".format(event.identifier,
                                                                                        event.text))
 
         return
