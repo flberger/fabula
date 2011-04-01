@@ -88,7 +88,7 @@ class Assets:
 #
 #        for name in zip_file.namelist():
 #
-#            fabula.LOGGER.info("retrieving %s from ZIP file %s" % (name, asset_desc))
+#            fabula.LOGGER.debug("retrieving %s from ZIP file %s" % (name, asset_desc))
 #
 #            string_io = StringIO.StringIO(zip_file.read(name))
 #
@@ -179,7 +179,7 @@ class Assets:
 
                 return
 
-        fabula.LOGGER.info("attempting to retrieve '{}' from local file".format(asset_desc))
+        fabula.LOGGER.debug("attempting to retrieve '{}' from local file".format(asset_desc))
 
         file = open(asset_desc, mode='rb')
 

@@ -612,7 +612,7 @@ class DefaultGame(fabula.plugins.Plugin):
         """Load response logic from the file given.
         """
 
-        fabula.LOGGER.info("attempting to read from file '{}'".format(filename))
+        fabula.LOGGER.debug("attempting to read from file '{}'".format(filename))
 
         if filename:
 
@@ -779,7 +779,7 @@ class Editor(DefaultGame):
             self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
     def send_room_events(self, option):
-        """OptionList callback to read a Room from a file and send it to the Server.
+        """OptionSelector callback to read a Room from a file and send it to the Server.
         """
 
         fabula.LOGGER.debug("called")

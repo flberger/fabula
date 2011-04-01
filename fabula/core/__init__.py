@@ -335,9 +335,9 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
 
-        fabula.LOGGER.info(msg.format(event.property_key,
-                                     event.property_value,
-                                     event.identifier))
+        fabula.LOGGER.debug(msg.format(event.property_key,
+                                       event.property_value,
+                                       event.identifier))
 
         self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
 

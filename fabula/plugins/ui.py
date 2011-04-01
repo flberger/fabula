@@ -351,7 +351,7 @@ class UserInterface(fabula.plugins.Plugin):
            visible Entities you might have set up and render a static frame.
         """
 
-        fabula.LOGGER.info("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
+        fabula.LOGGER.debug("adding pointer to UserInterface to Entity '{}'".format(event.entity.identifier))
 
         event.entity.user_interface = self
 

@@ -418,7 +418,7 @@ class Client(fabula.core.Engine):
 
                         if isinstance(event, fabula.AttemptEvent):
 
-                            fabula.LOGGER.info("got AttemptEvent from Plugin: awaiting confirmation and discarding further user input")
+                            fabula.LOGGER.info("got attempt '{}' from Plugin: awaiting confirmation and discarding further user input".format(event.__class__.__name__))
 
                             self.await_confirmation = True
 

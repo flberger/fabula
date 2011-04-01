@@ -777,12 +777,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def process_CanSpeakEvent(self, event):
-        """Open the senteces as an OptionList and return a SaysEvent to the host.
+        """Open the sentences as an OptionSelector and return a SaysEvent to the host.
         """
 
         fabula.LOGGER.debug("called")
 
-        option_list = clickndrag.gui.OptionList("select_room",
+        option_list = clickndrag.gui.OptionSelector("select_room",
                                                 event.sentences,
                                                 lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
                                                 lineheight = 25)
@@ -1100,9 +1100,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if entity.asset is not None \
            and event.property_key == "caption" \
-           and not "caption" in entity.asset.subplanes_list:
+           and not event.identifier + "_caption" in self.window.room.subplanes_list:
 
-            fabula.LOGGER.info("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
+            fabula.LOGGER.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
 
             entity.process_ChangePropertyEvent(event)
 
@@ -1449,6 +1449,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     else:
                         entity.asset.draggable = False
 
+                else:
+                    # Make sure it's not draggable
+                    #
+                    entity.asset.draggable = False
+
         else:
             fabula.LOGGER.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
 
@@ -1647,21 +1652,6 @@ class PygameEditor(PygameUserInterface):
 
         # Add buttons
 
-        background = clickndrag.gui.Container("background",
-                                              padding = 4,
-                                              background_color = (120, 120, 120))
-
-        background.sub(clickndrag.gui.Label("title",
-                                            "Background",
-                                            pygame.Rect((0, 0),
-                                                        (80, 25)),
-                                            background_color = (120, 120, 120)))
-
-        background.sub(clickndrag.gui.Button("Open Image",
-                                             pygame.Rect((0, 0),
-                                                         (80, 25)),
-                                             self.open_image))
-
         room = clickndrag.gui.Container("room",
                                         padding = 4,
                                         background_color = (120, 120, 120))
@@ -1682,15 +1672,30 @@ class PygameEditor(PygameUserInterface):
                                                    (80, 25)),
                                        self.save_room))
 
-        room.sub(clickndrag.gui.Button("Add Item",
+        room.sub(clickndrag.gui.Button("Add Entity",
                                        pygame.Rect((0, 0),
                                                    (80, 25)),
-                                       lambda plane : self.window.room.sub(clickndrag.gui.GetStringDialog("Identifier Of New Item:", self.add_item, self.window))))
+                                       lambda plane: self.edit_entity_attributes(self.add_entity)))
 
         room.sub(clickndrag.gui.Button("Edit Walls",
                                        pygame.Rect((0, 0),
                                                    (80, 25)),
                                        self.edit_walls))
+
+        background = clickndrag.gui.Container("background",
+                                              padding = 4,
+                                              background_color = (120, 120, 120))
+
+        background.sub(clickndrag.gui.Label("title",
+                                            "Background",
+                                            pygame.Rect((0, 0),
+                                                        (80, 25)),
+                                            background_color = (120, 120, 120)))
+
+        background.sub(clickndrag.gui.Button("Open Image",
+                                             pygame.Rect((0, 0),
+                                                         (80, 25)),
+                                             self.open_image))
 
         logic = clickndrag.gui.Container("logic",
                                          padding = 4,
@@ -1717,8 +1722,8 @@ class PygameEditor(PygameUserInterface):
                                                     (80, 25)),
                                         lambda plane: self.host.clear_condition_response_dict()))
 
-        self.window.buttons.sub(background)
         self.window.buttons.sub(room)
+        self.window.buttons.sub(background)
         self.window.buttons.sub(logic)
 
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
@@ -1729,6 +1734,7 @@ class PygameEditor(PygameUserInterface):
         # Create Container for the properties
         #
         container = clickndrag.gui.Container("properties",
+                                             padding = 5,
                                              background_color = (120, 120, 120))
         container.rect.topleft = (900, 0)
         self.window.sub(container)
@@ -1831,13 +1837,12 @@ class PygameEditor(PygameUserInterface):
                     for entity in self.host.room.floor_plan[(x, y)].entities:
 
                         # TODO: make sure commas are not present in the other strings
-                        # TODO: port to new Entity API
                         #
                         argument_list = ",".join([entity.identifier,
-                                                 entity.entity_type,
-                                                 repr(entity.blocking),
-                                                 repr(entity.mobile),
-                                                 entity.asset_desc])
+                                                  entity.entity_type,
+                                                  repr(entity.blocking),
+                                                  repr(entity.mobile),
+                                                  entity.asset_desc])
 
                         entities_string = entities_string + "\t{}".format(argument_list)
 
@@ -1888,7 +1893,7 @@ class PygameEditor(PygameUserInterface):
                 room_list.append(filename.split(".floorplan")[0])
 
         if len(room_list):
-            option_list = clickndrag.gui.OptionList("select_room",
+            option_list = clickndrag.gui.OptionSelector("select_room",
                                                     room_list,
                                                     self.host.send_room_events,
                                                     lineheight = 25)
@@ -1900,19 +1905,153 @@ class PygameEditor(PygameUserInterface):
 
         return
 
-    def add_item(self, item_identifier):
-        """GetStringDialog callback to request an image and add the item to the rack.
+    def edit_entity_attributes(self, callback, entity = None):
+        """Open an editor to enter or edit Entity properties.
+           callback will be attached to the OK button.
+        """
+
+        # TODO: edit asset description / select image
+
+        fabula.LOGGER.debug("called")
+
+        container = clickndrag.gui.Container("get_entity_attributes",
+                                             padding = 5)
+
+        # Identifier
+        #
+        container.sub(clickndrag.gui.Label("id_caption",
+                                           "Identifier:",
+                                           pygame.rect.Rect((0, 0),
+                                                            (200, 30))))
+
+        if entity is not None:
+
+            # Shouldn't change identifier of a live Entity
+            #
+            container.sub(clickndrag.gui.Label("identifier",
+                                               entity.identifier,
+                                               pygame.rect.Rect((0, 0),
+                                                                (200, 30))))
+
+        else:
+            container.sub(clickndrag.gui.TextBox("identifier",
+                                                 pygame.rect.Rect((0, 0),
+                                                                (200, 30)),
+                                                 return_callback = None))
+
+            # Register text box
+            #
+            self.window.key_sensitive(container.identifier)
+
+
+        # Type
+        #
+        container.sub(clickndrag.gui.Label("type_caption",
+                                           "Type:",
+                                           pygame.rect.Rect((0, 0),
+                                                            (200, 30))))
+
+        if entity is not None:
+
+            if entity.entity_type == fabula.PLAYER:
+
+                container.sub(clickndrag.gui.Label("select_entity_type",
+                                                   "PLAYER",
+                                                   pygame.rect.Rect((0, 0),
+                                                                    (200, 30))))
+            else:
+
+                # Display current type at top
+                #
+                type_list = {fabula.ITEM: ["ITEM", "NPC"],
+                             fabula.NPC: ["NPC", "ITEM"]}[entity.entity_type]
+
+                container.sub(clickndrag.gui.OptionList("select_entity_type",
+                                                        type_list,
+                                                        lineheight = 25))
+        else:
+            container.sub(clickndrag.gui.OptionList("select_entity_type",
+                                                    ["ITEM", "NPC"],
+                                                    lineheight = 25))
+
+        # Blocking
+        #
+        container.sub(clickndrag.gui.Label("blocking_caption",
+                                           "Blocking:",
+                                           pygame.rect.Rect((0, 0),
+                                                            (200, 30))))
+
+        blocking_list = ["block", "no-block"]
+
+        if entity is not None:
+
+            # Display current at top
+            #
+            blocking_list = {True: ["block", "no-block"],
+                             False: ["no-block", "block"]}[entity.blocking]
+
+        container.sub(clickndrag.gui.OptionList("select_blocking",
+                                                blocking_list,
+                                                lineheight = 25))
+
+        # Mobility
+        # TODO: shouldn't be able to change mobility of PLAYER
+        #
+        container.sub(clickndrag.gui.Label("mobility_caption",
+                                           "Mobility:",
+                                           pygame.rect.Rect((0, 0),
+                                                            (200, 30))))
+
+        mobility_list = ["mobile", "immobile"]
+
+        if entity is not None:
+
+            # Display current at top
+            #
+            mobility_list = {True: ["mobile", "immobile"],
+                             False: ["immobile", "mobile"]}[entity.mobile]
+
+        container.sub(clickndrag.gui.OptionList("select_mobile",
+                                                mobility_list,
+                                                lineheight = 25))
+
+        # OK button
+        #
+        container.sub(clickndrag.gui.Button("OK",
+                                            pygame.rect.Rect((0, 0),
+                                                            (200, 30)),
+                                            callback))
+
+        self.window.room.sub(container)
+
+        return
+
+    def add_entity(self, buttonplane):
+        """Button callback to request an image and add the Entity to the rack.
         """
 
         fabula.LOGGER.debug("called")
 
-        # Update to clean up already destroyed GetStringDialog
+        # Get user input
+        #
+        entity_type = buttonplane.parent.select_entity_type.selected.text
+        entity_identifier = buttonplane.parent.identifier.text
+        entity_blocking = {"block": True,
+                           "no-block": False}[buttonplane.parent.select_blocking.selected.text]
+        entity_mobile = {"mobile": True,
+                         "immobile": False}[buttonplane.parent.select_mobile.selected.text]
+
+        # Destroy dialog
+        #
+        buttonplane.parent.destroy()
+
+        # Update to clean up destroyed dialog
         #
         self.display_single_frame()
 
-        if item_identifier == '' or item_identifier is None:
+        if entity_identifier == '':
 
-            fabula.LOGGER.warning("no item identifer given")
+            fabula.LOGGER.warning("no item identifer given in attributes dialog, not adding Entity")
 
         else:
 
@@ -1920,21 +2059,88 @@ class PygameEditor(PygameUserInterface):
 
             if image is not None:
 
-                entity = fabula.Entity(identifier = item_identifier,
-                                       entity_type = fabula.ITEM,
-                                       blocking = True,
-                                       mobile = True,
+                entity = fabula.Entity(identifier = entity_identifier,
+                                       entity_type = {"ITEM": fabula.ITEM, "NPC": fabula.NPC}[entity_type],
+                                       blocking = entity_blocking,
+                                       mobile = entity_mobile,
                                        asset_desc = filename)
 
-                fabula.LOGGER.debug("appending SpawnEvent and PicksUpEvent")
+                fabula.LOGGER.info("adding Entity '{}'".format(entity_identifier))
+
+                fabula.LOGGER.debug("appending SpawnEvent")
 
                 # TODO: make sure to use a safe spawning location
                 # Observe: adding to self.host.message_for_host
                 #
                 self.host.message_for_host.event_list.append(fabula.SpawnEvent(entity, (0, 0)))
 
-                self.host.message_for_host.event_list.append(fabula.PicksUpEvent(self.host.client_id,
-                                                                                item_identifier))
+                if entity_type == "ITEM":
+
+                    fabula.LOGGER.debug("appending PicksUpEvent")
+
+                    self.host.message_for_host.event_list.append(fabula.PicksUpEvent(self.host.client_id,
+                                                                                     entity_identifier))
+
+            else:
+                fabula.LOGGER.warning("no image selected, not adding Entity")
+
+        return
+
+    def update_entity(self, buttonplane):
+        """Update the properties of the Entity in self.host.entity_dict.
+        """
+
+        # TODO: there is still a lot copied from add_entity(). Wrapper?
+
+        fabula.LOGGER.debug("called")
+
+        # Get user input
+        #
+        if isinstance(buttonplane.parent.select_entity_type,
+                      clickndrag.gui.OptionList):
+
+            entity_type = buttonplane.parent.select_entity_type.selected.text
+
+        else:
+            entity_type = "PLAYER"
+
+        entity_identifier = buttonplane.parent.identifier.text
+        entity_blocking = {"block": True,
+                           "no-block": False}[buttonplane.parent.select_blocking.selected.text]
+        entity_mobile = {"mobile": True,
+                         "immobile": False}[buttonplane.parent.select_mobile.selected.text]
+
+        # Destroy dialog
+        #
+        buttonplane.parent.destroy()
+
+        # Update to clean up destroyed dialog
+        #
+        self.display_single_frame()
+
+        if entity_identifier in self.host.room.entity_dict.keys():
+
+            fabula.LOGGER.info("updating Entity '{}'".format(entity_identifier))
+
+            entity = self.host.room.entity_dict[entity_identifier]
+
+            if entity_type != "PLAYER":
+
+                # This works because we have direct access to the server via
+                # self.host, which is the Server plugin.
+                #
+                entity.entity_type = entity_type
+
+            entity.blocking = entity_blocking
+
+            entity.mobile = entity_mobile
+
+            # Update the properties Plane to show the changes
+            #
+            self.show_properties(entity.asset)
+
+        else:
+            fabula.LOGGER.warning("Entity '{}' not found in entity_dict".format(entity_identifier))
 
         return
 
@@ -2098,7 +2304,7 @@ class PygameEditor(PygameUserInterface):
             self.window.buttons.sub(self.plane_cache.pop(0))
 
     def process_SpawnEvent(self, event):
-        """Call PygameUserInterface.process_SpawnEvent and add a left_click_callback to the Entity.
+        """Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.
         """
 
         PygameUserInterface.process_SpawnEvent(self, event)
@@ -2110,91 +2316,93 @@ class PygameEditor(PygameUserInterface):
             fabula.LOGGER.debug("left_click_callback of '{}' is still None, adding callback".format(event.entity.identifier))
             plane.left_click_callback = self.show_properties
 
+        self.make_items_draggable()
+
         return
 
     def show_properties(self, plane):
-        """Click callback for entities which shows their properties in the properties Plane.
+        """Click callback for entities to show their properties in the properties Plane.
         """
 
-        fabula.LOGGER.debug("called")
-
-        # Only update if not already visible
+        # Always update property display.
         #
-        if self.window.properties.subplanes_list and self.window.properties.identifier.text == plane.name:
+        fabula.LOGGER.debug("showing properties of '{}'".format(plane.name))
 
-            fabula.LOGGER.debug("properties for '{}' already displayed".format(plane.name))
+        self.window.properties.remove_all()
+
+        if plane.name in self.host.room.entity_dict.keys():
+
+            entity = self.host.room.entity_dict[plane.name]
+
+        elif plane.name in self.host.rack.entity_dict.keys():
+
+            entity = self.host.rack.entity_dict[plane.name]
 
         else:
-            fabula.LOGGER.info("showing properties of '{}'".format(plane.name))
-
-            self.window.properties.remove_all()
-
-            if plane.name in self.host.room.entity_dict.keys():
-
-                entity = self.host.room.entity_dict[plane.name]
-
-            elif plane.name in self.host.rack.entity_dict.keys():
-
-                entity = self.host.rack.entity_dict[plane.name]
-
-            else:
-                fabula.LOGGER.error("entity '{}' neither in Room nor Rack, can not update property inspector".format(plane.name))
-
-                return
-
-            # Entity.identifier
-            #
-            self.window.properties.sub(clickndrag.gui.Label("identifier",
-                                                            entity.identifier,
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            background_color = (120, 120, 120)))
-
-            # Entity.asset
-            #
-            rect = pygame.Rect((0, 0), entity.asset.image.get_rect().size)
-
-            asset_plane = clickndrag.Plane("asset", rect)
-
-            asset_plane.image = entity.asset.image
-
-            self.window.properties.sub(asset_plane)
-
-            # Entity.asset_desc
-            #
-            self.window.properties.sub(clickndrag.gui.Label("asset_desc",
-                                                            entity.asset_desc,
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            background_color = (120, 120, 120)))
-
-            # Entity.entity_type
-            #
-            self.window.properties.sub(clickndrag.gui.Label("entity_type",
-                                                            entity.entity_type,
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            background_color = (120, 120, 120)))
-
-            # Entity.blocking
-            #
-            self.window.properties.sub(clickndrag.gui.Label("blocking",
-                                                            {True: "block", False: "no-block"}[entity.blocking],
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            background_color = (120, 120, 120)))
-
-            # Entity.mobile
-            #
-            self.window.properties.sub(clickndrag.gui.Label("mobile",
-                                                            {True: "mobile", False: "immobile"}[entity.mobile],
-                                                            pygame.Rect((0, 0), (80, 25)),
-                                                            background_color = (120, 120, 120)))
-
-            # Logic
-            #
-            self.window.properties.sub(clickndrag.gui.Button("Edit Logic",
-                                                             pygame.Rect((0, 0),
-                                                                         (80, 25)),
-                                                             lambda plane : self.edit_logic(entity.identifier)))
+            fabula.LOGGER.error("entity '{}' neither in Room nor Rack, can not update property inspector".format(plane.name))
 
             return
+
+        # Entity.identifier
+        #
+        self.window.properties.sub(clickndrag.gui.Label("identifier",
+                                                        entity.identifier,
+                                                        pygame.Rect((0, 0), (80, 25)),
+                                                        background_color = (120, 120, 120)))
+
+        # Entity.asset
+        #
+        rect = pygame.Rect((0, 0), entity.asset.image.get_rect().size)
+
+        asset_plane = clickndrag.Plane("asset", rect)
+
+        asset_plane.image = entity.asset.image
+
+        self.window.properties.sub(asset_plane)
+
+        # Entity.asset_desc
+        #
+        self.window.properties.sub(clickndrag.gui.Label("asset_desc",
+                                                        entity.asset_desc,
+                                                        pygame.Rect((0, 0), (80, 25)),
+                                                        background_color = (120, 120, 120)))
+
+        # Entity.entity_type
+        #
+        self.window.properties.sub(clickndrag.gui.Label("entity_type",
+                                                        entity.entity_type,
+                                                        pygame.Rect((0, 0), (80, 25)),
+                                                        background_color = (120, 120, 120)))
+
+        # Entity.blocking
+        #
+        self.window.properties.sub(clickndrag.gui.Label("blocking",
+                                                        {True: "block", False: "no-block"}[entity.blocking],
+                                                        pygame.Rect((0, 0), (80, 25)),
+                                                        background_color = (120, 120, 120)))
+
+        # Entity.mobile
+        #
+        self.window.properties.sub(clickndrag.gui.Label("mobile",
+                                                        {True: "mobile", False: "immobile"}[entity.mobile],
+                                                        pygame.Rect((0, 0), (80, 25)),
+                                                        background_color = (120, 120, 120)))
+
+        # Edit
+        #
+        self.window.properties.sub(clickndrag.gui.Button("Edit Entity",
+                                                         pygame.Rect((0, 0),
+                                                                     (80, 25)),
+                                                         lambda plane: self.edit_entity_attributes(self.update_entity, entity)))
+
+        # Logic
+        #
+        self.window.properties.sub(clickndrag.gui.Button("Edit Logic",
+                                                         pygame.Rect((0, 0),
+                                                                     (80, 25)),
+                                                         lambda plane : self.edit_logic(entity.identifier)))
+
+        return
 
     def make_items_draggable(self):
         """Overriding base class: make all items always draggable.
@@ -2202,7 +2410,8 @@ class PygameEditor(PygameUserInterface):
 
         for identifier in self.host.room.entity_locations.keys():
 
-            if identifier != self.host.client_id:
+            if (identifier != self.host.client_id
+                and self.host.room.entity_dict[identifier].asset is not None):
 
                 self.host.room.entity_dict[identifier].asset.draggable = True
 
@@ -2231,7 +2440,7 @@ class PygameEditor(PygameUserInterface):
         # TODO: DropsEvent
         # TODO: specify multiple Events as response
 
-        option_list = clickndrag.gui.OptionList("select_response",
+        option_list = clickndrag.gui.OptionSelector("select_response",
                                                 event_list,
                                                 lambda option : self.edit_event(event, option),
                                                 lineheight = 25)
