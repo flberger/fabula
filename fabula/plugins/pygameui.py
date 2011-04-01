@@ -265,7 +265,8 @@ class PygameEntity(fabula.Entity):
             # intendet. So we make it a subplane of window.room, which is
             # the parent of the asset.
             #
-            self.asset.parent.sub(self.caption_plane)
+            self.asset.parent.sub(self.caption_plane,
+                                  insert_after = self.asset.name)
 
         return
 
@@ -1202,6 +1203,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         says_box.rect.center = (entity_rect.centerx, entity_rect.top)
 
+        # Make sure it's completely visible
+        #
+        says_box.rect.clamp_ip(pygame.Rect((0, 0), self.window.room.rect.size))
+
         self.window.room.sub(says_box)
 
         # Display for (action_time / 8) per character, but at least for
@@ -1328,6 +1333,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             icon_plane.rect.center = (plane.rect.center[0] - 35,
                                       plane.rect.center[1])
 
+            # Sync position to Entity plane
+            #
+            icon_plane.sync(plane)
+
             # This will remove and re-add the Plane to room.
             # <3 clickndrag :-)
             #
@@ -1340,6 +1349,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             icon_plane.rect.center = (plane.rect.center[0] + 35,
                                       plane.rect.center[1])
 
+            icon_plane.sync(plane)
+
             self.window.room.sub(icon_plane)
 
             # Three
@@ -1349,6 +1360,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             icon_plane.rect.center = (plane.rect.center[0],
                                       plane.rect.center[1] - 35)
 
+            icon_plane.sync(plane)
+
             self.window.room.sub(icon_plane)
 
             # Four
@@ -1357,6 +1370,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             icon_plane.rect.center = (plane.rect.center[0],
                                       plane.rect.center[1] + 35)
+
+            icon_plane.sync(plane)
 
             self.window.room.sub(icon_plane)
 
@@ -1398,6 +1413,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         for icon_plane in self.attempt_icon_planes:
 
             self.window.room.remove(icon_plane)
+
+            # Don't forget to unsync position
+            #
+            icon_plane.unsync()
 
         if event is not None:
 
@@ -1921,7 +1940,7 @@ class PygameEditor(PygameUserInterface):
         #
         container.sub(clickndrag.gui.Label("id_caption",
                                            "Identifier:",
-                                           pygame.rect.Rect((0, 0),
+                                           pygame.Rect((0, 0),
                                                             (200, 30))))
 
         if entity is not None:
@@ -1930,12 +1949,12 @@ class PygameEditor(PygameUserInterface):
             #
             container.sub(clickndrag.gui.Label("identifier",
                                                entity.identifier,
-                                               pygame.rect.Rect((0, 0),
+                                               pygame.Rect((0, 0),
                                                                 (200, 30))))
 
         else:
             container.sub(clickndrag.gui.TextBox("identifier",
-                                                 pygame.rect.Rect((0, 0),
+                                                 pygame.Rect((0, 0),
                                                                 (200, 30)),
                                                  return_callback = None))
 
@@ -1948,7 +1967,7 @@ class PygameEditor(PygameUserInterface):
         #
         container.sub(clickndrag.gui.Label("type_caption",
                                            "Type:",
-                                           pygame.rect.Rect((0, 0),
+                                           pygame.Rect((0, 0),
                                                             (200, 30))))
 
         if entity is not None:
@@ -1957,7 +1976,7 @@ class PygameEditor(PygameUserInterface):
 
                 container.sub(clickndrag.gui.Label("select_entity_type",
                                                    "PLAYER",
-                                                   pygame.rect.Rect((0, 0),
+                                                   pygame.Rect((0, 0),
                                                                     (200, 30))))
             else:
 
@@ -1978,7 +1997,7 @@ class PygameEditor(PygameUserInterface):
         #
         container.sub(clickndrag.gui.Label("blocking_caption",
                                            "Blocking:",
-                                           pygame.rect.Rect((0, 0),
+                                           pygame.Rect((0, 0),
                                                             (200, 30))))
 
         blocking_list = ["block", "no-block"]
@@ -1999,7 +2018,7 @@ class PygameEditor(PygameUserInterface):
         #
         container.sub(clickndrag.gui.Label("mobility_caption",
                                            "Mobility:",
-                                           pygame.rect.Rect((0, 0),
+                                           pygame.Rect((0, 0),
                                                             (200, 30))))
 
         mobility_list = ["mobile", "immobile"]
@@ -2018,7 +2037,7 @@ class PygameEditor(PygameUserInterface):
         # OK button
         #
         container.sub(clickndrag.gui.Button("OK",
-                                            pygame.rect.Rect((0, 0),
+                                            pygame.Rect((0, 0),
                                                             (200, 30)),
                                             callback))
 
