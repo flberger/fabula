@@ -216,26 +216,11 @@ class PygameEntity(fabula.Entity):
             #
             if self.caption_plane is not None:
 
-                # Is there enough space?
-                # TODO: arbitrary width formula
+                # Then only change the text.
+                # Should be made visible with the next call to update().
                 #
-                if self.caption_plane.rect.width < len(event.property_value) * 10:
-
-                    # Destroy existing caption
-                    #
-                    self.caption_plane.destroy()
-                    self.caption_plane = None
-
-                    # Call this method again, it will create a new Label.
-                    # Clever, eh? ;-)
-                    #
-                    self.process_ChangePropertyEvent(event)
-
-                else:
-                    # Then only change the text.
-                    # Should be made visible with the next call to update().
-                    #
-                    self.caption_plane.text = event.property_value
+                fabula.LOGGER.debug("changing caption_plane.text to '{}'".format(event.property_value))
+                self.caption_plane.text = event.property_value
 
             else:
                 # Create a new caption Label
@@ -254,6 +239,8 @@ class PygameEntity(fabula.Entity):
 
         if self.caption_plane is not None:
 
+            fabula.LOGGER.debug("aligning caption to midtop of Entity plane: {}".format(self.asset.rect.midtop))
+
             self.caption_plane.rect.center = self.asset.rect.midtop
 
             # Sync movements to asset Plane
@@ -262,7 +249,7 @@ class PygameEntity(fabula.Entity):
 
             # If we make the Label a subplane of the Entity.asset Plane,
             # it will be cropped at the width of Entity.asset. This is not
-            # intendet. So we make it a subplane of window.room, which is
+            # intended. So we make it a subplane of window.room, which is
             # the parent of the asset.
             #
             self.asset.parent.sub(self.caption_plane,
