@@ -43,7 +43,7 @@ PygameUserInterface.overlay_surface
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id35">
+      <table class="children sortable" id="id94">
   
   
 <tr class="method">
@@ -74,8 +74,20 @@ PygameUserInterface.overlay_surface
     
     
     <td>Method</td>
-    <td><a href="fabula.plugins.pygameui.PygameEditor.html#add_item">add_item</a></td>
-    <td><tt>GetStringDialog callback to request an image and add the item to the rack.</tt></td>
+    <td><a href="fabula.plugins.pygameui.PygameEditor.html#edit_entity_attributes">edit_entity_attributes</a></td>
+    <td><tt>Open an editor to enter or edit Entity properties.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameEditor.html#add_entity">add_entity</a></td>
+    <td><tt>Button callback to request an image and add the Entity to the rack.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameEditor.html#update_entity">update_entity</a></td>
+    <td><tt>Update the properties of the Entity in self.host.entity_dict.</tt></td>
   </tr><tr class="method">
     
     
@@ -111,13 +123,13 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Call PygameUserInterface.process_SpawnEvent and add a left_click_callback to the Entity.</tt></td>
+    <td><tt>Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#show_properties">show_properties</a></td>
-    <td><tt>Click callback for entities which shows their properties in the properties Plane.</tt></td>
+    <td><tt>Click callback for entities to show their properties in the properties Plane.</tt></td>
   </tr><tr class="method">
     
     
@@ -161,7 +173,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>:
         </p>
-        <table class="children sortable" id="id36">
+        <table class="children sortable" id="id95">
   
   
 <tr class="basemethod">
@@ -211,7 +223,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Open the senteces as an OptionList and return a SaysEvent to the host.</tt></td>
+    <td><tt>Open the sentences as an OptionSelector and return a SaysEvent to the host.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -235,7 +247,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>Make EntityPlanes surrounding the new position draggable and call the base class method.</tt></td>
+    <td><tt>Call the base class method, re-order EntityPlanes and make EntityPlanes surrounding a new player position draggable.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -260,6 +272,12 @@ PygameUserInterface.overlay_surface
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_SaysEvent">process_SaysEvent</a></td>
     <td><tt>Call the base class, then present the text to the user and wait some time.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#reorder_room_planes">reorder_room_planes</a></td>
+    <td><tt>Re-order subplanes of self.window.room from back to front by y-coordinate.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -309,7 +327,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>):
         </p>
-        <table class="children sortable" id="id37">
+        <table class="children sortable" id="id96">
   
   
 <tr class="basemethod">
@@ -343,7 +361,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>, <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a>, <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id38">
+        <table class="children sortable" id="id97">
   
   
 <tr class="basemethod">
@@ -513,21 +531,57 @@ PygameUserInterface.overlay_surface
         </pre>
   </div>
 </div><div class="function">
-  <a name="fabula.plugins.pygameui.PygameEditor.add_item">
+  <a name="fabula.plugins.pygameui.PygameEditor.edit_entity_attributes">
     
   </a>
-  <a name="add_item">
+  <a name="edit_entity_attributes">
     
   </a>
   <div class="functionHeader">
     
     def
-    add_item(self, item_identifier):
+    edit_entity_attributes(self, callback, entity=None):
     
   </div>
   <div class="functionBody">
     
-    <pre>GetStringDialog callback to request an image and add the item to the rack.
+    <pre>Open an editor to enter or edit Entity properties.
+callback will be attached to the OK button.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameEditor.add_entity">
+    
+  </a>
+  <a name="add_entity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    add_entity(self, buttonplane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Button callback to request an image and add the Entity to the rack.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameEditor.update_entity">
+    
+  </a>
+  <a name="update_entity">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    update_entity(self, buttonplane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Update the properties of the Entity in self.host.entity_dict.
         </pre>
   </div>
 </div><div class="function">
@@ -637,7 +691,7 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.PygameUserInterface.html#process_SpawnEvent">fabula.plugins.pygameui.PygameUserInterface.process_SpawnEvent</a></div>
-    <pre>Call PygameUserInterface.process_SpawnEvent and add a left_click_callback to the Entity.
+    <pre>Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.
         </pre>
   </div>
 </div><div class="function">
@@ -655,7 +709,7 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   </div>
   <div class="functionBody">
     
-    <pre>Click callback for entities which shows their properties in the properties Plane.
+    <pre>Click callback for entities to show their properties in the properties Plane.
         </pre>
   </div>
 </div><div class="function">
@@ -768,7 +822,7 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-03-30 00:39:55.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-04-06 18:01:31.
     </address>
   </body>
 </html>
