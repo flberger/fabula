@@ -1,6 +1,22 @@
 NEWS for Fabula
 ===============
 
+0.5.0
+-----
+
+Released on 6 April 2011.
+
+Logging refactoring, with a lot of cleanups. Fabula now makes use of several log 
+levels. PygameEditor now offers a full-fledged Entity editor. The properties 
+plane now displays more information. Using the new clickndrag API to prevent 
+entity captions from popping up in the wrong places. Refactored plane ordering 
+when processing MovesToEvents: entities now correctly overlap each other, 
+depending on their vertical position. Action icons now move with the entity that 
+has been clicked on. Changed the pathfinding to make entities stop when they can 
+not get any closer to their target. Included a default room in the distribution, 
+with free game art from Danc (www.lostgarden.com). Documentation update.
+
+
 0.4.0
 -----
 
@@ -40,6 +56,7 @@ logic is now stored in a plain text file. Lots of improvements in the user
 interface, most prominently captions for entities and implementation of entity 
 conversation. Improved support for Entity subclasses. Update to the new 
 clickndrag API. Docs update and a lot of fixes and enhancements under the hood.
+
 
 0.1.0
 -----
