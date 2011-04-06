@@ -37,16 +37,25 @@ import os.path
 PACKAGE = "fabula"
 VERSION = "0.4.0"
 
-INCLUDE_FILES = ["scripts/100x100-gray.png",
-                 "scripts/attempt_look_at.png",
-                 "scripts/attempt_manipulate.png",
-                 "scripts/attempt_talk_to.png",
-                 "scripts/cancel.png",
-                 "scripts/player.png",
-                 "scripts/splash.png",
-                 "scripts/inventory.png",
-                 "clickndrag/Vera.ttf",
-                 "clickndrag/VeraBd.ttf"]
+INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
+                 os.path.join("scripts", "attempt_look_at.png"),
+                 os.path.join("scripts", "attempt_manipulate.png"),
+                 os.path.join("scripts", "attempt_talk_to.png"),
+                 os.path.join("scripts", "cancel.png"),
+                 os.path.join("scripts", "player.png"),
+                 os.path.join("scripts", "splash.png"),
+                 os.path.join("scripts", "inventory.png"),
+                 os.path.join("clickndrag", "Vera.ttf"),
+                 os.path.join("clickndrag", "VeraBd.ttf")]
+
+# Include default room
+#
+INCLUDE_FILES.extend([os.path.join("scripts", "default.floorplan"),
+                      os.path.join("scripts", "default.logic"),
+                      os.path.join("scripts", "gem.png"),
+                      os.path.join("scripts", "key.png")])
+
+INCLUDE_FILES.extend(glob.glob(os.path.join("scripts", "default-*.png")))
 
 if sys.platform == "win32":
     INCLUDE_FILES.append(os.path.join(sys.prefix, "tcl", "tcl8.5"))
@@ -74,14 +83,14 @@ cx_Freeze.setup(name = PACKAGE,
                             "{}.plugins".format(PACKAGE),
                             "clickndrag"],
                 package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
-                scripts = ["scripts/run_pygame_editor.py",
-                           "scripts/run_pygame_game.py"],
-                data_files = [("share/doc/{}-{}".format(PACKAGE, VERSION),
+                scripts = [os.path.join("scripts", "run_pygame_editor.py"),
+                           os.path.join("scripts", "run_pygame_game.py")],
+                data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, VERSION),
                                glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
-                              ("share/{}".format(PACKAGE),
+                              (os.path.join("share", "{}").format(PACKAGE),
                                INCLUDE_FILES)],
-                executables = [cx_Freeze.Executable("scripts/run_pygame_editor.py"),
-                               cx_Freeze.Executable("scripts/run_pygame_game.py")],
+                executables = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py")),
+                               cx_Freeze.Executable(os.path.join("scripts", "run_pygame_game.py"))],
                 options = {"build_exe" :
                            {"include_files" :
                             [(path, os.path.basename(path)) for path in INCLUDE_FILES]
