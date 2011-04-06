@@ -604,6 +604,21 @@ class DefaultGame(fabula.plugins.Plugin):
                     shortest_distance = distance
                     best_move = move
 
+            # Does that move actually bring us any closer to the target?
+            # This check will stop Entities from wandering around, but they will
+            # miss winding ways to the target.
+            #
+            current_vector = fabula.difference_2d(location, target_identifier)
+
+            current_distance = math.sqrt(current_vector[0] * current_vector[0]
+                                         + current_vector[1] * current_vector[1])
+
+            if shortest_distance >= current_distance:
+
+                fabula.LOGGER.info("best move does not reduce distance to target, stopping movement")
+
+                return None
+
             # fabula.LOGGER.debug("choosing move {} with distance {}".format(best_move, shortest_distance))
 
             return best_move

@@ -126,6 +126,7 @@
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
 # TODO: support the Tiled editor, http://www.mapeditor.org/
+# TODO: read fullscreen, logging level from optional fabula.conf
 
 # Fabula will not work with Python versions prior to 3.x.
 #

@@ -665,39 +665,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Add the inventory Plane to window if it is not yet there.
         """
 
-        fabula.LOGGER.debug("rearranging tile and entity planes")
-
         # Entities may have been spawned inbetween ChangeMapElementEvents, but
         # clickndrag requires their Planes to be the last ones in
         # window.room.subplanes_list to be rendered on top of the tiles. So,
         # check if there are any entities in the wrong place and correct.
-
-        tiles = []
-        entities = []
-        other = []
-
-        for name in self.window.room.subplanes_list:
-
-            # By convention, a tile's plane name is the string representation of
-            # the coordinates, so it starts with a brace.
-            #
-            if name.startswith("("):
-                tiles.append(name)
-            elif name in self.host.room.entity_dict.keys():
-                entities.append(name)
-            else:
-                other.append(name)
-
-        # Now for the entity planes: they should be rendered from top to bottom,
-        # so sort by y coordinate.
         #
-        entities = sorted(entities,
-                          key = lambda name: self.host.room.entity_locations[name][1])
+        self.reorder_room_planes()
 
-        self.window.room.subplanes_list = tiles + entities + other
-
-        # Make items next to player draggable
-        #
         self.make_items_draggable()
 
         if "inventory" not in self.window.subplanes_list:
@@ -1057,7 +1031,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
     # Event handlers affecting Entities
 
     def process_MovesToEvent(self, event):
-        """Make EntityPlanes surrounding the new position draggable and call the base class method.
+        """Call the base class method, re-order EntityPlanes and make EntityPlanes surrounding a new player position draggable.
         """
 
         fabula.LOGGER.debug("called")
@@ -1066,7 +1040,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_MovesToEvent(self, event)
 
+        # Care for overlapping
+        #
+        self.reorder_room_planes()
+
+        # Care for draggability
+        #
         if event.identifier == self.host.client_id:
+
             self.make_items_draggable()
 
         return
@@ -1210,6 +1191,56 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.display_single_frame()
 
         says_box.destroy()
+
+        return
+
+    def reorder_room_planes(self):
+        """Re-order subplanes of self.window.room from back to front by y-coordinate.
+        """
+
+        # *sigh* We dis- and reassemble the whole list.
+        # Partly moved here from process_RoomCompleteEvent, which now calls
+        # this method.
+        #
+        fabula.LOGGER.debug("rearranging subplanes of room")
+
+        tiles = []
+        entities = []
+        captions = []
+        other = []
+
+        for name in self.window.room.subplanes_list:
+
+            # By convention, a tile's plane name is the string representation of
+            # the coordinates, so it starts with a brace.
+            #
+            if name.startswith("("):
+
+                tiles.append(name)
+
+            elif name in self.host.room.entity_dict.keys():
+
+                entities.append(name)
+
+            elif name.endswith("_caption"):
+
+                captions.append(name)
+
+            else:
+                other.append(name)
+
+        # Entity planes should be rendered from top to bottom, so sort by y
+        # coordinate.
+        #
+        entities.sort(key = lambda name: self.host.room.entity_locations[name][1])
+
+        # Finally, insert captions just after the according Entity Plane.
+        #
+        for name in captions:
+
+            entities.insert(entities.index(name.split("_caption")[0]) + 1, name)
+
+        self.window.room.subplanes_list = tiles + entities + other
 
         return
 
