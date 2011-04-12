@@ -1008,22 +1008,27 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
-        # Flash very short
+        # If it's not for us, ignore.
+        # TODO: checking for client_id should be everywhere and be more structured
         #
-        frames = int(self.action_frames / 10)
+        if event.identifier == self.host.client_id:
 
-        self.window.room.rendersurface.fill((250, 250, 250))
-        self.window.room.last_rect = None
+            # Flash very short
+            #
+            frames = int(self.action_frames / 10)
 
-        while frames:
+            self.window.room.rendersurface.fill((250, 250, 250))
+            self.window.room.last_rect = None
+
+            while frames:
+                self.display_single_frame()
+                frames = frames - 1
+
+            # Mark Entity Plane as changed to trigger redraw of the room
+            #
+            self.window.room.subplanes[event.identifier].last_rect = None
+
             self.display_single_frame()
-            frames = frames - 1
-
-        # Mark Entity Plane as changed to trigger redraw of the room
-        #
-        self.window.room.subplanes[event.identifier].last_rect = None
-
-        self.display_single_frame()
 
         return
 
