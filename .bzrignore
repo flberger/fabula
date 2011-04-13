@@ -13,3 +13,4 @@ build
 MANIFEST
 clickndrag
 user_install-filelist.txt
+*.backup
