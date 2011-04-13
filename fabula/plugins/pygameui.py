@@ -279,7 +279,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Plane to display the inventory
 
        PygameUserInterface.room_plane
-           Plane to display the room
+           Plane to display the room. Will be added as
+           PygameUserInterface.window.room by
+           PygameUserInterface.process_EnterRoomEvent()
 
        PygameUserInterface.spacing
            Spacing between tiles.
@@ -296,6 +298,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.window.room
            clickndrag Plane for the room. By default this is 800x500px with
            space for 8x5 tiles and located at the top of the window.
+
+       PygameUserInterface.window.room.tiles
+           clickndrag Plane which has the Tile Planes as subplanes.
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
@@ -429,6 +434,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.room_plane = clickndrag.Plane("room",
                                            pygame.Rect((0, 0), (800, 500)))
+
+        # Create a subplane just as big as a sort-of buffer for Tiles.
+        #
+        self.room_plane.sub(clickndrag.Plane("tiles",
+                                             pygame.Rect((0, 0),
+                                                         self.room_plane.rect.size)))
 
         fabula.LOGGER.debug("complete")
 
@@ -649,13 +660,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         pygame.display.flip()
 
-        # Clear room in any case
+        # Clear room in any case, keeping the tiles plane
         #
-        self.window.room.remove_all()
+        for plane_name in list(self.window.room.subplanes_list):
+
+            if plane_name is not "tiles":
+
+                self.window.room.remove(plane_name)
 
         # No more rendering until RoomComplete
         #
         fabula.LOGGER.info("freezing")
+
         self.freeze = True
 
         return
@@ -911,7 +927,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             if tile == event.tile:
 
-                # Tiles may compare equal, but the may not refer to the same
+                # Tiles may compare equal, but they may not refer to the same
                 # instance, so we use tile from tile_list.
                 #
                 fabula.LOGGER.debug("found event.tile in self.host.room.tile_list")
@@ -960,7 +976,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Tiles are clickndrag subplanes of self.window.room, indexed by their
         # location as string representation.
         #
-        if str(event.location) not in self.window.room.subplanes:
+        if str(event.location) not in self.window.room.tiles.subplanes:
 
             tile_plane = clickndrag.Plane(str(event.location),
                                           pygame.Rect((event.location[0] * self.spacing,
@@ -969,13 +985,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                           left_click_callback = self.tile_clicked_callback,
                                           dropped_upon_callback = self.tile_drop_callback)
 
-            self.window.room.sub(tile_plane)
+            self.window.room.tiles.sub(tile_plane)
 
         # Update image regardless whether the tile existed or not
         #
         fabula.LOGGER.debug("changing image for tile at {0} to {1}".format(str(event.location),
                                                                         tile_from_list.asset))
-        self.window.room.subplanes[str(event.location)].image = tile_from_list.asset
+
+        self.window.room.tiles.subplanes[str(event.location)].image = tile_from_list.asset
 
         return
 
@@ -1209,27 +1226,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.LOGGER.debug("rearranging subplanes of room")
 
-        tiles = []
         entities = []
         captions = []
         other = []
 
         for name in self.window.room.subplanes_list:
 
-            # By convention, a tile's plane name is the string representation of
-            # the coordinates, so it starts with a brace.
-            #
-            if name.startswith("("):
-
-                tiles.append(name)
-
-            elif name in self.host.room.entity_dict.keys():
+            if name in self.host.room.entity_dict.keys():
 
                 entities.append(name)
 
             elif name.endswith("_caption"):
 
                 captions.append(name)
+
+            elif name == "tiles":
+
+                # Drop the Tiles Plane for now
+                #
+                pass
 
             else:
                 other.append(name)
@@ -1245,7 +1260,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             entities.insert(entities.index(name.split("_caption")[0]) + 1, name)
 
-        self.window.room.subplanes_list = tiles + entities + other
+        # Observe the Tiles Plane
+        #
+        self.window.room.subplanes_list = ["tiles"] + entities + other
 
         return
 
