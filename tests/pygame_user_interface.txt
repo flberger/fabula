@@ -7,7 +7,7 @@ Client with PygameUserInterface
     >>> import fabula.interfaces
     >>> import fabula.plugins.pygameui
     >>> import fabula.run
-    >>> app = fabula.run.App("i", timeout = 5)
+    >>> app = fabula.run.App(timeout = 5)
     >>> app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
     >>> interface = fabula.interfaces.Interface()
     >>> app.run_client(60, interface)

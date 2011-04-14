@@ -39,7 +39,7 @@ Tile Fetching and Display in PygameUserInterface
     ...         fabula.plugins.pygameui.pygame.event.post(quit_event)
     ...         return
     ...
-    >>> app = fabula.run.App("i", timeout = 0)
+    >>> app = fabula.run.App(timeout = 0)
     >>> app.user_interface_class = QuittingInterface
     >>> app.server_plugin_class = MapTest
     >>> app.run_standalone(60, 0.5)

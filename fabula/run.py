@@ -35,15 +35,18 @@ import fabula.interfaces
 import threading
 import logging
 from time import sleep
-
-import sys
 import traceback
 import re
+import configparser
 
 class App:
     """An App instance represents a Fabula client or server application.
 
        Attributes:
+
+       App.parser
+           An instance of configparser.ConfigParser reading from fabula.conf, or
+           None if the file is not found.
 
        App.assets_class
            Class of the asset engine to be used.
@@ -61,26 +64,41 @@ class App:
            an App instance.
     """
 
-    def __init__(self, loglevel, timeout = 0):
+    def __init__(self, timeout = 0):
         """Initialise the application.
-
-           loglevel is one of "d" (DEBUG), "i" (INFO), "w" (WARNING),
-           "e" (ERROR), "c" (CRITICAL).
 
            timeout is the number of seconds after which the engine will receive
            an exit signal. This feature is meant for unit tests. timeout = 0
            will run for an unlimited time.
         """
 
-        # Set up logger level, now that we know it
+        # Initialise parser and read config file
         #
-        leveldict = {"d" : logging.DEBUG,
-                     "i" : logging.INFO,
-                     "w" : logging.WARNING,
-                     "e" : logging.ERROR,
-                     "c" : logging.CRITICAL}
+        self.parser = configparser.ConfigParser()
 
-        fabula.LOGGER.setLevel(leveldict[loglevel])
+        if not len(self.parser.read("fabula.conf")):
+
+            self.parser = None
+
+        # Set up logger level
+        #
+        if self.parser is not None and self.parser.has_option("fabula", "loglevel"):
+
+            leveldict = {"debug" : logging.DEBUG,
+                         "info" : logging.INFO,
+                         "warning" : logging.WARNING,
+                         "error" : logging.ERROR,
+                         "critical" : logging.CRITICAL}
+
+            if self.parser.get("fabula", "loglevel") in leveldict.keys():
+
+                fabula.LOGGER.setLevel(leveldict[self.parser.get("fabula", "loglevel")])
+
+                fabula.LOGGER.info("found loglevel option in fabula.conf, setting loglevel to '{}'".format(self.parser.get("fabula", "loglevel")))
+
+        else:
+
+            fabula.LOGGER.setLevel(logging.ERROR)
 
         self.timeout = timeout
 
@@ -88,7 +106,7 @@ class App:
         self.user_interface_class = fabula.plugins.ui.UserInterface
         self.server_plugin_class = fabula.plugins.Plugin
 
-    def run_client(self, framerate, interface, fullscreen = False):
+    def run_client(self, framerate, interface):
         """Run a Fabula client with the parameters given.
         """
 
@@ -98,6 +116,16 @@ class App:
         assets = self.assets_class()
 
         client = fabula.core.client.Client(interface)
+
+        fullscreen = False
+
+        if self.parser is not None and self.parser.has_option("fabula", "fullscreen"):
+
+            if self.parser.get("fabula", "fullscreen").lower() in ("true", "yes", "1"):
+
+                fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
+
+                fullscreen = True
 
         plugin = self.user_interface_class(assets,
                                            framerate,
@@ -176,7 +204,7 @@ class App:
         fabula.LOGGER.removeHandler(fabula.FILE_HANDLER)
         logging.shutdown()
 
-    def run_standalone(self, framerate, action_time, fullscreen = False):
+    def run_standalone(self, framerate, action_time):
         """Run Fabula client and server on the local machine.
         """
 
@@ -197,6 +225,18 @@ class App:
         assets = self.assets_class()
 
         client = fabula.core.client.Client(client_interface)
+
+        # TODO: copied from above
+        #
+        fullscreen = False
+
+        if self.parser is not None and self.parser.has_option("fabula", "fullscreen"):
+
+            if self.parser.get("fabula", "fullscreen").lower() in ("true", "yes", "1"):
+
+                fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
+
+                fullscreen = True
 
         user_interface = self.user_interface_class(assets,
                                                    framerate,

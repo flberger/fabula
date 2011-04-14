@@ -45,6 +45,7 @@ INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
                  os.path.join("scripts", "player.png"),
                  os.path.join("scripts", "splash.png"),
                  os.path.join("scripts", "inventory.png"),
+                 os.path.join("scripts", "fabula.conf"),
                  os.path.join("clickndrag", "Vera.ttf"),
                  os.path.join("clickndrag", "VeraBd.ttf")]
 

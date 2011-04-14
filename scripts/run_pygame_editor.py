@@ -35,7 +35,7 @@ import fabula.interfaces
 import fabula.run
 
 def main():
-    app = fabula.run.App("i", timeout = 0)
+    app = fabula.run.App(timeout = 0)
 
     interface = fabula.interfaces.Interface()
     interface.connect("dummy_client")
