@@ -1,6 +1,20 @@
 NEWS for Fabula
 ===============
 
+0.6.0
+-----
+
+Released on 14 April 2011.
+
+Fabula now supports rooms larger than the screen in client and editor. Changed 
+the underlying rendering architecture to pre-render backgrounds and resize 
+bitmaps to fit the size of the room. Moving the mouse to the edges of the window 
+triggers horizontal scrolling. Loading large background images in the editor now 
+creates a room of an appropriate size. Fabula applications now read options from 
+a config file, most prominently the 'fullscreen' option. Minor fixes and 
+documentation update.
+
+
 0.5.0
 -----
 
