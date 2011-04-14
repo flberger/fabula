@@ -281,6 +281,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.spacing
            Spacing between tiles.
 
+       PygameUserInterface.scroll
+           Counter for scrolling left-right. Used in display_single_frame().
+
        PygameUserInterface.window
            An instance of clickndrag.Display. By default this is 800x600 px and
            windowed.
@@ -335,6 +338,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Spacing between tiles.
         #
         self.spacing = 100
+
+        # Counter for scrolling left-right
+        #
+        self.scroll = 0
 
         # Open a click'n'drag window.
         #
@@ -548,6 +555,33 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if not self.freeze:
 
+            # Handle scrolling
+            # TODO: hardwired scroll amount
+            #
+            if self.scroll > 0:
+
+                self.scroll = self.scroll - 2
+
+                if self.scroll < 0:
+
+                    self.scroll = 0
+
+                else:
+
+                    self.window.room.rect.move_ip(2, 0)
+
+            elif self.scroll < 0:
+
+                self.scroll = self.scroll + 2
+
+                if self.scroll > 0:
+
+                    self.scroll = 0
+
+                else:
+
+                    self.window.room.rect.move_ip(-2, 0)
+
             self.window.update()
             self.window.render()
 
@@ -566,13 +600,35 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+        """Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         """
 
         # The UserInterface should only ever collect and send one
         # single client event to prevent cheating and blocking other
         # clients in the server. (hint by Alexander Marbach)
 
+        # Check mouse position, and trigger window scrolling
+        #
+        if not self.scroll:
+
+            mouse_position = pygame.mouse.get_pos()
+            window_width = self.window.rect.width
+
+            if 0 <= mouse_position[0] <= 25 and self.window.room.rect.left != 0:
+
+                # Scroll to the left
+                #
+                self.scroll = self.spacing
+
+            elif (window_width - 25 <= mouse_position[0] <= window_width
+                  and self.window.room.rect.right != window_width):
+
+                # Scroll to right
+                #
+                self.scroll = 0 - self.spacing
+
+        # Handle events
+        #
         events = pygame.event.get()
 
         for event in events:
@@ -2408,6 +2464,37 @@ class PygameEditor(PygameUserInterface):
         while len(self.plane_cache):
             self.window.buttons.sub(self.plane_cache.pop(0))
 
+        return
+
+    def collect_player_input(self):
+        """Call base class, but initiate scrolling in any case.
+        """
+
+        PygameUserInterface.collect_player_input(self)
+
+        # Check mouse position, and trigger window scrolling
+        # Copied from PygameUserInterface.collect_player_input()
+        # Pygame might have been quit, so check pygame.display.get_init().
+        #
+        if not self.scroll and pygame.display.get_init():
+
+            mouse_position = pygame.mouse.get_pos()
+            window_width = self.window.rect.width
+
+            if 0 <= mouse_position[0] <= 25:
+
+                # Scroll to the left
+                #
+                self.scroll = self.spacing
+
+            elif window_width - 25 <= mouse_position[0] <= window_width:
+
+                # Scroll to right
+                #
+                self.scroll = 0 - self.spacing
+
+        return
+
     def process_SpawnEvent(self, event):
         """Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.
         """
@@ -2422,6 +2509,16 @@ class PygameEditor(PygameUserInterface):
             plane.left_click_callback = self.show_properties
 
         self.make_items_draggable()
+
+        return
+
+    def process_RoomCompleteEvent(self, event):
+        """Call the base class, but make sure the buttons Plane is on top.
+        """
+
+        PygameUserInterface.process_RoomCompleteEvent(self, event)
+
+        self.window.sub(self.window.buttons)
 
         return
 
