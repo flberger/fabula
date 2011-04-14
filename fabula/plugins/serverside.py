@@ -776,10 +776,9 @@ class Editor(DefaultGame):
 
             tile = fabula.Tile(fabula.FLOOR, "100x100-gray.png")
 
-            for x in range(8):
-                for y in range(5):
-                    event = fabula.ChangeMapElementEvent(tile, (x, y))
-                    self.message_for_host.event_list.append(event)
+            event = fabula.ChangeMapElementEvent(tile, (0, 0))
+
+            self.message_for_host.event_list.append(event)
 
             entity = fabula.Entity(identifier = "player",
                                    entity_type = fabula.PLAYER,
@@ -790,6 +789,8 @@ class Editor(DefaultGame):
             self.message_for_host.event_list.append(fabula.SpawnEvent(entity,
                                                                      (0, 0)))
 
+            # Force recreation of the tiles plane
+            #
             self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
     def send_room_events(self, option):
@@ -880,7 +881,7 @@ class Editor(DefaultGame):
 
             # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
             #
-            self.pygame_editor.window.room.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename)))
+            self.pygame_editor.window.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename)))
 
         else:
             fabula.LOGGER.error("no filename given")
@@ -897,7 +898,7 @@ class Editor(DefaultGame):
 
         # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
         #
-        self.pygame_editor.window.room.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared."))
+        self.pygame_editor.window.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared."))
 
         return
 

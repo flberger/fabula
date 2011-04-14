@@ -278,14 +278,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.inventory_plane
            Plane to display the inventory
 
-       PygameUserInterface.room_plane
-           Plane to display the room
-
        PygameUserInterface.spacing
            Spacing between tiles.
 
+       PygameUserInterface.scroll
+           Counter for scrolling left-right. Used in display_single_frame().
+
        PygameUserInterface.window
-           An instance of clickndrag.Display. By default this is 800x600px and
+           An instance of clickndrag.Display. By default this is 800x600 px and
            windowed.
 
        PygameUserInterface.window.inventory
@@ -294,8 +294,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            window.
 
        PygameUserInterface.window.room
-           clickndrag Plane for the room. By default this is 800x500px with
-           space for 8x5 tiles and located at the top of the window.
+           clickndrag Plane for the room. Initially it will have a size of
+           0x0 px. The final Plane is created by process_RoomCompleteEvent.
+
+       PygameUserInterface.window.room.tiles
+           clickndrag Plane which has the Tile Planes as subplanes.
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
@@ -335,6 +338,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Spacing between tiles.
         #
         self.spacing = 100
+
+        # Counter for scrolling left-right
+        #
+        self.scroll = 0
 
         # Open a click'n'drag window.
         #
@@ -426,9 +433,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.right_clicked_entity = None
 
         # Create plane for the room.
+        # This Plane is only there to collect subplanes and hence is initialised
+        # with 0x0 pixels. The final Plane will be created by process_RoomCompleteEvent().
         #
-        self.room_plane = clickndrag.Plane("room",
-                                           pygame.Rect((0, 0), (800, 500)))
+        self.window.sub(clickndrag.Plane("room",
+                                         pygame.Rect((0, 0), (0, 0))))
+
+        # Create a subplane as a sort-of buffer for Tiles.
+        #
+        self.window.room.sub(clickndrag.Plane("tiles",
+                                              pygame.Rect((0, 0), (0, 0))))
 
         fabula.LOGGER.debug("complete")
 
@@ -541,6 +555,33 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if not self.freeze:
 
+            # Handle scrolling
+            # TODO: hardwired scroll amount
+            #
+            if self.scroll > 0:
+
+                self.scroll = self.scroll - 2
+
+                if self.scroll < 0:
+
+                    self.scroll = 0
+
+                else:
+
+                    self.window.room.rect.move_ip(2, 0)
+
+            elif self.scroll < 0:
+
+                self.scroll = self.scroll + 2
+
+                if self.scroll > 0:
+
+                    self.scroll = 0
+
+                else:
+
+                    self.window.room.rect.move_ip(-2, 0)
+
             self.window.update()
             self.window.render()
 
@@ -559,13 +600,35 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+        """Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         """
 
         # The UserInterface should only ever collect and send one
         # single client event to prevent cheating and blocking other
         # clients in the server. (hint by Alexander Marbach)
 
+        # Check mouse position, and trigger window scrolling
+        #
+        if not self.scroll:
+
+            mouse_position = pygame.mouse.get_pos()
+            window_width = self.window.rect.width
+
+            if 0 <= mouse_position[0] <= 25 and self.window.room.rect.left != 0:
+
+                # Scroll to the left
+                #
+                self.scroll = self.spacing
+
+            elif (window_width - 25 <= mouse_position[0] <= window_width
+                  and self.window.room.rect.right != window_width):
+
+                # Scroll to right
+                #
+                self.scroll = 0 - self.spacing
+
+        # Handle events
+        #
         events = pygame.event.get()
 
         for event in events:
@@ -591,16 +654,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def process_EnterRoomEvent(self, event):
         """Fade window to black and remove subplanes of PygameUserInterface.window.room.
-           Add room Plane if necessary.
         """
 
         fabula.LOGGER.info("entering room: {}".format(event.room_identifier))
-
-        if "room" not in self.window.subplanes_list:
-
-            fabula.LOGGER.debug("no room plane yet, adding")
-
-            self.window.sub(self.room_plane)
 
         fabula.LOGGER.debug("fading out")
 
@@ -649,40 +705,96 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         pygame.display.flip()
 
-        # Clear room in any case
+        # Clear room in any case, keeping the tiles plane
         #
-        self.window.room.remove_all()
+        for plane_name in list(self.window.room.subplanes_list):
+
+            if plane_name is not "tiles":
+
+                self.window.room.remove(plane_name)
 
         # No more rendering until RoomComplete
         #
         fabula.LOGGER.info("freezing")
+
         self.freeze = True
 
         return
 
     def process_RoomCompleteEvent(self, event):
-        """Update and render the Planes of the map elements and fade in the room.
+        """Recreate room and tile Planes at the correct size, update and render everything and fade in the room.
            Add the inventory Plane to window if it is not yet there.
         """
 
-        # Entities may have been spawned inbetween ChangeMapElementEvents, but
-        # clickndrag requires their Planes to be the last ones in
-        # window.room.subplanes_list to be rendered on top of the tiles. So,
-        # check if there are any entities in the wrong place and correct.
+        # Find out the size of the room. Tiles start at (0, 0) in the upper
+        # left, so search for the rightmost and lowermost tiles.
+        #
+        max_right = 0
+        max_bottom = 0
+
+        for tuple in self.host.room.floor_plan.keys():
+
+            if tuple[0] > max_right:
+
+                max_right = tuple[0]
+
+            if tuple[1] > max_bottom:
+
+                max_bottom = tuple[1]
+
+        # Create new room and tiles Planes based on the max size
+        #
+        room_plane = clickndrag.Plane("room",
+                                      pygame.Rect((0, 0),
+                                                  ((max_right + 1) * self.spacing,
+                                                   (max_bottom + 1) * self.spacing)))
+
+        room_plane.sub(clickndrag.Plane("tiles",
+                                        pygame.Rect((0, 0),
+                                                    room_plane.rect.size)))
+
+        # Transfer all Tile Planes to the new tiles Plane
+        #
+        for plane in list(self.window.room.tiles.subplanes.values()):
+
+            room_plane.tiles.sub(plane)
+
+        self.window.room.tiles.destroy()
+
+        # Transfer all remaining subplanes of room to the new room Plane
+        #
+        for plane in list(self.window.room.subplanes.values()):
+
+            room_plane.sub(plane)
+
+        # Save position, in case it has been shifted
+        #
+        room_plane.rect.topleft = self.window.room.rect.topleft
+
+        self.window.room.destroy()
+
+        # Add new room
+        #
+        fabula.LOGGER.debug("recreating room plane of size {}".format(room_plane.rect.size))
+
+        self.window.sub(room_plane)
+
+        # Tiles are rendered on the separate Plane window.room.tiles, but
+        # Entites may have been spawned in the incorrect rendering order, so
+        # rearrange them.
         #
         self.reorder_room_planes()
 
         self.make_items_draggable()
 
-        if "inventory" not in self.window.subplanes_list:
-
-            fabula.LOGGER.debug("adding inventory plane to window")
-
-            self.window.sub(self.inventory_plane)
+        # Make sure inventory is present and on top
+        #
+        self.window.sub(self.inventory_plane)
 
         # Display the game again and accept input
         #
         fabula.LOGGER.info("unfreezing")
+
         self.freeze = False
 
         # process_ChangeMapElementEvent and process_SpawnEvent should have
@@ -749,9 +861,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                 lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
                                                 lineheight = 25)
 
-        option_list.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
+        option_list.rect.center = self.window.rect.center
 
-        self.window.room.sub(option_list)
+        self.window.sub(option_list)
 
         return
 
@@ -911,7 +1023,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             if tile == event.tile:
 
-                # Tiles may compare equal, but the may not refer to the same
+                # Tiles may compare equal, but they may not refer to the same
                 # instance, so we use tile from tile_list.
                 #
                 fabula.LOGGER.debug("found event.tile in self.host.room.tile_list")
@@ -960,7 +1072,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Tiles are clickndrag subplanes of self.window.room, indexed by their
         # location as string representation.
         #
-        if str(event.location) not in self.window.room.subplanes:
+        if str(event.location) not in self.window.room.tiles.subplanes:
 
             tile_plane = clickndrag.Plane(str(event.location),
                                           pygame.Rect((event.location[0] * self.spacing,
@@ -969,13 +1081,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                           left_click_callback = self.tile_clicked_callback,
                                           dropped_upon_callback = self.tile_drop_callback)
 
-            self.window.room.sub(tile_plane)
+            self.window.room.tiles.sub(tile_plane)
 
         # Update image regardless whether the tile existed or not
         #
         fabula.LOGGER.debug("changing image for tile at {0} to {1}".format(str(event.location),
                                                                         tile_from_list.asset))
-        self.window.room.subplanes[str(event.location)].image = tile_from_list.asset
+
+        self.window.room.tiles.subplanes[str(event.location)].image = tile_from_list.asset
 
         return
 
@@ -994,8 +1107,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # Taken from PygameEditor.open_image().
             #
             perception_box = clickndrag.gui.OkBox(event.perception)
-            perception_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
-            self.window.room.sub(perception_box)
+            perception_box.rect.center = self.window.rect.center
+            self.window.sub(perception_box)
 
         else:
             fabula.LOGGER.warning("perception for '{}', not displaying".format(event.identifier))
@@ -1177,6 +1290,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         says_box.rect.center = (entity_rect.centerx, entity_rect.top)
 
         # Make sure it's completely visible
+        # TODO: but maybe the room is not completely visible
         #
         says_box.rect.clamp_ip(pygame.Rect((0, 0), self.window.room.rect.size))
 
@@ -1209,27 +1323,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.LOGGER.debug("rearranging subplanes of room")
 
-        tiles = []
         entities = []
         captions = []
         other = []
 
         for name in self.window.room.subplanes_list:
 
-            # By convention, a tile's plane name is the string representation of
-            # the coordinates, so it starts with a brace.
-            #
-            if name.startswith("("):
-
-                tiles.append(name)
-
-            elif name in self.host.room.entity_dict.keys():
+            if name in self.host.room.entity_dict.keys():
 
                 entities.append(name)
 
             elif name.endswith("_caption"):
 
                 captions.append(name)
+
+            elif name == "tiles":
+
+                # Drop the Tiles Plane for now
+                #
+                pass
 
             else:
                 other.append(name)
@@ -1245,7 +1357,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             entities.insert(entities.index(name.split("_caption")[0]) + 1, name)
 
-        self.window.room.subplanes_list = tiles + entities + other
+        # Observe the Tiles Plane
+        #
+        self.window.room.subplanes_list = ["tiles"] + entities + other
 
         return
 
@@ -1679,11 +1793,15 @@ class PygameEditor(PygameUserInterface):
 
         self.window.sub(self.inventory_plane)
 
-        # Add the room plane created in PygameUserInterface.__init__()
+        # Recreate room an tiles Planes
         #
-        self.room_plane.rect.left = 100
+        self.window.sub(clickndrag.Plane("room",
+                                         pygame.Rect((0, 0), (0, 0))))
 
-        self.window.sub(self.room_plane)
+        self.window.room.sub(clickndrag.Plane("tiles",
+                                              pygame.Rect((0, 0), (0, 0))))
+
+        self.window.room.rect.left = 100
 
         # Create Container for the editor buttons.
         #
@@ -1795,19 +1913,63 @@ class PygameEditor(PygameUserInterface):
 
         if new_image is not None:
 
-            for x in range(8):
-                for y in range(5):
-                    rect = pygame.Rect((x * 100, y * 100), (100, 100))
-
-                    # TODO: catch exception for smaller images
-                    #
-                    self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
-
-            # Warn user
+            # TODO: hardcoded spacing
+            # Cannot use self.spacing since it is deliberately larger than PygameUserInterface.spacing
             #
-            warning_box = clickndrag.gui.OkBox("Please save the room before editing walls.")
-            warning_box.rect.center = pygame.Rect((0, 0), self.window.room.rect.size).center
-            self.window.room.sub(warning_box)
+            spacing = 100
+
+            image_width, image_height = new_image.get_size()
+
+            fabula.LOGGER.debug("original dimensions of loaded image: {}x{}".format(image_width,
+                                                                                   image_height))
+
+            # Get width and height that are multiples of self.spacing
+            #
+            fitted_width = int(image_width / spacing) * spacing
+
+            if image_width % spacing:
+
+                # Add a whole spacing unit to catch the leftover pixels
+                #
+                fitted_width = fitted_width + spacing
+
+            fitted_height = int(image_height / spacing) * spacing
+
+            if image_height % spacing:
+
+                # Add a whole spacing unit to catch the leftover pixels
+                #
+                fitted_height = fitted_height + spacing
+
+            # Create a new Surface with the new size, and blit the image on it
+            #
+            fitted_surface = pygame.Surface((fitted_width, fitted_height))
+
+            fitted_surface.blit(new_image, (0, 0))
+
+            fabula.LOGGER.debug("dimensions of fitted image: {}x{}".format(fitted_width,
+                                                                           fitted_height))
+
+            for x in range(int(fitted_width / spacing)):
+
+                for y in range(int(fitted_height / spacing)):
+
+                    # Create new Tile and sent it to Server
+                    # Cave: dummy asset description
+                    #
+                    tile = fabula.Tile(fabula.FLOOR,
+                                       "dummy asset for ({}, {})".format(x, y))
+
+                    rect = pygame.Rect((x * spacing, y * spacing),
+                                       (spacing, spacing))
+
+                    tile.asset = fitted_surface.subsurface(rect)
+
+                    event = fabula.ChangeMapElementEvent(tile, (x, y))
+
+                    self.host.message_for_host.event_list.append(event)
+
+            self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
         else:
             fabula.LOGGER.error("could not load image '{}'".format(filename))
@@ -1853,14 +2015,13 @@ class PygameEditor(PygameUserInterface):
 
             # TODO: only save PNGs if they have actually changed
             #
-            for x in range(8):
-                for y in range(5):
+            for x, y in list(self.host.room.floor_plan.keys()):
 
                     # Save image file
                     #
                     current_file = filename + "-{0}_{1}.png".format(x, y)
                     fabula.LOGGER.debug(current_file)
-                    pygame.image.save(self.window.room.subplanes[str((x, y))].image,
+                    pygame.image.save(self.window.room.tiles.subplanes[str((x, y))].image,
                                       os.path.join(path, current_file))
 
                     # Send renamed Tile to Server
@@ -1940,7 +2101,9 @@ class PygameEditor(PygameUserInterface):
                                                     self.host.send_room_events,
                                                     lineheight = 25)
 
-            self.window.room.sub(option_list)
+            option_list.rect.center = self.window.rect.center
+
+            self.window.sub(option_list)
 
         else:
             fabula.LOGGER.warning("no floorplan files found in '{}'".format(os.getcwd()))
@@ -2064,7 +2227,9 @@ class PygameEditor(PygameUserInterface):
                                                             (200, 30)),
                                             callback))
 
-        self.window.room.sub(container)
+        container.rect.center = self.window.rect.center
+
+        self.window.sub(container)
 
         return
 
@@ -2233,10 +2398,8 @@ class PygameEditor(PygameUserInterface):
             plane.draggable = False
 
         # Install Tile clicked callback.
-        # All Entity Planes have been removed from room, so there should be only
-        # tiles left.
         #
-        for plane in self.window.room.subplanes.values():
+        for plane in self.window.room.tiles.subplanes.values():
             plane.left_click_callback = self.make_tile_obstacle
 
         # Finally, create overlays for OBSTACLE tiles.
@@ -2247,12 +2410,12 @@ class PygameEditor(PygameUserInterface):
             if self.host.room.floor_plan[coordinates].tile.tile_type == fabula.OBSTACLE:
 
                 overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
-                                                 pygame.Rect(self.window.room.subplanes[str(coordinates)].rect),
+                                                 pygame.Rect(self.window.room.tiles.subplanes[str(coordinates)].rect),
                                                  left_click_callback = self.make_tile_floor)
 
                 overlay_plane.image = self.overlay_surface
 
-                self.window.room.sub(overlay_plane)
+                self.window.room.tiles.sub(overlay_plane)
 
     def make_tile_obstacle(self, plane):
         """Clicked callback which changes the Tile type to fabula.OBSTACLE.
@@ -2269,7 +2432,7 @@ class PygameEditor(PygameUserInterface):
         asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
 
         event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.OBSTACLE, asset_desc),
-                                            coordinates)
+                                             coordinates)
 
         self.host.message_for_host.event_list.append(event)
 
@@ -2283,7 +2446,7 @@ class PygameEditor(PygameUserInterface):
 
         overlay_plane.image = self.overlay_surface
 
-        self.window.room.sub(overlay_plane)
+        self.window.room.tiles.sub(overlay_plane)
 
     def make_tile_floor(self, plane):
         """Clicked callback which changes the Tile type to fabula.FLOOR.
@@ -2302,7 +2465,7 @@ class PygameEditor(PygameUserInterface):
         asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
 
         event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, asset_desc),
-                                            coordinates)
+                                             coordinates)
 
         self.host.message_for_host.event_list.append(event)
 
@@ -2319,7 +2482,7 @@ class PygameEditor(PygameUserInterface):
         # Restore Tile clicked callbacks along the way.
         # Entity Planes are not yet restored, so there should be only tiles left.
         #
-        for plane in list(self.window.room.subplanes.values()):
+        for plane in list(self.window.room.tiles.subplanes.values()):
 
             if plane.name.endswith("_overlay"):
 
@@ -2345,6 +2508,37 @@ class PygameEditor(PygameUserInterface):
         while len(self.plane_cache):
             self.window.buttons.sub(self.plane_cache.pop(0))
 
+        return
+
+    def collect_player_input(self):
+        """Call base class, but initiate scrolling in any case.
+        """
+
+        PygameUserInterface.collect_player_input(self)
+
+        # Check mouse position, and trigger window scrolling
+        # Copied from PygameUserInterface.collect_player_input()
+        # Pygame might have been quit, so check pygame.display.get_init().
+        #
+        if not self.scroll and pygame.display.get_init():
+
+            mouse_position = pygame.mouse.get_pos()
+            window_width = self.window.rect.width
+
+            if 0 <= mouse_position[0] <= 25:
+
+                # Scroll to the left
+                #
+                self.scroll = self.spacing
+
+            elif window_width - 25 <= mouse_position[0] <= window_width:
+
+                # Scroll to right
+                #
+                self.scroll = 0 - self.spacing
+
+        return
+
     def process_SpawnEvent(self, event):
         """Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.
         """
@@ -2359,6 +2553,16 @@ class PygameEditor(PygameUserInterface):
             plane.left_click_callback = self.show_properties
 
         self.make_items_draggable()
+
+        return
+
+    def process_RoomCompleteEvent(self, event):
+        """Call the base class, but make sure the buttons Plane is on top.
+        """
+
+        PygameUserInterface.process_RoomCompleteEvent(self, event)
+
+        self.window.sub(self.window.buttons)
 
         return
 
@@ -2444,6 +2648,10 @@ class PygameEditor(PygameUserInterface):
                                                                      (80, 25)),
                                                          lambda plane : self.edit_logic(entity.identifier)))
 
+        # Make sure it's on top
+        #
+        self.window.sub(self.window.properties)
+
         return
 
     def make_items_draggable(self):
@@ -2487,7 +2695,9 @@ class PygameEditor(PygameUserInterface):
                                                 lambda option : self.edit_event(event, option),
                                                 lineheight = 25)
 
-        self.window.room.sub(option_list)
+        option_list.rect.center = self.window.rect.center
+
+        self.window.sub(option_list)
 
         return
 
@@ -2511,7 +2721,9 @@ class PygameEditor(PygameUserInterface):
                                                     pygame.Rect((0, 0), (100, 25)),
                                                     lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
 
-            self.window.room.sub(editor_window)
+            editor_window.rect.center = self.window.rect.center
+
+            self.window.sub(editor_window)
 
         elif option.text == "Attempt Failed":
 
@@ -2530,7 +2742,7 @@ class PygameEditor(PygameUserInterface):
 
         fabula.LOGGER.debug("called")
 
-        self.window.room.edit_event.destroy()
+        self.window.edit_event.destroy()
 
         self.host.add_response(trigger_event, response_event)
 
@@ -2609,7 +2821,9 @@ class PygameEditor(PygameUserInterface):
                                                 pygame.Rect((0, 0), (100, 25)),
                                                 self.update_logic))
 
-        self.window.room.sub(editor_window)
+        editor_window.rect.centerx = self.window.rect.centerx
+
+        self.window.sub(editor_window)
 
         return
 
@@ -2619,11 +2833,11 @@ class PygameEditor(PygameUserInterface):
 
         fabula.LOGGER.debug("called")
 
-        if "scrolling_rules" in self.window.room.display_logic.subplanes_list:
+        if "scrolling_rules" in self.window.display_logic.subplanes_list:
 
             # ScrollingPlanes lead to long attribute traversals
             #
-            rules_plane = self.window.room.display_logic.scrolling_rules.content.rules
+            rules_plane = self.window.display_logic.scrolling_rules.content.rules
 
             for name in rules_plane.subplanes_list:
 
@@ -2637,6 +2851,6 @@ class PygameEditor(PygameUserInterface):
 
                     self.host.add_response(trigger_event, response_event)
 
-        self.window.room.display_logic.destroy()
+        self.window.display_logic.destroy()
 
         return
