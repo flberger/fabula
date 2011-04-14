@@ -39,14 +39,14 @@ PygameUserInterface.loading_surface
 PygameUserInterface.inventory_plane
     Plane to display the inventory
 
-PygameUserInterface.room_plane
-    Plane to display the room
-
 PygameUserInterface.spacing
     Spacing between tiles.
 
+PygameUserInterface.scroll
+    Counter for scrolling left-right. Used in display_single_frame().
+
 PygameUserInterface.window
-    An instance of clickndrag.Display. By default this is 800x600px and
+    An instance of clickndrag.Display. By default this is 800x600 px and
     windowed.
 
 PygameUserInterface.window.inventory
@@ -55,8 +55,11 @@ PygameUserInterface.window.inventory
     window.
 
 PygameUserInterface.window.room
-    clickndrag Plane for the room. By default this is 800x500px with
-    space for 8x5 tiles and located at the top of the window.
+    clickndrag Plane for the room. Initially it will have a size of
+    0x0 px. The final Plane is created by process_RoomCompleteEvent.
+
+PygameUserInterface.window.room.tiles
+    clickndrag Plane which has the Tile Planes as subplanes.
 
 PygameUserInterface.fade_surface
     A black pygame surface for fade effects
@@ -70,7 +73,7 @@ PygameUserInterface.right_clicked_entity
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id90">
+      <table class="children sortable" id="id31">
   
   
 <tr class="method">
@@ -108,7 +111,7 @@ PygameUserInterface.right_clicked_entity
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#collect_player_input">collect_player_input</a></td>
-    <td><tt>Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.</tt></td>
+    <td><tt>Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.</tt></td>
   </tr><tr class="method">
     
     
@@ -120,7 +123,7 @@ PygameUserInterface.right_clicked_entity
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Update and render the Planes of the map elements and fade in the room.</tt></td>
+    <td><tt>Recreate room and tile Planes at the correct size, update and render everything and fade in the room.</tt></td>
   </tr><tr class="method">
     
     
@@ -242,7 +245,7 @@ PygameUserInterface.right_clicked_entity
         <p>
           Inherited from <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a>:
         </p>
-        <table class="children sortable" id="id91">
+        <table class="children sortable" id="id32">
   
   
 <tr class="basemethod">
@@ -276,7 +279,7 @@ PygameUserInterface.right_clicked_entity
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a>, <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id92">
+        <table class="children sortable" id="id33">
   
   
 <tr class="basemethod">
@@ -490,8 +493,8 @@ for testing purposes.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#collect_player_input">fabula.plugins.ui.UserInterface.collect_player_input</a></div>
-    <pre>Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#collect_player_input">fabula.plugins.ui.UserInterface.collect_player_input</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameEditor.html">fabula.plugins.pygameui.PygameEditor</a></div>
+    <pre>Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         </pre>
   </div>
 </div><div class="function">
@@ -510,7 +513,7 @@ for testing purposes.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_EnterRoomEvent">fabula.plugins.ui.UserInterface.process_EnterRoomEvent</a></div>
     <pre>Fade window to black and remove subplanes of PygameUserInterface.window.room.
-Add room Plane if necessary.</pre>
+        </pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent">
@@ -526,8 +529,8 @@ Add room Plane if necessary.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_RoomCompleteEvent">fabula.plugins.ui.UserInterface.process_RoomCompleteEvent</a></div>
-    <pre>Update and render the Planes of the map elements and fade in the room.
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_RoomCompleteEvent">fabula.plugins.ui.UserInterface.process_RoomCompleteEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.PygameEditor.html">fabula.plugins.pygameui.PygameEditor</a></div>
+    <pre>Recreate room and tile Planes at the correct size, update and render everything and fade in the room.
 Add the inventory Plane to window if it is not yet there.</pre>
   </div>
 </div><div class="function">
@@ -879,7 +882,7 @@ Adds appropriate Events to PygameUserInterface.message_for_host.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-04-06 18:01:31.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-04-14 12:04:11.
     </address>
   </body>
 </html>

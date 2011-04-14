@@ -43,7 +43,7 @@ PygameUserInterface.overlay_surface
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id94">
+      <table class="children sortable" id="id35">
   
   
 <tr class="method">
@@ -122,8 +122,20 @@ PygameUserInterface.overlay_surface
     
     
     <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameEditor.html#collect_player_input">collect_player_input</a></td>
+    <td><tt>Call base class, but initiate scrolling in any case.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#process_SpawnEvent">process_SpawnEvent</a></td>
     <td><tt>Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameEditor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Call the base class, but make sure the buttons Plane is on top.</tt></td>
   </tr><tr class="method">
     
     
@@ -173,7 +185,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>:
         </p>
-        <table class="children sortable" id="id95">
+        <table class="children sortable" id="id36">
   
   
 <tr class="basemethod">
@@ -204,20 +216,8 @@ PygameUserInterface.overlay_surface
     
     
     <td>Method</td>
-    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#collect_player_input">collect_player_input</a></td>
-    <td><tt>Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
     <td><tt>Fade window to black and remove subplanes of PygameUserInterface.window.room.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Update and render the Planes of the map elements and fade in the room.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -327,7 +327,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>):
         </p>
-        <table class="children sortable" id="id96">
+        <table class="children sortable" id="id37">
   
   
 <tr class="basemethod">
@@ -361,7 +361,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>, <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a>, <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id97">
+        <table class="children sortable" id="id38">
   
   
 <tr class="basemethod">
@@ -677,6 +677,24 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
         </pre>
   </div>
 </div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameEditor.collect_player_input">
+    
+  </a>
+  <a name="collect_player_input">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    collect_player_input(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.PygameUserInterface.html#collect_player_input">fabula.plugins.pygameui.PygameUserInterface.collect_player_input</a></div>
+    <pre>Call base class, but initiate scrolling in any case.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="fabula.plugins.pygameui.PygameEditor.process_SpawnEvent">
     
   </a>
@@ -692,6 +710,24 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.PygameUserInterface.html#process_SpawnEvent">fabula.plugins.pygameui.PygameUserInterface.process_SpawnEvent</a></div>
     <pre>Call PygameUserInterface.process_SpawnEvent, add a left_click_callback to the Entity, and make the Entity asset draggable.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameEditor.process_RoomCompleteEvent">
+    
+  </a>
+  <a name="process_RoomCompleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_RoomCompleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.PygameUserInterface.html#process_RoomCompleteEvent">fabula.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent</a></div>
+    <pre>Call the base class, but make sure the buttons Plane is on top.
         </pre>
   </div>
 </div><div class="function">
@@ -822,7 +858,7 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-04-06 18:01:31.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-04-14 12:04:11.
     </address>
   </body>
 </html>
