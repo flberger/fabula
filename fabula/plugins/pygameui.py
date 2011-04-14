@@ -1913,19 +1913,63 @@ class PygameEditor(PygameUserInterface):
 
         if new_image is not None:
 
-            for x in range(8):
-                for y in range(5):
-                    rect = pygame.Rect((x * 100, y * 100), (100, 100))
-
-                    # TODO: catch exception for smaller images
-                    #
-                    self.window.room.subplanes[str((x, y))].image = new_image.subsurface(rect)
-
-            # Warn user
+            # TODO: hardcoded spacing
+            # Cannot use self.spacing since it is deliberately larger than PygameUserInterface.spacing
             #
-            warning_box = clickndrag.gui.OkBox("Please save the room before editing walls.")
-            warning_box.rect.center = self.window.rect.center
-            self.window.sub(warning_box)
+            spacing = 100
+
+            image_width, image_height = new_image.get_size()
+
+            fabula.LOGGER.debug("original dimensions of loaded image: {}x{}".format(image_width,
+                                                                                   image_height))
+
+            # Get width and height that are multiples of self.spacing
+            #
+            fitted_width = int(image_width / spacing) * spacing
+
+            if image_width % spacing:
+
+                # Add a whole spacing unit to catch the leftover pixels
+                #
+                fitted_width = fitted_width + spacing
+
+            fitted_height = int(image_height / spacing) * spacing
+
+            if image_height % spacing:
+
+                # Add a whole spacing unit to catch the leftover pixels
+                #
+                fitted_height = fitted_height + spacing
+
+            # Create a new Surface with the new size, and blit the image on it
+            #
+            fitted_surface = pygame.Surface((fitted_width, fitted_height))
+
+            fitted_surface.blit(new_image, (0, 0))
+
+            fabula.LOGGER.debug("dimensions of fitted image: {}x{}".format(fitted_width,
+                                                                           fitted_height))
+
+            for x in range(int(fitted_width / spacing)):
+
+                for y in range(int(fitted_height / spacing)):
+
+                    # Create new Tile and sent it to Server
+                    # Cave: dummy asset description
+                    #
+                    tile = fabula.Tile(fabula.FLOOR,
+                                       "dummy asset for ({}, {})".format(x, y))
+
+                    rect = pygame.Rect((x * spacing, y * spacing),
+                                       (spacing, spacing))
+
+                    tile.asset = fitted_surface.subsurface(rect)
+
+                    event = fabula.ChangeMapElementEvent(tile, (x, y))
+
+                    self.host.message_for_host.event_list.append(event)
+
+            self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
         else:
             fabula.LOGGER.error("could not load image '{}'".format(filename))
