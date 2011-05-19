@@ -125,8 +125,9 @@
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
-# TODO: support the Tiled editor, http://www.mapeditor.org/
-# TODO: read fullscreen, logging level from optional fabula.conf
+# TODO: support the Tiled editor, http://www.mapeditor.org/, see http://silveiraneto.net/2009/12/19/tiled-tmx-map-loader-for-pygame/
+# TODO: HD support (at least 1280x720)
+# TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 
 # Fabula will not work with Python versions prior to 3.x.
 #

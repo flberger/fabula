@@ -18,13 +18,14 @@ Fabula can be used as a library to develop your own games. As an alternative,
 you can use the Pygame-based graphical editor and the default game engine that 
 come with fabula.
 
-You can find fabula on the web at http://florian-berger.de/software/fabula
+You can find fabula on the web at http://florian-berger.de/en/software/fabula
 
 
 Prerequisites
 -------------
 
 Python >= 3.0      http://python.org/
+
 Pygame >= 1.9.1    http://pygame.org/
 
 
@@ -54,6 +55,8 @@ Acknowledgements
 
 Fabula development is funded by the [MFG Stiftung 
 Baden-Württemberg](http://innovation.mfg.de/cmlink/mfg-portal/de/ueber-die-mfg/mfg-stiftung).
+
+![MFG Stiftung](http://www.karl-steinbuch-stipendium.de/uploads/pics/mfg_stiftung_140_01.gif)
 
 
 History
