@@ -82,13 +82,20 @@ class EntityPlane(clickndrag.Plane):
 
        EntityPlane.position_list
            A list of movement steps as position tuples
+
+       EntityPlane.spritesheet
+           A Pygame Surface that contains a sprite sheet.
+
+       EntityPlane.subsurface_rect_list
+           A list of Pygame Rects to create subsurfaces of the sprite sheet.
     """
 
     def __init__(self, name, rect, draggable = False,
                                    grab = False,
                                    left_click_callback = None,
                                    right_click_callback = None,
-                                   dropped_upon_callback = None):
+                                   dropped_upon_callback = None,
+                                   spritesheet = None):
         """Initialise.
         """
 
@@ -101,6 +108,8 @@ class EntityPlane(clickndrag.Plane):
                                                     dropped_upon_callback)
 
         self.position_list = []
+        self.spritesheet = spritesheet
+        self.subsurface_rect_list = []
 
         return
 
@@ -112,10 +121,18 @@ class EntityPlane(clickndrag.Plane):
         #
         clickndrag.Plane.update(self)
 
+        # Change position
+        #
         if self.position_list:
             new_position = self.position_list.pop(0)
             self.rect.centerx = new_position[0]
             self.rect.bottom = new_position[1]
+
+        # Change image
+        #
+        if self.subsurface_rect_list and self.spritesheet is not None:
+
+            self.image = self.spritesheet.subsurface(self.subsurface_rect_list.pop(0))
 
         return
 
@@ -199,6 +216,81 @@ class PygameEntity(fabula.Entity):
         position_list.append((future_x, future_y))
 
         self.asset.position_list.extend(position_list)
+
+        # Animation
+        #
+        if self.asset.spritesheet is not None:
+
+            # Compute direction from dx_per_frame and dy_per_frame.
+            # Colummns in spritesheet:
+            #     down = first column
+            #     left = second column
+            #     up = third column
+            #     right = fourth column
+            #
+            column = 0
+
+            if dx_per_frame > 0:
+
+                # Right
+                #
+                column = 3
+
+            elif dx_per_frame < 0:
+
+                # Left
+                #
+                column = 1
+
+            elif dy_per_frame < 0:
+
+                # Up
+                #
+                column = 2
+
+            subsurface_rect_list = []
+
+            height = self.asset.spritesheet.get_height()
+
+            # TODO: hardcoded
+            #
+            offset = 100
+
+            repeat_frames = 5
+            repeat_count = 0
+
+            # TODO: hardcoded
+            #
+            sprite_dimensions = (100, 100)
+
+            # Omit last step
+            # TODO: copied from above, can this be out into one single iteration?
+            #
+            for i in range(self.action_frames - 1):
+
+                subsurface_rect_list.append(pygame.Rect((column * sprite_dimensions[0], offset),
+                                                        sprite_dimensions))
+
+                repeat_count = repeat_count + 1
+
+                if repeat_count == repeat_frames:
+
+                    offset = offset + sprite_dimensions[1]
+
+                    if offset > height - sprite_dimensions[1]:
+
+                        # TODO: hardcoded
+                        #
+                        offset = 100
+
+                    repeat_count = 0
+
+            # Append neutral image as final
+            #
+            subsurface_rect_list.append(pygame.Rect((column * sprite_dimensions[0], 0),
+                                                    sprite_dimensions))
+
+            self.asset.subsurface_rect_list.extend(subsurface_rect_list)
 
         return
 
@@ -932,6 +1024,32 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
 
+            # Check for Fabula sprite sheet
+            #
+            spritesheet = None
+
+            if "fabulasheet" in event.entity.asset_desc:
+
+                fabula.LOGGER.debug("sprite sheet detected for Entity '{}', asset '{}'".format(event.entity.identifier,
+                                                                                               event.entity.asset_desc))
+
+                # Save orignal surface containing the sheet
+                #
+                spritesheet = surface
+
+                # Replace surface variable with a subsurface
+                # TODO: hardcoded dimension
+                #
+                surface = surface.subsurface(pygame.Rect((0, 0), (100, 100)))
+
+                # Fix rect accordingly
+                # TODO: hardcoded dimension
+                #
+                rect.width = 100
+                rect.height = 100
+
+            # Place at the correct location
+            #
             rect.centerx = event.location[0] * self.spacing + self.spacing / 2
             rect.bottom = event.location[1] * self.spacing + self.spacing
 
@@ -940,7 +1058,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             plane = EntityPlane(event.entity.identifier,
                                 rect,
                                 right_click_callback = self.entity_right_click_callback,
-                                dropped_upon_callback = self.entity_dropped_callback)
+                                dropped_upon_callback = self.entity_dropped_callback,
+                                spritesheet = spritesheet)
 
             plane.image = surface
 

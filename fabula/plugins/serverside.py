@@ -780,11 +780,13 @@ class Editor(DefaultGame):
 
             self.message_for_host.event_list.append(event)
 
+            # TODO: use a safe filename or a fallback for player, or no player at all
+            #
             entity = fabula.Entity(identifier = "player",
                                    entity_type = fabula.PLAYER,
                                    blocking = False,
                                    mobile = False,
-                                   asset_desc = "player.png")
+                                   asset_desc = "player-fabulasheet.png")
 
             self.message_for_host.event_list.append(fabula.SpawnEvent(entity,
                                                                      (0, 0)))
