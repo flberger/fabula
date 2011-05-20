@@ -222,40 +222,42 @@ class PygameEntity(fabula.Entity):
         if self.asset.spritesheet is not None:
 
             # Compute direction from dx_per_frame and dy_per_frame.
-            # Colummns in spritesheet:
-            #     down = first column
-            #     left = second column
-            #     up = third column
-            #     right = fourth column
+            # Rows in spritesheet:
+            #     down = row 0
+            #     left = row 1
+            #     up = row 2
+            #     right = row 3
             #
-            column = 0
+            row = 0
 
-            if dx_per_frame > 0:
-
-                # Right
-                #
-                column = 3
-
-            elif dx_per_frame < 0:
+            if dx_per_frame < 0:
 
                 # Left
                 #
-                column = 1
+                row = 1
 
             elif dy_per_frame < 0:
 
                 # Up
                 #
-                column = 2
+                row = 2
+
+            elif dx_per_frame > 0:
+
+                # Right
+                #
+                row = 3
 
             subsurface_rect_list = []
 
-            height = self.asset.spritesheet.get_height()
+            width = self.asset.spritesheet.get_width()
 
             # TODO: hardcoded
             #
             offset = 100
 
+            # TODO: hardcoded
+            #
             repeat_frames = 5
             repeat_count = 0
 
@@ -268,16 +270,16 @@ class PygameEntity(fabula.Entity):
             #
             for i in range(self.action_frames - 1):
 
-                subsurface_rect_list.append(pygame.Rect((column * sprite_dimensions[0], offset),
+                subsurface_rect_list.append(pygame.Rect((offset, row * sprite_dimensions[1]),
                                                         sprite_dimensions))
 
                 repeat_count = repeat_count + 1
 
                 if repeat_count == repeat_frames:
 
-                    offset = offset + sprite_dimensions[1]
+                    offset = offset + sprite_dimensions[0]
 
-                    if offset > height - sprite_dimensions[1]:
+                    if offset > width - sprite_dimensions[0]:
 
                         # TODO: hardcoded
                         #
@@ -287,7 +289,7 @@ class PygameEntity(fabula.Entity):
 
             # Append neutral image as final
             #
-            subsurface_rect_list.append(pygame.Rect((column * sprite_dimensions[0], 0),
+            subsurface_rect_list.append(pygame.Rect((0, row * sprite_dimensions[1]),
                                                     sprite_dimensions))
 
             self.asset.subsurface_rect_list.extend(subsurface_rect_list)
@@ -2793,11 +2795,11 @@ class PygameEditor(PygameUserInterface):
         fabula.LOGGER.debug("called")
 
         event_list = ("Attempt Failed",
-                      "Perception")
+                      "Perception",
+                      "Says")
 
         # TODO: "Can Speak"
         # TODO: "Moves To"
-        # TODO: "Says"
         # TODO: "Change Map Element"
         # TODO: "Delete"
         # TODO: "Spawn"
@@ -2833,6 +2835,24 @@ class PygameEditor(PygameUserInterface):
             editor_window = clickndrag.gui.Container("edit_event", padding = 4)
 
             event_editor = EventEditor(fabula.PerceptionEvent(event.identifier, ""), self.window)
+
+            editor_window.sub(event_editor)
+
+            editor_window.sub(clickndrag.gui.Button("OK",
+                                                    pygame.Rect((0, 0), (100, 25)),
+                                                    lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
+
+            editor_window.rect.center = self.window.rect.center
+
+            self.window.sub(editor_window)
+
+        elif option.text == "Says":
+
+            # TODO: copied from above, replace
+            #
+            editor_window = clickndrag.gui.Container("edit_event", padding = 4)
+
+            event_editor = EventEditor(fabula.SaysEvent(event.identifier, ""), self.window)
 
             editor_window.sub(event_editor)
 
