@@ -1823,9 +1823,11 @@ class EventEditor(clickndrag.gui.Container):
 
                 value = self.subplanes[name].subplanes["value_{}".format(key)].text
 
-                if not fabula.str_is_tuple(value):
+                # TODO: just guessing for a list, replace with a proper check
+                #
+                if not fabula.str_is_tuple(value) and not (value.startswith("[") and value.endswith("]")):
 
-                    # Then it should be a string
+                    # No coordinate tuple, no list, then it should be a string
                     #
                     value = "'{}'".format(value)
 
