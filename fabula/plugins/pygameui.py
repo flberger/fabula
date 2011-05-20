@@ -1880,28 +1880,9 @@ class PygameEditor(PygameUserInterface):
         #
         self.plane_cache = []
 
-        # Re-open the click'n'drag window.
-        #
-        self.window = clickndrag.Display((1000, 600))
-        self.window.image.fill((16, 16, 16))
-
         # Set window name
         #
         pygame.display.set_caption("Fabula Editor")
-
-        # Create a black pygame surface for fade effects
-        # Do not use Surface.copy() since we do not want per-pixel alphas.
-        #
-        self.fade_surface = pygame.Surface(self.window.image.get_rect().size)
-        self.fade_surface.fill((0, 0, 0))
-
-        loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
-                                               True,
-                                               (255, 255, 255))
-
-        self.fade_surface.blit(loading_surface,
-                               (int(self.fade_surface.get_width() / 2 - loading_surface.get_width() / 2),
-                                int(self.fade_surface.get_height() / 2 - loading_surface.get_height() / 2)))
 
         # Create a semi-transparent red Surface to be used as an OBSTACLE
         # indicator overlay
@@ -1912,18 +1893,10 @@ class PygameEditor(PygameUserInterface):
 
         # Add the inventory plane created in PygameUserInterface.__init__()
         #
-        self.inventory_plane.rect.left = 100
-
         self.window.sub(self.inventory_plane)
 
-        # Recreate room an tiles Planes
+        # Shift room to have space for the GUI
         #
-        self.window.sub(clickndrag.Plane("room",
-                                         pygame.Rect((0, 0), (0, 0))))
-
-        self.window.room.sub(clickndrag.Plane("tiles",
-                                              pygame.Rect((0, 0), (0, 0))))
-
         self.window.room.rect.left = 100
 
         # Create Container for the editor buttons.
@@ -2019,7 +1992,7 @@ class PygameEditor(PygameUserInterface):
         container = clickndrag.gui.Container("properties",
                                              padding = 5,
                                              background_color = (120, 120, 120))
-        container.rect.topleft = (900, 0)
+        container.rect.topleft = (700, 0)
         self.window.sub(container)
 
         fabula.LOGGER.debug("complete")
