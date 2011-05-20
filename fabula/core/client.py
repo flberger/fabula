@@ -627,8 +627,7 @@ class Client(fabula.core.Engine):
             self.await_confirmation = False
 
     def process_PerceptionEvent(self, event, **kwargs):
-        """A perception must be displayed by the UserInterface,
-           so it is queued in a Message passed from the Client.
+        """Unblock the client and call the base class implementation.
         """
 
         # That is a confirmation
@@ -640,18 +639,22 @@ class Client(fabula.core.Engine):
         # Call default implementation
         #
         fabula.core.Engine.process_PerceptionEvent(self,
-                                                  event,
-                                                  message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
-    #def process_SaysEvent(self, event, **kwargs):
-    #    """The UserInterface usually must display the
-    #       spoken text. Thus the event is put in the
-    #       event queue for the UserInterface.
-    #       The UserInterface is going to notify
-    #       the Entity once it starts speaking so it
-    #       can provide an animation."""
-    #
-    #    message.event_list.append(event)
+    def process_SaysEvent(self, event, **kwargs):
+        """Unblock the client and call the base class implementation.
+        """
+
+        # TODO: This is a temporary fix. A SaysEvent is a valid confirmation of an attempt, but only if the player is the target. Introduce targets in SaysEvent?
+        #
+        self.await_confirmation = False
+
+        # Call default implementation
+        #
+        fabula.core.Engine.process_PerceptionEvent(self,
+                                                   event,
+                                                   message = kwargs["message"])
 
     def process_DeleteEvent(self, event, **kwargs):
         """Sanity check, then let self.room process the Event.
