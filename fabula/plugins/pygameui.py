@@ -84,7 +84,13 @@ class EntityPlane(clickndrag.Plane):
            A list of movement steps as position tuples
 
        EntityPlane.spritesheet
-           A Pygame Surface that contains a sprite sheet.
+           If not None, a Pygame Surface that contains a sprite sheet. The sheet
+           is assumed to consist of 4 rows. The first column contains the
+           static view of the Entity in front, left, back and right view (from
+           the first row down). Rows are supposed to contain movement animation
+           frames: the first row a downward movement in front view, the second
+           row a movement to the left in left view etc. Frames are assumed to be
+           of equal width and height.
 
        EntityPlane.subsurface_rect_list
            A list of Pygame Rects to create subsurfaces of the sprite sheet.
@@ -142,6 +148,8 @@ class PygameEntity(fabula.Entity):
        PygameEntities support the key "caption" in PygameEntity.property_dict.
        The value of PygameEntity.property_dict["caption"] will be displayed above the
        PygameEntity.
+
+       PygameEntity.asset is supposed to be an instance of EntityPlane.
 
        Additional attributes:
 
@@ -222,11 +230,9 @@ class PygameEntity(fabula.Entity):
         if self.asset.spritesheet is not None:
 
             # Compute direction from dx_per_frame and dy_per_frame.
-            # Rows in spritesheet:
-            #     down = row 0
-            #     left = row 1
-            #     up = row 2
-            #     right = row 3
+            # See EntityPlane docstring for sprite sheet specifications.
+            #
+            # Default: down
             #
             row = 0
 
@@ -250,23 +256,27 @@ class PygameEntity(fabula.Entity):
 
             subsurface_rect_list = []
 
+            # TODO: most of these need only be calculated once. This should be done once the asset is fetched. Given the asset doesn't change. Nah.
+
             width = self.asset.spritesheet.get_width()
 
-            # TODO: hardcoded
-            #
-            offset = 100
+            offset = self.asset.rect.width
 
-            # TODO: hardcoded
-            #
-            repeat_frames = 5
+            repeat_frames = int(self.action_frames / int(width / offset))
+
+            if repeat_frames < 1:
+
+                repeat_frames = 1
+
+            fabula.LOGGER.debug("repeat_frames for {} == {}".format(self.identifier,
+                                                                    repeat_frames))
+
             repeat_count = 0
 
-            # TODO: hardcoded
-            #
-            sprite_dimensions = (100, 100)
+            sprite_dimensions = self.asset.rect.size
 
             # Omit last step
-            # TODO: copied from above, can this be out into one single iteration?
+            # TODO: copied from above, can this be moved into one single iteration?
             #
             for i in range(self.action_frames - 1):
 
@@ -281,9 +291,7 @@ class PygameEntity(fabula.Entity):
 
                     if offset > width - sprite_dimensions[0]:
 
-                        # TODO: hardcoded
-                        #
-                        offset = 100
+                        offset = self.asset.rect.width
 
                     repeat_count = 0
 
@@ -964,11 +972,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def process_SpawnEvent(self, event):
         """Add a subplane to window.room, possibly fetching an asset before.
+
            The name of the subplane is the Entity identifier, so the subplane
            is accessible using window.room.<identifier>.
+
            Entity.asset points to the Plane of the Entity.
+
            When a Plane has not yet been added, the Entity's class is changed
            to PygameEntity in addition.
+
+           If the asset file name contains 'fabulasheet', this method will treat
+           the image as a spritesheet. See the EntityPlane documentation for
+           details.
         """
 
         if event.entity.user_interface is None:
@@ -1032,23 +1047,32 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             if "fabulasheet" in event.entity.asset_desc:
 
-                fabula.LOGGER.debug("sprite sheet detected for Entity '{}', asset '{}'".format(event.entity.identifier,
-                                                                                               event.entity.asset_desc))
+                msg = "sprite sheet detected for Entity '{}', asset '{}'"
+
+                fabula.LOGGER.debug(msg.format(event.entity.identifier,
+                                               event.entity.asset_desc))
 
                 # Save orignal surface containing the sheet
                 #
                 spritesheet = surface
 
-                # Replace surface variable with a subsurface
-                # TODO: hardcoded dimension
+                # Spritesheet: Sheets are supposed to have 4 rows. See EntityPlane docstrings.
+                # Computing dimensions
                 #
-                surface = surface.subsurface(pygame.Rect((0, 0), (100, 100)))
+                sprite_height = int(spritesheet.get_height() / 4)
+
+                fabula.LOGGER.debug("assuming sprite height: {} px".format(sprite_height))
+
+                # Spritesheet: sub-images are assumed to be squares. See EntityPlane docstrings.
+                # Replace surface variable with a subsurface
+                #
+                surface = spritesheet.subsurface(pygame.Rect((0, 0),
+                                                             (sprite_height, sprite_height)))
 
                 # Fix rect accordingly
-                # TODO: hardcoded dimension
                 #
-                rect.width = 100
-                rect.height = 100
+                rect.width = sprite_height
+                rect.height = sprite_height
 
             # Place at the correct location
             #
@@ -1808,6 +1832,7 @@ class EventEditor(clickndrag.gui.Container):
         """
         # The Event is built as a string and then pumped through eval()
         # TODO: this should go to the Fabula main package
+        # TODO: escape quotes in text entered by user!
         #
         class_str = "fabula.{}(".format(self.title.text)
 
