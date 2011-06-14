@@ -82,13 +82,26 @@ class EntityPlane(clickndrag.Plane):
 
        EntityPlane.position_list
            A list of movement steps as position tuples
+
+       EntityPlane.spritesheet
+           If not None, a Pygame Surface that contains a sprite sheet. The sheet
+           is assumed to consist of 4 rows. The first column contains the
+           static view of the Entity in front, left, back and right view (from
+           the first row down). Rows are supposed to contain movement animation
+           frames: the first row a downward movement in front view, the second
+           row a movement to the left in left view etc. Frames are assumed to be
+           of equal width and height.
+
+       EntityPlane.subsurface_rect_list
+           A list of Pygame Rects to create subsurfaces of the sprite sheet.
     """
 
     def __init__(self, name, rect, draggable = False,
                                    grab = False,
                                    left_click_callback = None,
                                    right_click_callback = None,
-                                   dropped_upon_callback = None):
+                                   dropped_upon_callback = None,
+                                   spritesheet = None):
         """Initialise.
         """
 
@@ -101,6 +114,8 @@ class EntityPlane(clickndrag.Plane):
                                                     dropped_upon_callback)
 
         self.position_list = []
+        self.spritesheet = spritesheet
+        self.subsurface_rect_list = []
 
         return
 
@@ -112,10 +127,18 @@ class EntityPlane(clickndrag.Plane):
         #
         clickndrag.Plane.update(self)
 
+        # Change position
+        #
         if self.position_list:
             new_position = self.position_list.pop(0)
             self.rect.centerx = new_position[0]
             self.rect.bottom = new_position[1]
+
+        # Change image
+        #
+        if self.subsurface_rect_list and self.spritesheet is not None:
+
+            self.image = self.spritesheet.subsurface(self.subsurface_rect_list.pop(0))
 
         return
 
@@ -125,6 +148,8 @@ class PygameEntity(fabula.Entity):
        PygameEntities support the key "caption" in PygameEntity.property_dict.
        The value of PygameEntity.property_dict["caption"] will be displayed above the
        PygameEntity.
+
+       PygameEntity.asset is supposed to be an instance of EntityPlane.
 
        Additional attributes:
 
@@ -199,6 +224,93 @@ class PygameEntity(fabula.Entity):
         position_list.append((future_x, future_y))
 
         self.asset.position_list.extend(position_list)
+
+        # Animation
+        #
+        if self.asset.spritesheet is not None:
+
+            # Compute direction from dx_per_frame and dy_per_frame.
+            # See EntityPlane docstring for sprite sheet specifications.
+            #
+            # Default: down
+            #
+            row = 0
+
+            if dx_per_frame < 0:
+
+                # Left
+                #
+                row = 1
+
+            elif dy_per_frame < 0:
+
+                # Up
+                #
+                row = 2
+
+            elif dx_per_frame > 0:
+
+                # Right
+                #
+                row = 3
+
+            subsurface_rect_list = []
+
+            # TODO: most of these need only be calculated once. This should be done once the asset is fetched. Given the asset doesn't change. Nah.
+
+            width = self.asset.spritesheet.get_width()
+
+            offset = self.asset.rect.width
+
+            repeat_frames = int(self.action_frames / int(width / offset))
+
+            if repeat_frames < 1:
+
+                repeat_frames = 1
+
+            # That is, if there is only one column, then use no offset
+            #
+            if offset == width:
+
+                offset = 0
+
+                # Use default image all the time
+                #
+                repeat_frames = self.action_frames
+
+            fabula.LOGGER.debug("repeat_frames for {} == {}".format(self.identifier,
+                                                                    repeat_frames))
+
+            repeat_count = 0
+
+            sprite_dimensions = self.asset.rect.size
+
+            # Omit last step
+            # TODO: copied from above, can this be moved into one single iteration?
+            #
+            for i in range(self.action_frames - 1):
+
+                subsurface_rect_list.append(pygame.Rect((offset, row * sprite_dimensions[1]),
+                                                        sprite_dimensions))
+
+                repeat_count = repeat_count + 1
+
+                if repeat_count == repeat_frames:
+
+                    offset = offset + sprite_dimensions[0]
+
+                    if offset > width - sprite_dimensions[0]:
+
+                        offset = self.asset.rect.width
+
+                    repeat_count = 0
+
+            # Append neutral image as final
+            #
+            subsurface_rect_list.append(pygame.Rect((0, row * sprite_dimensions[1]),
+                                                    sprite_dimensions))
+
+            self.asset.subsurface_rect_list.extend(subsurface_rect_list)
 
         return
 
@@ -870,11 +982,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def process_SpawnEvent(self, event):
         """Add a subplane to window.room, possibly fetching an asset before.
+
            The name of the subplane is the Entity identifier, so the subplane
            is accessible using window.room.<identifier>.
+
            Entity.asset points to the Plane of the Entity.
+
            When a Plane has not yet been added, the Entity's class is changed
            to PygameEntity in addition.
+
+           If the asset file name contains 'fabulasheet', this method will treat
+           the image as a spritesheet. See the EntityPlane documentation for
+           details.
         """
 
         if event.entity.user_interface is None:
@@ -932,6 +1051,41 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
 
+            # Check for Fabula sprite sheet
+            #
+            spritesheet = None
+
+            if "fabulasheet" in event.entity.asset_desc:
+
+                msg = "sprite sheet detected for Entity '{}', asset '{}'"
+
+                fabula.LOGGER.debug(msg.format(event.entity.identifier,
+                                               event.entity.asset_desc))
+
+                # Save orignal surface containing the sheet
+                #
+                spritesheet = surface
+
+                # Spritesheet: Sheets are supposed to have 4 rows. See EntityPlane docstrings.
+                # Computing dimensions
+                #
+                sprite_height = int(spritesheet.get_height() / 4)
+
+                fabula.LOGGER.debug("assuming sprite height: {} px".format(sprite_height))
+
+                # Spritesheet: sub-images are assumed to be squares. See EntityPlane docstrings.
+                # Replace surface variable with a subsurface
+                #
+                surface = spritesheet.subsurface(pygame.Rect((0, 0),
+                                                             (sprite_height, sprite_height)))
+
+                # Fix rect accordingly
+                #
+                rect.width = sprite_height
+                rect.height = sprite_height
+
+            # Place at the correct location
+            #
             rect.centerx = event.location[0] * self.spacing + self.spacing / 2
             rect.bottom = event.location[1] * self.spacing + self.spacing
 
@@ -940,7 +1094,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             plane = EntityPlane(event.entity.identifier,
                                 rect,
                                 right_click_callback = self.entity_right_click_callback,
-                                dropped_upon_callback = self.entity_dropped_callback)
+                                dropped_upon_callback = self.entity_dropped_callback,
+                                spritesheet = spritesheet)
 
             plane.image = surface
 
@@ -1687,6 +1842,7 @@ class EventEditor(clickndrag.gui.Container):
         """
         # The Event is built as a string and then pumped through eval()
         # TODO: this should go to the Fabula main package
+        # TODO: escape quotes in text entered by user!
         #
         class_str = "fabula.{}(".format(self.title.text)
 
@@ -1702,9 +1858,11 @@ class EventEditor(clickndrag.gui.Container):
 
                 value = self.subplanes[name].subplanes["value_{}".format(key)].text
 
-                if not fabula.str_is_tuple(value):
+                # TODO: just guessing for a list, replace with a proper check
+                #
+                if not fabula.str_is_tuple(value) and not (value.startswith("[") and value.endswith("]")):
 
-                    # Then it should be a string
+                    # No coordinate tuple, no list, then it should be a string
                     #
                     value = "'{}'".format(value)
 
@@ -2647,11 +2805,11 @@ class PygameEditor(PygameUserInterface):
         fabula.LOGGER.debug("called")
 
         event_list = ("Attempt Failed",
-                      "Perception")
+                      "Perception",
+                      "Says")
 
         # TODO: "Can Speak"
         # TODO: "Moves To"
-        # TODO: "Says"
         # TODO: "Change Map Element"
         # TODO: "Delete"
         # TODO: "Spawn"
@@ -2687,6 +2845,24 @@ class PygameEditor(PygameUserInterface):
             editor_window = clickndrag.gui.Container("edit_event", padding = 4)
 
             event_editor = EventEditor(fabula.PerceptionEvent(event.identifier, ""), self.window)
+
+            editor_window.sub(event_editor)
+
+            editor_window.sub(clickndrag.gui.Button("OK",
+                                                    pygame.Rect((0, 0), (100, 25)),
+                                                    lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
+
+            editor_window.rect.center = self.window.rect.center
+
+            self.window.sub(editor_window)
+
+        elif option.text == "Says":
+
+            # TODO: copied from above, replace
+            #
+            editor_window = clickndrag.gui.Container("edit_event", padding = 4)
+
+            event_editor = EventEditor(fabula.SaysEvent(event.identifier, ""), self.window)
 
             editor_window.sub(event_editor)
 

@@ -20,6 +20,8 @@ help:
 	@echo '    user_install'
 	@echo '    sdist'
 	@echo '    exe'
+	@echo '    commit.txt'
+	@echo '    commit'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -87,3 +89,14 @@ clean:
 	rm -vf *.log
 	rm -vf */*.log
 	rm -vf */*/*.log
+
+commit.txt:
+	# single line because bzr diff returns false when there are diffs
+	bzr diff > commit.txt ; nano commit.txt
+
+# Taken from the StepSim Makefile
+#
+commit:
+	@echo RETURN to commit using commit.txt, CTRL-C to cancel:
+	@read DUMMY
+	bzr commit --file commit.txt && rm commit.txt
