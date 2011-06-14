@@ -268,6 +268,16 @@ class PygameEntity(fabula.Entity):
 
                 repeat_frames = 1
 
+            # That is, if there is only one column, then use no offset
+            #
+            if offset == width:
+
+                offset = 0
+
+                # Use default image all the time
+                #
+                repeat_frames = self.action_frames
+
             fabula.LOGGER.debug("repeat_frames for {} == {}".format(self.identifier,
                                                                     repeat_frames))
 
