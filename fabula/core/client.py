@@ -479,8 +479,8 @@ class Client(fabula.core.Engine):
             entity = self.room.entity_dict[event.identifier]
             location = self.room.entity_locations[event.identifier]
 
-            fabula.LOGGER.warning("attempt failed for %s, now at %s"
-                              % (event.identifier, location))
+            fabula.LOGGER.warning("attempt failed for '{}', now at {}".format(event.identifier,
+                                                                              location))
 
             # TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
             #
@@ -492,8 +492,9 @@ class Client(fabula.core.Engine):
             self.room.process_MovesToEvent(fabula.MovesToEvent(event.identifier,
                                                               (restored_x, restored_y)))
 
-            fabula.LOGGER.info("%s now reverted to %s" % (event.identifier,
-                                                         (restored_x, restored_y)))
+            fabula.LOGGER.info("'{}' now reverted to {}".format(event.identifier,
+                                                                (restored_x, restored_y)))
+
         # Call default to forward to the Plugin.
         #
         fabula.core.Engine.process_AttemptFailedEvent(self,

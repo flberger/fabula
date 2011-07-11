@@ -115,6 +115,23 @@ def load_room_from_file(filename, complete = True):
 
     return event_list
 
+def replace_identifier(event_list, identifier, replacement):
+    """Return a list of Events where alle occurences of identifier are replaced by replacement.
+    """
+
+    fabula.LOGGER.debug("replacing identifier '{}' with '{}'".format(identifier, replacement))
+
+    list_repr, replacements = re.subn(r"([^_])identifier = '{}'".format(identifier),
+                                      r"\1identifier = '{}'".format(replacement),
+                                      repr(event_list))
+
+    fabula.LOGGER.debug("original: {}, replacement: {}".format(event_list, list_repr))
+
+    fabula.LOGGER.debug("made {} replacements".format(replacements))
+
+    return eval(list_repr)
+
+
 class DefaultGame(fabula.plugins.Plugin):
     """This is an off-the-shelf server plugin, running a default Fabula game.
 
@@ -146,6 +163,7 @@ class DefaultGame(fabula.plugins.Plugin):
     def __init__(self, host):
         """Initialise.
         """
+
         # Call base class
         #
         fabula.plugins.Plugin.__init__(self, host)
@@ -213,17 +231,17 @@ class DefaultGame(fabula.plugins.Plugin):
 
         # Replace event.identifier with 'player' for lookup
         #
-        event_str = repr(self.replace_identifier([event],
-                                                 event.identifier,
-                                                 "player")[0])
+        event_str = repr(replace_identifier([event],
+                                            event.identifier,
+                                            "player")[0])
 
         if event_str in self.condition_response_dict:
 
             fabula.LOGGER.info("returning corresponding events")
 
-            self.message_for_host.event_list.extend(self.replace_identifier(self.condition_response_dict[event_str],
-                                                                            "player",
-                                                                            event.identifier))
+            self.message_for_host.event_list.extend(replace_identifier(self.condition_response_dict[event_str],
+                                                                       "player",
+                                                                       event.identifier))
 
         else:
             fabula.LOGGER.info("event '{}' not found in condition_response_dict, returning AttemptFailedEvent to host".format(event_str))
@@ -344,9 +362,9 @@ class DefaultGame(fabula.plugins.Plugin):
 
         else:
 
-            self.message_for_host.event_list.extend(self.replace_identifier(event_list,
-                                                                            "player",
-                                                                            event.identifier))
+            self.message_for_host.event_list.extend(replace_identifier(event_list,
+                                                                       "player",
+                                                                       event.identifier))
 
         return
 
@@ -658,22 +676,6 @@ class DefaultGame(fabula.plugins.Plugin):
 
         return
 
-    def replace_identifier(self, event_list, identifier, replacement):
-        """Return a list of Events where alle occurences of identifier are replaced by replacement.
-        """
-
-        fabula.LOGGER.debug("replacing identifier '{}' with '{}'".format(identifier, replacement))
-
-        list_repr, replacements = re.subn(r"([^_])identifier = '{}'".format(identifier),
-                                          r"\1identifier = '{}'".format(replacement),
-                                          repr(event_list))
-
-        fabula.LOGGER.debug("original: {}, replacement: {}".format(event_list, list_repr))
-
-        fabula.LOGGER.debug("made {} replacements".format(replacements))
-
-        return eval(list_repr)
-
 class Editor(DefaultGame):
     """This is the server-side Plugin for a Fabula map editor.
 
@@ -904,60 +906,136 @@ class Editor(DefaultGame):
 
         return
 
-    # HERE BE DRAGONS #####################################################
+class CommandLine(DefaultGame):
+    """This is a command-line interface server plugin.
+    """
 
-#    def process_TriesToDropEvent(self, event):
-#        """Return a DropsEvent to the Server.
-#        """
-#
-#        # Restrict drops to tiles right next to the player.
-#        # TODO: copied from process_TriesToPickUpEvent
-#        #
-#        player_location = self.host.room.entity_locations[event.identifier]
-#
-#        surrounding_positions = [(player_location[0] - 1, player_location[1]),
-#                                 (player_location[0], player_location[1] - 1),
-#                                 (player_location[0] + 1, player_location[1]),
-#                                 (player_location[0], player_location[1] + 1)]
-#
-#        # Server.process_TriesToDropEvent() has already done some checks,
-#        # so we can be sure that target_identifier is either a valid
-#        # coordinate tuple or an instance of fabula.Entity.
-#        #
-#
-#        if event.target_identifier in self.host.room.entity_dict.keys():
-#
-#            fabula.LOGGER.info("target '{}' is an entity identifier".format(event.target_identifier))
-#
-#            if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
-#
-#                fabula.LOGGER.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
-#                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
-#
-#            else:
-#                fabula.LOGGER.info("AttemptFailed: '{}' has been dropped on Entity '{}'. Not supported.".format(event.item_identifier, event.target_identifier))
-#                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
-#
-#        else:
-#            fabula.LOGGER.info("target '{}' is not an entity identifier".format(event.target_identifier))
-#
-#            if event.target_identifier not in surrounding_positions:
-#
-#                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
-#                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
-#
-#            else:
-#                # Still, the Entity to be dropped may originate either from Room or from
-#                # Rack.
-#                #
-#                if event.item_identifier not in self.host.rack.entity_dict.keys():
-#                    fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
-#                    self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
-#                                                                               event.item_identifier))
-#
-#                fabula.LOGGER.info("returning DropsEvent")
-#                self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-#                                                                         event.item_identifier,
-#                                                                         event.target_identifier))
-#
-#        return
+    def __init__(self, host):
+        """Initialise.
+        """
+
+        # Call base class
+        #
+        DefaultGame.__init__(self, host)
+
+        self.client_id = None
+
+        print("Welcome to the Fabula command-line interface.")
+        print()
+        print("Available commands:")
+        print("move   IDENTIFIER X Y         Make IDENTIFIER move to location (X, Y).")
+        print("pick   IDENTIFIER ITEM        Make IDENTIFIER pick up ITEM.")
+        print("drop   IDENTIFIER ITEM X Y    Make IDENTIFIER drop ITEM at location (X, Y).")
+        print("say    IDENTIFIER TEXT        Make IDENTIFIER say TEXT.")
+        print("load   NAME                   Load room NAME from local file NAME.floorplan.")
+        print("failed IDENTIFIER             Deny the attempt by IDENTIFIER.")
+        print()
+        print("Or hit RETURN at the prompt to proceed with default game responses.")
+        print()
+
+        return
+
+    def process_message(self, message):
+        """Display the incoming Message, and return typed Events as a Message.
+        """
+
+        # Clear message for host
+        #
+        self.message_for_host = fabula.Message([])
+
+        for event in message.event_list:
+
+            print("-> {}".format(event))
+
+            # Catch player identifier
+            #
+            if self.client_id is None and isinstance(event, fabula.InitEvent):
+
+                self.client_id = event.identifier
+
+        input_string = input("? ")
+
+        if input_string == "":
+
+            print("Proceeding with default game responses...")
+
+            # Call base class
+            #
+            self.message_for_host = DefaultGame.process_message(self, message)
+
+        else:
+
+            return_string, return_events = self.parse(input_string)
+
+            print(return_string)
+
+            self.message_for_host = fabula.Message(return_events)
+
+        return self.message_for_host
+
+    def parse(self, input_string):
+        """This method parses the input string and returns a tuple (string, event_list).
+           The string and event list may be empty.
+        """
+
+        return_string = "Unknown command."
+        return_events = []
+
+        token_list = input_string.lower().strip().split()
+
+        if token_list[0] == "load" and len(token_list) == 2:
+
+            return_string = "Loading room '{0}' from file {0}.floorplan".format(token_list[1])
+
+            return_events = load_room_from_file(token_list[1] + ".floorplan")
+
+            return_events = replace_identifier(return_events,
+                                               "player",
+                                               self.client_id)
+
+        elif token_list[0] == "failed" and len(token_list) == 2:
+
+            event = fabula.AttemptFailedEvent(token_list[1])
+
+            return_string = "<- {}".format(event)
+
+            return_events.append(event)
+
+        elif token_list[0] == "move" and len(token_list) == 4:
+
+            event = fabula.MovesToEvent(token_list[1],
+                                        (int(token_list[2]), int(token_list[3])))
+
+            return_string = "<- {}".format(event)
+
+            return_events.append(event)
+
+        elif token_list[0] == "pick" and len(token_list) == 3:
+
+            event = fabula.PicksUpEvent(token_list[1], token_list[2])
+
+            return_string = "<- {}".format(event)
+
+            return_events.append(event)
+
+        elif token_list[0] == "drop" and len(token_list) == 5:
+
+            event = fabula.DropsEvent(token_list[1],
+                                      token_list[2],
+                                      (int(token_list[3]), int(token_list[4])))
+
+            return_string = "<- {}".format(event)
+
+            return_events.append(event)
+
+        elif token_list[0] == "say" and len(token_list) > 2:
+
+            text = " ".join(token_list[2:])
+
+            event = fabula.SaysEvent(token_list[1], text)
+
+            return_string = "<- {}".format(event)
+
+            return_events.append(event)
+
+        return (return_string, return_events)
