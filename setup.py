@@ -33,9 +33,9 @@ if sys.version_info[0] != 3:
 import cx_Freeze
 import glob
 import os.path
+import fabula
 
 PACKAGE = "fabula"
-VERSION = "0.6.0"
 
 INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
                  os.path.join("scripts", "attempt_look_at.png"),
@@ -66,7 +66,7 @@ if sys.platform == "win32":
 # The syntax for the "include_files" option to "build_exe" is [(src, target), ...]
 #
 cx_Freeze.setup(name = PACKAGE,
-                version = VERSION,
+                version = fabula.VERSION,
                 author = "Florian Berger",
                 author_email = "fberger@florian-berger.de",
                 url = "http://florian-berger.de/software/{}/".format(PACKAGE),
@@ -86,7 +86,7 @@ cx_Freeze.setup(name = PACKAGE,
                 package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
                 scripts = [os.path.join("scripts", "run_pygame_editor.py"),
                            os.path.join("scripts", "run_pygame_game.py")],
-                data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, VERSION),
+                data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
                                glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
                               (os.path.join("share", "{}").format(PACKAGE),
                                INCLUDE_FILES)],

@@ -49,9 +49,9 @@
    establish the actual network connection to the Server Interface and add an
    according fabula.interfaces.MessageBuffer in Interface.connections.
 
-   When Interface.connect() returns, Client.run() send a fabula.InitEvent using
-   the client id given by the player. The Server will reply with a series of
-   Events that establish the first room.
+   When Interface.connect() returns, Client.run() will send a fabula.InitEvent
+   using the client id given by the player. The Server will reply with a series
+   of Events that establish the first room.
 
 
    Communication
@@ -60,7 +60,7 @@
    Server and Client communicate by sending Events, each using the MessageBuffer
    instance in Interface.connections.
 
-   Events are bundles into Messages. A Message represents a set of Events that
+   Events are bundled into Messages. A Message represents a set of Events that
    happen in parallel.
 """
 # "Stories On A Grid"
@@ -143,6 +143,11 @@ if sys.version_info[0] != 3:
 import fabula.eventprocessor
 import re
 import logging
+
+############################################################
+# Version Information
+
+VERSION = "0.6.0"
 
 ############################################################
 # Events
