@@ -20,17 +20,32 @@
 
 # work started on 10. December 2010
 
-# Fabula will not work with Python versions prior to 3.x.
-#
 import sys
 
+# Fabula will not work with Python versions prior to 3.x.
+#
 if sys.version_info[0] != 3:
     raise Exception("fabula needs Python 3 to work. Your Python version is: " + sys.version)
 
-# Imported by cx_Freeze
+# Fallback
 #
-#import distutils.core
-import cx_Freeze
+from distutils.core import setup
+
+EXECUTABLES = []
+
+try:
+    import cx_Freeze
+
+    setup = cx_Freeze.setup
+
+    EXECUTABLES = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_game.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py"))]
+
+except ImportError:
+
+    print("Warning: the cx_Freeze module could not be imported. You will not be able to build binary packages.")
+
 import glob
 import os.path
 import fabula
@@ -71,37 +86,35 @@ if sys.platform == "win32":
 # For most operations, cx_Freeze.setup() is a wrapper for distutils.core.setup().
 # The syntax for the "include_files" option to "build_exe" is [(src, target), ...]
 #
-cx_Freeze.setup(name = PACKAGE,
-                version = fabula.VERSION,
-                author = "Florian Berger",
-                author_email = "fberger@florian-berger.de",
-                url = "http://florian-berger.de/en/software/{}/".format(PACKAGE),
-                description = "An Open Source Python Game Engine suitable for adventure, role-playing and strategy games and digital interactive storytelling.",
-                license = "GPL",
-                packages = [PACKAGE,
-                            "{}.core".format(PACKAGE),
-                            "{}.interfaces".format(PACKAGE),
-                            "{}.plugins".format(PACKAGE),
-                            "clickndrag"],
-                requires = ["pygame (>=1.9.1)"],
-                provides = [PACKAGE,
-                            "{}.core".format(PACKAGE),
-                            "{}.interfaces".format(PACKAGE),
-                            "{}.plugins".format(PACKAGE),
-                            "clickndrag"],
-                package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
-                scripts = [os.path.join("scripts", "run_pygame_editor.py"),
-                           os.path.join("scripts", "run_pygame_game.py"),
-                           os.path.join("scripts", "run_pygame_cli.py")],
-                data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
-                               glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
-                              (os.path.join("share", "{}").format(PACKAGE),
-                               INCLUDE_FILES)],
-                executables = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py")),
-                               cx_Freeze.Executable(os.path.join("scripts", "run_pygame_game.py")),
-                               cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py"))],
-                options = {"build_exe" :
-                           {"include_files" :
-                            [(path, os.path.basename(path)) for path in INCLUDE_FILES]
-                           }
-                          })
+setup(name = PACKAGE,
+      version = fabula.VERSION,
+      author = "Florian Berger",
+      author_email = "fberger@florian-berger.de",
+      url = "http://florian-berger.de/en/software/{}/".format(PACKAGE),
+      description = "An Open Source Python Game Engine suitable for adventure, role-playing and strategy games and digital interactive storytelling.",
+      license = "GPL",
+      packages = [PACKAGE,
+                  "{}.core".format(PACKAGE),
+                  "{}.interfaces".format(PACKAGE),
+                  "{}.plugins".format(PACKAGE),
+                  "clickndrag"],
+      requires = ["pygame (>=1.9.1)"],
+      provides = [PACKAGE,
+                  "{}.core".format(PACKAGE),
+                  "{}.interfaces".format(PACKAGE),
+                  "{}.plugins".format(PACKAGE),
+                  "clickndrag"],
+      package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
+      scripts = [os.path.join("scripts", "run_pygame_editor.py"),
+                 os.path.join("scripts", "run_pygame_game.py"),
+                 os.path.join("scripts", "run_pygame_cli.py")],
+      data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
+                     glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
+                    (os.path.join("share", "{}").format(PACKAGE),
+                     INCLUDE_FILES)],
+      executables = EXECUTABLES,
+      options = {"build_exe" :
+                 {"include_files" :
+                  [(path, os.path.basename(path)) for path in INCLUDE_FILES]
+                 }
+                })
