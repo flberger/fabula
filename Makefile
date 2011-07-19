@@ -22,6 +22,7 @@ help:
 	@echo '    exe'
 	@echo '    commit.txt'
 	@echo '    commit'
+	@echo '    sign'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -54,7 +55,13 @@ user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt
 
 sdist:
-	$(PYTHON) setup.py sdist --force-manifest --formats=bztar,zip
+	# On April 14, 2011 11:34am, Xandar Kablandar (eternalcheesecake) hinted at 
+	# symbolic links in the .tar.bz2 file. These are stored by --formats=bztar 
+	# but not by --formats=zip. Since there is no setup.py option to dereference 
+	# symbolic links, we only use zip for the time being.
+	# Filed issue 12585 at http://bugs.python.org for this.
+	#
+	$(PYTHON) setup.py sdist --force-manifest --formats=zip
 
 exe: sdist
 	rm -rf build/exe.*
@@ -92,6 +99,7 @@ clean:
 
 commit.txt:
 	# single line because bzr diff returns false when there are diffs
+	#
 	bzr diff > commit.txt ; nano commit.txt
 
 # Taken from the StepSim Makefile
@@ -100,3 +108,8 @@ commit:
 	@echo RETURN to commit using commit.txt, CTRL-C to cancel:
 	@read DUMMY
 	bzr commit --file commit.txt && rm commit.txt
+
+sign:
+	rm -vf dist/*.asc
+	for i in dist/*.zip ; do gpg --sign --armor --detach $$i ; done
+	gpg --verify --multifile dist/*.asc
