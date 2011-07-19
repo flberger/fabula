@@ -27,6 +27,10 @@ import sys
 if sys.version_info[0] != 3:
     raise Exception("fabula needs Python 3 to work. Your Python version is: " + sys.version)
 
+import glob
+import os.path
+import fabula
+
 # Fallback
 #
 from distutils.core import setup
@@ -45,10 +49,6 @@ try:
 except ImportError:
 
     print("Warning: the cx_Freeze module could not be imported. You will not be able to build binary packages.")
-
-import glob
-import os.path
-import fabula
 
 PACKAGE = "fabula"
 

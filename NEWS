@@ -1,6 +1,24 @@
 NEWS for Fabula
 ===============
 
+0.7.0
+-----
+
+Released on 19 July 2011.
+
+This version comes with new demo game art, taken from the "Whispers of Avalon" 
+open source game project. Fabula entities now support horizontal sprite sheets 
+for walking animations, including one-column sprite sheets for just a front / 
+left / right / back view without animation. The editor now opens a screen of the 
+same size as the game screen and supports the SaysEvent. Fabula now features a 
+server-side command-line interface - start run_pygame_cli.py to give it a try. 
+setup.py has been fixed to finally work with vanilla Python distutils alongside 
+cx_Freeze. Fabula source releases will be in ZIP format for the time being since 
+tarballs created by distutils preserve symbolic links (see 
+http://bugs.python.org/issue12585). Minor fixes, cleanups and documentation 
+update.
+
+
 0.6.0
 -----
 
