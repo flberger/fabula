@@ -100,6 +100,8 @@ class App:
 
             fabula.LOGGER.setLevel(logging.ERROR)
 
+        fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
+
         self.timeout = timeout
 
         self.assets_class = fabula.assets.Assets
