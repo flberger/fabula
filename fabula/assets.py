@@ -28,7 +28,11 @@
 import fabula
 import os.path
 import glob
+
+# TODO: importing "site" leads to defunct executables using cx_Freeze 2.4.3 with Python 3.2 on Unix
+#
 import site
+
 import sys
 
 class Assets:

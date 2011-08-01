@@ -26,16 +26,18 @@
 
 # TODO: always diplay and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
-# TODO: render order top-down, following lines
 
 import fabula.plugins.ui
 import pygame
 import clickndrag.gui
 import tkinter.filedialog
 import tkinter.simpledialog
+
 # For cx_Freeze
 #
 import tkinter._fix
+import pygame._view
+
 import os
 
 # Pixels per character, for width estimation of text renderings
@@ -715,9 +717,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         """
 
-        # The UserInterface should only ever collect and send one
-        # single client event to prevent cheating and blocking other
-        # clients in the server. (hint by Alexander Marbach)
+        # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
 
         # Check mouse position, and trigger window scrolling
         #
@@ -879,10 +879,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             room_plane.sub(plane)
 
-        # Save position, in case it has been shifted
-        #
-        room_plane.rect.topleft = self.window.room.rect.topleft
-
         self.window.room.destroy()
 
         # Add new room
@@ -911,8 +907,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # process_ChangeMapElementEvent and process_SpawnEvent should have
         # set up everything by now, so we can simply fade in and roll.
-        # Since full screen blits are very slow, use a fraction of
-        # action_frames.
         #
         frames = self.action_frames
 
@@ -968,10 +962,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
-        option_list = clickndrag.gui.OptionSelector("select_room",
-                                                event.sentences,
-                                                lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
-                                                lineheight = 25)
+        option_list = clickndrag.gui.OptionSelector("select_sentence",
+                                                    event.sentences,
+                                                    lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
+                                                    lineheight = 25)
 
         option_list.rect.center = self.window.rect.center
 
@@ -1066,18 +1060,23 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 #
                 spritesheet = surface
 
-                # Spritesheet: Sheets are supposed to have 4 rows. See EntityPlane docstrings.
+                # Spritesheet: Sheets are supposed to have 4 rows. See
+                # EntityPlane docstrings.
+                #
                 # Computing dimensions
                 #
                 sprite_height = int(spritesheet.get_height() / 4)
 
                 fabula.LOGGER.debug("assuming sprite height: {} px".format(sprite_height))
 
-                # Spritesheet: sub-images are assumed to be squares. See EntityPlane docstrings.
+                # Spritesheet: sub-images are assumed to be squares. See
+                # EntityPlane docstrings.
+                #
                 # Replace surface variable with a subsurface
                 #
                 surface = spritesheet.subsurface(pygame.Rect((0, 0),
-                                                             (sprite_height, sprite_height)))
+                                                             (sprite_height,
+                                                              sprite_height)))
 
                 # Fix rect accordingly
                 #
@@ -1722,13 +1721,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if self.freeze:
 
-            displaystring = str(obj).center(32)
+            displaystring = str(obj).center(128)
 
             self.window.display.blit(clickndrag.gui.SMALL_FONT.render(displaystring,
                                                             True,
                                                             (127, 127, 127),
                                                             (0, 0, 0)),
-                                     (300, 500))
+                                     (120, 500))
 
             pygame.display.flip()
 
@@ -1929,10 +1928,6 @@ class PygameEditor(PygameUserInterface):
         # Add the inventory plane created in PygameUserInterface.__init__()
         #
         self.window.sub(self.inventory_plane)
-
-        # Shift room to have space for the GUI
-        #
-        self.window.room.rect.left = 100
 
         # Create Container for the editor buttons.
         #
@@ -2355,7 +2350,7 @@ class PygameEditor(PygameUserInterface):
         #
         container.sub(clickndrag.gui.Button("OK",
                                             pygame.Rect((0, 0),
-                                                            (200, 30)),
+                                                        (200, 30)),
                                             callback))
 
         container.rect.center = self.window.rect.center
@@ -2694,6 +2689,10 @@ class PygameEditor(PygameUserInterface):
         PygameUserInterface.process_RoomCompleteEvent(self, event)
 
         self.window.sub(self.window.buttons)
+
+        # Shift room to have space for the GUI
+        #
+        self.window.room.rect.left = 100
 
         return
 

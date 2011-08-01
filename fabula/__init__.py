@@ -132,6 +132,7 @@
 # TODO: fabula.conf should be read / accessed where it is needed, not in run; no passing of options through init arguments
 # TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.
+# TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -321,6 +322,9 @@ class ConfirmEvent(Event):
 
 class MovesToEvent(ConfirmEvent):
     """This is the server confirmation of a movement.
+
+       This Event will move any Entity, regardless if the Entity.mobile flag is
+       True or not.
 
        MovesToEvent.identifier
            identifier of the object that moves
@@ -740,8 +744,8 @@ class Entity(fabula.eventprocessor.EventProcessor):
            other Entities.
 
        Entity.mobile
-           Boolean flag, indicating whether the Entity can be picked up and
-           dropped.
+           Boolean flag. If True, the Entity can be picked up and dropped and
+           will be able to move.
 
        Entity.asset_desc
            Preferably a string with a file name or an URI of a media file

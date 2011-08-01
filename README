@@ -7,6 +7,8 @@ About
 Fabula is an Open Source Python Game Engine suitable for adventure, role-playing 
 and strategy games and digital interactive storytelling.
 
+![Fabula Open Source Python Game Engine](http://static.florian-berger.de/fabula-2011-07-19.jpg)
+
 It offers a client-server architecture, an event-based protocol, multiplayer
 and networking capabilites, a multi-threaded server, an abstract, 
 visualisation-agnostic model of a game world, an asset manager and a plugin 

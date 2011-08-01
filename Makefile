@@ -113,3 +113,8 @@ sign:
 	rm -vf dist/*.asc
 	for i in dist/*.zip ; do gpg --sign --armor --detach $$i ; done
 	gpg --verify --multifile dist/*.asc
+
+freshmeat:
+	@echo RETURN to submit to freshmeat.net using freshmeat-submit.txt, CTRL-C to cancel:
+	@read DUMMY
+	freshmeat-submit < freshmeat-submit.txt

@@ -349,7 +349,13 @@ class Server(fabula.core.Engine):
 
         fabula.LOGGER.info("{0} -> {1}".format(event.identifier, event.target_identifier))
 
-        if not self.tile_is_walkable(event.target_identifier):
+        if not self.room.entity_dict[event.identifier].mobile:
+
+            fabula.LOGGER.info("'{}' is not mobile".format(event.identifier))
+
+            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+        elif not self.tile_is_walkable(event.target_identifier):
 
             fabula.LOGGER.info("{} not walkable".format(event.target_identifier))
 
@@ -483,7 +489,7 @@ class Server(fabula.core.Engine):
                 kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: no key '{}' in floor_plan".format(event.target_identifier))
 
             # Issue AttemptFailed to unblock client.
             #
