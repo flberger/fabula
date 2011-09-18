@@ -292,6 +292,7 @@ class App:
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0:
+
             client_exit_thread = threading.Thread(target = client_exit,
                                                   name = "client_exit")
             client_exit_thread.start()
@@ -314,13 +315,35 @@ class App:
 
         fabula.LOGGER.info("waiting for server thread to stop")
         server_thread.join()
+        fabula.LOGGER.info("server thread stopped")
 
-        fabula.LOGGER.info("server thread stopped, shutting down logger")
+        threads_alive = threading.enumerate()
+
+        fabula.LOGGER.debug("threads still alive now:\n{}".format(threads_alive))
+
+        if len(threads_alive) > 1:
+
+            for thread in threads_alive:
+
+                if thread.name == "client_handle_messages":
+
+                    fabula.LOGGER.info("calling shutdown() on leftover client interface")
+
+                    client_interface.shutdown()
+
+                elif thread.name == "server_handle_messages":
+
+                    fabula.LOGGER.info("calling shutdown() on leftover server interface")
+
+                    server_interface.shutdown()
+
+                else:
+                    fabula.LOGGER.info("not stopping thread '{}'".format(thread.name))
 
         if exception:
             fabula.LOGGER.info("exception in client.run() was:\n{}".format(exception))
 
-        fabula.LOGGER.info("log file written to fabula.log")
+        fabula.LOGGER.info("shutting down logger, log file written to fabula.log")
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers

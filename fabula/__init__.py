@@ -133,6 +133,8 @@
 # TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.
 # TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value
+# TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
+# TODO: all if Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -1374,7 +1376,7 @@ FILE_HANDLER.setLevel(logging.DEBUG)
 # Loglevel:
 # + "%(levelname)-5s "
 
-FILE_HANDLER.setFormatter(FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s (l.%(lineno)s)",
+FILE_HANDLER.setFormatter(FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s  l.%(lineno)s",
                                               "%Y-%m-%d %H:%M:%S"))
 
 # Add handlers

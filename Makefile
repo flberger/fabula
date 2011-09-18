@@ -85,8 +85,8 @@ endif
 
 win2k_update: clean
 	mount /mnt/win2k/
-	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/*
-	cp -r --dereference ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/test/
+	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/fabula/*
+	cp -r --dereference ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/fabula/
 	umount /mnt/win2k/
 
 clean:
@@ -107,7 +107,7 @@ commit.txt:
 commit:
 	@echo RETURN to commit using commit.txt, CTRL-C to cancel:
 	@read DUMMY
-	bzr commit --file commit.txt && rm commit.txt
+	bzr commit --file commit.txt && rm -v commit.txt
 
 sign:
 	rm -vf dist/*.asc
