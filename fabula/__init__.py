@@ -14,12 +14,12 @@
    - fabula.plugins.Plugin
    - fabula.interfaces.Interface
 
-   The Server manages the authoritative game state and communicates with the
-   clients. The Plugin contains the actual game logic and controls the Server's
-   reactions. The Interface manages the actual communication.
+   The Server manages the authoritative game state and communicates with the 
+   clients. The Plugin contains the game logic and controls the Server's 
+   reactions. The Interface manages the communication.
 
-   fabula.plugins.serverside.DefaultGame contains a default game logic that
-   reads from configuration files.
+   fabula.plugins.serverside.DefaultGame contains a default Plugin that reads 
+   from configuration files.
 
    The client side consists of instances of:
 
@@ -29,7 +29,7 @@
 
    The Client communicates with the server and mirrors the Server game state.
    The UserInterface presents the game to the player and collects player input.
-   The Interface manages the actual communication.
+   The Interface manages the communication.
 
    fabula.plugins.pygameui.PygameUserInterface contains a default 2D UserInterface.
 
@@ -46,7 +46,7 @@
    and information on how to connect to the Server Interface.
 
    Given this information, Client.run() will call Interface.connect() which will
-   establish the actual network connection to the Server Interface and add an
+   establish the actual network connection to the Server's Interface and add an
    according fabula.interfaces.MessageBuffer in Interface.connections.
 
    When Interface.connect() returns, Client.run() will send a fabula.InitEvent
@@ -134,7 +134,9 @@
 # TODO: The asset manager should be used for finding the fabula.conf file.
 # TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value
 # TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
-# TODO: all if Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
+# TODO: all of Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
+# TODO: finally - add event to cleanly disconnect a client session, initiated by client or server; describe the whole connection-disconnection procedure
+# TODO: demos: pacman, chess
 
 # Fabula will not work with Python versions prior to 3.x.
 #

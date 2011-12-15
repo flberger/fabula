@@ -16,3 +16,5 @@ user_install-filelist.txt
 *.backup
 __pycache__
 freshmeat-submit.txt
+.coverage
+htmlcov

@@ -109,11 +109,15 @@ class EntityPlane(clickndrag.Plane):
 
         # Call base class
         #
-        clickndrag.Plane.__init__(self, name, rect, draggable,
-                                                    grab,
-                                                    left_click_callback,
-                                                    right_click_callback,
-                                                    dropped_upon_callback)
+        clickndrag.Plane.__init__(self,
+                                  name,
+                                  rect,
+                                  draggable = draggable,
+                                  grab = grab,
+                                  highlight = True,
+                                  left_click_callback = left_click_callback,
+                                  right_click_callback = right_click_callback,
+                                  dropped_upon_callback = dropped_upon_callback)
 
         self.position_list = []
         self.spritesheet = spritesheet
@@ -2944,7 +2948,7 @@ class PygameEditor(PygameUserInterface):
                     # See below for width - 1
                     #
                     rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
-                                                      pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
+                                                  pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
 
                     rule_plane.image.fill(clickndrag.gui.BACKGROUND_COLOR)
 

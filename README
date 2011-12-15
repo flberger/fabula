@@ -9,12 +9,19 @@ and strategy games and digital interactive storytelling.
 
 ![Fabula Open Source Python Game Engine](http://static.florian-berger.de/fabula-2011-07-19.jpg)
 
-It offers a client-server architecture, an event-based protocol, multiplayer
-and networking capabilites, a multi-threaded server, an abstract, 
-visualisation-agnostic model of a game world, an asset manager and a plugin 
-system. Gameplay can be recorded and played back. The code is well documented 
-and runs on Linux and MS Windows (it should work on OS X, too, but this has
-not yet been tested).
+Features:
+
+- client-server architecture
+- event-based protocol
+- multiplayer and networking capabilites
+- multi-threaded server
+- abstract, visualisation-agnostic model of a game world
+- asset manager
+- plugin system
+- recording and playback of gameplay
+- well-documented code
+- runs on Linux and MS Windows (it should work on OS X, too, but this has not 
+  yet been tested).
 
 Fabula can be used as a library to develop your own games. As an alternative, 
 you can use the Pygame-based graphical editor and the default game engine that 
