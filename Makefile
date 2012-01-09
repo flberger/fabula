@@ -49,7 +49,8 @@ doctest: clean
 	$(PYTHON) -m doctest tests/assets.txt && \
 	$(PYTHON) -m doctest tests/pygame_user_interface.txt && \
 	$(PYTHON) -m doctest tests/tiles.txt && \
-	$(PYTHON) -m doctest tests/serverside_event_queue.txt
+	$(PYTHON) -m doctest tests/serverside_event_queue.txt && \
+	$(PYTHON) -m doctest tests/tcp_networking.txt
 
 user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt

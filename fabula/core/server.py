@@ -100,11 +100,23 @@ class Server(fabula.core.Engine):
 
     def run(self):
         """Main loop of the Server.
-           This is a blocking method. It calls all the process
-           methods to process events, and then the plugin.
+           This is a blocking method. It calls all the process methods to
+           process events, and then the plugin.
         """
 
-        fabula.LOGGER.info("starting")
+        # TODO: retrieve connector from somewhere
+        #
+        connector = ("0.0.0.0", 6161)
+
+        fabula.LOGGER.info("attempting to connect server interface to '{}'".format(connector))
+
+        try:
+            self.interface.connect(connector)
+
+        except:
+            fabula.LOGGER.warning("server interface is already connected, continuing anyway")
+
+        fabula.LOGGER.info("starting main loop")
 
         # MAIN LOOP
         # TODO: Server.exit_requested is inconsistent with Client.plugin.exit_requested

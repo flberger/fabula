@@ -80,7 +80,7 @@ class App:
 
             self.parser = None
 
-        # Set up logger level
+        # Set up logger level if given.
         #
         if self.parser is not None and self.parser.has_option("fabula", "loglevel"):
 
@@ -98,7 +98,9 @@ class App:
 
         else:
 
-            fabula.LOGGER.setLevel(logging.ERROR)
+            # Default is logging.DEBUG
+            #
+            fabula.LOGGER.setLevel(logging.DEBUG)
 
         fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
 
@@ -158,9 +160,9 @@ class App:
         # be installed.
         #
         server = fabula.core.server.Server(interface,
-                                          framerate,
-                                          action_time,
-                                          threadsafe = False)
+                                           framerate,
+                                           action_time,
+                                           threadsafe = False)
 
         plugin = self.server_plugin_class(server)
 
@@ -190,8 +192,10 @@ class App:
         # Exit trigger for non-interactive unit tests
         #
         if self.timeout > 0 and exit_function is not None:
+
             exit_thread = threading.Thread(target = exit_function,
                                            name = "exit_function")
+
             exit_thread.start()
 
         # This method will block until the Engine exits

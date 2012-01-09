@@ -137,6 +137,7 @@
 # TODO: all of Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
 # TODO: finally - add event to cleanly disconnect a client session, initiated by client or server; describe the whole connection-disconnection procedure
 # TODO: demos: pacman, chess
+# TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 
 # Fabula will not work with Python versions prior to 3.x.
 #

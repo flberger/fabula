@@ -26,6 +26,7 @@
 
 # TODO: always diplay and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
+# TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
 
 import fabula.plugins.ui
 import pygame

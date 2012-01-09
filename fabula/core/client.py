@@ -180,7 +180,7 @@ class Client(fabula.core.Engine):
 
             else:
 
-                fabula.LOGGER.info("connecting Interface to '{}'".format(connector))
+                fabula.LOGGER.info("connecting client interface to '{}'".format(connector))
 
                 self.interface.connect(connector)
 

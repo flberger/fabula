@@ -1,0 +1,34 @@
+Doctests for the Fabula Package
+==============================
+
+TCP Networking
+--------------
+
+    >>> import fabula.interfaces
+    >>> import fabula.run
+    >>> def run_server():
+    ...     app = fabula.run.App(timeout = 5)
+    ...     interface = fabula.interfaces.TCPServerInterface()
+    ...     app.run_server(60, interface, 0.5)
+    ...
+    >>> class TCPUI(fabula.plugins.ui.UserInterface):
+    ...     def get_connection_details(self):
+    ...         fabula.LOGGER.info('returning ("TCP_Client", ("127.0.0.1", 6161))')
+    ...         return("TCP_Client", ("127.0.0.1", 6161))
+    ...     def collect_player_input(self):
+    ...         pass
+    ...
+    >>> def run_client():
+    ...     app = fabula.run.App(timeout = 5)
+    ...     app.user_interface_class = TCPUI
+    ...     interface = fabula.interfaces.TCPClientInterface()
+    ...     app.run_client(60, interface)
+    ...
+    >>> import multiprocessing
+    >>> server_process = multiprocessing.Process(target = run_server)
+    >>> client_process = multiprocessing.Process(target = run_client)
+    >>> server_process.start()
+    >>> client_process.start()
+    >>> server_process.join()
+    >>> client_process.join()
+    >>>

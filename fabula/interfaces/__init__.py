@@ -32,55 +32,45 @@
 import fabula
 from collections import deque
 from time import sleep
-
-# For UDP
-#
-#import socket
-#import socketserver
-#import pickle
-
-# Twisted has not yet been ported to Python 3.
-#
-# # Importing the Twisted base module for executable makers
-# #
-# import twisted
-#
-# import twisted.internet
-# import twisted.internet.protocol
-# import twisted.internet.reactor
-# import twisted.internet.task
+# For the TCP Interfaces
+import socket
+import socketserver
 
 class Interface:
     """This is a base class for Fabula interfaces which handle all the network traffic.
-       A custom implementation using Fabula will likely have a client- and
-       a server side interface.
+       A customised implementation will likely have a client- and a server side
+       interface.
 
        Attributes:
 
-           Interface.connector
-               An object that specifies how to connect to the remote host (for
-               clients) or where to listen for client messages (for the server),
-               for example a tuple (ip_address, port). Set in __init__().
+       Interface.connections
+           A dict of connector objects mapping to MessageBuffer instances.
+           A connector is an object that specifies how to connect to the remote
+           host.
 
-           Interface.connections
-               A dict of connector objects mapping to MessageBuffer instances.
+       Interface.connected
+           Flag to indicate whether Interface.connect() has been called.
+           Initially False.
 
-           Interface.shutdown_flag
-           Interface.shutdown_confirmed
-               Flags for shutdown handling.
+       Interface.shutdown_flag
+       Interface.shutdown_confirmed
+           Flags for shutdown handling.
     """
 
     def __init__(self):
         """Initialisation.
         """
 
-        # connections is a dict of MessageBuffer
-        # instances, indexed by connectors.
+        # connections is a dict of MessageBuffer instances, indexed by
+        # connectors.
         #
         self.connections = {}
 
-        # This is the flag which is set when shutdown()
-        # is called.
+        # Flag to indicate whether Interface.connect() has been called.
+        #
+        self.connected = False
+
+        # This is the flag which is set when shutdown() is called.
         #
         self.shutdown_flag = False
 
@@ -90,30 +80,52 @@ class Interface:
 
         fabula.LOGGER.debug("complete")
 
+        return
+
     def connect(self, connector):
         """Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
+
            connector must be an object that specifies how to connect to the
            remote host (for clients) or where to listen for client messages
-           (for the server), for example a tuple (ip_address, port).
+           (for the server).
+
+           The connector is implementation dependent. A TCP/IP implementation
+           will likely use a tuple (ip_address, port).
+
            A connector must be valid as a dictionary key.
+
            This method should not return until the connection is established.
+
+           This method must raise an exception if it is called more than once.
+
            The default implementation issues a warning and creates a dummy
            MessageBuffer.
         """
 
+        if self.connected:
+
+            fabula.LOGGER.error("this Interface is already connected")
+
+            raise Exception("this Interface is already connected")
+
         fabula.LOGGER.warning("this is a dummy implementation, not actually connecting to '{}'".format(connector))
 
         self.connections[connector] = MessageBuffer()
+
+        self.connected = True
 
         return
 
     def handle_messages(self):
         """This is the main method of an interface class.
 
-           It must transfer all the messages between local and remote host.
+           It must continuously receive messages from the remote host and store
+           them in MessageBuffer.messages_for_local in the according
+           MessageBuffer in Interface.connections as well as check for messages
+           in MessageBuffer.messages_for_remote and send them to the remote host.
 
            This method is put in a background thread by the startup script,
-           so your implementation can do all sorts of polling or blocking IO.
+           so an implementation can do all sorts of polling or blocking IO.
 
            It should regularly check whether shutdown() has been called
            (checking self.shutdown_flag), and if so, it should notify
@@ -121,8 +133,8 @@ class Interface:
            method can return True itself), and then raise SystemExit to stop
            the thread.
 
-           The default implementation does nothing, but will handle the
-           shutdown as described.
+           The default implementation does nothing, but will handle the shutdown
+           as described.
         """
 
         fabula.LOGGER.info("starting up")
@@ -160,6 +172,7 @@ class Interface:
         # Wait for confirmation (blocks interface and client!)
         #
         while not self.shutdown_confirmed:
+
             pass
 
         return True
@@ -177,8 +190,7 @@ class MessageBuffer:
     """
 
     def __init__(self):
-        """This method sets up the internal queues
-           (in this case instances of collections.deque)
+        """This method sets up the internal queues.
         """
 
         # A hint from the Python documentation:
@@ -187,6 +199,8 @@ class MessageBuffer:
         #
         self.messages_for_local = deque()
         self.messages_for_remote = deque()
+
+        return
 
     def send_message(self, message):
         """Called by the local engine with a message ready to be sent to the remote host.
@@ -229,6 +243,8 @@ class StandaloneInterface(Interface):
         self.framerate = framerate
 
         fabula.LOGGER.debug("complete")
+
+        return
 
     def handle_messages(self, remote_message_buffer):
         """This background thread method transfers messages between local and remote MessageBuffer.
@@ -296,9 +312,445 @@ class StandaloneInterface(Interface):
 
         raise SystemExit
 
+# TCP implementation, using the socket and socketserver modules from the
+# standard library, and clear text message representations.
+# Includes code and lessons learned from an early UDP-, and older Twisted-, and
+# an experimental asyncore implementation.
+#
+class TCPClientInterface(Interface):
+    """Fabula Client interface using TCP.
+
+       Additional attributes:
+
+       TCPClientInterface.sock
+           socket instance, connected to the server. Initially None.
+
+       TCPClientInterface.received_data
+           A bytearray to buffer incoming data.
+    """
+
+    def __init__(self):
+        """Initialisation.
+        """
+
+        # Call base class
+        #
+        Interface.__init__(self)
+
+        self.sock = None
+
+        self.received_data = bytearray()
+
+        return
+
+    def connect(self, connector):
+        """Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
+
+           connector must be a tuple (ip_address, port).
+        """
+
+        if self.connected:
+
+            fabula.LOGGER.error("this Interface is already connected")
+
+            raise Exception("this Interface is already connected")
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # The socket timeout is used for socket.recv() operations, which take
+        # turns with socket.sendall().
+        #
+        self.sock.settimeout(0.3)
+
+        fabula.LOGGER.info("connecting to {}:{}".format(connector[0],
+                                                        connector[1]))
+
+        while not self.connected:
+
+            try:
+
+                self.sock.connect(connector)
+
+                self.connected = True
+
+            except socket.error:
+
+                fabula.LOGGER.error("error while connecting, trying again in 1 second")
+
+                sleep(1)
+
+        fabula.LOGGER.info("connected")
+
+        self.connections[connector] = MessageBuffer()
+
+        return
+
+    def handle_messages(self):
+        """Main method of TCPClientInterface.
+
+           This method will be put in a background thread by the startup script,
+        """
+
+        fabula.LOGGER.info("waiting for server connection")
+
+        while not self.connections:
+
+            if self.shutdown_flag:
+
+                fabula.LOGGER.info("shutdown before server connection")
+
+                raise SystemExit
+
+            # No need to run as fast as possible.
+            #
+            sleep(1/60)
+
+        fabula.LOGGER.info("connected to server, starting loop")
+
+        # On the client side, there will only ever be one MessageBuffer element.
+        #
+        message_buffer = list(self.connections.values())[0]
+
+        # Run thread as long as no shutdown is requested
+        #
+        while not self.shutdown_flag:
+
+            # First deliver waiting local messages.
+            #
+            if message_buffer.messages_for_remote:
+
+                fabula.LOGGER.debug("sending 1 message of {}".format(len(message_buffer.messages_for_remote)))
+
+                # Send a clear-text representation. This is supposed to be a
+                # Python expression to recreate the instance.
+                #
+                representation = repr(message_buffer.messages_for_remote.popleft())
+
+                # Add a double newline as separator.
+                # TODO: this may block for an arbitrary time. Delegate to a new thread.
+                #
+                self.sock.sendall(bytes(representation + "\n\n", "utf8"))
+
+            # Now listen for incoming server messages for some time (set in
+            # connect()). This should catch any messages received in the
+            # meantime by the OS.
+            #
+            chunk = None
+
+            try:
+
+                # TODO: evaluate recv size
+                #
+                chunk = self.sock.recv(4096)
+
+            except socket.timeout:
+
+                # Nobody likes us, evereyone left us, there all out without
+                # us, having fun...
+                #
+                pass
+
+            except socket.error:
+
+                fabula.LOGGER.error("socket error while receiving")
+
+            if chunk:
+
+                fabula.LOGGER.debug("received {} bytes from server".format(len(chunk)))
+
+                # Assuming we are dealing with bytes here
+                #
+                self.received_data.extend(chunk)
+
+                # Now: look for Messages, separated by double newlines.
+                #
+                double_newline_index = self.received_data.find(b"\n\n")
+
+                # There actually may be more than one b"\n\n" separator in a
+                # message. Catch them all!
+                #
+                while double_newline_index > -1:
+
+                    # Found!
+
+                    message_str = str(self.received_data[:double_newline_index], "utf8")
+
+                    self.received_data = self.received_data[double_newline_index + 2:]
+
+                    msg = "message complete at {} bytes, {} left in buffer"
+
+                    fabula.LOGGER.debug(msg.format(len(message_str),
+                                                   len(self.received_data)))
+
+                    # TODO: eval() is the most dangerous thing you can do with data just received over the network.
+                    #
+                    message_buffer.messages_for_local.append(eval(message_str))
+
+                    # Next
+                    #
+                    double_newline_index = self.received_data.find(b"\n\n")
+
+                # No more double newlines, end of evaluation.
+
+            # No need to run as fast as possible.
+            #
+            sleep(1/60)
+
+            # Check shutdown_flag. Possibly start again.
+
+        fabula.LOGGER.info("caught shutdown notification")
+
+        try:
+
+            self.sock.shutdown(socket.SHUT_RDWR)
+
+        except:
+
+            # Socket may be unavailable already
+            #
+            fabula.LOGGER.warning("could not shut down socket")
+
+        self.sock.close()
+
+        fabula.LOGGER.info("server connection closed, stopping thread")
+
+        self.shutdown_confirmed = True
+
+        raise SystemExit
+
+class TCPServerInterface(Interface):
+    """Fabula Server interface using TCP.
+
+       Additional attributes:
+
+       TCPServerInterface.server
+           socketserver.TCPServer instance, handling incoming client requests.
+           Initially None.
+
+       TCPServerInterface.FabulaRequestHandler
+           An subclass of socketserver.BaseRequestHandler to handle incoming
+           connections.
+    """
+
+    def __init__(self):
+        """Initialisation.
+        """
+
+        # Call base class
+        #
+        Interface.__init__(self)
+
+        self.server = None
+
+        connections_proxy = self.connections
+
+        # We define the class here to be able to access local variables.
+        #
+        class FabulaRequestHandler(socketserver.BaseRequestHandler):
+
+            def handle(self):
+
+                # TODO: this will run in a thread spawned by the custom ThreadingTCPServer class. How thread safe are these operations?
+
+                # Fabula uses persistent TCP connections, so every call to this
+                # method should be from a new client. Blindly add this one.
+                #
+                message_buffer = connections_proxy[self.client_address] = MessageBuffer()
+
+                fabula.LOGGER.info("adding and handling new client: {}".format(self.client_address))
+
+                # Now, handle messages in a persistent fashion.
+
+                self.request.settimeout(0.3)
+
+                received_data = bytearray()
+
+                # TODO: replace with a test that actually terminates
+                #
+                while True:
+
+                    # TODO: copied from TCPClientInterface.handle_messages() with a few renamings
+
+                    # First deliver waiting local messages.
+                    #
+                    if message_buffer.messages_for_remote:
+
+                        fabula.LOGGER.debug("sending 1 message of {}".format(len(message_buffer.messages_for_remote)))
+
+                        # Send a clear-text representation. This is supposed to
+                        # be a Python expression to recreate the instance.
+                        #
+                        representation = repr(message_buffer.messages_for_remote.popleft())
+
+                        # Add a double newline as separator.
+                        #
+                        self.request.sendall(bytes(representation + "\n\n", "utf8"))
+
+                    # Now listen for incoming server messages for some time (set
+                    # above). This should catch any messages received in the
+                    # meantime by the OS.
+                    #
+                    chunk = None
+
+                    try:
+
+                        # TODO: evaluate recv size
+                        #
+                        chunk = self.request.recv(4096)
+
+                    except socket.timeout:
+
+                        # Nobody likes us, evereyone left us, there all out without
+                        # us, having fun...
+                        #
+                        pass
+
+                    except socket.error:
+
+                        fabula.LOGGER.error("socket error while receiving")
+
+                    if chunk:
+
+                        fabula.LOGGER.debug("received {} bytes from {}".format(len(chunk),
+                                                                               self.client_address))
+
+                        # Assuming we are dealing with bytes here
+                        #
+                        received_data.extend(chunk)
+
+                        # Now: look for Messages, separated by double newlines.
+                        #
+                        double_newline_index = received_data.find(b"\n\n")
+
+                        # There actually may be more than one b"\n\n" separator
+                        # in a message. Catch them all!
+                        #
+                        while double_newline_index > -1:
+
+                            # Found!
+
+                            message_str = str(received_data[:double_newline_index], "utf8")
+
+                            received_data = received_data[double_newline_index + 2:]
+
+                            msg = "message complete at {} bytes, {} left in buffer"
+
+                            fabula.LOGGER.debug(msg.format(len(message_str),
+                                                           len(received_data)))
+
+                            # TODO: eval() is the most dangerous thing you can do with data just received over the network.
+                            #
+                            message_buffer.messages_for_local.append(eval(message_str))
+
+                            # Next
+                            #
+                            double_newline_index = received_data.find(b"\n\n")
+
+                        # No more double newlines, end of evaluation.
+
+                return
+
+        # End of class.
+
+        self.FabulaRequestHandler = FabulaRequestHandler
+
+        return
+
+    def connect(self, connector):
+        """Create a socketserver.TCPServer which will listen for incoming client connections.
+
+           connector must be a tuple (ip_address, port) giving address and port
+           to listen on.
+        """
+
+        if self.connected:
+
+            fabula.LOGGER.error("this Interface is already connected")
+
+            raise Exception("this Interface is already connected")
+
+        fabula.LOGGER.info("creating server to listen on {}:{}".format(connector[0],
+                                                                       connector[1]))
+
+        # Since we use persistent TCP connections, the first handler would block
+        # the whole server. So we use the ThreadingMixIn, which spawns a thread
+        # for every handler.
+        #
+        class ThreadingTCPServer(socketserver.ThreadingMixIn,
+                                 socketserver.TCPServer):
+
+            pass
+
+        self.server = ThreadingTCPServer(connector, self.FabulaRequestHandler)
+
+        # Server timeout, so server.handle_request() doesn't wait forever, which
+        # would prevent shutdown.
+        #
+        self.server.timeout = 0.1
+
+        self.connected = True
+
+        return
+
+    def handle_messages(self):
+        """Main method of TCPServerInterface.
+
+           This method will be put in a background thread by the startup script,
+        """
+
+        fabula.LOGGER.info("waiting for server to be created")
+
+        while self.server is None:
+
+            if self.shutdown_flag:
+
+                fabula.LOGGER.info("shutdown before server creation")
+
+                raise SystemExit
+
+            # No need to run as fast as possible.
+            #
+            sleep(1/60)
+
+        fabula.LOGGER.info("server created, starting loop")
+
+        # Run thread as long as no shutdown is requested
+        #
+        while not self.shutdown_flag:
+
+            # Wait at most server.timeout seconds until a request comes in:
+            #
+            self.server.handle_request()
+
+        fabula.LOGGER.info("caught shutdown notification")
+
+        try:
+
+            self.server.socket.shutdown(socket.SHUT_RDWR)
+
+        except:
+
+            # Socket may be unavailable already
+            #
+            fabula.LOGGER.warning("could not shut down socket")
+
+        self.server.socket.close()
+
+        fabula.LOGGER.info("server connection closed, stopping thread")
+
+        self.shutdown_confirmed = True
+
+        raise SystemExit
+
 # UDP implementation
 #
 # TODO: This implementation may be defunct because of the Interface class refactoring. Check and refactor.
+
+# For UDP
+#
+#import socket
+#import socketserver
+#import pickle
 
 #class UDPClientInterface(MessageBuffer, Interface):
 #    """This is the base class for a Fabula Client Interface.
@@ -533,6 +985,17 @@ class StandaloneInterface(Interface):
 # TCP implementation using the Twisted framework
 #
 # Based on a pure socket implementation done in Oct 2009
+
+# Twisted has not yet been ported to Python 3.
+#
+# # Importing the Twisted base module for executable makers
+# #
+# import twisted
+#
+# import twisted.internet
+# import twisted.internet.protocol
+# import twisted.internet.reactor
+# import twisted.internet.task
 
 #class ProtocolMessageBuffer(MessageBuffer,
 #                            twisted.internet.protocol.Protocol):
