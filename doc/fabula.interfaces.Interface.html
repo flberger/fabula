@@ -17,25 +17,26 @@
       <a href="classIndex.html#fabula.interfaces.Interface">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a></p>
+      <p>Known subclasses: <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a>, <a href="fabula.interfaces.TCPClientInterface.html">fabula.interfaces.TCPClientInterface</a>, <a href="fabula.interfaces.TCPServerInterface.html">fabula.interfaces.TCPServerInterface</a></p>
     </div>
     <pre>This is a base class for Fabula interfaces which handle all the network traffic.
-A custom implementation using Fabula will likely have a client- and
-a server side interface.
+A customised implementation will likely have a client- and a server side
+interface.
 
 Attributes:
 
-    Interface.connector
-        An object that specifies how to connect to the remote host (for
-        clients) or where to listen for client messages (for the server),
-        for example a tuple (ip_address, port). Set in __init__().
+Interface.connections
+    A dict of connector objects mapping to MessageBuffer instances.
+    A connector is an object that specifies how to connect to the remote
+    host.
 
-    Interface.connections
-        A dict of connector objects mapping to MessageBuffer instances.
+Interface.connected
+    Flag to indicate whether Interface.connect() has been called.
+    Initially False.
 
-    Interface.shutdown_flag
-    Interface.shutdown_confirmed
-        Flags for shutdown handling.</pre>
+Interface.shutdown_flag
+Interface.shutdown_confirmed
+    Flags for shutdown handling.</pre>
 
     
     
@@ -91,7 +92,7 @@ Attributes:
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a>, <a href="fabula.interfaces.TCPClientInterface.html">fabula.interfaces.TCPClientInterface</a>, <a href="fabula.interfaces.TCPServerInterface.html">fabula.interfaces.TCPServerInterface</a></div>
     <pre>Initialisation.
         </pre>
   </div>
@@ -109,13 +110,22 @@ Attributes:
     
   </div>
   <div class="functionBody">
-    
+    <div class="interfaceinfo">overridden in <a href="fabula.interfaces.TCPClientInterface.html">fabula.interfaces.TCPClientInterface</a>, <a href="fabula.interfaces.TCPServerInterface.html">fabula.interfaces.TCPServerInterface</a></div>
     <pre>Connect to the remote host specified by connector and create a MessageBuffer at Interface.connections[connector].
+
 connector must be an object that specifies how to connect to the
 remote host (for clients) or where to listen for client messages
-(for the server), for example a tuple (ip_address, port).
+(for the server).
+
+The connector is implementation dependent. A TCP/IP implementation
+will likely use a tuple (ip_address, port).
+
 A connector must be valid as a dictionary key.
+
 This method should not return until the connection is established.
+
+This method must raise an exception if it is called more than once.
+
 The default implementation issues a warning and creates a dummy
 MessageBuffer.</pre>
   </div>
@@ -133,13 +143,16 @@ MessageBuffer.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a></div>
+    <div class="interfaceinfo">overridden in <a href="fabula.interfaces.StandaloneInterface.html">fabula.interfaces.StandaloneInterface</a>, <a href="fabula.interfaces.TCPClientInterface.html">fabula.interfaces.TCPClientInterface</a>, <a href="fabula.interfaces.TCPServerInterface.html">fabula.interfaces.TCPServerInterface</a></div>
     <pre>This is the main method of an interface class.
 
-It must transfer all the messages between local and remote host.
+It must continuously receive messages from the remote host and store
+them in MessageBuffer.messages_for_local in the according
+MessageBuffer in Interface.connections as well as check for messages
+in MessageBuffer.messages_for_remote and send them to the remote host.
 
 This method is put in a background thread by the startup script,
-so your implementation can do all sorts of polling or blocking IO.
+so an implementation can do all sorts of polling or blocking IO.
 
 It should regularly check whether shutdown() has been called
 (checking self.shutdown_flag), and if so, it should notify
@@ -147,8 +160,8 @@ shutdown() by setting self.shutdown_confirmed to true (so that
 method can return True itself), and then raise SystemExit to stop
 the thread.
 
-The default implementation does nothing, but will handle the
-shutdown as described.</pre>
+The default implementation does nothing, but will handle the shutdown
+as described.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.interfaces.Interface.shutdown">
@@ -173,7 +186,7 @@ notification and is about to exit.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2011-07-19 18:24:09.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-01-09 23:09:27.
     </address>
   </body>
 </html>
