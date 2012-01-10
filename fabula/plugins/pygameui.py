@@ -448,6 +448,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         fabula.LOGGER.debug("called")
 
         fabula.LOGGER.debug("initialising pygame")
+
         pygame.init()
 
         # Initialise the frame timing clock.
@@ -461,6 +462,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Counter for scrolling left-right
         #
         self.scroll = 0
+
+        # Center window. Hint from the pygame-users mailing list.
+        #
+        os.environ["SDL_VIDEO_CENTERED"] = "1"
 
         # Open a click'n'drag window.
         #
