@@ -182,7 +182,19 @@ class Client(fabula.core.Engine):
 
                 fabula.LOGGER.info("connecting client interface to '{}'".format(connector))
 
-                self.interface.connect(connector)
+                try:
+                    self.interface.connect(connector)
+
+                except:
+                    fabula.LOGGER.critical("error connecting to server")
+
+                    fabula.LOGGER.info("shutting down interface")
+
+                    self.interface.shutdown()
+
+                    fabula.LOGGER.info("exiting")
+
+                    raise SystemExit
 
         # Use only the first connection in the ClientInterface
         #

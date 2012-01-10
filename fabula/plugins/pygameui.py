@@ -567,7 +567,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-    def get_connection_details(self):
+    def get_connection_details(self, prompt_connector = True):
         """Display a splash screen, then get a connector to the Server and an identifier from the player.
 
            Initially, the Client Interface is not connected to the Server. This
@@ -578,8 +578,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            connector will be used for Interface.connect(connector).
            identifier will be used to send InitEvent(identifier) to the server.
 
-           The default implementation returns ("default_player", "dummy_connector")
-           for testing purposes.
+           If prompt_connector is False, the dialog will not ask for a connector
+           and use None instead.
         """
 
         fabula.LOGGER.debug("called")
@@ -612,21 +612,78 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Use a container so we can access it from an ad-hoc function.
         # That's Python.
         #
-        id_container = {"id" : None}
+        container_dict = {"login_name" : None,
+                          "connector" : None}
 
-        def set_client_id(input):
+        def dialog_callback(buttonplane):
 
-            id_container["id"] = input
+            container_dict["login_name"] = buttonplane.parent.identifier.text
 
-        id_dialog = clickndrag.gui.GetStringDialog("Your Name:",
-                                                   set_client_id,
-                                                   self.window)
+            if "connector" in buttonplane.parent.subplanes_list:
 
-        id_dialog.rect.center = self.window.rect.center
+                # Construct tuple
+                #
+                ip, port = buttonplane.parent.connector.text.split(":")
 
-        self.window.sub(id_dialog)
+                container_dict["connector"] = (ip, int(port))
 
-        while id_container["id"] is None:
+        container = clickndrag.gui.Container("get_connection_details",
+                                             padding = 5)
+
+        # Login name prompt
+        #
+        container.sub(clickndrag.gui.Label("id_caption",
+                                           "Login name:",
+                                           pygame.Rect((0, 0),
+                                                       (200, 30))))
+
+        container.sub(clickndrag.gui.TextBox("identifier",
+                                             pygame.Rect((0, 0),
+                                                         (200, 30)),
+                                             return_callback = None))
+
+        # Upon clicked, register the TextBox for keyboard input
+        #
+        container.identifier.left_click_callback = lambda plane : self.window.key_sensitive(plane)
+
+        # Register this one as key sensitive now
+        #
+        self.window.key_sensitive(container.identifier)
+
+        # Optional connector prompt
+        #
+        if prompt_connector:
+
+            container.sub(clickndrag.gui.Label("connector_caption",
+                                               "Server IP:PORT",
+                                               pygame.Rect((0, 0),
+                                                           (200, 30))))
+
+            container.sub(clickndrag.gui.TextBox("connector",
+                                                 pygame.Rect((0, 0),
+                                                             (200, 30)),
+                                                 return_callback = None))
+
+            # Provide a default
+            #
+            container.connector.text = "127.0.0.1:6161"
+
+            # Upon clicked, register the TextBox for keyboard input
+            #
+            container.connector.left_click_callback = lambda plane : self.window.key_sensitive(plane)
+
+        # OK button
+        #
+        container.sub(clickndrag.gui.Button("OK",
+                                            pygame.Rect((0, 0),
+                                                        (200, 30)),
+                                            dialog_callback))
+
+        container.rect.center = self.window.rect.center
+
+        self.window.sub(container)
+
+        while container_dict["login_name"] is None:
 
             self.display_single_frame()
 
@@ -636,15 +693,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 # Return anything to get out of the loop
                 #
-                id_container["id"] = "exit requested"
+                container_dict["login_name"] = "exit requested"
 
-        # We are done with the splash screen if there was one. Now make
-        # sure that there is no image for the window Plane left that would
-        # invisibly blitted below room and inventory planes.
+        # We are done with the splash screen if there was one. Now make sure
+        # that there is no image for the window Plane left that would invisibly
+        # be blitted below room and inventory planes.
         #
         self.window.image = self.window.display
 
-        return (id_container["id"], "dummy_connector")
+        return (container_dict["login_name"], container_dict["connector"])
 
     def update_frame_timer(self):
         """Use pygame.time.Clock.tick() to slow down to given framerate.

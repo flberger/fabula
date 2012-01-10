@@ -35,6 +35,7 @@ from time import sleep
 # For the TCP Interfaces
 import socket
 import socketserver
+import threading
 
 class Interface:
     """This is a base class for Fabula interfaces which handle all the network traffic.
@@ -365,7 +366,9 @@ class TCPClientInterface(Interface):
         fabula.LOGGER.info("connecting to {}:{}".format(connector[0],
                                                         connector[1]))
 
-        while not self.connected:
+        countdown = list(range(1, 11))
+
+        while not self.connected and countdown:
 
             try:
 
@@ -375,13 +378,25 @@ class TCPClientInterface(Interface):
 
             except socket.error:
 
-                fabula.LOGGER.error("error while connecting, trying again in 1 second")
+                fabula.LOGGER.error("error while connecting in attempt {}, trying again".format(countdown[0]))
 
                 sleep(1)
 
-        fabula.LOGGER.info("connected")
+                del countdown[0]
 
-        self.connections[connector] = MessageBuffer()
+        if self.connected:
+
+            fabula.LOGGER.info("connected")
+
+            self.connections[connector] = MessageBuffer()
+
+        else:
+
+            fabula.LOGGER.critical("could not connect to server on {}:{}".format(connector[0],
+                                                                                 connector[1]))
+
+            raise Exception("could not connect to server on {}:{}".format(connector[0],
+                                                                          connector[1]))
 
         return
 
@@ -398,6 +413,10 @@ class TCPClientInterface(Interface):
             if self.shutdown_flag:
 
                 fabula.LOGGER.info("shutdown before server connection")
+
+                self.sock.close()
+
+                self.shutdown_confirmed = True
 
                 raise SystemExit
 
@@ -530,6 +549,9 @@ class TCPServerInterface(Interface):
        TCPServerInterface.FabulaRequestHandler
            An subclass of socketserver.BaseRequestHandler to handle incoming
            connections.
+
+       TCPServerInterface.thread_list
+           A list of threads spawned for handling incoming connections.
     """
 
     def __init__(self):
@@ -542,7 +564,9 @@ class TCPServerInterface(Interface):
 
         self.server = None
 
-        connections_proxy = self.connections
+        self.thread_list = []
+
+        parent = self
 
         # We define the class here to be able to access local variables.
         #
@@ -555,9 +579,13 @@ class TCPServerInterface(Interface):
                 # Fabula uses persistent TCP connections, so every call to this
                 # method should be from a new client. Blindly add this one.
                 #
-                message_buffer = connections_proxy[self.client_address] = MessageBuffer()
+                message_buffer = parent.connections[self.client_address] = MessageBuffer()
 
                 fabula.LOGGER.info("adding and handling new client: {}".format(self.client_address))
+
+                # Register in thread list, which is used for Interface shutdown
+                #
+                parent.thread_list.append(threading.current_thread())
 
                 # Now, handle messages in a persistent fashion.
 
@@ -565,9 +593,7 @@ class TCPServerInterface(Interface):
 
                 received_data = bytearray()
 
-                # TODO: replace with a test that actually terminates
-                #
-                while True:
+                while not parent.shutdown_flag:
 
                     # TODO: copied from TCPClientInterface.handle_messages() with a few renamings
 
@@ -648,7 +674,21 @@ class TCPServerInterface(Interface):
 
                         # No more double newlines, end of evaluation.
 
-                return
+                try:
+
+                    self.request.shutdown(socket.SHUT_RDWR)
+
+                except:
+
+                    # Socket may be unavailable already
+                    #
+                    fabula.LOGGER.warning("could not shut down socket")
+
+                self.request.close()
+
+                fabula.LOGGER.info("handler connection closed, stopping thread")
+
+                raise SystemExit
 
         # End of class.
 
@@ -706,6 +746,8 @@ class TCPServerInterface(Interface):
 
                 fabula.LOGGER.info("shutdown before server creation")
 
+                self.shutdown_confirmed = True
+
                 raise SystemExit
 
             # No need to run as fast as possible.
@@ -736,7 +778,15 @@ class TCPServerInterface(Interface):
 
         self.server.socket.close()
 
-        fabula.LOGGER.info("server connection closed, stopping thread")
+        fabula.LOGGER.info("server connection closed")
+
+        for thread in self.thread_list:
+
+            fabula.LOGGER.info("waiting for thread {} to terminate".format(thread))
+
+            thread.join()
+
+        fabula.LOGGER.info("stopping thread")
 
         self.shutdown_confirmed = True
 

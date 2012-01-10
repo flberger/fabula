@@ -110,6 +110,8 @@ class App:
         self.user_interface_class = fabula.plugins.ui.UserInterface
         self.server_plugin_class = fabula.plugins.Plugin
 
+        return
+
     def run_client(self, framerate, interface):
         """Run a Fabula client with the parameters given.
         """
@@ -149,6 +151,8 @@ class App:
 
         self.run(interface, client, exit)
 
+        return
+
     def run_server(self, framerate, interface, action_time):
         """Run a Fabula server with the parameters given.
         """
@@ -177,6 +181,8 @@ class App:
 
         self.run(interface, server, exit)
 
+        return
+
     def run(self, interface, engine_instance, exit_function):
         """Helper method to be called from run_client() or run_server().
         """
@@ -202,6 +208,12 @@ class App:
         #
         engine_instance.run()
 
+        fabula.LOGGER.info("run() returned")
+
+        fabula.LOGGER.debug("threads still alive now:\n{}".format(threading.enumerate()))
+
+        fabula.LOGGER.info("shutting down logger, log file written to fabula.log")
+
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
         # when recreating the instance.
@@ -209,6 +221,8 @@ class App:
         fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
         fabula.LOGGER.removeHandler(fabula.FILE_HANDLER)
         logging.shutdown()
+
+        return
 
     def run_standalone(self, framerate, action_time):
         """Run Fabula client and server on the local machine.
@@ -356,3 +370,5 @@ class App:
         fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
         fabula.LOGGER.removeHandler(fabula.FILE_HANDLER)
         logging.shutdown()
+
+        return
