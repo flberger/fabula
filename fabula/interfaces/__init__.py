@@ -414,8 +414,6 @@ class TCPClientInterface(Interface):
 
                 fabula.LOGGER.info("shutdown before server connection")
 
-                self.sock.close()
-
                 self.shutdown_confirmed = True
 
                 raise SystemExit

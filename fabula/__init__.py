@@ -14,11 +14,11 @@
    - fabula.plugins.Plugin
    - fabula.interfaces.Interface
 
-   The Server manages the authoritative game state and communicates with the 
-   clients. The Plugin contains the game logic and controls the Server's 
+   The Server manages the authoritative game state and communicates with the
+   clients. The Plugin contains the game logic and controls the Server's
    reactions. The Interface manages the communication.
 
-   fabula.plugins.serverside.DefaultGame contains a default Plugin that reads 
+   fabula.plugins.serverside.DefaultGame contains a default Plugin that reads
    from configuration files.
 
    The client side consists of instances of:
@@ -1310,33 +1310,6 @@ def representation(object, attributes):
 ############################################################
 # Logging
 
-class FabulaFileFormatter(logging.Formatter):
-    """Subclass of Formatter with reasonable module information.
-    """
-
-    def __init__(self, fmt, datefmt):
-        """Compile a regular expression object, then call base class __init__().
-        """
-        logging.Formatter.__init__(self, fmt, datefmt)
-
-        self.module_re = re.compile("^.*fabula/([^/]+/)*?([^/]+)(/__init__)*.py$")
-
-    def format(self, record):
-        """Override logging.Formatter.format()
-        """
-
-        # Reformat path to module information
-        #
-        record.pathname = "{:10}".format(self.module_re.sub(r"\2", record.pathname))
-
-        # Fixed-length line number
-        #
-        #record.lineno = "{:3}".format(record.lineno)
-
-        # Call base class implementation
-        #
-        return logging.Formatter.format(self, record)
-
 # Create the logger for the whole Fabula package
 #
 LOGGER = logging.getLogger("fabula")
@@ -1345,6 +1318,8 @@ LOGGER = logging.getLogger("fabula")
 
 # STDERR console handler
 #
+# This is the only handler created here. A FileHandler will be added in the
+# respective run.App method.
 # Creating an instance without arguments defaults to STDERR.
 #
 STDERR_HANDLER = logging.StreamHandler()
@@ -1366,25 +1341,8 @@ STDERR_FORMATTER = logging.Formatter("%(funcName)s() %(message)s")
 
 STDERR_HANDLER.setFormatter(STDERR_FORMATTER)
 
-# File handler
-#
-# TODO: Different file names for client and server?
-# TODO: Checking for existing file, creating a new one?
-#
-FILE_HANDLER = logging.FileHandler(filename = "fabula.log",
-                                   mode = "w")
-
-FILE_HANDLER.setLevel(logging.DEBUG)
-
-# Loglevel:
-# + "%(levelname)-5s "
-
-FILE_HANDLER.setFormatter(FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s  l.%(lineno)s",
-                                              "%Y-%m-%d %H:%M:%S"))
-
 # Add handlers
 #
 LOGGER.addHandler(STDERR_HANDLER)
-LOGGER.addHandler(FILE_HANDLER)
 
 # Done with logging setup.

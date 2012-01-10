@@ -168,7 +168,23 @@ class Client(fabula.core.Engine):
 
         else:
 
-            if connector is None:
+            if self.client_id == "exit requested":
+
+                # TODO: copied from below
+
+                fabula.LOGGER.info("exit requested from UserInterface, shutting down interface")
+
+                # stop the Client Interface thread
+                #
+                self.interface.shutdown()
+
+                fabula.LOGGER.info("shutdown confirmed.")
+
+                # TODO: possibly exit cleanly from the UserInterface here
+
+                return
+
+            elif connector is None:
 
                 msg = "can not connect to Server: client_id == '{}', connector == {}"
 
