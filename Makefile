@@ -15,7 +15,7 @@ help:
 	@echo '    check'
 	@echo '    errors'
 	@echo '    doctest'
-	@echo '    win2k_update'
+	@echo '    winxp_update'
 	@echo '    clean'
 	@echo '    user_install'
 	@echo '    sdist'
@@ -84,11 +84,11 @@ exe: sdist
 
 endif
 
-win2k_update: clean
-	mount /mnt/win2k/
-	rm -rf /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/fabula/*
-	cp -r --dereference ./* /mnt/win2k/Dokumente\ und\ Einstellungen/user/Eigene\ Dateien/fabula/
-	umount /mnt/win2k/
+winxp_update: clean
+	mount /mnt/winxp/
+	rm -vrf /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/*
+	cp -v -r --dereference ./* /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/
+	umount /mnt/winxp/
 
 clean:
 	rm -vf *.pyc

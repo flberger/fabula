@@ -161,7 +161,7 @@ class App:
 
         return
 
-    def run_server(self, framerate, interface, action_time):
+    def run_server(self, framerate, interface, action_time, threadsafe = False):
         """Run a Fabula server with the parameters given.
         """
 
@@ -170,13 +170,10 @@ class App:
         fabula.LOGGER.info("running in server mode")
         fabula.LOGGER.info("running with interval (framerate) {}/s".format(framerate))
 
-        # Since the Server will run in the main thread, signal handlers can
-        # be installed.
-        #
         server = fabula.core.server.Server(interface,
                                            framerate,
                                            action_time,
-                                           threadsafe = False)
+                                           threadsafe)
 
         plugin = self.server_plugin_class(server)
 

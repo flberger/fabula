@@ -36,6 +36,7 @@ from time import sleep
 import socket
 import socketserver
 import threading
+import traceback
 
 class Interface:
     """This is a base class for Fabula interfaces which handle all the network traffic.
@@ -174,7 +175,9 @@ class Interface:
         #
         while not self.shutdown_confirmed:
 
-            pass
+            # No need to run as fast as possible.
+            #
+            sleep(1/60)
 
         return True
 
@@ -383,6 +386,10 @@ class TCPClientInterface(Interface):
                 sleep(1)
 
                 del countdown[0]
+
+            # No need to run as fast as possible.
+            #
+            sleep(1/60)
 
         if self.connected:
 
@@ -672,6 +679,10 @@ class TCPServerInterface(Interface):
 
                         # No more double newlines, end of evaluation.
 
+                    # No need to run as fast as possible.
+                    #
+                    sleep(1/60)
+
                 try:
 
                     self.request.shutdown(socket.SHUT_RDWR)
@@ -717,7 +728,15 @@ class TCPServerInterface(Interface):
         class ThreadingTCPServer(socketserver.ThreadingMixIn,
                                  socketserver.TCPServer):
 
-            pass
+            def handle_error(self, request, client_address):
+                """Log the exception using fabula.LOGGER.
+                """
+
+                exception = traceback.format_exc()
+
+                fabula.LOGGER.warning("exception in handle():\n{}".format(exception))
+
+                return
 
         self.server = ThreadingTCPServer(connector, self.FabulaRequestHandler)
 

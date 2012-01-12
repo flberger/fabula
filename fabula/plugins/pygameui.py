@@ -37,7 +37,10 @@ import tkinter.simpledialog
 # For cx_Freeze
 #
 import tkinter._fix
-import pygame._view
+#
+# Not present in Pygame 1.9.1
+#
+#import pygame._view
 
 import os
 

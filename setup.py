@@ -42,9 +42,11 @@ try:
 
     setup = cx_Freeze.setup
 
-    EXECUTABLES = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_game.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py"))]
+    EXECUTABLES = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_standalone.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_client.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_defaultgame_server.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py"))]
 
 except ImportError:
 
@@ -105,9 +107,11 @@ setup(name = PACKAGE,
                   "{}.plugins".format(PACKAGE),
                   "clickndrag"],
       package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
-      scripts = [os.path.join("scripts", "run_pygame_editor.py"),
-                 os.path.join("scripts", "run_pygame_game.py"),
-                 os.path.join("scripts", "run_pygame_cli.py")],
+      scripts = [os.path.join("scripts", "run_pygame_standalone.py"),
+                 os.path.join("scripts", "run_pygame_client.py"),
+                 os.path.join("scripts", "run_defaultgame_server.py"),
+                 os.path.join("scripts", "run_pygame_cli.py"),
+                 os.path.join("scripts", "run_pygame_editor.py")],
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
                      glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
                     (os.path.join("share", "{}").format(PACKAGE),
