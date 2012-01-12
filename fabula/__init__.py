@@ -138,6 +138,7 @@
 # TODO: finally - add event to cleanly disconnect a client session, initiated by client or server; describe the whole connection-disconnection procedure
 # TODO: demos: pacman, chess
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
+# TODO: support and test Python package managers, as pip, easyinstall etc.
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -153,7 +154,7 @@ import logging
 ############################################################
 # Version Information
 
-VERSION = "0.7.0"
+VERSION = "0.8.0"
 
 ############################################################
 # Events

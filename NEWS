@@ -1,6 +1,23 @@
 NEWS for Fabula
 ===============
 
+0.8.0
+-----
+
+Released on 12 January 2012.
+
+The main feature of this release is the re-introduction of TCP networking which 
+had been disabled in all previous releases of Fabula. Networking is handled by 
+TCPClientInterface and TCPServerInterface, using only modules from the Python 
+standard library. Server networking is multithreaded, with a new thread for 
+every incoming connection. Players will now be prompted for server IP and port. 
+Two new scripts have been added, which start a networking enabled server and 
+client. The PygameUserInterface now highlights entities and buttons on 
+mouseover, using a new clickndrag feature. Other new features are truly immobile 
+entities, improved thread handling and cleanups in logging. Lots of minor fixes 
+and improvements as well as a documentation update.
+
+
 0.7.0
 -----
 

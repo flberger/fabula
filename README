@@ -7,9 +7,18 @@ About
 Fabula is an Open Source Python Game Engine suitable for adventure, role-playing 
 and strategy games and digital interactive storytelling.
 
-![Fabula Open Source Python Game Engine](http://static.florian-berger.de/fabula-2011-07-19.jpg)
+Fabula can be used as a library to develop your own games. As an alternative, 
+you can use the Pygame-based graphical editor and the default game engine that 
+come with fabula.
 
-Features:
+Fabula is Free Software under the General Public License (GPL) as published by 
+the Free Software Foundation.
+
+You can find fabula on the web at http://fabula-engine.org/
+
+
+Features
+--------
 
 - client-server architecture
 - event-based protocol
@@ -23,49 +32,40 @@ Features:
 - runs on Linux and MS Windows (it should work on OS X, too, but this has not 
   yet been tested).
 
-Fabula can be used as a library to develop your own games. As an alternative, 
-you can use the Pygame-based graphical editor and the default game engine that 
-come with fabula.
-
-You can find fabula on the web at http://florian-berger.de/en/software/fabula
-
-
-Prerequisites
--------------
-
-Python >= 3.0      http://python.org/
-
-Pygame >= 1.9.1    http://pygame.org/
-
 
 Installation
 ------------
 
-If you want to run the binary editor or game engine that come with fabula then 
-just unzip the archive and run one of the files ending with ".exe".
-
-Fabula uses the Python distutils module. If you want to install it as a library, 
-running
-
-    python3 setup.py install
-
-should do the job.
+Fabula comes in several release formats. Which one is for you depends on how you 
+want to use Fabula.
 
 
-License
--------
+### I want to run a standard Fabula client or server, or use the visual editor.
 
-Fabula is Free Software under the General Public License (GPL) as published by 
-the Free Software Foundation.
+Get the *binary release* for your platform, unzip the archive and simply run the 
+appropriate *.exe file.
+
+
+### I want code my own games using Fabula, customising server logic or the client.
+
+You will need Python >= 3.1 from http://python.org/ and Pygame >= 1.9.1 from 
+http://pygame.org/.
+
+Then get the *source release*. Fabula uses the Python distutils module. To 
+install, unzip the archive and run
+
+    python setup.py install
+
+on the command line.
 
 
 Acknowledgements
 ----------------
 
-Fabula development is funded by the [MFG Stiftung 
-Baden-Württemberg](http://innovation.mfg.de/cmlink/mfg-portal/de/ueber-die-mfg/mfg-stiftung).
+Fabula development has been funded by the MFG Stiftung Baden-Württemberg from 
+November 2010 to October 2011.
 
-![MFG Stiftung](http://www.karl-steinbuch-stipendium.de/uploads/pics/mfg_stiftung_140_01.gif)
+http://innovation.mfg.de/
 
 
 History
@@ -77,4 +77,4 @@ History
 Author & Copyright
 ------------------
 
-Copyright 2010 Florian Berger <fberger@florian-berger.de>
+Copyright 2010-2012 Florian Berger <fberger@florian-berger.de>
