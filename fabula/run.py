@@ -38,6 +38,7 @@ from time import sleep
 import traceback
 import re
 import configparser
+import os
 
 class App:
     """An App instance represents a Fabula client or server application.
@@ -122,7 +123,7 @@ class App:
         """Run a Fabula client with the parameters given.
         """
 
-        self.add_file_handler("client")
+        self.add_file_handler("client-{}".format(os.getpid()))
 
         fabula.LOGGER.info("running in client mode")
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
