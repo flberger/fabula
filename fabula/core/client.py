@@ -307,7 +307,24 @@ class Client(fabula.core.Engine):
             # At least process_message() must be called regularly even if the
             # server Message and thus message_for_plugin  are empty.
             #
-            message_from_plugin = self.plugin.process_message(self.message_for_plugin)
+            try:
+
+                message_from_plugin = self.plugin.process_message(self.message_for_plugin)
+
+            except:
+                fabula.LOGGER.critical("the UserInterface raised an exception:\n{}".format(traceback.format_exc()))
+
+                fabula.LOGGER.info("shutting down interface")
+
+                self.interface.shutdown()
+
+                fabula.LOGGER.debug("closing message log file")
+
+                self.message_log_file.close()
+
+                fabula.LOGGER.info("exiting")
+
+                return
 
             # The UserInterface returned, the Server Message has been applied
             # and processed. Clean up.

@@ -15,6 +15,6 @@ clickndrag
 user_install-filelist.txt
 *.backup
 __pycache__
-freshmeat-submit.txt
+freecode-submit.txt
 .coverage
 htmlcov

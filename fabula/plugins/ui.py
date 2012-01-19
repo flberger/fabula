@@ -228,11 +228,12 @@ class UserInterface(fabula.plugins.Plugin):
            This is a serious error which usually prohibits continuation.
            The user should be asked to check his installation, file system
            or network connection.
+           The default implementation logs the error and raises an Exception.
         """
 
         fabula.LOGGER.critical("Asset could not be fetched: {}. Aborting.".format(asset))
 
-        raise SystemExit
+        raise Exception("Asset could not be fetched: {}. Aborting.".format(asset))
 
     def update_frame_timer(self):
         """You might have to notify a timer once per frame.

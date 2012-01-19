@@ -10,7 +10,7 @@ Serverside Event Queue
     >>> class QueueTest(fabula.plugins.serverside.DefaultGame):
     ...     def __init__(self, host):
     ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)
-    ...         self.queue_messages(fabula.Message([fabula.EnterRoomEvent("test")]),
+    ...         self.queue_messages(fabula.Message([fabula.EnterRoomEvent("player", "test")]),
     ...                             fabula.Message([fabula.RoomCompleteEvent()]),
     ...                             fabula.Message([fabula.PerceptionEvent("player", "Test")]))
     ...
@@ -27,7 +27,7 @@ Serverside Event Queue
     >>> init_message = fabula.Message([fabula.InitEvent("dummy_client")])
     >>> interface.connections["dummy_client"].messages_for_local.append(init_message)
     >>> app.run_server(60, interface, 1.0)
-    fabula.Message(event_list = [fabula.EnterRoomEvent(room_identifier = 'test')])
+    fabula.Message(event_list = [fabula.EnterRoomEvent(client_identifier = 'player', room_identifier = 'test')])
     fabula.Message(event_list = [fabula.RoomCompleteEvent()])
     fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player', perception = 'Test')])
     >>>

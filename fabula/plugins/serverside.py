@@ -20,6 +20,8 @@
 
 # work started on 27. Oct 2010
 
+# TODO: This module should be importable without pygame and clickndrag.
+
 import fabula.plugins.pygameui
 import fabula.assets
 import os
@@ -29,28 +31,29 @@ import re
 
 def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
-       Returns None upon failure.
-       If the complete argument is True, a RoomCompleteEvent will be added,
-       otherwise it will be left out.
+       The introducing EnterRoomEvent will not be included, as the client id is
+       only known to the caller.
+       If 'complete' is True, a RoomCompleteEvent will be added, otherwise it
+       will be left out.
 
        The file must consist of lines of tab-separated elements:
 
        (x, y)    tile_type    tile_asset_desc    entity_type,identifier,entity_asset_desc
+
+       Note that this example uses spaces in place of TABs.
     """
 
-    try:
-        roomfile = open(filename, "rt")
+    # Will raise an IOError if the file does not exist. This must be handled by
+    # the caller.
+    #
+    roomfile = open(filename, "rt")
 
-    except IOError:
-
-        return None
-
-    event_list = [fabula.EnterRoomEvent(os.path.splitext(os.path.basename(filename))[0])]
+    event_list = []
 
     for line in roomfile:
 
-        # Remove whitespace. This also makes sure that the splitted line
-        # will not end in a tab.
+        # Remove whitespace. This also makes sure that the splitted line will
+        # not end in a tab.
         #
         line = line.strip()
 
@@ -76,12 +79,15 @@ def load_room_from_file(filename, complete = True):
             event_list.append(event)
 
         else:
+
             # TODO: warn here
+            #
             pass
 
         if len(splitted_line):
-            # There is still something there. This should be Entities.
 
+            # There is still something there. This should be Entities.
+            #
             for comma_sep_entity in splitted_line:
 
                 identifier, entity_type, blocking, mobile, asset_desc = comma_sep_entity.split(",")
@@ -346,25 +352,78 @@ class DefaultGame(fabula.plugins.Plugin):
         return
 
     def process_InitEvent(self, event):
-        """Load default.floorplan and send it.
-           Replace the Entity identifier "player" with event.identifier.
+        """Conditionally load default.floorplan and send it, or just spawn the player Entity.
+
+           If a room is sent, all SpawnEvents with Entity type PLAYER whose
+           identifier does not match event.identifier will be removed.
         """
 
         fabula.LOGGER.debug("called")
 
         fabula.LOGGER.info("attempting to load 'default.floorplan'")
 
-        event_list = load_room_from_file("default.floorplan")
+        try:
+            event_list = [fabula.EnterRoomEvent(event.identifier,
+                                                "default")] + load_room_from_file("default.floorplan")
 
-        if event_list is None:
+        except:
 
             fabula.LOGGER.error("error opening file 'default.floorplan'")
 
-        else:
+            return
 
-            self.message_for_host.event_list.extend(replace_identifier(event_list,
-                                                                       "player",
-                                                                       event.identifier))
+        if self.host.room is not None:
+
+            fabula.LOGGER.info("Server already has room '{}', only sending SpawnEvent and RoomCompleteEvent".format(self.host.room.identifier))
+
+            for returned_event in event_list:
+
+                if (isinstance(returned_event, fabula.SpawnEvent)
+                    and returned_event.entity.entity_type == fabula.PLAYER
+                    and returned_event.entity.identifier == event.identifier):
+
+                    self.message_for_host.event_list.append(returned_event)
+
+                    # Creating the room is a joint undertaking by Server and
+                    # Plugin, but now it is complete!
+                    #
+                    self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
+
+        else:
+            fabula.LOGGER.info("Server has no room, sending Events from default.floorplan")
+
+            new_list = []
+            spawn_events = removed_events = 0
+
+            for returned_event in event_list:
+
+                if (isinstance(returned_event, fabula.SpawnEvent)
+                    and returned_event.entity.entity_type == fabula.PLAYER):
+
+                    spawn_events = spawn_events + 1
+
+                    if returned_event.entity.identifier == event.identifier:
+
+                        new_list.append(returned_event)
+
+                    else:
+                        msg = "discarding PLAYER SpawnEvent because identifier does not match: {}"
+
+                        fabula.LOGGER.info(msg.format(returned_event))
+
+                        removed_events = removed_events + 1
+
+                else:
+                        new_list.append(returned_event)
+
+            fabula.LOGGER.info("found {} SpawnEvents, removed {}".format(spawn_events,
+                                                                         removed_events))
+
+            if removed_events == spawn_events:
+
+                fabula.LOGGER.warning("all SpawnEvents removed! proceeding with undefined results")
+
+            self.message_for_host.event_list.extend(new_list)
 
         return
 
@@ -774,7 +833,8 @@ class Editor(DefaultGame):
 
             fabula.LOGGER.info("no room sent yet, sending initial room")
 
-            self.message_for_host.event_list.append(fabula.EnterRoomEvent("edit_this"))
+            self.message_for_host.event_list.append(fabula.EnterRoomEvent(self.client_id,
+                                                                          "edit_this"))
 
             tile = fabula.Tile(fabula.FLOOR, "100x100-gray.png")
 
@@ -787,7 +847,7 @@ class Editor(DefaultGame):
             entity = fabula.Entity(identifier = "player",
                                    entity_type = fabula.PLAYER,
                                    blocking = False,
-                                   mobile = False,
+                                   mobile = True,
                                    asset_desc = "player-fabulasheet.png")
 
             self.message_for_host.event_list.append(fabula.SpawnEvent(entity,
@@ -803,15 +863,17 @@ class Editor(DefaultGame):
 
         fabula.LOGGER.debug("called")
 
-        event_list = load_room_from_file(option.text + ".floorplan")
+        try:
+            event_list = [fabula.EnterRoomEvent(self.client_id,
+                                                option.text)] + load_room_from_file(option.text + ".floorplan")
 
-        if event_list is None:
+        except:
 
             fabula.LOGGER.error("error opening file '{}.floorplan'".format(option.text + ".floorplan"))
 
-        else:
+            return
 
-            self.message_for_host.event_list.extend(event_list)
+        self.message_for_host.event_list.extend(event_list)
 
         fabula.LOGGER.debug("complete")
 
@@ -987,7 +1049,7 @@ class CommandLine(DefaultGame):
 
             return_string = "Loading room '{0}' from file {0}.floorplan".format(token_list[1])
 
-            return_events = load_room_from_file(token_list[1] + ".floorplan")
+            return_events = [fabula.EnterRoomEvent("player", token_list[1])] + load_room_from_file(token_list[1] + ".floorplan")
 
             return_events = replace_identifier(return_events,
                                                "player",

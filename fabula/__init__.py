@@ -123,22 +123,29 @@
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
 # TODO: per-player inventories in server... -.-
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
-# TODO: There currently is no way Plugins can directly issue Events for other clients (for example PercentionEvents or EnterRoomEvents)
+# TODO: There currently is no way Plugins can directly issue Events for other clients (for example PerceptionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
 # TODO: support the Tiled editor, http://www.mapeditor.org/, see http://silveiraneto.net/2009/12/19/tiled-tmx-map-loader-for-pygame/
 # TODO: HD support (at least 1280x720)
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen!
+#
 # TODO: fabula.conf should be read / accessed where it is needed, not in run; no passing of options through init arguments
 # TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.
+#
 # TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value
 # TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
 # TODO: all of Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
-# TODO: finally - add event to cleanly disconnect a client session, initiated by client or server; describe the whole connection-disconnection procedure
+#
+# TODO: finally - add event to cleanly disconnect a client session, initiated by client or server
+# TODO: describe the whole connection-disconnection procedure
+# TODO: allow refusal of logins by the server
+#
 # TODO: demos: pacman, chess
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 # TODO: support and test Python package managers, as pip, easyinstall etc.
+# TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, clickndrag, attempt_*.png, cancel.png, default.floorplan etc.
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -583,6 +590,8 @@ class SpawnEvent(ServerEvent):
            A description as in the TriesToMoveEvent
     """
 
+    # TODO: why no SpawnEvent.identifier, as Event has?
+
     def __init__(self, entity, location):
         """Event initialisation.
            entity is an instance of fabula.Entity, having a type, identifier and
@@ -606,19 +615,24 @@ class EnterRoomEvent(ServerEvent):
        follow. The room is done and can be used when the server issues
        RoomCompleteEvent.
 
+       EnterRoomEvent.client_identifier
+           The identifier of the client that enters the Room.
+
        EnterRoomEvent.room_identifier
            The identifier of the Room to be entered.
     """
 
-    def __init__(self, room_identifier):
+    def __init__(self, client_identifier, room_identifier):
         """Event initialisation.
+           client_identifier is the identifier of the client that enters the
+           Room.
            room_identifier is the identifier of the Room to be entered.
         """
+        self.client_identifier = client_identifier
         self.room_identifier = room_identifier
 
 class RoomCompleteEvent(ServerEvent):
-    """Issued by the server after an EnterRoomEvent
-       when the room is populated with a map, items and NPCs.
+    """Issued by the server after an EnterRoomEvent when the room is populated with a tiles, a player Entity, items and NPCs.
     """
 
     def __init__(self):
@@ -1019,7 +1033,9 @@ class Room(fabula.eventprocessor.EventProcessor):
            A list of tiles for the current room, for easy asset fetching.
 
        Room.active_clients
-           A list of client identifiers whose player entities are in this room.
+           A dict mapping connectors from Interface.connections.keys() to the
+           respective client identifier. Dict elements represent the clients who
+           are currently in this room.
 
        Note that these dicts assume that Entity identifiers are unique.
     """
@@ -1052,7 +1068,7 @@ class Room(fabula.eventprocessor.EventProcessor):
         self.entity_dict = {}
         self.entity_locations = {}
 
-        self.active_clients = []
+        self.active_clients = {}
 
         return
 

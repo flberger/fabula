@@ -734,6 +734,8 @@ class TCPServerInterface(Interface):
 
                 exception = traceback.format_exc()
 
+                # TODO: handle exited clients, which raise 'socket.error: [Errno 32] Broken pipe'
+                #
                 fabula.LOGGER.warning("exception in handle():\n{}".format(exception))
 
                 return

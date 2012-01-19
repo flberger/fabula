@@ -23,6 +23,7 @@ help:
 	@echo '    commit.txt'
 	@echo '    commit'
 	@echo '    sign'
+	@echo '    freecode'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -62,6 +63,7 @@ sdist:
 	# symbolic links, we only use zip for the time being.
 	# Filed issue 12585 at http://bugs.python.org for this.
 	#
+	rm -fv MANIFEST
 	$(PYTHON) setup.py sdist --force-manifest --formats=zip
 
 exe: sdist
@@ -115,7 +117,7 @@ sign:
 	for i in dist/*.zip ; do gpg --sign --armor --detach $$i ; done
 	gpg --verify --multifile dist/*.asc
 
-freshmeat:
-	@echo RETURN to submit to freshmeat.net using freshmeat-submit.txt, CTRL-C to cancel:
+freecode:
+	@echo RETURN to submit to freecode.com using freecode-submit.txt, CTRL-C to cancel:
 	@read DUMMY
-	freshmeat-submit < freshmeat-submit.txt
+	freecode-submit < freecode-submit.txt

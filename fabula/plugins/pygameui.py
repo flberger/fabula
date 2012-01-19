@@ -924,7 +924,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 max_bottom = tuple[1]
 
-        # Create new room and tiles Planes based on the max size
+        # Create new 'room' and 'tiles' Planes based on the max size
         #
         room_plane = clickndrag.Plane("room",
                                       pygame.Rect((0, 0),
@@ -935,7 +935,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                         pygame.Rect((0, 0),
                                                     room_plane.rect.size)))
 
-        # Transfer all Tile Planes to the new tiles Plane
+        # Transfer all Tile Planes to the new 'tiles' Plane
         #
         for plane in list(self.window.room.tiles.subplanes.values()):
 
@@ -1820,6 +1820,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 entity = self.host.room.entity_dict[identifier]
 
+                fabula.LOGGER.debug("processing Entity '{}'".format(identifier))
+
                 if entity.entity_type == fabula.ITEM and entity.mobile:
 
                     if self.host.room.entity_locations[identifier] in surrounding_positions:
@@ -2205,7 +2207,8 @@ class PygameEditor(PygameUserInterface):
         else:
             fabula.LOGGER.info("save to: {}".format(filename))
 
-            self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(filename))
+            self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
+                                                                               filename))
 
             roomfile = open(filename + ".floorplan", "wt")
 
@@ -2851,6 +2854,10 @@ class PygameEditor(PygameUserInterface):
         # Make sure it's on top
         #
         self.window.sub(self.window.properties)
+
+        # Make it completely visible, no matter how large
+        #
+        self.window.properties.rect.right = self.window.rect.width
 
         return
 

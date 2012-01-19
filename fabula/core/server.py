@@ -114,7 +114,7 @@ class Server(fabula.core.Engine):
             self.interface.connect(connector)
 
         except:
-            fabula.LOGGER.warning("server interface is already connected, continuing anyway")
+            fabula.LOGGER.warning("Exception in interface.connect() (server interface already connected?), continuing anyway")
 
         fabula.LOGGER.info("starting main loop")
 
@@ -123,13 +123,13 @@ class Server(fabula.core.Engine):
         #
         while not self.exit_requested:
 
-            for address_port_tuple in self.interface.connections:
+            for connector in self.interface.connections:
 
-                message = self.interface.connections[address_port_tuple].grab_message()
+                message = self.interface.connections[connector].grab_message()
 
                 if len(message.event_list):
 
-                    fabula.LOGGER.debug("{0} incoming: {1}".format(address_port_tuple, message))
+                    fabula.LOGGER.debug("{0} incoming: {1}".format(connector, message))
 
                     for event in message.event_list:
 
@@ -152,18 +152,20 @@ class Server(fabula.core.Engine):
                             # These methods may add events for the plugin engine
                             # to self.message_for_plugin
                             #
-                            # client_key is really only needed by process_InitEvent,
-                            # but to avoid splitting this beautiful call we submit
-                            # it to all methods.
+                            # connector is not needed by all methods, but to
+                            # avoid splitting this beautiful call we submit
+                            # it to all of them.
                             #
                             self.event_dict[event.__class__](event,
                                                              message = self.message_for_plugin,
-                                                             client_key = address_port_tuple)
+                                                             connector = connector)
+
                         else:
                             # Looks like the Client sent an Event typically
                             # issued by the Server. Let the Plugin handle that.
                             #
                             fabula.LOGGER.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
+
                             self.message_for_plugin.event_list.append(event)
 
                         # Contrary to the Client, the Server calls its plugin
@@ -171,7 +173,7 @@ class Server(fabula.core.Engine):
                         # message-by-message base to allow for quick and
                         # real-time reaction.
 
-                        self.call_plugin(address_port_tuple)
+                        self.call_plugin(connector)
 
                         # process next event in message from this client
 
@@ -180,7 +182,7 @@ class Server(fabula.core.Engine):
                     # Call Plugin anyway to catch Plugin initiated Events
                     # self.message_for_plugin is already set to an empty Message
                     #
-                    self.call_plugin(address_port_tuple)
+                    self.call_plugin(connector)
 
                 # read from next client message_buffer
 
@@ -209,7 +211,7 @@ class Server(fabula.core.Engine):
 
         return
 
-    def call_plugin(self, address_port_tuple):
+    def call_plugin(self, connector):
         """Call Plugin and process Plugin message.
            Auxiliary method.
         """
@@ -225,30 +227,30 @@ class Server(fabula.core.Engine):
         #
         self.message_for_plugin = fabula.Message([])
 
-        # Process events from the story engine before returning them to the
-        # client. We cannot just forward them since we may be required to change
-        # maps, spawn entities etc.
+        # Process events from the Plugin before returning them to the client.
+        # We cannot just forward them since we may be required to change maps,
+        # spawn entities etc.
         # Note that this time resulting events are queued for the remote host,
         # not the plugin.
         #
-        # TODO: could we be required to send any new events to the story engine? But this could become an infinite loop!
+        # TODO: could we be required to send any new events to the Plugin? But this could become an infinite loop!
         # TODO: Again it's completely weird to give the Message as an argument. Functions should return Event lists instead.
         #
         for event in message_from_plugin.event_list:
 
             self.event_dict[event.__class__](event,
                                              message = self.message_for_remote,
-                                             client_key = address_port_tuple)
+                                             connector = connector)
 
         # If this iteration yielded any events, send them.
         # Message for remote host first
         #
         if self.message_for_remote.event_list:
 
-            fabula.LOGGER.debug("{0} outgoing: {1}".format(address_port_tuple,
-                                                         self.message_for_remote))
+            fabula.LOGGER.debug("{0} outgoing: {1}".format(connector,
+                                                           self.message_for_remote))
 
-            self.interface.connections[address_port_tuple].send_message(self.message_for_remote)
+            self.interface.connections[connector].send_message(self.message_for_remote)
 
             ### Build broadcast message for all clients
             #
@@ -274,44 +276,41 @@ class Server(fabula.core.Engine):
 
             if not skip_room_events:
 
-                fabula.LOGGER.info("no RoomCompleteEvent found, broadcasting all events")
+                fabula.LOGGER.info("no RoomCompleteEvent found, will broadcast all events")
 
             for event in self.message_for_remote.event_list:
 
-                # We also broadcast all SpawnEvents. That means
-                # that when a new client joins, all entities
-                # (in the current room) are respawned.
-                # process_SpawnEvent in the engine will
-                # filter duplicate entities, so no harm done.
-                #
-                # TODO: respawning might cause some loss of internal entity state
-                #
                 if (skip_room_events
-                    and
-                    isinstance(event, fabula.EnterRoomEvent)):
+                    and isinstance(event, fabula.EnterRoomEvent)):
 
                     fabula.LOGGER.info("EnterRoomEvent found, starting to skip")
 
                     skip_room_events = "now"
 
                 elif (skip_room_events == "now"
-                      and
-                      isinstance(event, fabula.RoomCompleteEvent)):
+                      and isinstance(event, fabula.SpawnEvent)
+                      and event.entity.identifier == self.room.active_clients[connector]):
+
+                    fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one")
+
+                    self.message_for_all.event_list.append(event)
+
+                elif (skip_room_events == "now"
+                      and isinstance(event, fabula.RoomCompleteEvent)):
 
                     fabula.LOGGER.info("RoomCompleteEvent found, stopping to skip")
 
                     skip_room_events = False
 
                 elif (not skip_room_events == "now"
-                      and
-                      event.__class__ in [fabula.DropsEvent,
-                                          fabula.MovesToEvent,
-                                          fabula.PicksUpEvent,
-                                          fabula.SaysEvent,
-                                          fabula.SpawnEvent,
-                                          fabula.DeleteEvent,
-                                          fabula.ChangePropertyEvent,
-                                          fabula.ChangeMapElementEvent]):
+                      and event.__class__ in [fabula.DropsEvent,
+                                              fabula.MovesToEvent,
+                                              fabula.PicksUpEvent,
+                                              fabula.SaysEvent,
+                                              fabula.SpawnEvent,
+                                              fabula.DeleteEvent,
+                                              fabula.ChangePropertyEvent,
+                                              fabula.ChangeMapElementEvent]):
 
                     self.message_for_all.event_list.append(event)
 
@@ -321,16 +320,14 @@ class Server(fabula.core.Engine):
 
                 fabula.LOGGER.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
-                for client_key in self.room.active_clients:
+                for active_connector in self.room.active_clients.keys():
 
-                    # Leave out current MessageBuffer which
-                    # already has reveived the events above.
-                    # We can compare MessageBuffer instances
-                    # right away. ;-)
+                    # Leave out current client which already has reveived the
+                    # events above.
                     #
-                    if not client_key == address_port_tuple:
+                    if not active_connector == connector:
 
-                        self.interface.connections[client_key].send_message(self.message_for_all)
+                        self.interface.connections[active_connector].send_message(self.message_for_all)
 
         # Clean up
         #
@@ -381,8 +378,7 @@ class Server(fabula.core.Engine):
         return
 
     def process_InitEvent(self, event, **kwargs):
-        """Check if we already have a room and entities.
-           If yes, send the data. If not, pass on to the plugin.
+        """Check if we already have a room and entities. If yes, send the data. If not, pass on to the plugin.
         """
         # TODO: update docstring
 
@@ -392,15 +388,19 @@ class Server(fabula.core.Engine):
 
         if self.room is not None:
 
-            fabula.LOGGER.info("sending existing floor_plan and entities")
+            fabula.LOGGER.debug("creating and processing EnterRoomEvent for new client")
 
-            # TODO: The following is even worse in terms on consistency. :-) Replace with a clean, room-oriented design.
+            enter_room_event = fabula.EnterRoomEvent(event.identifier,
+                                                     self.room.identifier)
+
+            # Process the Event right away, since it is not going through the
+            # Plugin. This will also append the Event to self.message_for_remote.
             #
-            # This will register the client in the room and forward the Event.
-            #
-            self.process_EnterRoomEvent(fabula.EnterRoomEvent(self.room.identifier),
-                                        message = self.message_for_remote,
-                                        client_key = kwargs["client_key"])
+            self.process_EnterRoomEvent(enter_room_event,
+                                        connector = kwargs["connector"],
+                                        message = self.message_for_remote)
+
+            fabula.LOGGER.info("sending existing floor_plan and entities")
 
             for tuple in self.room.floor_plan:
 
@@ -415,11 +415,9 @@ class Server(fabula.core.Engine):
             for identifier in self.room.entity_locations:
 
                 spawn_event = fabula.SpawnEvent(self.room.entity_dict[identifier],
-                                               self.room.entity_locations[identifier])
+                                                self.room.entity_locations[identifier])
 
                 self.message_for_remote.event_list.append(spawn_event)
-
-            self.message_for_remote.event_list.append(fabula.RoomCompleteEvent())
 
         if len(self.rack.entity_dict):
 
@@ -443,6 +441,7 @@ class Server(fabula.core.Engine):
 
         # If a room has already been sent, the plugin should only spawn a new
         # player entity.
+        # The Plugin will add RoomCompleteEvent when processing InitEvent.
         #
         kwargs["message"].event_list.append(event)
 
@@ -654,15 +653,25 @@ class Server(fabula.core.Engine):
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """Register the client in the room and forward the Event.
+           If the room does not exist, it will be created.
         """
 
-        # TODO: Implement correct handling of multiple rooms.
+        # TODO: Implement handling of multiple rooms.
 
-        self.room = fabula.Room(event.room_identifier)
+        state = "new"
 
-        fabula.LOGGER.info("registering client {} in new room {}".format(str(kwargs["client_key"]),
-                                                                        event.room_identifier))
-        self.room.active_clients.append(kwargs["client_key"])
+        if self.room is None:
+
+            self.room = fabula.Room(event.room_identifier)
+
+        else:
+            state = "existing"
+
+        fabula.LOGGER.info("registering client {} in {} room '{}'".format(str(kwargs["connector"]),
+                                                                          state,
+                                                                          event.room_identifier))
+
+        self.room.active_clients[kwargs["connector"]] = event.client_identifier
 
         kwargs["message"].event_list.append(event)
 
