@@ -414,10 +414,22 @@ class Server(fabula.core.Engine):
 
             for identifier in self.room.entity_locations:
 
-                spawn_event = fabula.SpawnEvent(self.room.entity_dict[identifier],
+                entity = self.room.entity_dict[identifier]
+
+                spawn_event = fabula.SpawnEvent(entity,
                                                 self.room.entity_locations[identifier])
 
                 self.message_for_remote.event_list.append(spawn_event)
+
+                # Send properties of the Entity if there are any
+                #
+                for property in entity.property_dict.keys():
+
+                    change_property_event = fabula.ChangePropertyEvent(entity.identifier,
+                                                                       property,
+                                                                       entity.property_dict[property])
+
+                    self.message_for_remote.event_list.append(change_property_event)
 
         if len(self.rack.entity_dict):
 

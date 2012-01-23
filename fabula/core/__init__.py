@@ -46,6 +46,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            An instance of fabula.Room, initialy None.
 
        Engine.rack
+           An instance of fabula.Rack.
     """
 
     def __init__(self, interface_instance):
@@ -222,9 +223,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
         return
 
     def process_PicksUpEvent(self, event, **kwargs):
-        """Save the Entity to be picked up in Engine.rack,
-           delete the it from Engine.room and pass the
-           PicksUpEvent on.
+        """Save the Entity to be picked up in Engine.rack, delete it from Engine.room and pass the PicksUpEvent on.
         """
 
         fabula.LOGGER.debug("called")

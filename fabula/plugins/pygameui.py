@@ -1442,44 +1442,50 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def process_PicksUpEvent(self, event):
-        """Move the item's Plane from window.room to window.inventory.
+        """Check the affected Entity, then either move the item's Plane from window.room to window.inventory or delete it.
            Then call the base class implementation to notify the Entity.
         """
 
-        fabula.LOGGER.debug("moving Plane from window.room to window.inventory")
-
         # The Client has already put the item from Client.room to Client.rack.
-        # We have to update the display accordingly, so move the item plane
-        # from window.room to window.inventory.
+        # We have to update the display accordingly.
 
-        # First remove the caption plane, if existing.
+        # In any case, first remove the caption plane, if existing.
         #
         if event.item_identifier + "_caption" in self.window.room.subplanes_list:
 
             self.window.room.remove(event.item_identifier + "_caption")
 
-        # Cache the plane
-        #
-        plane = self.window.room.subplanes[event.item_identifier]
+        if event.identifier == self.host.client_id:
 
-        # Append at the right of the inventory.
-        # Since the item is already in self.host.rack.entity_dict, the position
-        # is len - 1.
-        #
-        plane.rect.top = 0
-        plane.rect.left = (len(self.host.rack.entity_dict) - 1) * 100
+            fabula.LOGGER.debug("this affects the player entity, will move item Plane from window.room to window.inventory")
 
-        # This will remove the plane from its current parent, window.room
-        #
-        self.window.inventory.sub(plane)
+            # Cache the plane
+            #
+            plane = self.window.room.subplanes[event.item_identifier]
 
-        # Make sure the plane is draggable
-        #
-        plane.draggable = True
+            # Append at the right of the inventory.
+            # Since the item is already in self.host.rack.entity_dict, the position
+            # is len - 1.
+            #
+            plane.rect.top = 0
+            plane.rect.left = (len(self.host.rack.items_of(self.host.client_id)) - 1) * 100
 
-        # Make insensitive to drops
-        #
-        plane.dropped_upon_callback = None
+            # This will remove the plane from its current parent, window.room
+            #
+            self.window.inventory.sub(plane)
+
+            # Make sure the plane is draggable
+            #
+            plane.draggable = True
+
+            # Make insensitive to drops
+            #
+            plane.dropped_upon_callback = None
+
+        else:
+            fabula.LOGGER.debug("this does not affect the player entity, will delete item Plane from window.room")
+
+            self.window.room.remove(event.item_identifier)
 
         # Call base class to notify the Entity
         #
