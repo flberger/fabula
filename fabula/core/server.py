@@ -302,17 +302,26 @@ class Server(fabula.core.Engine):
 
                     skip_room_events = False
 
-                elif (not skip_room_events == "now"
-                      and event.__class__ in [fabula.DropsEvent,
-                                              fabula.MovesToEvent,
-                                              fabula.PicksUpEvent,
-                                              fabula.SaysEvent,
-                                              fabula.SpawnEvent,
-                                              fabula.DeleteEvent,
-                                              fabula.ChangePropertyEvent,
-                                              fabula.ChangeMapElementEvent]):
+                elif not skip_room_events == "now":
 
-                    self.message_for_all.event_list.append(event)
+                    if event.__class__ in [fabula.DropsEvent,
+                                           fabula.MovesToEvent,
+                                           fabula.PicksUpEvent,
+                                           fabula.SaysEvent,
+                                           fabula.SpawnEvent,
+                                           fabula.DeleteEvent,
+                                           fabula.ChangePropertyEvent,
+                                           fabula.ChangeMapElementEvent,
+                                           fabula.CanSpeakEvent,
+                                           fabula.ManipulatesEvent,
+                                           fabula.PerceptionEvent]:
+
+                        # TODO: Is this Event type filter still necessary? We check identifiers in the Client. Most of them.
+
+                        self.message_for_all.event_list.append(event)
+
+                    else:
+                        fabula.LOGGER.warning("Event not in whitelist for broadcasting, discarding: {}".format(event))
 
             # Only send self.message_for_all when not empty
             #
@@ -442,12 +451,12 @@ class Server(fabula.core.Engine):
                 # picked up in an instant anyway.
                 #
                 spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                               self.room.floor_plan.keys()[0])
+                                                list(self.room.floor_plan.keys())[0])
 
                 self.message_for_remote.event_list.append(spawn_event)
 
                 picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
-                                                    identifier)
+                                                     identifier)
 
                 self.message_for_remote.event_list.append(picks_up_event)
 

@@ -789,20 +789,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
 
-        # Check mouse position, and trigger window scrolling
+        # Check mouse position, and trigger window scrolling.
+        # Also check whether the display window has the focus.
+        # Scrolling will be done in display_single_frame().
         #
         if not self.scroll:
 
             mouse_position = pygame.mouse.get_pos()
             window_width = self.window.rect.width
 
-            if 0 <= mouse_position[0] <= 25 and self.window.room.rect.left != 0:
+            if (pygame.mouse.get_focused()
+                and 0 <= mouse_position[0] <= 25
+                and self.window.room.rect.left != 0):
 
                 # Scroll to the left
                 #
                 self.scroll = self.spacing
 
-            elif (window_width - 25 <= mouse_position[0] <= window_width
+            elif (pygame.mouse.get_focused()
+                  and window_width - 25 <= mouse_position[0] <= window_width
                   and self.window.room.rect.right != window_width):
 
                 # Scroll to right
@@ -1030,11 +1035,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Open the sentences as an OptionSelector and return a SaysEvent to the host.
         """
 
-        fabula.LOGGER.debug("called")
+        # We blindly assume that this is for us.
+        #
+        fabula.LOGGER.debug("showing {}".format(event))
 
         option_list = clickndrag.gui.OptionSelector("select_sentence",
                                                     event.sentences,
                                                     lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
+                                                    width = 400,
                                                     lineheight = 25)
 
         option_list.rect.center = self.window.rect.center

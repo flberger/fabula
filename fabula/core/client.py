@@ -220,9 +220,11 @@ class Client(fabula.core.Engine):
         #
         self.message_log_file = open("messages-{}.log".format(self.client_id), "wb")
 
-        fabula.LOGGER.info("sending InitEvent")
+        init_event = fabula.InitEvent(self.client_id)
 
-        self.message_buffer.send_message(fabula.Message([fabula.InitEvent(self.client_id)]))
+        fabula.LOGGER.info("sending {}".format(init_event))
+
+        self.message_buffer.send_message(fabula.Message([init_event]))
 
         # Start Message log timer upon InitEvent
         #
@@ -551,20 +553,26 @@ class Client(fabula.core.Engine):
             self.await_confirmation = False
 
     def process_CanSpeakEvent(self, event, **kwargs):
-        """Call default and unblock client.
+        """Check if this affects the player. If yes, call default and unblock client.
         """
-
-        # Call default.
-        #
-        fabula.core.Engine.process_CanSpeakEvent(self,
-                                                event,
-                                                message = kwargs["message"])
-
-        # TriesToTalkTo confirmed
+        # Contrary to other Events, CanSpeakEvent has no meaning for any local
+        # Entity except for the current player. So only proceed if this is
+        # actually for us.
         #
         if event.identifier == self.client_id:
 
+            # Call default.
+            #
+            fabula.core.Engine.process_CanSpeakEvent(self,
+                                                    event,
+                                                    message = kwargs["message"])
+
+            # TriesToTalkTo confirmed
+            #
             self.await_confirmation = False
+
+        else:
+            fabula.LOGGER.debug("ignoring {}".format(event))
 
     def process_DropsEvent(self, event, **kwargs):
         """Remove affected Entity from rack,
@@ -663,8 +671,8 @@ class Client(fabula.core.Engine):
         # Call default
         #
         fabula.core.Engine.process_PicksUpEvent(self,
-                                               event,
-                                               message = kwargs["message"])
+                                                event,
+                                                message = kwargs["message"])
 
         # picking up confirmed
         #

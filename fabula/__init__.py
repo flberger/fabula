@@ -1249,13 +1249,18 @@ class Rack:
     def items_of(self, identifier):
         """Return a list of Entities owned by identifier.
         """
+
+        # TODO: Is it more useful to return a list of identifiers instead?
+
         item_list = []
 
-        for item in self.owner_dict:
+        for item_identifier in self.owner_dict.keys():
 
-            if self.owner_dict[item] == identifier:
+            if self.owner_dict[item_identifier] == identifier:
 
-                item_list.append(item)
+                # Append the Entity
+                #
+                item_list.append(self.entity_dict[item_identifier])
 
         return item_list
 

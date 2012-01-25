@@ -387,13 +387,9 @@ class TCPClientInterface(Interface):
 
                 del countdown[0]
 
-            # No need to run as fast as possible.
-            #
-            sleep(1/60)
-
         if self.connected:
 
-            fabula.LOGGER.info("connected")
+            fabula.LOGGER.info("connected, local address is {}".format(self.sock.getsockname()))
 
             self.connections[connector] = MessageBuffer()
 
@@ -606,7 +602,8 @@ class TCPServerInterface(Interface):
                     #
                     if message_buffer.messages_for_remote:
 
-                        fabula.LOGGER.debug("sending 1 message of {}".format(len(message_buffer.messages_for_remote)))
+                        fabula.LOGGER.debug("sending 1 message of {} to {}".format(len(message_buffer.messages_for_remote),
+                                                                                   self.client_address))
 
                         # Send a clear-text representation. This is supposed to
                         # be a Python expression to recreate the instance.
@@ -664,9 +661,10 @@ class TCPServerInterface(Interface):
 
                             received_data = received_data[double_newline_index + 2:]
 
-                            msg = "message complete at {} bytes, {} left in buffer"
+                            msg = "message from {} complete at {} bytes, {} left in buffer"
 
-                            fabula.LOGGER.debug(msg.format(len(message_str),
+                            fabula.LOGGER.debug(msg.format(self.client_address,
+                                                           len(message_str),
                                                            len(received_data)))
 
                             # TODO: eval() is the most dangerous thing you can do with data just received over the network.

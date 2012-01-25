@@ -67,6 +67,10 @@ class App:
        App.file_handler
            The logging.FileHandler instance created in App.add_file_handler().
            Initially None.
+
+       App.logfile_name
+           The name of the logfile that is written. Initially the empty string.
+           Will be set to the return value of App.add_file_handler().
     """
 
     def __init__(self, timeout = 0):
@@ -116,6 +120,7 @@ class App:
         self.server_plugin_class = fabula.plugins.Plugin
 
         self.file_handler = None
+        self.logfile_name = ""
 
         return
 
@@ -123,7 +128,7 @@ class App:
         """Run a Fabula client with the parameters given.
         """
 
-        self.add_file_handler("client-{}".format(os.getpid()))
+        self.logfile_name = self.add_file_handler("client-{}".format(os.getpid()))
 
         fabula.LOGGER.info("running in client mode")
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
@@ -166,7 +171,7 @@ class App:
         """Run a Fabula server with the parameters given.
         """
 
-        self.add_file_handler("server")
+        self.logfile_name = self.add_file_handler("server")
 
         fabula.LOGGER.info("running in server mode")
         fabula.LOGGER.info("running with interval (framerate) {}/s".format(framerate))
@@ -220,7 +225,7 @@ class App:
 
         fabula.LOGGER.debug("threads still alive now:\n{}".format(threading.enumerate()))
 
-        fabula.LOGGER.info("shutting down logger, log file written to fabula-client/server.log")
+        fabula.LOGGER.info("shutting down logger, log file written to '{}'".format(self.logfile_name))
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
@@ -236,7 +241,7 @@ class App:
         """Run Fabula client and server on the local machine.
         """
 
-        self.add_file_handler("standalone")
+        self.logfile_name = self.add_file_handler("standalone")
 
         fabula.LOGGER.info("running in standalone mode, logging client and server")
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
@@ -371,7 +376,7 @@ class App:
         if exception:
             fabula.LOGGER.info("exception in client.run() was:\n{}".format(exception))
 
-        fabula.LOGGER.info("shutting down logger, log file written to fabula-standalone.log")
+        fabula.LOGGER.info("shutting down logger, log file written to '{}'".format(self.logfile_name))
 
         # Engine returned. Close logger.
         # Explicitly remove handlers to avoid multiple handlers
@@ -385,6 +390,7 @@ class App:
 
     def add_file_handler(self, name):
         """This method will add a FileHandler to fabula.LOGGER that writes log messages to fabula-<name>.log.
+           It will return the file name.
         """
 
         # TODO: Checking for existing file, creating a new one?
@@ -416,7 +422,9 @@ class App:
                 #
                 return logging.Formatter.format(self, record)
 
-        self.file_handler = logging.FileHandler(filename = "fabula-{}.log".format(name),
+        file_name = "fabula-{}.log".format(name)
+
+        self.file_handler = logging.FileHandler(filename = file_name,
                                                 mode = "w")
 
         # Fix log level at logging.DEBUG, ignoring the config file
@@ -431,4 +439,4 @@ class App:
 
         fabula.LOGGER.addHandler(self.file_handler)
 
-        return
+        return file_name
