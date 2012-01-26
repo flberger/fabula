@@ -48,6 +48,10 @@ import os
 #
 PIX_PER_CHAR = 8
 
+# Hardwired screen size.
+#
+SCREENSIZE = (800, 600)
+
 def load_image(title):
     """Auxiliary function to make the user open an image file.
        Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
@@ -407,8 +411,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Counter for scrolling left-right. Used in display_single_frame().
 
        PygameUserInterface.window
-           An instance of clickndrag.Display. By default this is 800x600 px and
-           windowed.
+           An instance of clickndrag.Display. Dimensions are given by
+           SCREENSIZE. By default opened in windowed mode, this can be changed
+           by editing the file fabula.conf.
 
        PygameUserInterface.window.inventory
            clickndrag Plane for the inventory. By default this is 800x100px
@@ -472,7 +477,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Open a click'n'drag window.
         #
-        self.window = clickndrag.Display((800, 600), fullscreen)
+        self.window = clickndrag.Display(SCREENSIZE, fullscreen)
 
         # Create a black pygame surface for fade effects.
         #
@@ -973,6 +978,33 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Make sure inventory is present and on top
         #
         self.window.sub(self.inventory_plane)
+
+        # Make sure the player Entity is visible. Position the room view
+        # accordingly.
+
+        player_position = list(self.host.room.entity_locations[self.host.client_id])
+
+        # Convert to pixels, refering to the center of the tile
+        #
+        player_position[0] = int((player_position[0] + 0.5) * self.spacing)
+        player_position[1] = int((player_position[1] + 0.5) * self.spacing)
+
+        self.window.room.rect.left = 0 - player_position[0] + (SCREENSIZE[0] / 2)
+        self.window.room.rect.top =  0 - player_position[1] + (SCREENSIZE[1] / 2)
+
+        # Perfectly centered. Now, snap to edges.
+        #
+        if self.window.room.rect.left > 0:
+           self.window.room.rect.left = 0
+
+        if self.window.room.rect.top > 0:
+           self.window.room.rect.top = 0
+
+        if self.window.room.rect.right < SCREENSIZE[0]:
+           self.window.room.rect.right = SCREENSIZE[0]
+
+        if self.window.room.rect.bottom < SCREENSIZE[1]:
+           self.window.room.rect.bottom = SCREENSIZE[1]
 
         # Display the game again and accept input
         #
