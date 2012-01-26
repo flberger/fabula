@@ -1329,6 +1329,21 @@ def representation(object, attributes):
                               object.__class__.__name__,
                               arguments)
 
+def surrounding_positions(position):
+    """Return a list of tuples, representing the 8 surrounding positions around the tuple given.
+    """
+
+    # Start at top left and proceed clockwise
+    #
+    return [(position[0] - 1, position[1] - 1),
+            (position[0], position[1] - 1),
+            (position[0] + 1, position[1] - 1),
+            (position[0] + 1, position[1]),
+            (position[0] + 1, position[1] + 1),
+            (position[0], position[1] + 1),
+            (position[0] - 1, position[1] + 1),
+            (position[0] - 1, position[1])]
+
 ############################################################
 # Logging
 

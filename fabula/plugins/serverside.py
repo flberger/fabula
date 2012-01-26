@@ -495,10 +495,7 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         player_location = self.host.room.entity_locations[event.identifier]
 
-        surrounding_positions = [(player_location[0] - 1, player_location[1]),
-                                 (player_location[0], player_location[1] - 1),
-                                 (player_location[0] + 1, player_location[1]),
-                                 (player_location[0], player_location[1] + 1)]
+        surrounding_positions = fabula.surrounding_positions(player_location)
 
         if self.host.room.entity_locations[event.target_identifier] in surrounding_positions:
 
@@ -521,10 +518,7 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         player_location = self.host.room.entity_locations[event.identifier]
 
-        surrounding_positions = [(player_location[0] - 1, player_location[1]),
-                                 (player_location[0], player_location[1] - 1),
-                                 (player_location[0] + 1, player_location[1]),
-                                 (player_location[0], player_location[1] + 1)]
+        surrounding_positions = fabula.surrounding_positions(player_location)
 
         # Server.process_TriesToDropEvent() has already done some checks,
         # so we can be sure that target_identifier is either a valid

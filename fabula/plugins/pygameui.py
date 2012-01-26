@@ -1862,10 +1862,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             player_location = self.host.room.entity_locations[self.host.client_id]
 
-            surrounding_positions = [(player_location[0] - 1, player_location[1]),
-                                     (player_location[0], player_location[1] - 1),
-                                     (player_location[0] + 1, player_location[1]),
-                                     (player_location[0], player_location[1] + 1)]
+            surrounding_positions = fabula.surrounding_positions(player_location)
 
             for identifier in self.host.room.entity_locations.keys():
 
