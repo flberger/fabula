@@ -410,6 +410,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.scroll
            Counter for scrolling left-right. Used in display_single_frame().
 
+       PygameUserInterface.scroll_amount
+           Number of pixels to scroll per call to display_single_frame().
+
        PygameUserInterface.window
            An instance of clickndrag.Display. Dimensions are given by
            SCREENSIZE. By default opened in windowed mode, this can be changed
@@ -470,6 +473,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Counter for scrolling left-right
         #
         self.scroll = 0
+
+        # Scroll amount, tied to framerate.
+        # Scroll 2 px @ 60 fps
+        #
+        self.scroll_amount = int(120 / self.framerate)
+
+        fabula.LOGGER.debug("setting scroll_amount to {}".format(self.scroll_amount))
 
         # Center window. Hint from the pygame-users mailing list.
         #
@@ -640,6 +650,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 container_dict["connector"] = (ip, int(port))
 
+                buttonplane.parent.destroy()
+
+                return
+
         container = clickndrag.gui.Container("get_connection_details",
                                              padding = 5)
 
@@ -740,16 +754,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def display_single_frame(self):
         """Update and render all click'd'drag planes.
+           This method also handles scrolling.
         """
 
         if not self.freeze:
 
             # Handle scrolling
-            # TODO: hardwired scroll amount
             #
             if self.scroll > 0:
 
-                self.scroll = self.scroll - 2
+                self.scroll = self.scroll - self.scroll_amount
 
                 if self.scroll < 0:
 
@@ -757,11 +771,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 else:
 
-                    self.window.room.rect.move_ip(2, 0)
+                    self.window.room.rect.move_ip(self.scroll_amount, 0)
+
+                    self._snap_room_to_display()
 
             elif self.scroll < 0:
 
-                self.scroll = self.scroll + 2
+                self.scroll = self.scroll + self.scroll_amount
 
                 if self.scroll > 0:
 
@@ -769,7 +785,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 else:
 
-                    self.window.room.rect.move_ip(-2, 0)
+                    self.window.room.rect.move_ip( - self.scroll_amount, 0)
+
+                    self._snap_room_to_display()
 
             self.window.update()
             self.window.render()
@@ -801,19 +819,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if not self.scroll:
 
             mouse_position = pygame.mouse.get_pos()
-            window_width = self.window.rect.width
 
             if (pygame.mouse.get_focused()
                 and 0 <= mouse_position[0] <= 25
-                and self.window.room.rect.left != 0):
+                and self.window.room.rect.left < 0):
 
                 # Scroll to the left
                 #
                 self.scroll = self.spacing
 
             elif (pygame.mouse.get_focused()
-                  and window_width - 25 <= mouse_position[0] <= window_width
-                  and self.window.room.rect.right != window_width):
+                  and SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]
+                  and self.window.room.rect.right > SCREENSIZE[0]):
 
                 # Scroll to right
                 #
@@ -992,19 +1009,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.window.room.rect.left = 0 - player_position[0] + (SCREENSIZE[0] / 2)
         self.window.room.rect.top =  0 - player_position[1] + (SCREENSIZE[1] / 2)
 
-        # Perfectly centered. Now, snap to edges.
-        #
-        if self.window.room.rect.left > 0:
-           self.window.room.rect.left = 0
-
-        if self.window.room.rect.top > 0:
-           self.window.room.rect.top = 0
-
-        if self.window.room.rect.right < SCREENSIZE[0]:
-           self.window.room.rect.right = SCREENSIZE[0]
-
-        if self.window.room.rect.bottom < SCREENSIZE[1]:
-           self.window.room.rect.bottom = SCREENSIZE[1]
+        self._snap_room_to_display()
 
         # Display the game again and accept input
         #
@@ -1884,6 +1889,24 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         else:
             fabula.LOGGER.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
+
+        return
+
+    def _snap_room_to_display(self):
+        """Snap the room plane to the window plane.
+        """
+
+        if self.window.room.rect.left > 0:
+           self.window.room.rect.left = 0
+
+        if self.window.room.rect.top > 0:
+           self.window.room.rect.top = 0
+
+        if self.window.room.rect.right < SCREENSIZE[0]:
+           self.window.room.rect.right = SCREENSIZE[0]
+
+        if self.window.room.rect.bottom < SCREENSIZE[1]:
+           self.window.room.rect.bottom = SCREENSIZE[1]
 
         return
 
@@ -2768,7 +2791,6 @@ class PygameEditor(PygameUserInterface):
         if not self.scroll and pygame.display.get_init():
 
             mouse_position = pygame.mouse.get_pos()
-            window_width = self.window.rect.width
 
             if 0 <= mouse_position[0] <= 25:
 
@@ -2776,7 +2798,7 @@ class PygameEditor(PygameUserInterface):
                 #
                 self.scroll = self.spacing
 
-            elif window_width - 25 <= mouse_position[0] <= window_width:
+            elif SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]:
 
                 # Scroll to right
                 #
@@ -2903,7 +2925,7 @@ class PygameEditor(PygameUserInterface):
 
         # Make it completely visible, no matter how large
         #
-        self.window.properties.rect.right = self.window.rect.width
+        self.window.properties.rect.right = SCREENSIZE[0]
 
         return
 
