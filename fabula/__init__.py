@@ -295,6 +295,8 @@ class TriesToDropEvent(AttemptEvent):
            target location / item to drop on
     """
 
+    # TODO: why are the attributes different from DropsEvent?! Unify all attepmts and confirmations.
+
     def __init__(self, identifier, item_identifier, target_identifier):
         """Event initialisation.
            An attempt to drop the item identified by item_identifier. When sent
@@ -1154,11 +1156,10 @@ class Room(fabula.eventprocessor.EventProcessor):
     def process_DeleteEvent(self, event):
         """Update all affected dicts.
         """
-        if event.identifier not in self.entity_dict:
 
-            raise Exception("cannot delete unknown entity %s"
-                                 % event.identifier)
-
+        # No need for pre-checks - the following will raise an exception if the
+        # Entity does not exist.
+        #
         entity = self.entity_dict[event.identifier]
 
         self.floor_plan[self.entity_locations[event.identifier]].entities.remove(entity)

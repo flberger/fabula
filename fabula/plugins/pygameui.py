@@ -1272,7 +1272,23 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return
 
-#    def process_DeleteEvent(self, event):
+    def process_DeleteEvent(self, event):
+        """Remove the associated Plane from window.room.
+        """
+
+        # Partly taken from process_PicksUpEvent
+
+        fabula.LOGGER.debug("deleting caption and item Plane for '{}' from window.room".format(event.identifier))
+
+        # First remove the caption plane, if existing.
+        #
+        if event.identifier + "_caption" in self.window.room.subplanes_list:
+
+            self.window.room.remove(event.identifier + "_caption")
+
+        self.window.room.remove(event.identifier)
+
+        return
 
     def process_ChangeMapElementEvent(self, event):
         """Fetch asset and register/replace tile.

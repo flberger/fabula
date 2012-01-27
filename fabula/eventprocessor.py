@@ -26,6 +26,8 @@ class EventProcessor:
     """This is the base class for all Fabula objects that process events.
     """
 
+    # TODO: implement process_Event fallback
+
     def __init__(self):
         """Set up EventProcessor.event_dict
            which maps event classes to functions to be called for

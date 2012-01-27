@@ -718,9 +718,8 @@ class Client(fabula.core.Engine):
         #
         if event.identifier in self.room.entity_dict:
 
-            # Now call default implementation which
-            # lets self.room process the Event and
-            # queues it in the Message given
+            # Now call default implementation which lets self.room process the
+            # Event and queues it in the Message given
             #
             fabula.core.Engine.process_DeleteEvent(self,
                                                   event,

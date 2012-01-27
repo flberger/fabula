@@ -491,7 +491,6 @@ class DefaultGame(fabula.plugins.Plugin):
 
         # The Server has performed basic sanity checks.
         # In addition, we restrict picking up to items right next to the player.
-        # TODO: duplicate from PygameUserInterface.make_items_draggable()
         #
         player_location = self.host.room.entity_locations[event.identifier]
 
@@ -510,11 +509,10 @@ class DefaultGame(fabula.plugins.Plugin):
         return
 
     def process_TriesToDropEvent(self, event):
-        """Return a DropsEvent to the Server.
+        """If the target is an Entity, forward to respond(). If the target is a position, create a DropsEvent.
         """
 
         # Restrict drops to tiles right next to the player.
-        # TODO: copied from process_TriesToPickUpEvent
         #
         player_location = self.host.room.entity_locations[event.identifier]
 
@@ -546,8 +544,8 @@ class DefaultGame(fabula.plugins.Plugin):
                 self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
-                # Still, the Entity to be dropped may originate either from Room or from
-                # Rack.
+                # Still, the Entity to be dropped may originate either from Room
+                # or from Rack.
                 #
                 if event.item_identifier not in self.host.rack.entity_dict.keys():
                     fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
