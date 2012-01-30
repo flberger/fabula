@@ -999,17 +999,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Make sure the player Entity is visible. Position the room view
         # accordingly.
 
-        player_position = list(self.host.room.entity_locations[self.host.client_id])
+        try:
+            player_position = list(self.host.room.entity_locations[self.host.client_id])
 
-        # Convert to pixels, refering to the center of the tile
-        #
-        player_position[0] = int((player_position[0] + 0.5) * self.spacing)
-        player_position[1] = int((player_position[1] + 0.5) * self.spacing)
+            # Convert to pixels, refering to the center of the tile
+            #
+            player_position[0] = int((player_position[0] + 0.5) * self.spacing)
+            player_position[1] = int((player_position[1] + 0.5) * self.spacing)
 
-        self.window.room.rect.left = 0 - player_position[0] + (SCREENSIZE[0] / 2)
-        self.window.room.rect.top =  0 - player_position[1] + (SCREENSIZE[1] / 2)
+            self.window.room.rect.left = 0 - player_position[0] + (SCREENSIZE[0] / 2)
+            self.window.room.rect.top =  0 - player_position[1] + (SCREENSIZE[1] / 2)
 
-        self._snap_room_to_display()
+            self._snap_room_to_display()
+
+        except KeyError:
+
+            msg = "cannot center window on player Entity, Entity '{}' not found in room: {}"
+
+            fabula.LOGGER.warning(msg.format(self.host.client_id,
+                                             self.host.room.entity_locations))
 
         # Display the game again and accept input
         #
@@ -1918,8 +1926,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if self.window.room.rect.right < SCREENSIZE[0]:
            self.window.room.rect.right = SCREENSIZE[0]
 
-        if self.window.room.rect.bottom < SCREENSIZE[1]:
-           self.window.room.rect.bottom = SCREENSIZE[1]
+        # Mind the inventory
+        #
+        if self.window.room.rect.bottom < SCREENSIZE[1] - self.window.inventory.rect.height:
+           self.window.room.rect.bottom = SCREENSIZE[1] - self.window.inventory.rect.height
 
         return
 

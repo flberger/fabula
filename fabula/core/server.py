@@ -455,10 +455,22 @@ class Server(fabula.core.Engine):
 
                 self.message_for_remote.event_list.append(spawn_event)
 
-                picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
-                                                     identifier)
+                # Owner may be 'None' when the Entity is in Rack because it
+                # has been deleted. In this case, send DeleteEvent.
+                #
+                if self.rack.owner_dict[identifier] is None:
 
-                self.message_for_remote.event_list.append(picks_up_event)
+                    fabula.LOGGER.debug("owner of '{}' is None, sending DeleteEvent".format(identifier))
+
+                    delete_event = fabula.DeleteEvent(identifier)
+
+                    self.message_for_remote.event_list.append(delete_event)
+
+                else:
+                    picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
+                                                         identifier)
+
+                    self.message_for_remote.event_list.append(picks_up_event)
 
         # If a room has already been sent, the plugin should only spawn a new
         # player entity.
@@ -508,6 +520,7 @@ class Server(fabula.core.Engine):
             if not self.room.floor_plan[event.target_identifier].entities:
 
                 fabula.LOGGER.info("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
+                fabula.LOGGER.debug("room.entity_locations == {}".format(self.room.entity_locations))
 
                 kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -681,14 +694,15 @@ class Server(fabula.core.Engine):
 
         state = "new"
 
-        if self.room is None:
+        if (self.room is None
+            or self.room.identifier != event.room_identifier):
 
             self.room = fabula.Room(event.room_identifier)
 
         else:
             state = "existing"
 
-        fabula.LOGGER.info("registering client {} in {} room '{}'".format(str(kwargs["connector"]),
+        fabula.LOGGER.info("registering client '{}' in {} room '{}'".format(str(kwargs["connector"]),
                                                                           state,
                                                                           event.room_identifier))
 

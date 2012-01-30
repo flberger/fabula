@@ -128,13 +128,13 @@ class UserInterface(fabula.plugins.Plugin):
            connector will be used for Interface.connect(connector).
            identifier will be used to send InitEvent(identifier) to the server.
 
-           The default implementation returns ("default_player", "dummy_connector")
-           for testing purposes.
+           The default implementation returns ("player", "dummy_connector") for
+           testing purposes.
         """
 
-        fabula.LOGGER.warning('this is a dummy implementation, returning ("default_player", "dummy_connector")')
+        fabula.LOGGER.warning('this is a dummy implementation, returning ("player", "dummy_connector")')
 
-        return ("default_player", "dummy_connector")
+        return ("player", "dummy_connector")
 
     ####################
     # UserInterface Main Method

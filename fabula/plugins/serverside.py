@@ -31,8 +31,10 @@ import re
 
 def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
-       The introducing EnterRoomEvent will not be included, as the client id is
-       only known to the caller.
+
+       The introducing EnterRoomEvent(client_identifier, room_identifier) will
+       not be included, as the client id is only known to the caller.
+
        If 'complete' is True, a RoomCompleteEvent will be added, otherwise it
        will be left out.
 

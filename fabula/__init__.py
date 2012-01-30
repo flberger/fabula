@@ -145,7 +145,9 @@
 # TODO: demos: pacman, chess
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 # TODO: support and test Python package managers, as pip, easyinstall etc.
+#
 # TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, clickndrag, attempt_*.png, cancel.png, default.floorplan etc.
+# TODO: automatically create file lists for inclusion from level files etc. for distribution
 
 # Fabula will not work with Python versions prior to 3.x.
 #
@@ -1099,15 +1101,21 @@ class Room(fabula.eventprocessor.EventProcessor):
         """
         if event.location not in self.floor_plan:
 
-            raise Exception("cannot spawn entity %s at undefined location %s"
-                                 % (event.entity.identifier, event.location))
+            raise Exception("cannot spawn entity '{}' at undefined location {}".format(event.entity.identifier,
+                                                                                       event.location))
 
-        # If Entity is already there, just do nothing.
-        # This is no error, so no exception is raised.
-        # TODO: We would like to log that, but Entities have no logging access.
-        #
-        if event.entity.identifier not in self.entity_dict:
+        if event.entity.identifier in self.entity_dict:
 
+            # This is no error, so no exception is raised.
+            #
+            msg = "Entity '{}', to be spawned at {}, already exists in room '{}': {}"
+
+            fabula.LOGGER.warning(msg.format(event.entity.identifier,
+                                             event.location,
+                                             self.identifier,
+                                             self.entity_locations))
+
+        else:
             self.floor_plan[event.location].entities.append(event.entity)
 
             self.entity_dict[event.entity.identifier] = event.entity

@@ -158,7 +158,7 @@ class Interface:
         raise SystemExit
 
     def shutdown(self):
-        """This method is called when the engine is about to exit.
+        """This is called by the engine when it is about to exit.
            It notifies handle_messages() to raise SystemExit to stop the thread
            properly by setting self.shutdown_flag.
            shutdown() will return True when handle_messages() received the

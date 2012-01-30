@@ -392,10 +392,9 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """Let self.room process the event and pass it on.
         """
 
-        fabula.LOGGER.info("spawning entity '%s', type %s, location %s"
-                          % (event.entity.identifier,
-                             event.entity.entity_type,
-                             event.location))
+        fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
+                                                                               event.entity.entity_type,
+                                                                               event.location))
 
         self.room.process_SpawnEvent(event)
 

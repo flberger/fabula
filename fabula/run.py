@@ -219,7 +219,20 @@ class App:
 
         # This method will block until the Engine exits
         #
-        engine_instance.run()
+        try:
+
+            engine_instance.run()
+
+        except:
+            exception = traceback.format_exc()
+
+            fabula.LOGGER.error("exception in run():\n{}".format(exception))
+
+            fabula.LOGGER.debug("shutting down Interface")
+
+            engine_instance.interface.shutdown()
+
+            fabula.LOGGER.debug("shutdown() returned")
 
         fabula.LOGGER.info("run() returned")
 
@@ -341,7 +354,7 @@ class App:
 
         except:
             exception = traceback.format_exc()
-            fabula.LOGGER.info("exception in client.run():\n{}".format(exception))
+            fabula.LOGGER.error("exception in client.run():\n{}".format(exception))
 
         fabula.LOGGER.info("client exited, calling server.handle_exit()")
         server.handle_exit(2, None)
