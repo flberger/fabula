@@ -45,9 +45,13 @@ PygameUserInterface.spacing
 PygameUserInterface.scroll
     Counter for scrolling left-right. Used in display_single_frame().
 
+PygameUserInterface.scroll_amount
+    Number of pixels to scroll per call to display_single_frame().
+
 PygameUserInterface.window
-    An instance of clickndrag.Display. By default this is 800x600 px and
-    windowed.
+    An instance of clickndrag.Display. Dimensions are given by
+    SCREENSIZE. By default opened in windowed mode, this can be changed
+    by editing the file fabula.conf.
 
 PygameUserInterface.window.inventory
     clickndrag Plane for the inventory. By default this is 800x100px
@@ -140,6 +144,12 @@ PygameUserInterface.right_clicked_entity
     
     
     <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Remove the associated Plane from window.room.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
     <td><tt>Fetch asset and register/replace tile.</tt></td>
   </tr><tr class="method">
@@ -177,7 +187,7 @@ PygameUserInterface.right_clicked_entity
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Move the item's Plane from window.room to window.inventory.</tt></td>
+    <td><tt>Check the affected Entity, then either move the item's Plane from window.room to window.inventory or delete it.</tt></td>
   </tr><tr class="method">
     
     
@@ -238,6 +248,12 @@ PygameUserInterface.right_clicked_entity
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#make_items_draggable">make_items_draggable</a></td>
     <td><tt>Auxiliary method to make items next to the player draggable.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#_snap_room_to_display">_snap_room_to_display</a></td>
+    <td><tt>Snap the room plane to the window plane.</tt></td>
   </tr>
   
 </table>
@@ -266,12 +282,6 @@ PygameUserInterface.right_clicked_entity
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#display_asset_exception">display_asset_exception</a></td>
     <td><tt>Called when assets is unable to retrieve the asset.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.plugins.ui.UserInterface.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>This method is called with an instance of DeleteEvent.</tt></td>
   </tr>
   
 </table>
@@ -477,7 +487,7 @@ and use None instead.</pre>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#display_single_frame">fabula.plugins.ui.UserInterface.display_single_frame</a></div>
     <pre>Update and render all click'd'drag planes.
-        </pre>
+This method also handles scrolling.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.collect_player_input">
@@ -579,6 +589,24 @@ to PygameEntity in addition.
 If the asset file name contains 'fabulasheet', this method will treat
 the image as a spritesheet. See the EntityPlane documentation for
 details.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameUserInterface.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_DeleteEvent">fabula.plugins.ui.UserInterface.process_DeleteEvent</a></div>
+    <pre>Remove the associated Plane from window.room.
+        </pre>
   </div>
 </div><div class="function">
   <a name="fabula.plugins.pygameui.PygameUserInterface.process_ChangeMapElementEvent">
@@ -704,7 +732,7 @@ be derived from a single Tile.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.plugins.ui.UserInterface.html#process_PicksUpEvent">fabula.plugins.ui.UserInterface.process_PicksUpEvent</a></div>
-    <pre>Move the item's Plane from window.room to window.inventory.
+    <pre>Check the affected Entity, then either move the item's Plane from window.room to window.inventory or delete it.
 Then call the base class implementation to notify the Entity.</pre>
   </div>
 </div><div class="function">
@@ -887,9 +915,27 @@ Adds appropriate Events to PygameUserInterface.message_for_host.</pre>
     <pre>Auxiliary method to make items next to the player draggable.
         </pre>
   </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.PygameUserInterface._snap_room_to_display">
+    
+  </a>
+  <a name="_snap_room_to_display">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    _snap_room_to_display(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Snap the room plane to the window plane.
+        </pre>
+  </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-01-12 20:46:46.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-01-30 19:59:42.
     </address>
   </body>
 </html>
