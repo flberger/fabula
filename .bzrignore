@@ -18,3 +18,4 @@ __pycache__
 freecode-submit.txt
 .coverage
 htmlcov
+print_log.sh

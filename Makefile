@@ -89,7 +89,18 @@ endif
 winxp_update: clean
 	mount /mnt/winxp/
 	rm -vrf /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/*
-	cp -v -r --dereference ./* /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/
+	cp -v -r --dereference ./clickndrag \
+	                       ./COPYING \
+	                       ./doc \
+	                       ./fabula \
+	                       ./Makefile \
+	                       ./MANIFEST \
+	                       ./NEWS \
+	                       ./README \
+	                       ./scripts \
+	                       ./setup.py \
+	                       ./tests \
+	                       /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/
 	umount /mnt/winxp/
 
 clean:

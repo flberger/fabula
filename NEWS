@@ -1,6 +1,25 @@
 NEWS for Fabula
 ===============
 
+0.8.1
+-----
+
+Released on 31 January 2012.
+
+Improved room and multiplayer handling on the server side. In the Pygame client, 
+the room scrolling amount is now based on the framerate. There now is a check 
+for window focus before the window scrolls. The client now centers the room 
+plane on the player Entity, while snapping the room to the display edges. Also, 
+handling of DeleteEvent is finally implemented. When performing PickUp and Drop, 
+all eight positions surrounding the player are considered now instead of just 
+four. The property window of the Pygame editor will display large entities 
+correctly now. Overall exception handling has been improved, Fabula exits 
+cleanly upon an exception in most cases now. Log file names now include the 
+process id, making it possible to run parallel clients from the same directory 
+without conflicts. Lots of minor changes, fixes, cleanups, and a documentation 
+update.
+
+
 0.8.0
 -----
 

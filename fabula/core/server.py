@@ -26,6 +26,8 @@ import fabula
 import fabula.core
 import time
 
+# TODO: Add a decent default server CLI.
+
 class Server(fabula.core.Engine):
     """The Server is the central management and control authority in Fabula.
        It relies on the ServerInterface and the Plugin.
