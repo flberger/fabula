@@ -104,7 +104,12 @@ class Server(fabula.core.Engine):
         """Main loop of the Server.
            This is a blocking method. It calls all the process methods to
            process events, and then the plugin.
+           This method will print usage information and status reports to STDOUT.
         """
+
+        print("============================================================")
+        print("Fabula {} Server".format(fabula.VERSION))
+        print("------------------------------------------------------------\n")
 
         # Listen on port 0xfab == 4011 :-)
         # TODO: retrieve connector from somewhere
@@ -116,8 +121,14 @@ class Server(fabula.core.Engine):
         try:
             self.interface.connect(connector)
 
+            ip, port = self.interface.server.socket.getsockname()
+
+            print("Listening on IP {}, port {}\n".format(ip, port))
+
         except:
             fabula.LOGGER.warning("Exception in interface.connect() (server interface already connected?), continuing anyway")
+
+        print("Press [Ctrl] + [C] to stop the server.")
 
         fabula.LOGGER.info("starting main loop")
 
@@ -202,6 +213,8 @@ class Server(fabula.core.Engine):
 
         # exit has been requested
         #
+        print("\nShutting down server...", end = "")
+
         fabula.LOGGER.info("exit flag set, shutting down interface")
 
         # stop the Interface thread
@@ -211,6 +224,8 @@ class Server(fabula.core.Engine):
         fabula.LOGGER.info("shutdown confirmed")
 
         # TODO: possibly exit cleanly from the plugin here
+
+        print(" ok.\n\nA log file should be at fabula-server.log\n")
 
         return
 
