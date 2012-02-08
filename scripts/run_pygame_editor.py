@@ -37,15 +37,9 @@ import fabula.run
 def main():
     app = fabula.run.App(timeout = 0)
 
-    interface = fabula.interfaces.Interface()
-    interface.connect("dummy_client")
-
-    init_event = fabula.Message([fabula.InitEvent("player")])
-    interface.connections["dummy_client"].messages_for_local.append(init_event)
-
     app.server_plugin_class = fabula.plugins.serverside.Editor
 
-    app.run_server(60, interface, 0.5)
+    app.run_server(60, fabula.interfaces.Interface, 0.5)
 
 if __name__ == "__main__":
 

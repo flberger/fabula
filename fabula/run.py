@@ -65,12 +65,16 @@ class App:
            an App instance.
 
        App.file_handler
-           The logging.FileHandler instance created in App.add_file_handler().
+           The logging.FileHandler instance created in App._setup_file_logging().
+           Initially None.
+
+       App.stderr_handler
+           The StreamHandler instance created in App._setup_stderr_logging.
            Initially None.
 
        App.logfile_name
            The name of the logfile that is written. Initially the empty string.
-           Will be set to the return value of App.add_file_handler().
+           Will be set to the return value of App._setup_file_logging().
     """
 
     def __init__(self, timeout = 0):
@@ -89,29 +93,9 @@ class App:
 
             self.parser = None
 
-        # Set up logger level if given.
+        # Base logger level is always logging.DEBUG
         #
-        if self.parser is not None and self.parser.has_option("fabula", "loglevel"):
-
-            leveldict = {"debug" : logging.DEBUG,
-                         "info" : logging.INFO,
-                         "warning" : logging.WARNING,
-                         "error" : logging.ERROR,
-                         "critical" : logging.CRITICAL}
-
-            if self.parser.get("fabula", "loglevel") in leveldict.keys():
-
-                fabula.LOGGER.setLevel(leveldict[self.parser.get("fabula", "loglevel")])
-
-                fabula.LOGGER.info("found loglevel option in fabula.conf, setting loglevel to '{}'".format(self.parser.get("fabula", "loglevel")))
-
-        else:
-
-            # Default is logging.DEBUG
-            #
-            fabula.LOGGER.setLevel(logging.DEBUG)
-
-        fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
+        fabula.LOGGER.setLevel(logging.DEBUG)
 
         self.timeout = timeout
 
@@ -122,18 +106,27 @@ class App:
         self.file_handler = None
         self.logfile_name = ""
 
+        self.stderr_handler = None
+
         return
 
-    def run_client(self, framerate, interface):
+    def run_client(self, framerate, interface_class):
         """Run a Fabula client with the parameters given.
         """
 
-        self.logfile_name = self.add_file_handler("client-{}".format(os.getpid()))
+        # A client always logs to console, and conditionally to file
+        #
+        self._setup_stderr_logging()
 
+        self.logfile_name = self._setup_file_logging("client-{}".format(os.getpid()))
+
+        fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
         fabula.LOGGER.info("running in client mode")
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
 
         assets = self.assets_class()
+
+        interface = interface_class()
 
         client = fabula.core.client.Client(interface)
 
@@ -167,14 +160,20 @@ class App:
 
         return
 
-    def run_server(self, framerate, interface, action_time, threadsafe = False):
+    def run_server(self, framerate, interface_class, action_time, threadsafe = False):
         """Run a Fabula server with the parameters given.
         """
 
-        self.logfile_name = self.add_file_handler("server")
+        # A server only logs to file to free the console for the command line
+        # interface.
+        #
+        self.logfile_name = self._setup_file_logging("server")
 
+        fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
         fabula.LOGGER.info("running in server mode")
         fabula.LOGGER.info("running with interval (framerate) {}/s".format(framerate))
+
+        interface = interface_class()
 
         server = fabula.core.server.Server(interface,
                                            framerate,
@@ -238,14 +237,24 @@ class App:
 
         fabula.LOGGER.debug("threads still alive now:\n{}".format(threading.enumerate()))
 
-        fabula.LOGGER.info("shutting down logger, log file written to '{}'".format(self.logfile_name))
+        fabula.LOGGER.info("shutting down logger")
 
         # Engine returned. Close logger.
-        # Explicitly remove handlers to avoid multiple handlers
-        # when recreating the instance.
+        # Explicitly remove handlers to avoid multiple handlers when recreating
+        # the instance.
         #
-        fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
-        fabula.LOGGER.removeHandler(self.file_handler)
+        if self.stderr_handler is not None:
+
+            if self.file_handler is not None:
+
+                fabula.LOGGER.critical("log file written to '{}'".format(self.logfile_name))
+
+            fabula.LOGGER.removeHandler(self.stderr_handler)
+
+        if self.file_handler is not None:
+
+            fabula.LOGGER.removeHandler(self.file_handler)
+
         logging.shutdown()
 
         return
@@ -254,8 +263,13 @@ class App:
         """Run Fabula client and server on the local machine.
         """
 
-        self.logfile_name = self.add_file_handler("standalone")
+        # A standalone setup always logs to console, and conditionally to file
+        #
+        self._setup_stderr_logging()
 
+        self.logfile_name = self._setup_file_logging("standalone")
+
+        fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
         fabula.LOGGER.info("running in standalone mode, logging client and server")
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
 
@@ -389,24 +403,32 @@ class App:
         if exception:
             fabula.LOGGER.info("exception in client.run() was:\n{}".format(exception))
 
-        fabula.LOGGER.info("shutting down logger, log file written to '{}'".format(self.logfile_name))
+        fabula.LOGGER.info("shutting down logger")
 
         # Engine returned. Close logger.
-        # Explicitly remove handlers to avoid multiple handlers
-        # when recreating the instance.
+        # Explicitly remove handlers to avoid multiple handlers when recreating
+        # the instance.
         #
-        fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
-        fabula.LOGGER.removeHandler(self.file_handler)
+        if self.stderr_handler is not None:
+
+            if self.file_handler is not None:
+
+                fabula.LOGGER.critical("log file written to '{}'".format(self.logfile_name))
+
+            fabula.LOGGER.removeHandler(self.stderr_handler)
+
+        if self.file_handler is not None:
+
+            fabula.LOGGER.removeHandler(self.file_handler)
+
         logging.shutdown()
 
         return
 
-    def add_file_handler(self, name):
-        """This method will add a FileHandler to fabula.LOGGER that writes log messages to fabula-<name>.log.
-           It will return the file name.
+    def _setup_file_logging(self, name):
+        """Aux method which checks App.parser for an option and conditionally adds a FileHandler to fabula.LOGGER that writes to fabula-<name>.log.
+           It will return the file name, or None when logging is disabled.
         """
-
-        # TODO: Checking for existing file, creating a new one?
 
         class FabulaFileFormatter(logging.Formatter):
             """Subclass of Formatter with reasonable module information.
@@ -435,21 +457,60 @@ class App:
                 #
                 return logging.Formatter.format(self, record)
 
-        file_name = "fabula-{}.log".format(name)
+            # End of class.
 
-        self.file_handler = logging.FileHandler(filename = file_name,
-                                                mode = "w")
+        file_name = None
 
-        # Fix log level at logging.DEBUG, ignoring the config file
-        #
-        self.file_handler.setLevel(logging.DEBUG)
+        if (self.parser is not None
+            and self.parser.has_option("fabula", "write_logfile")
+            and self.parser.get("fabula", "write_logfile").lower() in ("true", "yes", "1")):
 
-        # Loglevel:
-        # + "%(levelname)-5s "
+            file_name = "fabula-{}.log".format(name)
 
-        self.file_handler.setFormatter(FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s  l.%(lineno)s",
-                                                           "%Y-%m-%d %H:%M:%S"))
+            self.file_handler = logging.FileHandler(filename = file_name,
+                                                    mode = "w")
 
-        fabula.LOGGER.addHandler(self.file_handler)
+            # Fix log level at logging.DEBUG
+            #
+            self.file_handler.setLevel(logging.DEBUG)
+
+            # Loglevel:
+            # + "%(levelname)-5s "
+
+            self.file_handler.setFormatter(FabulaFileFormatter("%(asctime)s  %(pathname)s %(funcName)s() --- %(message)s  l.%(lineno)s",
+                                                               "%Y-%m-%d %H:%M:%S"))
+
+            fabula.LOGGER.addHandler(self.file_handler)
 
         return file_name
+
+    def _setup_stderr_logging(self):
+        """Aux method to add a stderr handler to fabula.LOGGER.
+        """
+
+        # Creating an instance without arguments defaults to STDERR.
+        #
+        self.stderr_handler = logging.StreamHandler()
+
+        # Fix log level at logging.WARNING
+        #
+        self.stderr_handler.setLevel(logging.WARNING)
+
+        # Loglevel:
+        # "\x1b\x5b\x33\x32\x6d"
+        # + "%(levelname)-5s "
+        # + "\x1b\x5b\x33\x39\x6d"
+
+        # Fancy coloring for Unix terminals:
+        #STDERR_FORMATTER = logging.Formatter("\x1b\x5b\x33\x36\x6d"
+        #                                     + "%(funcName)s() "
+        #                                     + "\x1b\x5b\x33\x39\x6d"
+        #                                     + "%(message)s")
+
+        stderr_formatter = logging.Formatter("%(funcName)s() %(message)s")
+
+        self.stderr_handler.setFormatter(stderr_formatter)
+
+        fabula.LOGGER.addHandler(self.stderr_handler)
+
+        return

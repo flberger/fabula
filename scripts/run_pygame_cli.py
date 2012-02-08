@@ -36,10 +36,6 @@ import fabula.run
 
 def main():
 
-    # Remove STDERR logger to unclutter the console
-    #
-    fabula.LOGGER.removeHandler(fabula.STDERR_HANDLER)
-
     app = fabula.run.App(timeout = 0)
     app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
     app.server_plugin_class = fabula.plugins.serverside.CommandLine

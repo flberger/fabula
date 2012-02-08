@@ -753,6 +753,14 @@ class Editor(DefaultGame):
 
         fabula.LOGGER.debug("called")
 
+        # Trick Interface into believing a client is there
+        #
+        self.host.interface.connect("dummy_client")
+
+        init_event = fabula.Message([fabula.InitEvent("player")])
+
+        self.host.interface.connections["dummy_client"].messages_for_local.append(init_event)
+
         # TODO: When handling of multiple rooms is implemented, this should go into the base class.
         # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
         #

@@ -1360,35 +1360,6 @@ def surrounding_positions(position):
 #
 LOGGER = logging.getLogger("fabula")
 
-# LOGGER.setLevel() will be called in fabula.run.App.__init__()
-
-# STDERR console handler
-#
-# This is the only handler created here. A FileHandler will be added in the
-# respective run.App method.
-# Creating an instance without arguments defaults to STDERR.
-#
-STDERR_HANDLER = logging.StreamHandler()
-
-STDERR_HANDLER.setLevel(logging.DEBUG)
-
-# Loglevel:
-# "\x1b\x5b\x33\x32\x6d"
-# + "%(levelname)-5s "
-# + "\x1b\x5b\x33\x39\x6d"
-
-# Fancy coloring for Unix terminals:
-#STDERR_FORMATTER = logging.Formatter("\x1b\x5b\x33\x36\x6d"
-#                                     + "%(funcName)s() "
-#                                     + "\x1b\x5b\x33\x39\x6d"
-#                                     + "%(message)s")
-
-STDERR_FORMATTER = logging.Formatter("%(funcName)s() %(message)s")
-
-STDERR_HANDLER.setFormatter(STDERR_FORMATTER)
-
-# Add handlers
-#
-LOGGER.addHandler(STDERR_HANDLER)
+# All setup will be done in fabula.run.
 
 # Done with logging setup.
