@@ -106,9 +106,10 @@ class Server(fabula.core.Engine):
            process events, and then the plugin.
         """
 
+        # Listen on port 0xfab == 4011 :-)
         # TODO: retrieve connector from somewhere
         #
-        connector = ("0.0.0.0", 6161)
+        connector = ("0.0.0.0", 4011)
 
         fabula.LOGGER.info("attempting to connect server interface to '{}'".format(connector))
 

@@ -522,7 +522,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             surface = surface.convert()
 
-            fabula.LOGGER.warning("using inventory.png")
+            fabula.LOGGER.debug("using inventory.png")
 
             self.inventory_plane.image = surface
 
@@ -623,7 +623,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             surface = surface.convert()
 
-            fabula.LOGGER.warning("displaying splash.png")
+            fabula.LOGGER.debug("displaying splash.png")
 
             self.window.image = surface
 
@@ -646,9 +646,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 # Construct tuple
                 #
-                ip, port = buttonplane.parent.connector.text.split(":")
-
-                container_dict["connector"] = (ip, int(port))
+                container_dict["connector"] = buttonplane.parent.connector.text
 
                 buttonplane.parent.destroy()
 
@@ -682,7 +680,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if prompt_connector:
 
             container.sub(clickndrag.gui.Label("connector_caption",
-                                               "Server IP:PORT",
+                                               "Server IP",
                                                pygame.Rect((0, 0),
                                                            (200, 30))))
 
@@ -693,7 +691,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Provide a default
             #
-            container.connector.text = "127.0.0.1:6161"
+            container.connector.text = "127.0.0.1"
 
             # Upon clicked, register the TextBox for keyboard input
             #
@@ -728,7 +726,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.window.image = self.window.display
 
-        return (container_dict["login_name"], container_dict["connector"])
+        # Return connector (ip, port) using the default Fabula
+        # port 0xfab == 4011.
+        #
+        return (container_dict["login_name"],
+                (container_dict["connector"], 4011))
 
     def update_frame_timer(self):
         """Use pygame.time.Clock.tick() to slow down to given framerate.
