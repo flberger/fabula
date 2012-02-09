@@ -670,6 +670,22 @@ class ChangeMapElementEvent(ServerEvent):
 
         self.location = location
 
+class ServerParametersEvent(ServerEvent):
+    """This Event is sent by the Server when an InitEvent has been received.
+       It informs the client about the Server parameters.
+
+       Attributes:
+
+       ServerParametersEvent.action_time
+           The time the Server waits between actions that do not happen instantly.
+    """
+
+    def __init__(self, action_time):
+        """action_time is the time the Server waits between actions that do not happen instantly.
+        """
+
+        self.action_time = action_time
+
 ####################
 # Client Events
 
@@ -700,22 +716,6 @@ class InitEvent(Event):
         """
 
         self.identifier = identifier
-
-class ServerParametersEvent(Event):
-    """This Event is sent by the Server when an InitEvent has been received.
-       It informs the client about the Server parameters.
-
-       Attributes:
-
-       ServerParametersEvent.action_time
-           The time the Server waits between actions that do not happen instantly.
-    """
-
-    def __init__(self, action_time):
-        """action_time is the time the Server waits between actions that do not happen instantly.
-        """
-
-        self.action_time = action_time
 
 ############################################################
 # Message
