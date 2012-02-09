@@ -1513,7 +1513,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def process_PicksUpEvent(self, event):
-        """Check the affected Entity, then either move the item's Plane from window.room to window.inventory or delete it.
+        """Check the affected Entity, then either move the item's Plane from window.room to PygameUserInterface.inventory_plane or delete it.
            Then call the base class implementation to notify the Entity.
         """
 
@@ -1535,15 +1535,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             plane = self.window.room.subplanes[event.item_identifier]
 
             # Append at the right of the inventory.
-            # Since the item is already in self.host.rack.entity_dict, the position
-            # is len - 1.
             #
             plane.rect.top = 0
-            plane.rect.left = (len(self.host.rack.items_of(self.host.client_id)) - 1) * 100
+            plane.rect.left = len(self.inventory_plane.subplanes) * 100
 
             # This will remove the plane from its current parent, window.room
+            # Use self.inventory_plane because we do not know whether the
+            # inventory is currently visible.
             #
-            self.window.inventory.sub(plane)
+            self.inventory_plane.sub(plane)
 
             # Make sure the plane is draggable
             #

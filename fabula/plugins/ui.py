@@ -443,7 +443,13 @@ class UserInterface(fabula.plugins.Plugin):
 
         fabula.LOGGER.debug("notifying Entity '{}'".format(event.identifier))
 
-        self.host.room.entity_dict[event.identifier].process_PicksUpEvent(event)
+        try:
+
+            self.host.room.entity_dict[event.identifier].process_PicksUpEvent(event)
+
+        except:
+
+            fabula.LOGGER.error("Entity '{}' not found in host.room.entity_dict, cannot forward PicksUpEvent".format(event.identifier))
 
         return
 
