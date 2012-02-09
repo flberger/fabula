@@ -153,6 +153,15 @@ class Interface:
         #
         fabula.LOGGER.info("shutting down")
 
+        for connector in self.connections.keys():
+
+            if len(self.connections[connector].messages_for_remote):
+
+                msg = "{} unsent messages left in queue for '{}'"
+
+                fabula.LOGGER.warning(msg.format(len(self.connections[connector].messages_for_remote),
+                                                 connector))
+
         self.shutdown_confirmed = True
 
         raise SystemExit
@@ -532,7 +541,20 @@ class TCPClientInterface(Interface):
 
         self.sock.close()
 
-        fabula.LOGGER.info("server connection closed, stopping thread")
+        fabula.LOGGER.info("server connection closed")
+
+        # Copied from base class
+        #
+        for connector in self.connections.keys():
+
+            if len(self.connections[connector].messages_for_remote):
+
+                msg = "{} unsent messages left in queue for '{}'"
+
+                fabula.LOGGER.warning(msg.format(len(self.connections[connector].messages_for_remote),
+                                                 connector))
+
+        fabula.LOGGER.info("stopping thread")
 
         self.shutdown_confirmed = True
 
@@ -681,6 +703,26 @@ class TCPServerInterface(Interface):
                     #
                     sleep(1/60)
 
+                fabula.LOGGER.debug("shutdown flag set in parent")
+
+                # Deliver waiting local messages.
+                #
+                while len(message_buffer.messages_for_remote):
+
+                    # Copied from above
+                    #
+                    fabula.LOGGER.debug("sending 1 message of {} to {}".format(len(message_buffer.messages_for_remote),
+                                                                               self.client_address))
+
+                    # Send a clear-text representation. This is supposed to
+                    # be a Python expression to recreate the instance.
+                    #
+                    representation = repr(message_buffer.messages_for_remote.popleft())
+
+                    # Add a double newline as separator.
+                    #
+                    self.request.sendall(bytes(representation + "\n\n", "utf8"))
+
                 try:
 
                     self.request.shutdown(socket.SHUT_RDWR)
@@ -782,6 +824,16 @@ class TCPServerInterface(Interface):
             self.server.handle_request()
 
         fabula.LOGGER.info("caught shutdown notification")
+
+        # Build a list of MessageBuffer instances that still have unsent
+        # Messages for remote as an indicator of whether to wait.
+        # Go, Python!
+        #
+        while len([mess_buffer for mess_buffer in self.connections.values() if len(mess_buffer.messages_for_remote)]):
+
+            fabula.LOGGER.debug("waiting for buffered Messages to be sent")
+
+            self.server.handle_request()
 
         try:
 

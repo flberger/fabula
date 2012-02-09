@@ -215,10 +215,18 @@ class Server(fabula.core.Engine):
         #
         print("\nShutting down server...", end = "")
 
-        fabula.LOGGER.info("exit flag set, shutting down interface")
+        fabula.LOGGER.info("exit flag set")
+
+        fabula.LOGGER.info("sending ExitEvent to all connected Clients")
+
+        for message_buffer in self.interface.connections.values():
+
+            message_buffer.send_message(fabula.Message([fabula.ExitEvent("server")]))
 
         # stop the Interface thread
         #
+        fabula.LOGGER.info("shutting down interface")
+
         self.interface.shutdown()
 
         fabula.LOGGER.info("shutdown confirmed")

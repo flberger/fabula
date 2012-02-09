@@ -767,3 +767,13 @@ class Client(fabula.core.Engine):
         fabula.core.Engine.process_RoomCompleteEvent(self,
                                                     event,
                                                     message = kwargs["message"])
+
+    def process_ExitEvent(self, event, **kwargs):
+        """Trigger Client shutdown by setting self.plugin.exit_requested to True.
+        """
+
+        fabula.LOGGER.critical("server has closed the session")
+
+        self.plugin.exit_requested = True
+
+        return
