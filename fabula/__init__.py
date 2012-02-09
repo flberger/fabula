@@ -483,6 +483,41 @@ class ManipulatesEvent(ConfirmEvent):
 ####################
 # Unclassified events without a special base class
 
+class InitEvent(Event):
+    """This event is sent by the client upon startup.
+       It asks the server to send the server parameters and anything that is
+       needed to update the client to the current game state - usually a number
+       of ChangeMapElementEvents and SpawnEvents.
+       The client interface may decide to issue this event again in case there
+       has been a connection failure.
+
+       InitEvent.identifer
+           Client identifier. Must be unique for each client.
+    """
+
+    def __init__(self, identifier):
+        """identifier must be unique for each client.
+        """
+
+        self.identifier = identifier
+
+class ExitEvent(Event):
+    """This Event is sent by the Client or the Server so signla that it is about to exit and that no further Events will be sent.
+
+       Attributes:
+
+       ExitEvent.identifer
+           Client identifier. Must be unique for each client.
+    """
+
+    def __init__(self, identifier):
+        """identifier must be unique for each client.
+        """
+
+        self.identifier = identifier
+
+        return
+
 class SaysEvent(Event):
     """This normally is a reaction to the CanSpeakEvent, to be sent by the player.
        NPCs can speak spontanously, in that case a SaysEvent is issued by he
@@ -698,24 +733,6 @@ class ServerParametersEvent(ServerEvent):
 #     def __init__(self):
 #         """Client events have no parameters."""
 #         pass
-
-class InitEvent(Event):
-    """This event is sent once by the client upon startup.
-       It asks the server to supply anything that is needed to update the client
-       to the current game state - usually a number of ChangeMapElementEvents
-       and SpawnEvents.
-       The client interface may decide to issue this event again in case there
-       has been a connection failure.
-
-       InitEvent.identifer
-           Client identifier. Must be unique for each client.
-    """
-
-    def __init__(self, identifier):
-        """identifier must be unique for each client.
-        """
-
-        self.identifier = identifier
 
 ############################################################
 # Message
