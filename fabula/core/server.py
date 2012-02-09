@@ -137,7 +137,12 @@ class Server(fabula.core.Engine):
         #
         while not self.exit_requested:
 
-            for connector in self.interface.connections:
+            # Client connections may come and go. So rebuild the list of
+            # connections at every run.
+            #
+            connector_list = list(self.interface.connections.keys())
+
+            for connector in connector_list:
 
                 message = self.interface.connections[connector].grab_message()
 
@@ -155,6 +160,7 @@ class Server(fabula.core.Engine):
                         # TODO: Include fabula.ChangePropertyEvent?
                         #
                         if isinstance(event, (fabula.InitEvent,
+                                              fabula.ExitEvent,
                                               fabula.AttemptEvent,
                                               fabula.SaysEvent)):
 
@@ -213,7 +219,7 @@ class Server(fabula.core.Engine):
 
         # exit has been requested
         #
-        print("\nShutting down server...", end = "")
+        print("\nShutting down server.\n")
 
         fabula.LOGGER.info("exit flag set")
 
@@ -233,7 +239,7 @@ class Server(fabula.core.Engine):
 
         # TODO: possibly exit cleanly from the plugin here
 
-        print(" ok.\n\nA log file should be at fabula-server.log\n")
+        print("Shutdown complete. A log file should be at fabula-server.log\n")
 
         return
 
@@ -276,7 +282,14 @@ class Server(fabula.core.Engine):
             fabula.LOGGER.debug("{0} outgoing: {1}".format(connector,
                                                            self.message_for_remote))
 
-            self.interface.connections[connector].send_message(self.message_for_remote)
+            try:
+                self.interface.connections[connector].send_message(self.message_for_remote)
+
+            except KeyError:
+
+                msg = "connection to client '{}' not found, could not send Message"
+
+                fabula.LOGGER.error(msg.format(connector))
 
             ### Build broadcast message for all clients
             #
@@ -317,7 +330,7 @@ class Server(fabula.core.Engine):
                       and isinstance(event, fabula.SpawnEvent)
                       and event.entity.identifier == self.room.active_clients[connector]):
 
-                    fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one")
+                    fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one".format(event.entity.identifier))
 
                     self.message_for_all.event_list.append(event)
 
@@ -735,5 +748,32 @@ class Server(fabula.core.Engine):
         self.room.active_clients[kwargs["connector"]] = event.client_identifier
 
         kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_ExitEvent(self, event, **kwargs):
+        """Handle ExitEvent.
+           Items that the player has picked up will be kept in self.rack.
+        """
+
+        fabula.LOGGER.info("client '{}' exiting".format(event.identifier))
+
+        fabula.LOGGER.debug("removing interface.connections[{}]".format(kwargs["connector"]))
+
+        del self.interface.connections[kwargs["connector"]]
+
+        # TODO: the connection to client in interface is still open, and will continue to listen and even receive events. It should be closed here, but how to notify a RequestHandler of a socketserver.TCPServer that runs in a thread?
+
+        fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
+
+        del self.room.active_clients[kwargs["connector"]]
+
+        # Delete player Entity
+        # Process the Event right away, since it is not going through the
+        # Plugin. This will also append the Event to self.message_for_remote.
+        #
+        self.process_DeleteEvent(fabula.DeleteEvent(event.identifier),
+                                 connector = kwargs["connector"],
+                                 message = self.message_for_remote)
 
         return

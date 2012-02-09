@@ -170,7 +170,7 @@ class Client(fabula.core.Engine):
 
             if self.client_id == "exit requested":
 
-                # TODO: copied from below
+                # partly copied from below
 
                 fabula.LOGGER.info("exit requested from UserInterface, shutting down interface")
 
@@ -494,7 +494,13 @@ class Client(fabula.core.Engine):
 
         # exit has been requested
 
-        fabula.LOGGER.info("exit requested from UserInterface, shutting down interface...")
+        fabula.LOGGER.info("exit requested from UserInterface")
+
+        fabula.LOGGER.info("sending ExitEvent to Server")
+
+        self.message_buffer.send_message(fabula.Message([fabula.ExitEvent(self.client_id)]))
+
+        fabula.LOGGER.info("shutting down interface")
 
         # stop the Client Interface thread
         #

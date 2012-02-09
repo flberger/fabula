@@ -474,8 +474,8 @@ class TCPClientInterface(Interface):
 
             except socket.timeout:
 
-                # Nobody likes us, evereyone left us, there all out without
-                # us, having fun...
+                # Nobody likes us, evereyone left us, there all out without us,
+                # having fun...
                 #
                 pass
 
@@ -529,6 +529,24 @@ class TCPClientInterface(Interface):
 
         fabula.LOGGER.info("caught shutdown notification")
 
+        # Deliver waiting local messages.
+        #
+        while len(message_buffer.messages_for_remote):
+
+            # Copied from above
+
+            fabula.LOGGER.debug("sending 1 message of {}".format(len(message_buffer.messages_for_remote)))
+
+            # Send a clear-text representation. This is supposed to be a
+            # Python expression to recreate the instance.
+            #
+            representation = repr(message_buffer.messages_for_remote.popleft())
+
+            # Add a double newline as separator.
+            # This may block for an arbitrary time, but here we can wait.
+            #
+            self.sock.sendall(bytes(representation + "\n\n", "utf8"))
+
         try:
 
             self.sock.shutdown(socket.SHUT_RDWR)
@@ -542,17 +560,6 @@ class TCPClientInterface(Interface):
         self.sock.close()
 
         fabula.LOGGER.info("server connection closed")
-
-        # Copied from base class
-        #
-        for connector in self.connections.keys():
-
-            if len(self.connections[connector].messages_for_remote):
-
-                msg = "{} unsent messages left in queue for '{}'"
-
-                fabula.LOGGER.warning(msg.format(len(self.connections[connector].messages_for_remote),
-                                                 connector))
 
         fabula.LOGGER.info("stopping thread")
 
@@ -591,7 +598,8 @@ class TCPServerInterface(Interface):
 
         parent = self
 
-        # We define the class here to be able to access local variables.
+        # We define the class here to be able to access local variables through
+        # parent.
         #
         class FabulaRequestHandler(socketserver.BaseRequestHandler):
 
@@ -636,7 +644,7 @@ class TCPServerInterface(Interface):
                         #
                         self.request.sendall(bytes(representation + "\n\n", "utf8"))
 
-                    # Now listen for incoming server messages for some time (set
+                    # Now listen for incoming client messages for some time (set
                     # above). This should catch any messages received in the
                     # meantime by the OS.
                     #
@@ -650,8 +658,8 @@ class TCPServerInterface(Interface):
 
                     except socket.timeout:
 
-                        # Nobody likes us, evereyone left us, there all out without
-                        # us, having fun...
+                        # Nobody likes us, evereyone left us, there all out
+                        # without us, having fun...
                         #
                         pass
 
