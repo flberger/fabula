@@ -24,6 +24,7 @@
 
 import fabula
 import fabula.eventprocessor
+from time import sleep
 
 class Engine(fabula.eventprocessor.EventProcessor):
     """Common base class for Fabula server and client engines.
@@ -122,7 +123,10 @@ class Engine(fabula.eventprocessor.EventProcessor):
         # over.
         #
         while not self.plugin.exit_requested:
-            pass
+
+            # No need to run as fast as possible
+            #
+            sleep(1/30)
 
         # exit has been requested
 

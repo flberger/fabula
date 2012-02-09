@@ -86,6 +86,8 @@ class EventProcessor:
                                self.process_ChangeMapElementEvent,
                            fabula.InitEvent :
                                self.process_InitEvent,
+                           fabula.ExitEvent :
+                               self.process_ExitEvent,
                            fabula.ServerParametersEvent :
                                self.process_ServerParametersEvent,
                           }
@@ -256,6 +258,12 @@ class EventProcessor:
         pass
 
     def process_InitEvent(self, event, **kwargs):
+        """Process the Event.
+           The default implementation does nothing.
+        """
+        pass
+
+    def process_ExitEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation does nothing.
         """
