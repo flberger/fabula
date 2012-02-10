@@ -170,7 +170,7 @@ class Client(fabula.core.Engine):
 
             if self.client_id == "exit requested":
 
-                # TODO: copied from below
+                # partly copied from below
 
                 fabula.LOGGER.info("exit requested from UserInterface, shutting down interface")
 
@@ -356,11 +356,20 @@ class Client(fabula.core.Engine):
 
                         timedifference = datetime.datetime.today() - self.timestamp
 
-                        if timedifference.seconds >= 1:
+                        if timedifference.seconds >= 3:
 
-                            fabula.LOGGER.warning("waited 1s, still no confirmation, resetting timer")
+                            fabula.LOGGER.warning("waited 3s, still no confirmation, notifying user and resetting timer")
 
                             self.timestamp = None
+
+                            msg = "The server does not reply.\nConsider to restart."
+
+                            perception_event = fabula.PerceptionEvent(self.client_id,
+                                                                      msg)
+
+                            # Not catching reaction
+                            #
+                            self.plugin.process_message(fabula.Message([perception_event]))
 
                         else:
 
@@ -494,7 +503,13 @@ class Client(fabula.core.Engine):
 
         # exit has been requested
 
-        fabula.LOGGER.info("exit requested from UserInterface, shutting down interface...")
+        fabula.LOGGER.info("exit requested from UserInterface")
+
+        fabula.LOGGER.info("sending ExitEvent to Server")
+
+        self.message_buffer.send_message(fabula.Message([fabula.ExitEvent(self.client_id)]))
+
+        fabula.LOGGER.info("shutting down interface")
 
         # stop the Client Interface thread
         #
@@ -767,3 +782,13 @@ class Client(fabula.core.Engine):
         fabula.core.Engine.process_RoomCompleteEvent(self,
                                                     event,
                                                     message = kwargs["message"])
+
+    def process_ExitEvent(self, event, **kwargs):
+        """Trigger Client shutdown by setting self.plugin.exit_requested to True.
+        """
+
+        fabula.LOGGER.critical("server has closed the session")
+
+        self.plugin.exit_requested = True
+
+        return

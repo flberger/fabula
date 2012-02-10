@@ -24,6 +24,7 @@
 
 import fabula
 import fabula.eventprocessor
+from time import sleep
 
 class Engine(fabula.eventprocessor.EventProcessor):
     """Common base class for Fabula server and client engines.
@@ -122,7 +123,10 @@ class Engine(fabula.eventprocessor.EventProcessor):
         # over.
         #
         while not self.plugin.exit_requested:
-            pass
+
+            # No need to run as fast as possible
+            #
+            sleep(1/30)
 
         # exit has been requested
 
@@ -407,23 +411,25 @@ class Engine(fabula.eventprocessor.EventProcessor):
            delete the it from Engine.room and pass the DeleteEvent on.
         """
 
-        # TODO: very similar to PicksUpEvent
+        # Handled similar to PicksUpEvent
 
         fabula.LOGGER.debug("called")
 
-        # Save the Entity to be deleted in Engine.rack
-        #
         deleted_entity = self.room.entity_dict[event.identifier]
 
-        # Entities stored by Engine are owned by None
+        # If it is not a player Entity, save it in Engine.rack
         #
-        self.rack.store(deleted_entity, None)
+        if deleted_entity.entity_type != fabula.PLAYER:
+
+            # Entities stored by Engine are owned by None
+            #
+            self.rack.store(deleted_entity, None)
 
         # Delete it from Engine.room
         #
         self.room.process_DeleteEvent(event)
 
-        # and pass the PicksUpEvent on
+        # and pass the Event on
         #
         kwargs["message"].event_list.append(event)
 
