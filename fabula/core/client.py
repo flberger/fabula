@@ -356,11 +356,20 @@ class Client(fabula.core.Engine):
 
                         timedifference = datetime.datetime.today() - self.timestamp
 
-                        if timedifference.seconds >= 1:
+                        if timedifference.seconds >= 3:
 
-                            fabula.LOGGER.warning("waited 1s, still no confirmation, resetting timer")
+                            fabula.LOGGER.warning("waited 3s, still no confirmation, notifying user and resetting timer")
 
                             self.timestamp = None
+
+                            msg = "The server does not reply.\nConsider to restart."
+
+                            perception_event = fabula.PerceptionEvent(self.client_id,
+                                                                      msg)
+
+                            # Not catching reaction
+                            #
+                            self.plugin.process_message(fabula.Message([perception_event]))
 
                         else:
 

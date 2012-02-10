@@ -640,9 +640,43 @@ class TCPServerInterface(Interface):
                         #
                         representation = repr(message_buffer.messages_for_remote.popleft())
 
-                        # Add a double newline as separator.
-                        #
-                        self.request.sendall(bytes(representation + "\n\n", "utf8"))
+                        try:
+                            # Add a double newline as separator.
+                            #
+                            self.request.sendall(bytes(representation + "\n\n", "utf8"))
+
+                        except socket.error:
+
+                            fabula.LOGGER.error("socket error while sending to {}".format(self.client_address))
+
+                            try:
+                                fabula.LOGGER.debug("closing socket")
+
+                                self.request.shutdown(socket.SHUT_RDWR)
+
+                            except:
+
+                                # Socket may be unavailable already
+                                #
+                                fabula.LOGGER.warning("could not shut down socket")
+
+                            self.request.close()
+
+                            fabula.LOGGER.info("handler connection closed")
+
+                            # This is the only way to notify the Server
+                            #
+                            fabula.LOGGER.debug("removing connection from connections dict")
+
+                            del parent.connections[self.client_address]
+
+                            fabula.LOGGER.debug("removing thread from thread list")
+
+                            parent.thread_list.remove(threading.current_thread())
+
+                            fabula.LOGGER.info("stopping thread")
+
+                            raise SystemExit
 
                     # Now listen for incoming client messages for some time (set
                     # above). This should catch any messages received in the

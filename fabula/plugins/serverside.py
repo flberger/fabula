@@ -269,37 +269,47 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         for identifier in list(self.tries_to_move_dict.keys()):
 
-            target_identifier = self.tries_to_move_dict[identifier]
+            # Check if the Entity still exists
+            #
+            if identifier not in self.host.room.entity_dict.keys():
 
-            location = self.move_towards(identifier,
-                                         target_identifier,
-                                         self.path_dict[identifier])
-
-            if location is None:
-
-                fabula.LOGGER.warning("no possible move for '{}', removing from tries_to_move_dict and returning AttemptFailedEvent".format(identifier))
+                fabula.LOGGER.debug("Entity '{}' gone from entity_dict, removing from tries_to_move_dict".format(identifier))
 
                 del self.tries_to_move_dict[identifier]
                 del self.path_dict[identifier]
 
-                event_list.append(fabula.AttemptFailedEvent(identifier))
-
             else:
-                fabula.LOGGER.info("movement pending for '{}'".format(identifier))
-                fabula.LOGGER.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
+                target_identifier = self.tries_to_move_dict[identifier]
 
-                # Save current position before movement as last position
-                #
-                self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
+                location = self.move_towards(identifier,
+                                             target_identifier,
+                                             self.path_dict[identifier])
 
-                event_list.append(fabula.MovesToEvent(identifier, location))
+                if location is None:
 
-                if location == target_identifier:
-
-                    fabula.LOGGER.info("target reached, removing from tries_to_move_dict")
+                    fabula.LOGGER.warning("no possible move for '{}', removing from tries_to_move_dict and returning AttemptFailedEvent".format(identifier))
 
                     del self.tries_to_move_dict[identifier]
                     del self.path_dict[identifier]
+
+                    event_list.append(fabula.AttemptFailedEvent(identifier))
+
+                else:
+                    fabula.LOGGER.info("movement pending for '{}'".format(identifier))
+                    fabula.LOGGER.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
+
+                    # Save current position before movement as last position
+                    #
+                    self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
+
+                    event_list.append(fabula.MovesToEvent(identifier, location))
+
+                    if location == target_identifier:
+
+                        fabula.LOGGER.info("target reached, removing from tries_to_move_dict")
+
+                        del self.tries_to_move_dict[identifier]
+                        del self.path_dict[identifier]
 
         # Process Message queue
         #

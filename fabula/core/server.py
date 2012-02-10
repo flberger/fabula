@@ -142,6 +142,34 @@ class Server(fabula.core.Engine):
             #
             connector_list = list(self.interface.connections.keys())
 
+            # Check if someone has left who is supposed to be there
+            #
+            if self.room is not None:
+
+                # Create a list copy, for the same reason as above
+                #
+                active_list = list(self.room.active_clients.keys())
+
+                for connector in active_list:
+
+                    if not connector in connector_list:
+
+                        client_id = self.room.active_clients[connector]
+
+                        msg = "client '{}' {} has left without notice, removing"
+
+                        fabula.LOGGER.warning(msg.format(client_id, connector))
+
+                        self.process_ExitEvent(fabula.ExitEvent(client_id),
+                                               connector = connector)
+
+                        # Since we do this outside the loop, we have to clean
+                        # up to not confuse the next iteration
+                        #
+                        self.message_for_remote = fabula.Message([])
+
+                        self.message_for_all.event_list.append(fabula.DeleteEvent(client_id))
+
             for connector in connector_list:
 
                 message = self.interface.connections[connector].grab_message()
@@ -760,9 +788,14 @@ class Server(fabula.core.Engine):
 
         fabula.LOGGER.debug("removing interface.connections[{}]".format(kwargs["connector"]))
 
-        del self.interface.connections[kwargs["connector"]]
+        try:
+            del self.interface.connections[kwargs["connector"]]
 
-        # TODO: the connection to client in interface is still open, and will continue to listen and even receive events. It should be closed here, but how to notify a RequestHandler of a socketserver.TCPServer that runs in a thread?
+        except KeyError:
+
+            fabula.LOGGER.warning("connection {} is already gone".format(kwargs["connector"]))
+
+        # TODO: the connection to client in interface might still be open, and will continue to listen and even receive events. It should be closed here, but how to notify a RequestHandler of a socketserver.TCPServer that runs in a thread?
 
         fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
 
