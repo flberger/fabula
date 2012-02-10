@@ -507,37 +507,37 @@ class Server(fabula.core.Engine):
 
                     self.message_for_remote.event_list.append(change_property_event)
 
-        if len(self.rack.entity_dict):
+            if len(self.rack.entity_dict):
 
-            fabula.LOGGER.info("sending Spawn and PickUpEvents from existing rack")
+                fabula.LOGGER.info("sending Spawn and PickUpEvents from existing rack")
 
-            for identifier in self.rack.entity_dict:
+                for identifier in self.rack.entity_dict:
 
-                # We must spawn at a valid location. Spawning at the first
-                # coordinate tuple in the room. Doesn't matter, it will be
-                # picked up in an instant anyway.
-                #
-                spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                                list(self.room.floor_plan.keys())[0])
+                    # We must spawn at a valid location. Spawning at the first
+                    # coordinate tuple in the room. Doesn't matter, it will be
+                    # picked up in an instant anyway.
+                    #
+                    spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
+                                                    list(self.room.floor_plan.keys())[0])
 
-                self.message_for_remote.event_list.append(spawn_event)
+                    self.message_for_remote.event_list.append(spawn_event)
 
-                # Owner may be 'None' when the Entity is in Rack because it
-                # has been deleted. In this case, send DeleteEvent.
-                #
-                if self.rack.owner_dict[identifier] is None:
+                    # Owner may be 'None' when the Entity is in Rack because it
+                    # has been deleted. In this case, send DeleteEvent.
+                    #
+                    if self.rack.owner_dict[identifier] is None:
 
-                    fabula.LOGGER.debug("owner of '{}' is None, sending DeleteEvent".format(identifier))
+                        fabula.LOGGER.debug("owner of '{}' is None, sending DeleteEvent".format(identifier))
 
-                    delete_event = fabula.DeleteEvent(identifier)
+                        delete_event = fabula.DeleteEvent(identifier)
 
-                    self.message_for_remote.event_list.append(delete_event)
+                        self.message_for_remote.event_list.append(delete_event)
 
-                else:
-                    picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
-                                                         identifier)
+                    else:
+                        picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
+                                                             identifier)
 
-                    self.message_for_remote.event_list.append(picks_up_event)
+                        self.message_for_remote.event_list.append(picks_up_event)
 
         # If a room has already been sent, the plugin should only spawn a new
         # player entity.

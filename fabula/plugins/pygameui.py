@@ -1691,14 +1691,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if item_identifier in self.host.rack.entity_dict.keys():
 
-            fabula.LOGGER.info("'{}' already in Rack, skipping".format(item_identifier))
+            fabula.LOGGER.warning("'{}' already in Rack, skipping".format(item_identifier))
 
         else:
 
             fabula.LOGGER.info("issuing TriesToPickUpEvent")
 
             event = fabula.TriesToPickUpEvent(self.host.client_id,
-                                             self.host.room.entity_locations[item_identifier])
+                                              self.host.room.entity_locations[item_identifier])
 
             self.message_for_host.event_list.append(event)
 
