@@ -438,6 +438,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.right_clicked_entity
            Cache for the last right-clicked Entity.
+
+       PygameUserInterface.osd
+           An instance of PygameOSD.
+
+       PygameUserInterface.stats
+           A dict mapping names of different metrics to their current vaule.
+           Updated in PygameUserInterface.update_frame_timer().
     """
 
     def __init__(self, assets, framerate, host, fullscreen = False):
@@ -461,6 +468,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         fabula.LOGGER.debug("initialising pygame")
 
         pygame.init()
+
+        # Initialise on screen display.
+        #
+        self.osd = PygameOSD()
+
+        # Statistics
+        #
+        self.stats = {"framerate" : self.framerate,
+                      "fps" : None}
 
         # Initialise the frame timing clock.
         #
@@ -734,23 +750,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def update_frame_timer(self):
         """Use pygame.time.Clock.tick() to slow down to given framerate.
+           Also, update PygameUserInterface.stats.
         """
 
         self.clock.tick(self.framerate)
 
-        return
-
-    def display_stats(self):
-        """Display the actual framerate and various other statistics on screen.
-        """
-
-        fps_string = " {}/{} fps ".format(int(self.clock.get_fps()),
-                                          self.framerate)
-
-        self.window.display.blit(clickndrag.gui.SMALL_FONT.render(fps_string, True,
-                                                                  (0, 0, 0),
-                                                                  (240, 240, 240)),
-                                 (700, 575))
+        self.stats["fps"] = int(self.clock.get_fps())
 
         return
 
@@ -794,7 +799,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.window.update()
             self.window.render()
 
-            self.display_stats()
+            self.osd.render(self.window.display)
 
             # TODO: replace with update(dirty_rect_list)
             #
@@ -853,6 +858,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # done Client and ClientInterface.
                 #
                 pygame.quit()
+
+            elif (event.type == pygame.KEYDOWN
+                  and event.key == pygame.K_F1):
+
+                if self.osd.is_displaying("FPS: "):
+
+                    self.osd.remove("Framerate: ")
+                    self.osd.remove("FPS: ")
+
+                else:
+                    self.osd.display("Framerate: ", self.stats, "framerate")
+                    self.osd.display("FPS: ", self.stats, "fps")
 
         self.window.process(events)
 
@@ -3172,3 +3189,73 @@ class PygameEditor(PygameUserInterface):
         self.window.display_logic.destroy()
 
         return
+
+class PygameOSD:
+    """A PygameOSD instance manages an on-screen display.
+
+       Attributes:
+
+       PygameOSD.caption_dict_dict
+           A dict, mapping caption strings to a (dict, key) tuple.
+
+       PygameOSD.offset
+           A (x, y) tuple giving the rendering offset relative to (0, 0).
+    """
+
+    def __init__(self):
+        """Initialise.
+        """
+
+        self.caption_dict_dict = {}
+
+        self.offset = (0, 0)
+
+        return
+
+    def display(self, caption, dictionary, key):
+        """Track the value of dictionary[key], and display it after caption.
+        """
+
+        self.caption_dict_dict[caption] = (dictionary, key)
+
+        return
+
+    def render(self, surface):
+        """Render the OSD on the Pygame Surface given.
+        """
+
+        y = self.offset[1]
+
+        for caption in self.caption_dict_dict.keys():
+
+            dictionary, key = self.caption_dict_dict[caption]
+
+            text = "{} {}".format(caption, dictionary[key])
+
+            text_plane = clickndrag.gui.OutlinedText("osd",
+                                                     text)
+
+            surface.blit(text_plane.image, (self.offset[0], y))
+
+            y = y + text_plane.rect.height
+
+        return
+
+    def remove(self, caption):
+        """No longer display the item identified by caption.
+        """
+
+        del self.caption_dict_dict[caption]
+
+        return
+
+    def is_displaying(self, key):
+        """Convenience method: return True if key is a key in PygameOSD.caption_dict_dict.
+        """
+
+        if key in self.caption_dict_dict.keys():
+
+            return True
+
+        else:
+            return False

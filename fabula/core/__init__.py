@@ -342,7 +342,12 @@ class Engine(fabula.eventprocessor.EventProcessor):
                                        event.property_value,
                                        event.identifier))
 
-        self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
+        if self.room:
+
+            self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
+
+        else:
+            fabula.LOGGER.warning("received ChangePropertyEvent before Room was established")
 
         kwargs["message"].event_list.append(event)
 
