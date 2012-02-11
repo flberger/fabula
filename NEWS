@@ -1,6 +1,21 @@
 NEWS for Fabula
 ===============
 
+0.8.2
+-----
+
+Released on 11 February 2012.
+
+This release makes server and client dis/reconnection much more reliable, adding 
+ExitEvent and making the server more tolereant towards abrupt client exits. On 
+the client side, the user will be warned when server replies take too long. 
+Console and file log levels are hardwired now. The server will now listen on 
+port '0xfab' (4011), and display a friendly interface on the console. 
+PygameUserInterface now has an on-screen display which will display statistics 
+upon F1. Lots of fixes and improvements, API changes in fabula.run, and a 
+documentation update.
+
+
 0.8.1
 -----
 
