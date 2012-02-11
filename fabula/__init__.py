@@ -1184,16 +1184,21 @@ class Room(fabula.eventprocessor.EventProcessor):
         """Update all affected dicts.
         """
 
-        # No need for pre-checks - the following will raise an exception if the
-        # Entity does not exist.
-        #
-        entity = self.entity_dict[event.identifier]
+        try:
+            entity = self.entity_dict[event.identifier]
 
-        self.floor_plan[self.entity_locations[event.identifier]].entities.remove(entity)
+            self.floor_plan[self.entity_locations[event.identifier]].entities.remove(entity)
 
-        del self.entity_dict[event.identifier]
+            del self.entity_dict[event.identifier]
 
-        del self.entity_locations[event.identifier]
+            del self.entity_locations[event.identifier]
+
+        except KeyError:
+
+            # Since the Entity is to be deleted anyway, we do not raise an
+            # exception
+            #
+            fabula.LOGGER.warning("could not delete Entity '{}': Entity does not exist".format(event.identifier))
 
         return
 

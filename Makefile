@@ -42,16 +42,49 @@ errors:
 ifdef PYTHON
 
 doctest: clean
+	@echo --------------------------- && \
+	echo Testing  tests/imports.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/imports.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/entity.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/entity.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/client.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/client.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/server.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/server.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/standalone.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/standalone.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/assets.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/assets.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/pygame_user_interface.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/pygame_user_interface.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/tiles.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/tiles.txt && \
+	echo --------------------------- && \
+	echo Testing  tests/serverside_event_queue.txt && \
+	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/serverside_event_queue.txt && \
-	$(PYTHON) -m doctest tests/tcp_networking.txt
+	echo --------------------------- && \
+	echo Testing  tests/tcp_networking.txt && \
+	echo --------------------------- && \
+	$(PYTHON) -m doctest tests/tcp_networking.txt && \
+	echo --------------------------- && \
+	echo Done testing. && \
+	echo ---------------------------
 
 user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt

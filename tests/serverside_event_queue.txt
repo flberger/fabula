@@ -10,6 +10,9 @@ Serverside Event Queue
     >>> class QueueTest(fabula.plugins.serverside.DefaultGame):
     ...     def __init__(self, host):
     ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)
+    ...         self.host.interface.connect("dummy_client")
+    ...         init_message = fabula.Message([fabula.InitEvent("dummy_client")])
+    ...         self.host.interface.connections["dummy_client"].messages_for_local.append(init_message)
     ...         self.queue_messages(fabula.Message([fabula.EnterRoomEvent("player", "test")]),
     ...                             fabula.Message([fabula.RoomCompleteEvent()]),
     ...                             fabula.Message([fabula.PerceptionEvent("player", "Test")]))
@@ -22,12 +25,19 @@ Serverside Event Queue
     ...
     >>> app = fabula.run.App(timeout = 5)
     >>> app.server_plugin_class = QueueTest
-    >>> interface = fabula.interfaces.Interface()
-    >>> interface.connect("dummy_client")
-    >>> init_message = fabula.Message([fabula.InitEvent("dummy_client")])
-    >>> interface.connections["dummy_client"].messages_for_local.append(init_message)
-    >>> app.run_server(60, interface, 1.0)
+    >>> interface_class = fabula.interfaces.Interface
+    >>> app.run_server(60, interface_class, 1.0)
+    ============================================================
+    Fabula 0.8.1 Server
+    ------------------------------------------------------------
+    <BLANKLINE>
+    Press [Ctrl] + [C] to stop the server.
     fabula.Message(event_list = [fabula.EnterRoomEvent(client_identifier = 'player', room_identifier = 'test')])
     fabula.Message(event_list = [fabula.RoomCompleteEvent()])
     fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player', perception = 'Test')])
+    <BLANKLINE>
+    Shutting down server.
+    <BLANKLINE>
+    Shutdown complete. A log file should be at fabula-server.log
+    <BLANKLINE>
     >>>

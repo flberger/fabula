@@ -7,4 +7,14 @@ Standalone Execution (Client and Server)
     >>> import fabula.run
     >>> app = fabula.run.App(timeout = 5)
     >>> app.run_standalone(60, 0.5)
+    ============================================================
+    Fabula 0.8.1 Server
+    ------------------------------------------------------------
+    <BLANKLINE>
+    Press [Ctrl] + [C] to stop the server.
+    <BLANKLINE>
+    Shutting down server.
+    <BLANKLINE>
+    Shutdown complete. A log file should be at fabula-server.log
+    <BLANKLINE>
     >>>

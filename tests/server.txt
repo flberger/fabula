@@ -7,6 +7,16 @@ Server Execution
     >>> import fabula.interfaces
     >>> import fabula.run
     >>> app = fabula.run.App(timeout = 5)
-    >>> interface = fabula.interfaces.Interface()
-    >>> app.run_server(60, interface, 0.5)
+    >>> interface_class = fabula.interfaces.Interface
+    >>> app.run_server(60, interface_class, 0.5)
+    ============================================================
+    Fabula 0.8.1 Server
+    ------------------------------------------------------------
+    <BLANKLINE>
+    Press [Ctrl] + [C] to stop the server.
+    <BLANKLINE>
+    Shutting down server.
+    <BLANKLINE>
+    Shutdown complete. A log file should be at fabula-server.log
+    <BLANKLINE>
     >>>

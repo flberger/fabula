@@ -8,21 +8,21 @@ TCP Networking
     >>> import fabula.run
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 5)
-    ...     interface = fabula.interfaces.TCPServerInterface()
-    ...     app.run_server(60, interface, 0.5, threadsafe = True)
+    ...     interface_class = fabula.interfaces.TCPServerInterface
+    ...     app.run_server(60, interface_class, 0.5, threadsafe = True)
     ...
     >>> class TCPUI(fabula.plugins.ui.UserInterface):
     ...     def get_connection_details(self):
-    ...         fabula.LOGGER.info('returning ("TCP_Client", ("127.0.0.1", 6161))')
-    ...         return("TCP_Client", ("127.0.0.1", 6161))
+    ...         fabula.LOGGER.info('returning ("TCP_Client", ("127.0.0.1", 4011))')
+    ...         return("TCP_Client", ("127.0.0.1", 4011))
     ...     def collect_player_input(self):
     ...         pass
     ...
     >>> def run_client():
     ...     app = fabula.run.App(timeout = 5)
     ...     app.user_interface_class = TCPUI
-    ...     interface = fabula.interfaces.TCPClientInterface()
-    ...     app.run_client(60, interface)
+    ...     interface_class = fabula.interfaces.TCPClientInterface
+    ...     app.run_client(60, interface_class)
     ...
     >>> import threading
     >>> server_process = threading.Thread(target = run_server)
@@ -30,5 +30,17 @@ TCP Networking
     >>> server_process.start()
     >>> client_process.start()
     >>> server_process.join()
+    ============================================================
+    Fabula 0.8.1 Server
+    ------------------------------------------------------------
+    <BLANKLINE>
+    Listening on IP 0.0.0.0, port 4011
+    <BLANKLINE>
+    Press [Ctrl] + [C] to stop the server.
+    <BLANKLINE>
+    Shutting down server.
+    <BLANKLINE>
+    Shutdown complete. A log file should be at fabula-server.log
+    <BLANKLINE>
     >>> client_process.join()
     >>>

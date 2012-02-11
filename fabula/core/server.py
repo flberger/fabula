@@ -785,16 +785,22 @@ class Server(fabula.core.Engine):
 
         # TODO: the connection to client in interface might still be open, and will continue to listen and even receive events. It should be closed here, but how to notify a RequestHandler of a socketserver.TCPServer that runs in a thread?
 
-        fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
-
-        del self.room.active_clients[kwargs["connector"]]
-
-        # Delete player Entity
-        # Process the Event right away, since it is not going through the
-        # Plugin. This will also append the Event to self.message_for_remote.
+        # No room, nothing to delete.
         #
-        self.process_DeleteEvent(fabula.DeleteEvent(event.identifier),
-                                 connector = kwargs["connector"],
-                                 message = self.message_for_remote)
+        if self.room:
+
+            fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
+
+            # TODO: Manage active clients rather in Room methods than here, from the outside?
+            #
+            del self.room.active_clients[kwargs["connector"]]
+
+            # Delete player Entity
+            # Process the Event right away, since it is not going through the
+            # Plugin. This will also append the Event to self.message_for_remote.
+            #
+            self.process_DeleteEvent(fabula.DeleteEvent(event.identifier),
+                                     connector = kwargs["connector"],
+                                     message = self.message_for_remote)
 
         return

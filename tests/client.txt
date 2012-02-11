@@ -7,6 +7,6 @@ Client Execution
     >>> import fabula.interfaces
     >>> import fabula.run
     >>> app = fabula.run.App(timeout = 5)
-    >>> interface = fabula.interfaces.Interface()
-    >>> app.run_client(60, interface)
+    >>> interface_class = fabula.interfaces.Interface
+    >>> app.run_client(60, interface_class)
     >>>
