@@ -737,8 +737,8 @@ class Client(fabula.core.Engine):
             # Event and queues it in the Message given
             #
             fabula.core.Engine.process_DeleteEvent(self,
-                                                  event,
-                                                  message = kwargs["message"])
+                                                   event,
+                                                   message = kwargs["message"])
 
         else:
             fabula.LOGGER.warning("Entity to delete does not exist.")

@@ -1118,8 +1118,10 @@ class Room(fabula.eventprocessor.EventProcessor):
         """
         if event.location not in self.floor_plan:
 
-            raise Exception("cannot spawn entity '{}' at undefined location {}".format(event.entity.identifier,
-                                                                                       event.location))
+            msg = "cannot spawn entity '{}' at undefined location {}"
+
+            raise Exception(msg.format(event.entity.identifier,
+                                       event.location))
 
         if event.entity.identifier in self.entity_dict:
 

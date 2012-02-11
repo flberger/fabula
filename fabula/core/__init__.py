@@ -412,23 +412,10 @@ class Engine(fabula.eventprocessor.EventProcessor):
         return
 
     def process_DeleteEvent(self, event, **kwargs):
-        """Save the Entity to be deleted in Engine.rack,
-           delete the it from Engine.room and pass the DeleteEvent on.
+        """Delete the Entity from Engine.room and pass the DeleteEvent on.
         """
 
-        # Handled similar to PicksUpEvent
-
         fabula.LOGGER.debug("called")
-
-        deleted_entity = self.room.entity_dict[event.identifier]
-
-        # If it is not a player Entity, save it in Engine.rack
-        #
-        if deleted_entity.entity_type != fabula.PLAYER:
-
-            # Entities stored by Engine are owned by None
-            #
-            self.rack.store(deleted_entity, None)
 
         # Delete it from Engine.room
         #
