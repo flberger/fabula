@@ -137,12 +137,9 @@ winxp_update: clean
 	umount /mnt/winxp/
 
 clean:
-	rm -vf *.pyc
-	rm -vf */*.pyc
-	rm -vf */*/*.pyc
-	rm -vf *.log
-	rm -vf */*.log
-	rm -vf */*/*.log
+	rm -vf `find . -iname '*.log'`
+	rm -rvf `find . -type d -iname '__pycache__'`
+	rm -vf `find . -iname '*.pyc'`
 
 commit.txt:
 	# single line because bzr diff returns false when there are diffs

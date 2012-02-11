@@ -3,45 +3,49 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.RoomCompleteEvent&rdquo;</title>
+    <title>API docs for &ldquo;fabula.ExitEvent&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.RoomCompleteEvent(<a href="fabula.ServerEvent.html">ServerEvent</a>):</h1>
+    <h1 class="class">Class f.ExitEvent(<a href="fabula.Event.html">Event</a>):</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a></span>
       
-      <a href="classIndex.html#fabula.RoomCompleteEvent">View In Hierarchy</a>
+      <a href="classIndex.html#fabula.ExitEvent">View In Hierarchy</a>
     </p>
     <div>
       
     </div>
-    <pre>Issued by the server after an EnterRoomEvent when the room is populated with a tiles, a player Entity, items and NPCs.
-    </pre>
+    <pre>This Event is sent by the Client or the Server so signla that it is about to exit and that no further Events will be sent.
+
+Attributes:
+
+ExitEvent.identifer
+    Client identifier. Must be unique for each client.</pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id44">
+      <table class="children sortable" id="id28">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.RoomCompleteEvent.html#__init__">__init__</a></td>
-    <td><tt>This event has no parameters.</tt></td>
+    <td><a href="fabula.ExitEvent.html#__init__">__init__</a></td>
+    <td><tt>identifier must be unique for each client.</tt></td>
   </tr>
   
 </table>
       
         <p>
-          Inherited from <a href="fabula.Event.html">Event</a> (via <a href="fabula.ServerEvent.html">ServerEvent</a>):
+          Inherited from <a href="fabula.Event.html">Event</a>:
         </p>
-        <table class="children sortable" id="id45">
+        <table class="children sortable" id="id29">
   
   
 <tr class="basemethod">
@@ -73,7 +77,7 @@
     
 
     <div class="function">
-  <a name="fabula.RoomCompleteEvent.__init__">
+  <a name="fabula.ExitEvent.__init__">
     
   </a>
   <a name="__init__">
@@ -82,12 +86,12 @@
   <div class="functionHeader">
     
     def
-    __init__(self):
+    __init__(self, identifier):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.Event.html#__init__">fabula.Event.__init__</a></div>
-    <pre>This event has no parameters.
+    <pre>identifier must be unique for each client.
         </pre>
   </div>
 </div>
