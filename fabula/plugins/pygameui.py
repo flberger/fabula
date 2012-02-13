@@ -469,10 +469,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         pygame.init()
 
-        # Initialise on screen display.
-        #
-        self.osd = PygameOSD()
-
         # Statistics
         #
         self.stats = {"framerate" : self.framerate,
@@ -601,6 +597,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.window.room.sub(clickndrag.Plane("tiles",
                                               pygame.Rect((0, 0), (0, 0))))
+
+        # Initialise on screen display.
+        #
+        self.osd = PygameOSD(self.window)
 
         fabula.LOGGER.debug("complete")
 
@@ -799,8 +799,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             self.window.update()
             self.window.render()
 
-            self.osd.render(self.window.display)
-
             # TODO: replace with update(dirty_rect_list)
             #
             pygame.display.flip()
@@ -862,7 +860,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             elif (event.type == pygame.KEYDOWN
                   and event.key == pygame.K_F1):
 
-                if self.osd.is_displaying("FPS: "):
+                if "FPS: " in self.osd.caption_list:
 
                     self.osd.remove("Framerate: ")
                     self.osd.remove("FPS: ")
@@ -3195,49 +3193,92 @@ class PygameOSD:
 
        Attributes:
 
-       PygameOSD.caption_dict_dict
-           A dict, mapping caption strings to a (dict, key) tuple.
+       PygameOSD.caption_list
+           A list of active captions which also serve as identifiers for
+           OSDText instances.
 
        PygameOSD.offset
            A (x, y) tuple giving the rendering offset relative to (0, 0).
+
+       PygameOSD.display_plane
+           An instance of clickndrag.Display.
     """
 
-    def __init__(self):
+    def __init__(self, display_plane):
         """Initialise.
+           display is an instance of clickndrag.Display.
         """
 
-        self.caption_dict_dict = {}
+        self.display_plane = display_plane
+
+        self.caption_list = []
 
         self.offset = (0, 0)
+
+        class OSDText(clickndrag.gui.OutlinedText):
+            """Subclass that updates the text to a dict value in update().
+
+               Additional attributes:
+
+               OSDText.caption
+               OSDText.dictionary
+               OSDText.key
+                   Data to update the text.
+            """
+
+            def __init__(self, name,
+                               caption,
+                               dictionary,
+                               key,
+                               text_color=(255, 255, 255)):
+                """Call base class and register caption, dictionary and key.
+                """
+
+                clickndrag.gui.OutlinedText.__init__(self, name, "", text_color)
+
+                self.caption = caption
+                self.dictionary = dictionary
+                self.key = key
+
+                self.update()
+
+                return
+
+            def update(self):
+                """Update text, then call base class to display.
+                """
+
+                self.text =  "{} {}".format(self.caption,
+                                            self.dictionary[self.key])
+
+                clickndrag.gui.OutlinedText.update(self)
+
+                return
+
+        self.OSDText = OSDText
 
         return
 
     def display(self, caption, dictionary, key):
-        """Track the value of dictionary[key], and display it after caption.
+        """Create an OSDText instance and register it as a subplane of display_plane.
         """
 
-        self.caption_dict_dict[caption] = (dictionary, key)
+        # Use caption as Plane name
+        #
+        osdtext = self.OSDText(caption, caption, dictionary, key)
 
-        return
-
-    def render(self, surface):
-        """Render the OSD on the Pygame Surface given.
-        """
+        osdtext.rect.left = self.offset[0]
 
         y = self.offset[1]
 
-        for caption in self.caption_dict_dict.keys():
+        for existing_caption in self.caption_list:
+            y += self.display_plane.subplanes[existing_caption].rect.height
 
-            dictionary, key = self.caption_dict_dict[caption]
+        osdtext.rect.top = y
 
-            text = "{} {}".format(caption, dictionary[key])
+        self.display_plane.sub(osdtext)
 
-            text_plane = clickndrag.gui.OutlinedText("osd",
-                                                     text)
-
-            surface.blit(text_plane.image, (self.offset[0], y))
-
-            y = y + text_plane.rect.height
+        self.caption_list.append(caption)
 
         return
 
@@ -3245,17 +3286,8 @@ class PygameOSD:
         """No longer display the item identified by caption.
         """
 
-        del self.caption_dict_dict[caption]
+        self.display_plane.remove(caption)
+
+        self.caption_list.remove(caption)
 
         return
-
-    def is_displaying(self, key):
-        """Convenience method: return True if key is a key in PygameOSD.caption_dict_dict.
-        """
-
-        if key in self.caption_dict_dict.keys():
-
-            return True
-
-        else:
-            return False

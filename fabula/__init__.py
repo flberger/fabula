@@ -145,6 +145,8 @@
 # TODO: demos: pacman, chess
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 # TODO: support and test Python package managers, as pip, easyinstall etc.
+# TODO: makeself binary release for Linux - http://megastep.org/makeself
+# TODO: support zeroinstall - http://0install.net/
 #
 # TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, clickndrag, attempt_*.png, cancel.png, default.floorplan etc.
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
