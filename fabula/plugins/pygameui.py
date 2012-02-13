@@ -3248,8 +3248,17 @@ class PygameOSD:
                 """Update text, then call base class to display.
                 """
 
-                self.text =  "{} {}".format(self.caption,
-                                            self.dictionary[self.key])
+                value = ""
+
+                try:
+
+                    value = self.dictionary[self.key]
+
+                except KeyError:
+
+                    value = "ERROR"
+
+                self.text =  "{} {}".format(self.caption, value)
 
                 clickndrag.gui.OutlinedText.update(self)
 
@@ -3272,6 +3281,7 @@ class PygameOSD:
         y = self.offset[1]
 
         for existing_caption in self.caption_list:
+
             y += self.display_plane.subplanes[existing_caption].rect.height
 
         osdtext.rect.top = y
