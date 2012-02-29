@@ -30,7 +30,8 @@
 
 import fabula.plugins.ui
 import pygame
-import clickndrag.gui
+import clickndrag.gui.lmr
+import clickndrag.gui.tmb
 import tkinter.filedialog
 import tkinter.simpledialog
 
@@ -668,15 +669,17 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 return
 
-        container = clickndrag.gui.Container("get_connection_details",
-                                             padding = 5)
+        container = clickndrag.gui.tmb.TMBContainer("get_connection_details",
+                                                    clickndrag.gui.tmb.C_256_STYLE,
+                                                    padding = 5)
 
         # Login name prompt
         #
         container.sub(clickndrag.gui.Label("id_caption",
                                            "Login name:",
                                            pygame.Rect((0, 0),
-                                                       (200, 30))))
+                                                       (200, 30)),
+                                           background_color = (128, 128, 128, 0)))
 
         container.sub(clickndrag.gui.TextBox("identifier",
                                              pygame.Rect((0, 0),
@@ -698,7 +701,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             container.sub(clickndrag.gui.Label("connector_caption",
                                                "Server IP",
                                                pygame.Rect((0, 0),
-                                                           (200, 30))))
+                                                           (200, 30)),
+                                               background_color = (128, 128, 128, 0)))
 
             container.sub(clickndrag.gui.TextBox("connector",
                                                  pygame.Rect((0, 0),
@@ -715,10 +719,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # OK button
         #
-        container.sub(clickndrag.gui.Button("OK",
-                                            pygame.Rect((0, 0),
-                                                        (200, 30)),
-                                            dialog_callback))
+        container.sub(clickndrag.gui.lmr.LMRButton("OK",
+                                                   50,
+                                                   dialog_callback))
 
         container.rect.center = self.window.rect.center
 
@@ -1101,11 +1104,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.LOGGER.debug("showing {}".format(event))
 
-        option_list = clickndrag.gui.OptionSelector("select_sentence",
-                                                    event.sentences,
-                                                    lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text)),
-                                                    width = 400,
-                                                    lineheight = 25)
+        callback = lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text))
+
+        option_list = clickndrag.gui.tmb.TMBOptionSelector("select_sentence",
+                                                           event.sentences,
+                                                           callback)
 
         option_list.rect.center = self.window.rect.center
 
@@ -1416,7 +1419,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # Using a OkBox for now.
             # Taken from PygameEditor.open_image().
             #
-            perception_box = clickndrag.gui.OkBox(event.perception)
+            perception_box = clickndrag.gui.tmb.TMBOkBox(event.perception)
             perception_box.rect.center = self.window.rect.center
             self.window.sub(perception_box)
 
@@ -1587,17 +1590,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_SaysEvent(self, event)
 
-        # TODO: replace with a nice speech balloon
+        says_box = clickndrag.gui.tmb.TMBContainer("{}_says".format(event.identifier),
+                                                   clickndrag.gui.tmb.C_256_STYLE)
 
-        # Taken from process_PerceptionEvent()
-        #
-        says_box = clickndrag.gui.Label("{}_says".format(event.identifier),
-                                        event.text,
-                                        pygame.Rect((0, 0),
-                                                    (len(event.text) * PIX_PER_CHAR, 30)),
-                                        background_color = (250, 250, 240))
-
-        clickndrag.gui.draw_border(says_box, (0, 0, 0))
+        says_box.sub(clickndrag.gui.Label("text",
+                                          event.text,
+                                          pygame.Rect((0, 0),
+                                                      (len(event.text) * PIX_PER_CHAR, 30)),
+                                          background_color = (128, 128, 128, 0)))
 
         entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
 
