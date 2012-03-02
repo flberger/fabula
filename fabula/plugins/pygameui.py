@@ -1217,9 +1217,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 #
                 # Replace surface variable with a subsurface
                 #
-                surface = spritesheet.subsurface(pygame.Rect((0, 0),
-                                                             (sprite_height,
-                                                              sprite_height)))
+                try:
+                    surface = spritesheet.subsurface(pygame.Rect((0, 0),
+                                                                 (sprite_height,
+                                                                  sprite_height)))
+
+                except ValueError:
+
+                    msg = "Error: could not create subsurface from spritesheet"
+
+                    fabula.LOGGER.critical(msg)
+
+                    raise Exception(msg)
 
                 # Fix rect accordingly
                 #
@@ -1416,11 +1425,23 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         if event.identifier == self.host.client_id:
 
+            # Choose container width depending on text length
+            # Copied from process_SaysEvent().
+            #
+            container_style = clickndrag.gui.tmb.C_256_STYLE
+
+            if len(event.perception) * PIX_PER_CHAR > 200:
+
+                container_style = clickndrag.gui.tmb.C_512_STYLE
+
             # Using a OkBox for now.
             # Taken from PygameEditor.open_image().
             #
-            perception_box = clickndrag.gui.tmb.TMBOkBox(event.perception)
+            perception_box = clickndrag.gui.tmb.TMBOkBox(event.perception,
+                                                         style = container_style)
+
             perception_box.rect.center = self.window.rect.center
+
             self.window.sub(perception_box)
 
         else:
@@ -1590,8 +1611,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         fabula.plugins.ui.UserInterface.process_SaysEvent(self, event)
 
+        # Choose container width depending on text length
+        #
+        container_style = clickndrag.gui.tmb.C_256_STYLE
+
+        if len(event.text) * PIX_PER_CHAR > 200:
+
+            container_style = clickndrag.gui.tmb.C_512_STYLE
+
         says_box = clickndrag.gui.tmb.TMBContainer("{}_says".format(event.identifier),
-                                                   clickndrag.gui.tmb.C_256_STYLE)
+                                                   container_style)
 
         says_box.sub(clickndrag.gui.Label("text",
                                           event.text,
