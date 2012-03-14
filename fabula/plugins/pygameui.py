@@ -518,7 +518,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                 pygame.Rect((0, 500), (800, 100)),
                                                 dropped_upon_callback = self.inventory_callback)
 
-        self.inventory_plane.image.fill((32, 32, 32))
+        self.inventory_plane.image.fill((64, 64, 64))
 
         # Copied from get_connection_details().
         # TODO: Again a reason for an image loading routine.
@@ -2003,7 +2003,8 @@ class EventEditor(clickndrag.gui.Container):
         #
         clickndrag.gui.Container.__init__(self,
                                           str(id(event)),
-                                          padding = 5)
+                                          padding = 5,
+                                          background_color = (128, 128, 128, 0))
 
         # Title
         #
@@ -2023,7 +2024,9 @@ class EventEditor(clickndrag.gui.Container):
 
             key_label = clickndrag.gui.Label("key_{}".format(key),
                                              "{}:".format(key),
-                                             pygame.Rect((0, 0), (150, 25)))
+                                             pygame.Rect((0, 0), (150, 25)),
+                                             background_color = (64, 64, 64, 0),
+                                             text_color = (250, 250, 250))
 
             value_textbox = clickndrag.gui.TextBox("value_{}".format(key),
                                                    pygame.Rect((key_label.rect.width, 0),
@@ -2038,6 +2041,11 @@ class EventEditor(clickndrag.gui.Container):
             key_value = clickndrag.Plane("keyvalue_{}".format(key),
                                          pygame.Rect((0, 0),
                                                      (300, 25)))
+
+            # Make Plane transparent
+            #
+            key_value.image = pygame.Surface(key_value.rect.size,
+                                             flags = pygame.SRCALPHA)
 
             key_value.sub(key_label)
             key_value.sub(value_textbox)
@@ -2143,79 +2151,74 @@ class PygameEditor(PygameUserInterface):
         #
         container = clickndrag.gui.Container("buttons",
                                              padding = 4,
-                                             background_color = (120, 120, 120))
+                                             background_color = (64, 64, 64))
         self.window.sub(container)
 
         # Add buttons
 
         room = clickndrag.gui.Container("room",
                                         padding = 4,
-                                        background_color = (120, 120, 120))
+                                        background_color = (64, 64, 64))
 
         room.sub(clickndrag.gui.Label("title",
                                       "Room",
                                       pygame.Rect((0, 0),
                                                   (80, 25)),
-                                      background_color = (120, 120, 120)))
+                                      background_color = (64, 64, 64),
+                                      text_color = (250, 250, 250)))
 
         room.sub(clickndrag.gui.Button("Load Room",
-                                       pygame.Rect((0, 0),
-                                                   (80, 25)),
+                                       pygame.Rect((0, 0), (80, 25)),
                                        self.load_room))
 
         room.sub(clickndrag.gui.Button("Save Room",
-                                       pygame.Rect((0, 0),
-                                                   (80, 25)),
+                                       pygame.Rect((0, 0), (80, 25)),
                                        self.save_room))
 
         room.sub(clickndrag.gui.Button("Add Entity",
-                                       pygame.Rect((0, 0),
-                                                   (80, 25)),
+                                       pygame.Rect((0, 0), (80, 25)),
                                        lambda plane: self.edit_entity_attributes(self.add_entity)))
 
         room.sub(clickndrag.gui.Button("Edit Walls",
-                                       pygame.Rect((0, 0),
-                                                   (80, 25)),
+                                       pygame.Rect((0, 0), (80, 25)),
                                        self.edit_walls))
 
         background = clickndrag.gui.Container("background",
                                               padding = 4,
-                                              background_color = (120, 120, 120))
+                                              background_color = (64, 64, 64))
 
         background.sub(clickndrag.gui.Label("title",
                                             "Background",
                                             pygame.Rect((0, 0),
                                                         (80, 25)),
-                                            background_color = (120, 120, 120)))
+                                            background_color = (64, 64, 64),
+                                            text_color = (250, 250, 250)))
 
         background.sub(clickndrag.gui.Button("Open Image",
-                                             pygame.Rect((0, 0),
-                                                         (80, 25)),
+                                             pygame.Rect((0, 0), (80, 25)),
                                              self.open_image))
 
         logic = clickndrag.gui.Container("logic",
                                          padding = 4,
-                                         background_color = (120, 120, 120))
+                                         background_color = (64, 64, 64))
 
         logic.sub(clickndrag.gui.Label("title",
                                        "Logic",
                                        pygame.Rect((0, 0),
                                                    (80, 25)),
-                                       background_color = (120, 120, 120)))
+                                       background_color = (64, 64, 64),
+                                       text_color = (250, 250, 250)))
 
         logic.sub(clickndrag.gui.Button("Save Logic",
-                                        pygame.Rect((0, 0),
-                                                    (80, 25)),
+                                        pygame.Rect((0, 0), (80, 25)),
                                         lambda plane : self.host.save_condition_response_dict("default.logic")))
 
         logic.sub(clickndrag.gui.Button("Load Logic",
-                                        pygame.Rect((0, 0),
-                                                    (80, 25)),
+                                        pygame.Rect((0, 0), (80, 25)),
                                         lambda plane: self.host.load_condition_response_dict("default.logic")))
 
         logic.sub(clickndrag.gui.Button("Clear Logic",
-                                        pygame.Rect((0, 0),
-                                                    (80, 25)),
+                                        pygame.Rect((0, 0), (80, 25)),
                                         lambda plane: self.host.clear_condition_response_dict()))
 
         self.window.buttons.sub(room)
@@ -2223,15 +2226,15 @@ class PygameEditor(PygameUserInterface):
         self.window.buttons.sub(logic)
 
         self.window.buttons.sub(clickndrag.gui.Button("Quit",
-                                                      pygame.Rect((0, 0),
-                                                                  (80, 25)),
+                                                      pygame.Rect((0, 0), (80, 25)),
                                                       self.quit))
 
         # Create Container for the properties
         #
         container = clickndrag.gui.Container("properties",
                                              padding = 5,
-                                             background_color = (120, 120, 120))
+                                             background_color = (64, 64, 64))
+
         container.rect.topleft = (700, 0)
         self.window.sub(container)
 
@@ -2434,9 +2437,9 @@ class PygameEditor(PygameUserInterface):
 
         if len(room_list):
             option_list = clickndrag.gui.OptionSelector("select_room",
-                                                    room_list,
-                                                    self.host.send_room_events,
-                                                    lineheight = 25)
+                                                        room_list,
+                                                        self.host.send_room_events,
+                                                        background_color = (64, 64, 64))
 
             option_list.rect.center = self.window.rect.center
 
@@ -2457,14 +2460,17 @@ class PygameEditor(PygameUserInterface):
         fabula.LOGGER.debug("called")
 
         container = clickndrag.gui.Container("get_entity_attributes",
-                                             padding = 5)
+                                             padding = 5,
+                                             background_color = (64, 64, 64))
 
         # Identifier
         #
         container.sub(clickndrag.gui.Label("id_caption",
                                            "Identifier:",
                                            pygame.Rect((0, 0),
-                                                            (200, 30))))
+                                                            (200, 30)),
+                                           background_color = (64, 64, 64),
+                                           text_color = (250, 250, 250)))
 
         if entity is not None:
 
@@ -2473,7 +2479,9 @@ class PygameEditor(PygameUserInterface):
             container.sub(clickndrag.gui.Label("identifier",
                                                entity.identifier,
                                                pygame.Rect((0, 0),
-                                                                (200, 30))))
+                                                                (200, 30)),
+                                               background_color = (64, 64, 64),
+                                               text_color = (250, 250, 250)))
 
         else:
             container.sub(clickndrag.gui.TextBox("identifier",
@@ -2491,7 +2499,9 @@ class PygameEditor(PygameUserInterface):
         container.sub(clickndrag.gui.Label("type_caption",
                                            "Type:",
                                            pygame.Rect((0, 0),
-                                                            (200, 30))))
+                                                            (200, 30)),
+                                           background_color = (64, 64, 64),
+                                           text_color = (250, 250, 250)))
 
         if entity is not None:
 
@@ -2500,7 +2510,9 @@ class PygameEditor(PygameUserInterface):
                 container.sub(clickndrag.gui.Label("select_entity_type",
                                                    "PLAYER",
                                                    pygame.Rect((0, 0),
-                                                                    (200, 30))))
+                                                                    (200, 30)),
+                                                   background_color = (64, 64, 64),
+                                                   text_color = (250, 250, 250)))
             else:
 
                 # Display current type at top
@@ -2510,18 +2522,20 @@ class PygameEditor(PygameUserInterface):
 
                 container.sub(clickndrag.gui.OptionList("select_entity_type",
                                                         type_list,
-                                                        lineheight = 25))
+                                                        width = 200))
         else:
             container.sub(clickndrag.gui.OptionList("select_entity_type",
                                                     ["ITEM", "NPC"],
-                                                    lineheight = 25))
+                                                    width = 200))
 
         # Blocking
         #
         container.sub(clickndrag.gui.Label("blocking_caption",
                                            "Blocking:",
                                            pygame.Rect((0, 0),
-                                                            (200, 30))))
+                                                            (200, 30)),
+                                           background_color = (64, 64, 64),
+                                           text_color = (250, 250, 250)))
 
         blocking_list = ["block", "no-block"]
 
@@ -2534,7 +2548,7 @@ class PygameEditor(PygameUserInterface):
 
         container.sub(clickndrag.gui.OptionList("select_blocking",
                                                 blocking_list,
-                                                lineheight = 25))
+                                                width = 200))
 
         # Mobility
         # TODO: shouldn't be able to change mobility of PLAYER
@@ -2542,7 +2556,9 @@ class PygameEditor(PygameUserInterface):
         container.sub(clickndrag.gui.Label("mobility_caption",
                                            "Mobility:",
                                            pygame.Rect((0, 0),
-                                                            (200, 30))))
+                                                            (200, 30)),
+                                           background_color = (64, 64, 64),
+                                           text_color = (250, 250, 250)))
 
         mobility_list = ["mobile", "immobile"]
 
@@ -2555,13 +2571,12 @@ class PygameEditor(PygameUserInterface):
 
         container.sub(clickndrag.gui.OptionList("select_mobile",
                                                 mobility_list,
-                                                lineheight = 25))
+                                                width = 200))
 
         # OK button
         #
         container.sub(clickndrag.gui.Button("OK",
-                                            pygame.Rect((0, 0),
-                                                        (200, 30)),
+                                            pygame.Rect((0, 0), (80, 25)),
                                             callback))
 
         container.rect.center = self.window.rect.center
@@ -2934,7 +2949,8 @@ class PygameEditor(PygameUserInterface):
         self.window.properties.sub(clickndrag.gui.Label("identifier",
                                                         entity.identifier,
                                                         pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (120, 120, 120)))
+                                                        background_color = (64, 64, 64),
+                                                        text_color = (250, 250, 250)))
 
         # Entity.asset
         #
@@ -2951,28 +2967,32 @@ class PygameEditor(PygameUserInterface):
         self.window.properties.sub(clickndrag.gui.Label("asset_desc",
                                                         entity.asset_desc,
                                                         pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (120, 120, 120)))
+                                                        background_color = (64, 64, 64),
+                                                        text_color = (250, 250, 250)))
 
         # Entity.entity_type
         #
         self.window.properties.sub(clickndrag.gui.Label("entity_type",
                                                         entity.entity_type,
                                                         pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (120, 120, 120)))
+                                                        background_color = (64, 64, 64),
+                                                        text_color = (250, 250, 250)))
 
         # Entity.blocking
         #
         self.window.properties.sub(clickndrag.gui.Label("blocking",
                                                         {True: "block", False: "no-block"}[entity.blocking],
                                                         pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (120, 120, 120)))
+                                                        background_color = (64, 64, 64),
+                                                        text_color = (250, 250, 250)))
 
         # Entity.mobile
         #
         self.window.properties.sub(clickndrag.gui.Label("mobile",
                                                         {True: "mobile", False: "immobile"}[entity.mobile],
                                                         pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (120, 120, 120)))
+                                                        background_color = (64, 64, 64),
+                                                        text_color = (250, 250, 250)))
 
         # Edit
         #
@@ -3035,9 +3055,9 @@ class PygameEditor(PygameUserInterface):
         # TODO: specify multiple Events as response
 
         option_list = clickndrag.gui.OptionSelector("select_response",
-                                                event_list,
-                                                lambda option : self.edit_event(event, option),
-                                                lineheight = 25)
+                                                    event_list,
+                                                    lambda option : self.edit_event(event, option),
+                                                    background_color = (64, 64, 64))
 
         option_list.rect.center = self.window.rect.center
 
@@ -3055,14 +3075,16 @@ class PygameEditor(PygameUserInterface):
 
             # TODO: taken from update_logic(). Replace with a general Plane/Editor.
             #
-            editor_window = clickndrag.gui.Container("edit_event", padding = 4)
+            editor_window = clickndrag.gui.Container("edit_event",
+                                                     padding = 4,
+                                                     background_color = (64, 64, 64))
 
             event_editor = EventEditor(fabula.PerceptionEvent(event.identifier, ""), self.window)
 
             editor_window.sub(event_editor)
 
             editor_window.sub(clickndrag.gui.Button("OK",
-                                                    pygame.Rect((0, 0), (100, 25)),
+                                                    pygame.Rect((0, 0), (50, 25)),
                                                     lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
 
             editor_window.rect.center = self.window.rect.center
@@ -3073,14 +3095,16 @@ class PygameEditor(PygameUserInterface):
 
             # TODO: copied from above, replace
             #
-            editor_window = clickndrag.gui.Container("edit_event", padding = 4)
+            editor_window = clickndrag.gui.Container("edit_event",
+                                                     padding = 4,
+                                                     background_color = (64, 64, 64))
 
             event_editor = EventEditor(fabula.SaysEvent(event.identifier, ""), self.window)
 
             editor_window.sub(event_editor)
 
             editor_window.sub(clickndrag.gui.Button("OK",
-                                                    pygame.Rect((0, 0), (100, 25)),
+                                                    pygame.Rect((0, 0), (50, 25)),
                                                     lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
 
             editor_window.rect.center = self.window.rect.center
@@ -3116,13 +3140,19 @@ class PygameEditor(PygameUserInterface):
 
         fabula.LOGGER.debug("called")
 
-        editor_window = clickndrag.gui.Container("display_logic", padding = 4)
+        editor_window = clickndrag.gui.Container("display_logic",
+                                                 padding = 4,
+                                                 background_color = (64, 64, 64))
 
         editor_window.sub(clickndrag.gui.Label("title",
                                                "Logic affecting Entity '{}'".format(identifier),
-                                               pygame.Rect((0, 0), (300, 25))))
+                                               pygame.Rect((0, 0), (300, 25)),
+                                               background_color = (64, 64, 64),
+                                               text_color = (250, 250, 250)))
 
-        rules_container = clickndrag.gui.Container("rules", padding = 4)
+        rules_container = clickndrag.gui.Container("rules",
+                                                   padding = 4,
+                                                   background_color = (64, 64, 64))
 
         for trigger_event_str in self.host.condition_response_dict.keys():
 
@@ -3160,7 +3190,7 @@ class PygameEditor(PygameUserInterface):
                     rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
                                                   pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
 
-                    rule_plane.image.fill(clickndrag.gui.BACKGROUND_COLOR)
+                    rule_plane.image.fill((64, 64, 64))
 
                     # Make them overlap to have an 1px separating line
                     #

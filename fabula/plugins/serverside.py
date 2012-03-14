@@ -959,7 +959,11 @@ class Editor(DefaultGame):
 
             # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
             #
-            self.pygame_editor.window.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename)))
+            ok_box = fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename))
+
+            ok_box.rect.center = self.pygame_editor.window.rect.center
+
+            self.pygame_editor.window.sub(ok_box)
 
         else:
             fabula.LOGGER.error("no filename given")
@@ -976,7 +980,11 @@ class Editor(DefaultGame):
 
         # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
         #
-        self.pygame_editor.window.sub(fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared."))
+        ok_box = fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared.")
+
+        ok_box.rect.center = self.pygame_editor.window.rect.center
+
+        self.pygame_editor.window.sub(ok_box)
 
         return
 
