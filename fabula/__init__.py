@@ -161,6 +161,7 @@ if sys.version_info[0] != 3:
 import fabula.eventprocessor
 import re
 import logging
+import json
 
 ############################################################
 # Version Information
@@ -240,6 +241,12 @@ class Event:
         keys.sort()
 
         return representation(self, keys)
+
+    def json(self):
+        """Return a JSON representation of the Event.
+        """
+
+        return json_dump(self)
 
 ####################
 # Attempt events
@@ -504,7 +511,7 @@ class InitEvent(Event):
         self.identifier = identifier
 
 class ExitEvent(Event):
-    """This Event is sent by the Client or the Server so signla that it is about to exit and that no further Events will be sent.
+    """This Event is sent by the Client or the Server to signal that it is about to exit and that no further Events will be sent.
 
        Attributes:
 
@@ -644,6 +651,30 @@ class SpawnEvent(ServerEvent):
         self.entity = entity
         self.location = location
 
+    def json(self):
+        """Return a JSON representation of the SpawnEvent.
+        """
+
+        # This Event need special care because it carries an Entity that must be
+        # JSON-serialized.
+
+        json_str = '{{"class" : "{}", "entity" : {}, "location" : {}}}'
+
+        # We pipe the whole thing back and forth through json, to get both
+        # validation and pretty-printing.
+        #
+        # See Message.json().
+        #
+        # Use list() to get JSON-style square brackets for tuples.
+        #
+        # TODO: Use compact JSON, and indentation only in doctest
+        #
+        return json.dumps(json.loads(json_str.format(self.__class__.__name__,
+                                                     self.entity.json(),
+                                                     str(list(self.location)))),
+                          sort_keys = True,
+                          indent = 4)
+
 class DeleteEvent(ServerEvent):
     """This event deletes an item or NPC from the map.
        Note that items may still persist in the players posessions.
@@ -707,6 +738,34 @@ class ChangeMapElementEvent(ServerEvent):
 
         self.location = location
 
+        return
+
+    def json(self):
+        """Return a JSON representation of the ChangeMapElementEvent.
+        """
+
+        # This Event need special care because it carries a Tile that must be
+        # JSON-serialized.
+
+        # TODO: Copied from SpawnEven.json(). Maybe replace by a joining approach.
+
+        json_str = '{{"class" : "{}", "tile" : {}, "location" : {}}}'
+
+        # We pipe the whole thing back and forth through json, to get both
+        # validation and pretty-printing.
+        #
+        # See Message.json().
+        #
+        # Use list() to get JSON-style square brackets for tuples.
+        #
+        # TODO: Use compact JSON, and indentation only in doctest
+        #
+        return json.dumps(json.loads(json_str.format(self.__class__.__name__,
+                                                     self.tile.json(),
+                                                     str(list(self.location)))),
+                          sort_keys = True,
+                          indent = 4)
+
 class ServerParametersEvent(ServerEvent):
     """This Event is sent by the Server when an InitEvent has been received.
        It informs the client about the Server parameters.
@@ -766,6 +825,19 @@ class Message:
         """
 
         return representation(self, ("event_list",))
+
+    def json(self):
+        """Return a JSON representation of the Message.
+        """
+
+        json_str = '{{"Message": [{}]}}'.format(",".join([event.json() for event in self.event_list]))
+
+        # We pipe the whole thing back and forth through json, to get both
+        # validation and pretty-printing.
+        #
+        # Taken from pycms.CMS.json().
+        #
+        return json.dumps(json.loads(json_str), sort_keys = True, indent = 4)
 
 ############################################################
 # Entities
@@ -925,6 +997,26 @@ class Entity(fabula.eventprocessor.EventProcessor):
                                                    self.property_dict,
                                                    self.asset)
 
+    def json(self):
+        """Return a JSON representation of the Entity.
+        """
+
+        json_dict = {"class" : self.__class__.__name__}
+
+        # Using attribute list from Entity.__repr__()
+        #
+        for attribute in ("identifier",
+                          "entity_type",
+                          "blocking",
+                          "mobile",
+                          "asset_desc"):
+
+            json_dict[attribute] = self.__dict__[attribute]
+
+        # TODO: Use compact JSON, and indentation only in doctest
+        #
+        return json.dumps(json_dict, sort_keys = True, indent = 4)
+
 ############################################################
 # Entity And Tile Types
 
@@ -963,7 +1055,7 @@ class Tile:
 
        Tile.asset
            The actual asset, application-dependent. The UserInterface may fetch
-           the asset using Entity.asset_desc and attach it here.
+           the asset using Entity.asset_desc and attach it here. Initially None.
     """
 
     def __init__(self, tile_type, asset_desc):
@@ -1029,6 +1121,12 @@ class Tile:
 
         return "<{} asset = {}>".format(self.__repr__(),
                                         self.asset)
+
+    def json(self):
+        """Return a JSON representation of the Tile.
+        """
+
+        return json_dump(self)
 
 ############################################################
 # Rooms
@@ -1363,6 +1461,18 @@ def representation(object, attributes):
     return "{}.{}({})".format(object.__module__,
                               object.__class__.__name__,
                               arguments)
+
+def json_dump(object):
+    """Return a JSON representation of the object.
+    """
+
+    instance_dict = object.__dict__.copy()
+
+    instance_dict["class"] = object.__class__.__name__
+
+    # TODO: Use compact JSON, and indentation only in doctest
+    #
+    return json.dumps(instance_dict, sort_keys = True, indent = 4)
 
 def surrounding_positions(position):
     """Return a list of tuples, representing the 8 surrounding positions around the tuple given.

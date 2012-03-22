@@ -83,6 +83,10 @@ doctest: clean
 	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/tcp_networking.txt && \
 	echo --------------------------- && \
+	echo Testing  tests/json.txt && \
+	echo --------------------------- && \
+	$(PYTHON) -m doctest tests/json.txt && \
+	echo --------------------------- && \
 	echo Done testing. && \
 	echo ---------------------------
 
