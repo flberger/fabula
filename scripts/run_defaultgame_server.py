@@ -31,11 +31,11 @@ sys.path.append("../")
 sys.path.append("./")
 
 import fabula.plugins.serverside
-import fabula.interfaces
+import fabula.interfaces.python_tcp
 import fabula.run
 
 if __name__ == "__main__":
 
     app = fabula.run.App(timeout = 0)
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
-    app.run_server(60, fabula.interfaces.TCPServerInterface, 0.5)
+    app.run_server(30, fabula.interfaces.python_tcp.TCPServerInterface, 0.8)

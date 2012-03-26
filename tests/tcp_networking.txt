@@ -4,11 +4,11 @@ Doctests for the Fabula Package
 TCP Networking
 --------------
 
-    >>> import fabula.interfaces
+    >>> import fabula.interfaces.python_tcp
     >>> import fabula.run
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 5)
-    ...     interface_class = fabula.interfaces.TCPServerInterface
+    ...     interface_class = fabula.interfaces.python_tcp.TCPServerInterface
     ...     app.run_server(60, interface_class, 0.5, threadsafe = True)
     ...
     >>> class TCPUI(fabula.plugins.ui.UserInterface):
@@ -21,7 +21,7 @@ TCP Networking
     >>> def run_client():
     ...     app = fabula.run.App(timeout = 5)
     ...     app.user_interface_class = TCPUI
-    ...     interface_class = fabula.interfaces.TCPClientInterface
+    ...     interface_class = fabula.interfaces.python_tcp.TCPClientInterface
     ...     app.run_client(60, interface_class)
     ...
     >>> import threading
@@ -29,9 +29,9 @@ TCP Networking
     >>> client_process = threading.Thread(target = run_client)
     >>> server_process.start()
     >>> client_process.start()
-    >>> server_process.join()
+    >>> server_process.join() # doctest: +ELLIPSIS
     ============================================================
-    Fabula 0.8.1 Server
+    Fabula ... Server
     ------------------------------------------------------------
     <BLANKLINE>
     Listening on IP 0.0.0.0, port 4011

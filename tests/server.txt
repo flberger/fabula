@@ -8,9 +8,9 @@ Server Execution
     >>> import fabula.run
     >>> app = fabula.run.App(timeout = 5)
     >>> interface_class = fabula.interfaces.Interface
-    >>> app.run_server(60, interface_class, 0.5)
+    >>> app.run_server(60, interface_class, 0.5) # doctest: +ELLIPSIS
     ============================================================
-    Fabula 0.8.1 Server
+    Fabula ... Server
     ------------------------------------------------------------
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
