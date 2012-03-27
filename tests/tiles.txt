@@ -44,9 +44,9 @@ Tile Fetching and Display in PygameUserInterface
     >>> app = fabula.run.App(timeout = 0)
     >>> app.user_interface_class = QuittingInterface
     >>> app.server_plugin_class = MapTest
-    >>> app.run_standalone(60, 0.5)
+    >>> app.run_standalone(60, 0.5) # doctest: +ELLIPSIS
     ============================================================
-    Fabula 0.8.1 Server
+    Fabula ... Server
     ------------------------------------------------------------
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.

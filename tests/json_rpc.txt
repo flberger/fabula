@@ -1,35 +1,28 @@
 Doctests for the Fabula Package
-==============================
+===============================
 
-TCP Networking
---------------
+JSON-RPC
+--------
 
-    >>> import fabula.interfaces.python_tcp
+    >>> import fabula.interfaces.json_rpc
     >>> import fabula.run
+    >>> import socket
+    >>> from time import sleep
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 5)
-    ...     interface_class = fabula.interfaces.python_tcp.TCPServerInterface
+    ...     interface_class = fabula.interfaces.json_rpc.JSONRPCServerInterface
     ...     app.run_server(60, interface_class, 0.5, threadsafe = True)
     ...
-    >>> class TCPUI(fabula.plugins.ui.UserInterface):
-    ...     def get_connection_details(self):
-    ...         fabula.LOGGER.info('returning ("TCP_Client", ("127.0.0.1", 4011))')
-    ...         return("TCP_Client", ("127.0.0.1", 4011))
-    ...     def collect_player_input(self):
-    ...         pass
-    ...
     >>> def run_client():
-    ...     app = fabula.run.App(timeout = 5)
-    ...     app.user_interface_class = TCPUI
-    ...     interface_class = fabula.interfaces.python_tcp.TCPClientInterface
-    ...     app.run_client(60, interface_class)
+    ...     connection = socket.create_connection(("127.0.0.1", 4011), timeout = 5.0)
+    ...     connection.sendall(b'{"method" : "process_message", "params" : [{"class" : "InitEvent", "identifier" : "json_rpc_client"}], "id" : 1} \n {"method" : "process_message", "params" : [{"incomplete')
+    ...     connection.close()
     ...
     >>> import threading
     >>> server_process = threading.Thread(target = run_server)
     >>> client_process = threading.Thread(target = run_client)
     >>> server_process.start()
-    >>> client_process.start()
-    >>> server_process.join() # doctest: +ELLIPSIS
+    >>> sleep(3.0) # doctest: +ELLIPSIS
     ============================================================
     Fabula ... Server
     ------------------------------------------------------------
@@ -37,6 +30,8 @@ TCP Networking
     Listening on IP 0.0.0.0, port 4011
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
+    >>> client_process.start()
+    >>> server_process.join()
     <BLANKLINE>
     Shutting down server.
     <BLANKLINE>

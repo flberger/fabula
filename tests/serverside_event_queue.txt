@@ -26,9 +26,9 @@ Serverside Event Queue
     >>> app = fabula.run.App(timeout = 5)
     >>> app.server_plugin_class = QueueTest
     >>> interface_class = fabula.interfaces.Interface
-    >>> app.run_server(60, interface_class, 1.0)
+    >>> app.run_server(60, interface_class, 1.0) # doctest: +ELLIPSIS
     ============================================================
-    Fabula 0.8.1 Server
+    Fabula ... Server
     ------------------------------------------------------------
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.

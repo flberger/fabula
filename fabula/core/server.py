@@ -25,6 +25,7 @@
 import fabula
 import fabula.core
 import time
+import traceback
 
 # TODO: Add a decent default server CLI.
 
@@ -121,12 +122,12 @@ class Server(fabula.core.Engine):
         try:
             self.interface.connect(connector)
 
-            ip, port = self.interface.server.socket.getsockname()
-
-            print("Listening on IP {}, port {}\n".format(ip, port))
+            print("Listening on IP {}, port {}\n".format(connector[0],
+                                                         connector[1]))
 
         except:
             fabula.LOGGER.warning("Exception in interface.connect() (server interface already connected?), continuing anyway")
+            fabula.LOGGER.debug(traceback.format_exc())
 
         print("Press [Ctrl] + [C] to stop the server.")
 

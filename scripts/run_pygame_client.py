@@ -31,11 +31,11 @@ sys.path.append("../")
 sys.path.append("./")
 
 import fabula.plugins.pygameui
-import fabula.interfaces
+import fabula.interfaces.python_tcp
 import fabula.run
 
 if __name__ == "__main__":
 
     app = fabula.run.App(timeout = 0)
     app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
-    app.run_client(60, fabula.interfaces.TCPClientInterface)
+    app.run_client(30, fabula.interfaces.python_tcp.TCPClientInterface)

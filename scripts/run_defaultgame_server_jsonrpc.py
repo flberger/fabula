@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""Pygame Server for Fabula start script
+"""Pygame Server for Fabula using JSON-RPC start script
 
    Copyright 2012 Florian Berger <fberger@florian-berger.de>
 """
@@ -20,7 +20,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Fabula.  If not, see <http://www.gnu.org/licenses/>.
 
-# work started on 10 January 2012
+# Work started on 26. Mar 2012
 
 import sys
 
@@ -31,11 +31,11 @@ sys.path.append("../")
 sys.path.append("./")
 
 import fabula.plugins.serverside
-import fabula.interfaces.python_tcp
+import fabula.interfaces.json_rpc
 import fabula.run
 
 if __name__ == "__main__":
 
     app = fabula.run.App(timeout = 0)
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
-    app.run_server(30, fabula.interfaces.python_tcp.TCPServerInterface, 0.8)
+    app.run_server(30, fabula.interfaces.json_rpc.JSONRPCServerInterface, 0.8)
