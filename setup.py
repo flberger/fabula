@@ -45,6 +45,7 @@ try:
     EXECUTABLES = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_standalone.py")),
                    cx_Freeze.Executable(os.path.join("scripts", "run_pygame_client.py")),
                    cx_Freeze.Executable(os.path.join("scripts", "run_defaultgame_server.py")),
+                   cx_Freeze.Executable(os.path.join("scripts", "run_defaultgame_server_jsonrpc.py")),
                    cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py")),
                    cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py"))]
 
@@ -110,6 +111,7 @@ setup(name = PACKAGE,
       scripts = [os.path.join("scripts", "run_pygame_standalone.py"),
                  os.path.join("scripts", "run_pygame_client.py"),
                  os.path.join("scripts", "run_defaultgame_server.py"),
+                 os.path.join("scripts", "run_defaultgame_server_jsonrpc.py"),
                  os.path.join("scripts", "run_pygame_cli.py"),
                  os.path.join("scripts", "run_pygame_editor.py")],
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),

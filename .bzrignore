@@ -19,3 +19,4 @@ freecode-submit.txt
 .coverage
 htmlcov
 print_log.sh
+./fabula.conf
