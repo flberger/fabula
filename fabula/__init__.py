@@ -1476,6 +1476,7 @@ def json_dump(object):
 
 def surrounding_positions(position):
     """Return a list of tuples, representing the 8 surrounding positions around the tuple given.
+       The list starts with the top left position and proceeds clockwise.
     """
 
     # Start at top left and proceed clockwise

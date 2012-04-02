@@ -815,7 +815,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+        """Gather Pygame events, scan for QUIT or special keys and let the clickndrag Display evaluate the events.
         """
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
@@ -848,9 +848,26 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     self.osd.display("Framerate: ", self.stats, "framerate")
                     self.osd.display("FPS: ", self.stats, "fps")
 
-        self.window.process(events)
+#            elif (self.host.room is not None
+#                  and event.type == pygame.KEYDOWN
+#                  and event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d)):
+#
+#                fabula.LOGGER.debug("got key '{}' from user, returning TriesToMoveToEvent".format(event.key))
+#
+#                surrounding_positions = fabula.surrounding_positions(self.host.room.entity_locations[self.host.client_id])
+#
+#                event = fabula.TriesToMoveEvent(self.host.client_id,
+#                                                {pygame.K_w : surrounding_positions[1],
+#                                                 pygame.K_d : surrounding_positions[3],
+#                                                 pygame.K_s : surrounding_positions[5],
+#                                                 pygame.K_a : surrounding_positions[7],
+#                                                 }[event.key])
+#
+#                # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
+#                #
+#                self.message_for_host.event_list.append(event)
 
-        # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
+        self.window.process(events)
 
         return
 
