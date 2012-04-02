@@ -20,10 +20,7 @@
 
 # work started on 27. Oct 2010
 
-# TODO: This module should be importable without pygame and clickndrag.
-
-import fabula.plugins.pygameui
-import fabula.assets
+import fabula.plugins
 import os
 import math
 import time
@@ -747,6 +744,9 @@ class Editor(DefaultGame):
        Editor.current_room
            Name of the current room.
 
+       Editor.pygameui
+           The fabula.plugins.pygameui module.
+
        Editor.pygame_editor
            A PygameEditor where the editing is done.
     """
@@ -757,6 +757,12 @@ class Editor(DefaultGame):
     def __init__(self, host):
         """Initialise.
         """
+
+        import fabula.plugins.pygameui
+        import fabula.assets
+
+        self.pygameui = fabula.plugins.pygameui
+
         # Call base class
         #
         DefaultGame.__init__(self, host)
@@ -787,9 +793,9 @@ class Editor(DefaultGame):
         # Create a PygameEditor where the editing is done
         # TODO: hardcoded framerate
         #
-        self.pygame_editor = fabula.plugins.pygameui.PygameEditor(fabula.assets.Assets(),
-                                                                  60,
-                                                                  self)
+        self.pygame_editor = self.pygameui.PygameEditor(fabula.assets.Assets(),
+                                                        60,
+                                                        self)
 
         fabula.LOGGER.debug("complete")
 
@@ -959,7 +965,7 @@ class Editor(DefaultGame):
 
             # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
             #
-            ok_box = fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename))
+            ok_box = self.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename))
 
             ok_box.rect.center = self.pygame_editor.window.rect.center
 
@@ -980,7 +986,7 @@ class Editor(DefaultGame):
 
         # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
         #
-        ok_box = fabula.plugins.pygameui.clickndrag.gui.OkBox("Logic cleared.")
+        ok_box = self.pygameui.clickndrag.gui.OkBox("Logic cleared.")
 
         ok_box.rect.center = self.pygame_editor.window.rect.center
 

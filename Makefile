@@ -87,6 +87,10 @@ doctest: clean
 	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/json.txt && \
 	echo --------------------------- && \
+	echo Testing  tests/json_rpc.txt && \
+	echo --------------------------- && \
+	$(PYTHON) -m doctest tests/json_rpc.txt && \
+	echo --------------------------- && \
 	echo Done testing. && \
 	echo ---------------------------
 

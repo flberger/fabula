@@ -13,6 +13,8 @@ Server Execution
     Fabula ... Server
     ------------------------------------------------------------
     <BLANKLINE>
+    Listening on IP 0.0.0.0, port 4011
+    <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
     <BLANKLINE>
     Shutting down server.

@@ -6,8 +6,9 @@ TCP Networking
 
     >>> import fabula.interfaces.python_tcp
     >>> import fabula.run
+    >>> from time import sleep
     >>> def run_server():
-    ...     app = fabula.run.App(timeout = 5)
+    ...     app = fabula.run.App(timeout = 10)
     ...     interface_class = fabula.interfaces.python_tcp.TCPServerInterface
     ...     app.run_server(60, interface_class, 0.5, threadsafe = True)
     ...
@@ -28,8 +29,7 @@ TCP Networking
     >>> server_process = threading.Thread(target = run_server)
     >>> client_process = threading.Thread(target = run_client)
     >>> server_process.start()
-    >>> client_process.start()
-    >>> server_process.join() # doctest: +ELLIPSIS
+    >>> sleep(5) # doctest: +ELLIPSIS
     ============================================================
     Fabula ... Server
     ------------------------------------------------------------
@@ -37,6 +37,8 @@ TCP Networking
     Listening on IP 0.0.0.0, port 4011
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
+    >>> client_process.start()
+    >>> server_process.join()
     <BLANKLINE>
     Shutting down server.
     <BLANKLINE>

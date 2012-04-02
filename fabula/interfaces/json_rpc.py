@@ -106,8 +106,17 @@ class JSONRPCServerInterface(fabula.interfaces.python_tcp.TCPServerInterface):
 
                         json_event_list = '[{}]'.format(", ".join([event.json() for event in message_buffer.messages_for_remote.popleft().event_list]))
 
+                        try:
+                            id = parent.json_rpc_id_list.pop(0)
+
+                        except IndexError:
+
+                            fabula.LOGGER.debug("List of queued JSON_RPC ids exhausted, sending JSON-RPC notification instead")
+
+                            id = 'null'
+
                         representation = json_rpc_response.format(json_event_list,
-                                                                  parent.json_rpc_id_list.pop(0))
+                                                                  id)
 
                         fabula.LOGGER.debug("attempting to send {}".format(representation))
 
@@ -215,10 +224,14 @@ class JSONRPCServerInterface(fabula.interfaces.python_tcp.TCPServerInterface):
                                                            end_index,
                                                            len(received_data)))
 
+                            fabula.LOGGER.debug("decoded JSON: {}".format(json_decoded))
+
                             message = parent.json_to_message(json_decoded["params"])
 
                             # Queue id
                             #
+                            fabula.LOGGER.debug("queueing request id '{}'".format(json_decoded["id"]))
+
                             parent.json_rpc_id_list.append(json_decoded["id"])
 
                             message_buffer.messages_for_local.append(message)
@@ -260,8 +273,17 @@ class JSONRPCServerInterface(fabula.interfaces.python_tcp.TCPServerInterface):
 
                     json_event_list = '[{}]'.format(", ".join([event.json() for event in message_buffer.messages_for_remote.popleft().event_list]))
 
+                    try:
+                        id = parent.json_rpc_id_list.pop(0)
+
+                    except IndexError:
+
+                        fabula.LOGGER.debug("List of queued JSON_RPC ids exhausted, sending JSON-RPC notification instead")
+
+                        id = 'null'
+
                     representation = json_rpc_response.format(json_event_list,
-                                                              parent.json_rpc_id_list.pop(0))
+                                                              id)
 
                     # Add a double newline as separator for convenience.
                     # Use ASCII.
@@ -305,7 +327,15 @@ class JSONRPCServerInterface(fabula.interfaces.python_tcp.TCPServerInterface):
 
             del event_dict["class"]
 
+            # Convert target identifiers from JSON lists to tuples
+            #
+            if ("target_identifier" in event_dict.keys()
+                and type(event_dict["target_identifier"]) is list):
+
+                event_dict["target_identifier"] = tuple(event_dict["target_identifier"])
+
             # Using the infamous argument unpacking from dict
+            # TODO: this will of course fail with Tiles and Entities
             #
             event = event_class(**event_dict)
 
