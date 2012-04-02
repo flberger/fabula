@@ -815,34 +815,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """Initiate scrolling, gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
+        """Gather Pygame events, scan for QUIT and let the clickndrag Display evaluate the events.
         """
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
-
-        # Check mouse position, and trigger window scrolling.
-        # Also check whether the display window has the focus.
-        # Scrolling will be done in display_single_frame().
-        #
-        if not self.scroll:
-
-            mouse_position = pygame.mouse.get_pos()
-
-            if (pygame.mouse.get_focused()
-                and 0 <= mouse_position[0] <= 25
-                and self.window.room.rect.left < 0):
-
-                # Scroll to the left
-                #
-                self.scroll = self.spacing
-
-            elif (pygame.mouse.get_focused()
-                  and SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]
-                  and self.window.room.rect.right > SCREENSIZE[0]):
-
-                # Scroll to right
-                #
-                self.scroll = 0 - self.spacing
 
         # Handle events
         #
@@ -1488,7 +1464,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
-        # Call base class
+        # Call base class.
+        # This will forward the Event to the affected Entity.
         #
         fabula.plugins.ui.UserInterface.process_MovesToEvent(self, event)
 
@@ -1496,11 +1473,37 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.reorder_room_planes()
 
-        # Care for draggability
+        # And if it is the player...
         #
         if event.identifier == self.host.client_id:
 
+            # Care for draggability
+            #
             self.make_items_draggable()
+
+            # Check whether the player has moved one Tile away or closer from
+            # the window border, and if so, initiate scrolling.
+            # Actual scrolling will be done in display_single_frame().
+            #
+            if not self.scroll:
+
+                left_border_x = int((0 - self.window.room.rect.left) / self.spacing)
+
+                right_border_x = left_border_x + int(SCREENSIZE[0] / self.spacing) - 1
+
+                if (event.location[0] <= left_border_x + 1
+                    and self.window.room.rect.left < 0):
+
+                    # Scroll to the left
+                    #
+                    self.scroll = self.spacing
+
+                elif (event.location[0] >= right_border_x - 1
+                      and self.window.room.rect.right > SCREENSIZE[0]):
+
+                    # Scroll to the right
+                    #
+                    self.scroll = 0 - self.spacing
 
         return
 
