@@ -90,7 +90,37 @@ class JSONRPCServerInterface(fabula.interfaces.python_tcp.TCPServerInterface):
 
                 while not parent.shutdown_flag:
 
-                    # TODO: copied from TCPClientInterface.handle_messages() with a few renamings
+                    # TODO: partly copied from TCPClientInterface.handle_messages() with a few renamings
+
+                    # Only the Interface may add connections to
+                    # Interface.connections, but the server may remove them if
+                    # a client exits on the application level.
+                    # So, first check whether the client handled by this
+                    # FabulaRequestHandler has been removed, and if so,
+                    # terminate.
+                    #
+                    if not self.client_address in parent.connections.keys():
+
+                        fabula.LOGGER.info("client '{}' has been removed by the server".format(self.client_address))
+
+                        # We are *not* setting parent.shutdown_flag, since only
+                        # this connection should terminate.
+
+                        try:
+
+                            self.request.shutdown(fabula.interfaces.python_tcp.socket.SHUT_RDWR)
+
+                        except:
+
+                            # Socket may be unavailable already
+                            #
+                            fabula.LOGGER.warning("could not shut down socket")
+
+                        self.request.close()
+
+                        fabula.LOGGER.info("handler connection closed, stopping thread")
+
+                        raise SystemExit
 
                     # First deliver waiting local messages.
                     #

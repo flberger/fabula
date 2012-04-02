@@ -784,8 +784,6 @@ class Server(fabula.core.Engine):
 
             fabula.LOGGER.warning("connection {} is already gone".format(kwargs["connector"]))
 
-        # TODO: the connection to client in interface might still be open, and will continue to listen and even receive events. It should be closed here, but how to notify a RequestHandler of a socketserver.TCPServer that runs in a thread?
-
         # No room, nothing to delete.
         #
         if self.room:
