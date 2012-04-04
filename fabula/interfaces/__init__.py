@@ -30,6 +30,7 @@
 # Work on Fabula server interface started on 24. Sep 2009
 
 import fabula
+import datetime
 from collections import deque
 from time import sleep
 
@@ -52,6 +53,13 @@ class Interface:
        Interface.shutdown_flag
        Interface.shutdown_confirmed
            Flags for shutdown handling.
+
+       Interface.message_timestamp
+           Timestamp for Message log.
+
+       Interface.message_log_file
+           Open stream to record a list of Messages and time intervals.
+           Initially None.
     """
 
     def __init__(self):
@@ -74,6 +82,15 @@ class Interface:
         # And this is the one for the confirmation.
         #
         self.shutdown_confirmed = False
+
+        # The message log file records a list of Messages and time intervals.
+        # TODO: It will be opened...when and where?
+        #
+        self.message_log_file = None
+
+        # Timestamp for Message log
+        #
+        self.message_timestamp = None
 
         fabula.LOGGER.debug("complete")
 
@@ -121,12 +138,15 @@ class Interface:
            MessageBuffer in Interface.connections as well as check for messages
            in MessageBuffer.messages_for_remote and send them to the remote host.
 
+           It should call Interface.log_message(message) with each incoming
+           message.
+
            This method is put in a background thread by the startup script,
            so an implementation can do all sorts of polling or blocking IO.
 
            It should regularly check whether shutdown() has been called
            (checking self.shutdown_flag), and if so, it should notify
-           shutdown() by setting self.shutdown_confirmed to true (so that
+           shutdown() by setting self.shutdown_confirmed to True (so that
            method can return True itself), and then raise SystemExit to stop
            the thread.
 
@@ -161,12 +181,47 @@ class Interface:
 
         raise SystemExit
 
+    def log_message(self, raw_message):
+        """Log the raw incoming Message and Interface.message_timestamp to Interface.message_log_file.
+           To be called from Interface.handle_messages().
+           The default log file is 'messages.log'.
+        """
+
+        if self.message_log_file is None:
+
+            fabula.LOGGER.debug("Opening raw messages log file 'messages.log'")
+
+            self.message_log_file = open("messages.log", "wt")
+
+        # Start Message log timer with first incoming message
+        #
+        if self.message_timestamp is None:
+
+            fabula.LOGGER.debug("Starting message log timer")
+
+            self.message_timestamp = datetime.datetime.today()
+
+        timedifference = datetime.datetime.today() - self.message_timestamp
+
+        # Loggin time difference in seconds and message, tab-separated,
+        # terminated with double-newline.
+        # timedifference as seconds + tenth of a second
+        #
+        self.message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
+                                                        raw_message))
+
+        # Renew timestamp
+        #
+        self.message_timestamp = datetime.datetime.today()
+
+        return
+
     def shutdown(self):
         """This is called by the engine when it is about to exit.
            It notifies handle_messages() to raise SystemExit to stop the thread
            properly by setting self.shutdown_flag.
-           shutdown() will return True when handle_messages() received the
-           notification and is about to exit.
+           shutdown() will close the messages log file and return True when
+           handle_messages() received the notification and is about to exit.
         """
 
         fabula.LOGGER.debug("called")
@@ -182,6 +237,12 @@ class Interface:
             # No need to run as fast as possible.
             #
             sleep(1/60)
+
+        if self.message_log_file is not None:
+
+            fabula.LOGGER.debug("closing message log file")
+
+            self.message_log_file.close()
 
         return True
 
@@ -240,8 +301,10 @@ class StandaloneInterface(Interface):
     """An Interface that is meant to be used in conjunction with run.App.run_standalone().
     """
 
-    def __init__(self, framerate):
+    def __init__(self, framerate, logging = False):
         """Initialise.
+           logging is a boolean flage that indicates whether a raw messages log
+           of incoming messages should be written.
         """
 
         # Call base class
@@ -249,6 +312,8 @@ class StandaloneInterface(Interface):
         Interface.__init__(self)
 
         self.framerate = framerate
+
+        self.logging = logging
 
         fabula.LOGGER.debug("complete")
 
@@ -300,6 +365,12 @@ class StandaloneInterface(Interface):
                         # string that can be evaluated here!
                         #
                         fabula.LOGGER.error("error: can not evaluate '{}', skipping".format(repr(event)))
+
+                # Conditionally write string representation to messages log file
+                #
+                if self.logging:
+
+                    self.log_message(repr(new_message))
 
                 # Blindly use the first connection
                 #

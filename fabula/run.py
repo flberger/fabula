@@ -276,8 +276,8 @@ class App:
         # Setting up interfaces
         #
         server_interface = fabula.interfaces.StandaloneInterface(framerate)
-
-        client_interface = fabula.interfaces.StandaloneInterface(framerate)
+        client_interface = fabula.interfaces.StandaloneInterface(framerate,
+                                                                 logging = True)
 
         server_interface.connect("client")
         client_interface.connect("server")

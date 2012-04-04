@@ -104,6 +104,7 @@
 # TODO: is the default mirroring policy in Plugin OK? UserInterface also is a Plugin, after all, and it makes no sense here.
 # TODO: Entity.entity_type -> Entity.type? Tile.tile_type -> Tile.type?
 # TODO: nicer logging. Use the NullLogger and leave logging to the Fabula host. Use named calls to getLogger("somename") and repeat these calls whenever a Fabula logger is needed instead of passing them around.
+# TODO: Remove "This method..." from docstrings, and just explain what it does.
 #
 #
 # OPTIMISATION
