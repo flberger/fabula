@@ -24,7 +24,6 @@ import fabula
 import fabula.core
 import time
 import datetime
-import pickle
 import traceback
 
 class Client(fabula.core.Engine):
