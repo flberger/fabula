@@ -130,6 +130,11 @@
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen!
 #
+# TODO: Use conventional names. Call maps maps, tiles tiles.
+# TODO: Fabula is not event-based, it is turn-based. Reflect that in method names: next_turn(), or something like that.
+#
+# TODO: Fabula needs a JSON-API for the server plugin. It also needs methods to acces internal data structures like room, position etc.
+#
 # TODO: fabula.conf should be read / accessed where it is needed, not in run; no passing of options through init arguments
 # TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.

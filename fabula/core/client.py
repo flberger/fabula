@@ -65,8 +65,8 @@ class Client(fabula.core.Engine):
     def __init__(self, interface_instance):
         """Initalisation.
            The Client must be instantiated with an instance of a subclass of
-           fabula.interfaces.Interface which handles the connection to the server
-           or supplies events in some other way.
+           fabula.interfaces.Interface which handles the connection to the
+           server or supplies events in some other way.
         """
 
         # Save the player id for Server and UserInterface.
@@ -241,11 +241,9 @@ class Client(fabula.core.Engine):
 
             if server_message.event_list:
 
-                fabula.LOGGER.debug("server incoming: %s"
-                                 % server_message)
+                fabula.LOGGER.debug("server incoming: {}".format(server_message))
 
-                # Loggin a tuple of time difference
-                # in seconds and message
+                # Loggin a tuple of time difference in seconds and message
                 #
                 timedifference = datetime.datetime.today() - self.message_timestamp
 
