@@ -48,13 +48,6 @@ class Client(fabula.core.Engine):
        Client.timestamp
            Timestamp to detect server dropouts
 
-       Client.message_timestamp
-           Timestamp for Message log
-
-       Client.message_log_file
-           Open stream to record a list of Messages and time intervals.
-           Initially None.
-
        Client.local_moves_to_event
            Cache for the latest local MovesToEvent
     """
@@ -79,8 +72,7 @@ class Client(fabula.core.Engine):
 
         # Then setup Engine internals
         #
-        fabula.core.Engine.__init__(self,
-                                   interface_instance)
+        fabula.core.Engine.__init__(self, interface_instance)
 
         # Now we have:
         #
@@ -117,15 +109,6 @@ class Client(fabula.core.Engine):
         # Timestamp to detect server dropouts
         #
         self.timestamp = None
-
-        # Timestamp for Message log
-        #
-        self.message_timestamp = None
-
-        # The message log file records a list of Messages and time intervals.
-        # It will be opened in run() once the client_id is known.
-        #
-        self.message_log_file = None
 
         # Remember the latest local MovesToEvent
         #
@@ -216,19 +199,11 @@ class Client(fabula.core.Engine):
         #
         self.message_buffer = list(self.interface.connections.values())[0]
 
-        # Now open the messages log file. See __init__().
-        #
-        self.message_log_file = open("messages-{}.log".format(self.client_id), "wb")
-
         init_event = fabula.InitEvent(self.client_id)
 
         fabula.LOGGER.info("sending {}".format(init_event))
 
         self.message_buffer.send_message(fabula.Message([init_event]))
-
-        # Start Message log timer upon InitEvent
-        #
-        self.message_timestamp = datetime.datetime.today()
 
         # Now loop
         #
@@ -242,30 +217,6 @@ class Client(fabula.core.Engine):
             if server_message.event_list:
 
                 fabula.LOGGER.debug("server incoming: {}".format(server_message))
-
-                # Loggin a tuple of time difference in seconds and message
-                #
-                timedifference = datetime.datetime.today() - self.message_timestamp
-
-                # timedifference as seconds + tenth of a second
-                #
-                exception = ''
-                try:
-                    self.message_log_file.write(pickle.dumps((timedifference.seconds
-                                                              + timedifference.microseconds / 1000000.0,
-                                                              server_message),
-                                                             0))
-                except:
-                    exception = traceback.format_exc()
-                    fabula.LOGGER.error("exception trying to pickle server message {}:\n{}".format(server_message, exception))
-
-                # Add double newline as separator
-                #
-                self.message_log_file.write(bytes("\n\n", "utf_8"))
-
-                # Renew timestamp
-                #
-                self.message_timestamp = datetime.datetime.today()
 
                 # Message was not empty
                 #
@@ -317,10 +268,6 @@ class Client(fabula.core.Engine):
                 fabula.LOGGER.info("shutting down interface")
 
                 self.interface.shutdown()
-
-                fabula.LOGGER.debug("closing message log file")
-
-                self.message_log_file.close()
 
                 fabula.LOGGER.info("exiting")
 
@@ -512,10 +459,6 @@ class Client(fabula.core.Engine):
         # stop the Client Interface thread
         #
         self.interface.shutdown()
-
-        fabula.LOGGER.debug("closing message log file")
-
-        self.message_log_file.close()
 
         fabula.LOGGER.info("shutdown confirmed.")
 

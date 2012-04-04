@@ -33,6 +33,69 @@ import fabula
 from collections import deque
 from time import sleep
 
+###
+#       Client.message_timestamp
+#           Timestamp for Message log
+
+
+#       Client.message_log_file
+#           Open stream to record a list of Messages and time intervals.
+#           Initially None.
+
+#init
+#        # The message log file records a list of Messages and time intervals.
+#        # It will be opened in run() once the client_id is known.
+#        #
+#        self.message_log_file = None
+
+#        # Timestamp for Message log
+#        #
+#        self.message_timestamp = None
+
+
+
+#run
+
+
+#        # Now open the messages log file. See __init__().
+#        #
+#        self.message_log_file = open("messages-{}.log".format(self.client_id), "wb")
+
+
+#        # Start Message log timer upon InitEvent
+#        #
+#        self.message_timestamp = datetime.datetime.today()
+
+#                # Loggin a tuple of time difference in seconds and message
+#                #
+#                timedifference = datetime.datetime.today() - self.message_timestamp
+
+#                # timedifference as seconds + tenth of a second
+#                #
+#                exception = ''
+#                try:
+#                    self.message_log_file.write(pickle.dumps((timedifference.seconds
+#                                                              + timedifference.microseconds / 1000000.0,
+#                                                              server_message),
+#                                                             0))
+#                except:
+#                    exception = traceback.format_exc()
+#                    fabula.LOGGER.error("exception trying to pickle server message {}:\n{}".format(server_message, exception))
+
+#                # Add double newline as separator
+#                #
+#                self.message_log_file.write(bytes("\n\n", "utf_8"))
+
+#                # Renew timestamp
+#                #
+#                self.message_timestamp = datetime.datetime.today()
+
+#                fabula.LOGGER.debug("closing message log file")
+
+#                self.message_log_file.close()
+
+###
+
 class Interface:
     """This is a base class for Fabula interfaces which handle all the network traffic.
        A customised implementation will likely have a client- and a server side
@@ -126,7 +189,7 @@ class Interface:
 
            It should regularly check whether shutdown() has been called
            (checking self.shutdown_flag), and if so, it should notify
-           shutdown() by setting self.shutdown_confirmed to true (so that
+           shutdown() by setting self.shutdown_confirmed to True (so that
            method can return True itself), and then raise SystemExit to stop
            the thread.
 
