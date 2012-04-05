@@ -3,43 +3,37 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.interfaces.StandaloneInterface&rdquo;</title>
+    <title>API docs for &ldquo;fabula.interfaces.replay.PythonReplayInterface&rdquo;</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.i.StandaloneInterface(<a href="fabula.interfaces.Interface.html">Interface</a>):</h1>
+    <h1 class="class">Class f.i.r.PythonReplayInterface(<a href="fabula.interfaces.Interface.html">fabula.interfaces.Interface</a>):</h1>
     <p>
-      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.interfaces.html">interfaces</a></span>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.interfaces.html">interfaces</a>.<a href="fabula.interfaces.replay.html">replay</a></span>
       
-      <a href="classIndex.html#fabula.interfaces.StandaloneInterface">View In Hierarchy</a>
+      <a href="classIndex.html#fabula.interfaces.replay.PythonReplayInterface">View In Hierarchy</a>
     </p>
     <div>
       
     </div>
-    <pre>An Interface that is meant to be used in conjunction with run.App.run_standalone().
+    <pre>An Interface which replays Python message logs.
     </pre>
 
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id76">
+      <table class="children sortable" id="id94">
   
   
 <tr class="method">
     
     
     <td>Method</td>
-    <td><a href="fabula.interfaces.StandaloneInterface.html#__init__">__init__</a></td>
-    <td><tt>Initialise.</tt></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.interfaces.StandaloneInterface.html#handle_messages">handle_messages</a></td>
-    <td><tt>This background thread method transfers messages between local and remote MessageBuffer.</tt></td>
+    <td><a href="fabula.interfaces.replay.PythonReplayInterface.html#handle_messages">handle_messages</a></td>
+    <td><tt>Read a file created by Interface.log_message(), and fill MessageBuffer.messages_for_local with these messages.</tt></td>
   </tr>
   
 </table>
@@ -47,10 +41,16 @@
         <p>
           Inherited from <a href="fabula.interfaces.Interface.html">Interface</a>:
         </p>
-        <table class="children sortable" id="id77">
+        <table class="children sortable" id="id95">
   
   
 <tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.interfaces.Interface.html#__init__">__init__</a></td>
+    <td><tt>Initialisation.</tt></td>
+  </tr><tr class="basemethod">
     
     
     <td>Method</td>
@@ -79,26 +79,7 @@
     
 
     <div class="function">
-  <a name="fabula.interfaces.StandaloneInterface.__init__">
-    
-  </a>
-  <a name="__init__">
-    
-  </a>
-  <div class="functionHeader">
-    
-    def
-    __init__(self, framerate, logging=False):
-    
-  </div>
-  <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.interfaces.Interface.html#__init__">fabula.interfaces.Interface.__init__</a></div>
-    <pre>Initialise.
-logging is a boolean flage that indicates whether a raw messages log
-of incoming messages should be written.</pre>
-  </div>
-</div><div class="function">
-  <a name="fabula.interfaces.StandaloneInterface.handle_messages">
+  <a name="fabula.interfaces.replay.PythonReplayInterface.handle_messages">
     
   </a>
   <a name="handle_messages">
@@ -107,14 +88,13 @@ of incoming messages should be written.</pre>
   <div class="functionHeader">
     
     def
-    handle_messages(self, remote_message_buffer):
+    handle_messages(self):
     
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.interfaces.Interface.html#handle_messages">fabula.interfaces.Interface.handle_messages</a></div>
-    <pre>This background thread method transfers messages between local and remote MessageBuffer.
-It uses representations of the Events being sent to create new copies
-of the original ones.</pre>
+    <pre>Read a file created by Interface.log_message(), and fill MessageBuffer.messages_for_local with these messages.
+        </pre>
   </div>
 </div>
     <address>
