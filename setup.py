@@ -35,6 +35,8 @@ import fabula
 #
 from distutils.core import setup
 
+SCRIPTS = glob.glob(os.path.join("scripts", "*.py"))
+
 EXECUTABLES = []
 
 try:
@@ -44,7 +46,7 @@ try:
 
     # Collect all Python scripts in the 'script' directory
     #
-    EXECUTABLES = [cx_Freeze.Executable(path) for path in glob.glob(os.path.join("scripts", "*.py"))]
+    EXECUTABLES = [cx_Freeze.Executable(path) for path in SCRIPTS]
 
 except ImportError:
 
@@ -107,12 +109,7 @@ setup(name = PACKAGE,
                   "{}.plugins".format(PACKAGE),
                   "clickndrag"],
       package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
-      scripts = [os.path.join("scripts", "run_pygame_standalone.py"),
-                 os.path.join("scripts", "run_pygame_client.py"),
-                 os.path.join("scripts", "run_defaultgame_server.py"),
-                 os.path.join("scripts", "run_defaultgame_server_jsonrpc.py"),
-                 os.path.join("scripts", "run_pygame_cli.py"),
-                 os.path.join("scripts", "run_pygame_editor.py")],
+      scripts = SCRIPTS,
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
                      glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
                     (os.path.join("share", "{}").format(PACKAGE),
