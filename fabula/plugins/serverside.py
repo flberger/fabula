@@ -578,11 +578,16 @@ class DefaultGame(fabula.plugins.Plugin):
 
     def process_SaysEvent(self, event):
         """This is a convenience hook to override.
-           The default implementation calls DefaultGame.respond().
+           The default implementation sends the SaysEvent back to the Client and
+           calls DefaultGame.respond().
         """
 
         fabula.LOGGER.debug("called")
+
+        self.message_for_host.event_list.append(event)
+
         self.respond(event)
+
         return
 
     def process_TriesToLookAtEvent(self, event):
