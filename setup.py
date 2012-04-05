@@ -42,12 +42,9 @@ try:
 
     setup = cx_Freeze.setup
 
-    EXECUTABLES = [cx_Freeze.Executable(os.path.join("scripts", "run_pygame_standalone.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_client.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_defaultgame_server.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_defaultgame_server_jsonrpc.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_cli.py")),
-                   cx_Freeze.Executable(os.path.join("scripts", "run_pygame_editor.py"))]
+    # Collect all Python scripts in the 'script' directory
+    #
+    EXECUTABLES = [cx_Freeze.Executable(path) for path in glob.glob(os.path.join("scripts", "*.py"))]
 
 except ImportError:
 
