@@ -1090,22 +1090,35 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def process_CanSpeakEvent(self, event):
-        """Open the sentences as an OptionSelector and return a SaysEvent to the host.
+        """Have the user select or input text and return a SaysEvent to the host.
         """
 
-        # We blindly assume that this is for us.
+        # If it's not for us, ignore.
         #
-        fabula.LOGGER.debug("showing {}".format(event))
+        if event.identifier == self.host.client_id:
 
-        callback = lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text))
+            if event.sentences:
 
-        option_list = clickndrag.gui.tmb.TMBOptionSelector("select_sentence",
-                                                           event.sentences,
-                                                           callback)
+                callback = lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text))
 
-        option_list.rect.center = self.window.rect.center
+                option_list = clickndrag.gui.tmb.TMBOptionSelector("select_sentence",
+                                                                   event.sentences,
+                                                                   callback)
 
-        self.window.sub(option_list)
+                option_list.rect.center = self.window.rect.center
+
+                self.window.sub(option_list)
+
+            else:
+                callback = lambda text: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, text))
+
+                dialog = clickndrag.gui.tmb.TMBGetStringDialog("You say:",
+                                                               callback,
+                                                               self.window)
+
+                dialog.rect.center = self.window.rect.center
+
+                self.window.sub(dialog)
 
         return
 
@@ -1453,9 +1466,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         if event.identifier == self.host.client_id:
 
-            # Flash very short
+            # Flash very short...
             #
             frames = int(self.action_frames / 10)
+
+            # ...but make sure it flashes
+            #
+            if frames < 1:
+                frames = 1
 
             self.window.room.rendersurface.fill((250, 250, 250))
             self.window.room.last_rect = None
@@ -1960,19 +1978,30 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 fabula.LOGGER.debug("processing Entity '{}'".format(identifier))
 
-                if entity.entity_type == fabula.ITEM and entity.mobile:
+                # Catch a common error.
+                # TODO: Why does this happen?
+                #
+                if entity.asset is None:
 
-                    if self.host.room.entity_locations[identifier] in surrounding_positions:
+                    msg = "asset of Entity '{}' is None, cannot change draggable flag: {}"
 
-                        entity.asset.draggable = True
-
-                    else:
-                        entity.asset.draggable = False
+                    fabula.LOGGER.warning(msg.format(entity.identifier, entity))
 
                 else:
-                    # Make sure it's not draggable
-                    #
-                    entity.asset.draggable = False
+
+                    if entity.entity_type == fabula.ITEM and entity.mobile:
+
+                            if self.host.room.entity_locations[identifier] in surrounding_positions:
+
+                                entity.asset.draggable = True
+
+                            else:
+                                entity.asset.draggable = False
+
+                    else:
+                        # Make sure it's not draggable
+                        #
+                        entity.asset.draggable = False
 
         else:
             fabula.LOGGER.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))

@@ -262,6 +262,8 @@ class TCPClientInterface(fabula.interfaces.Interface):
             # Add a double newline as separator.
             # This may block for an arbitrary time, but here we can wait.
             #
+            # TODO: Exception handling, especially here!
+            #
             self.sock.sendall(bytes(representation + "\n\n", "utf8"))
 
         try:
