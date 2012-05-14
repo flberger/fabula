@@ -65,7 +65,8 @@ INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
 
 # Include clickndrag resources
 #
-INCLUDE_FILES.extend(glob.glob(os.path.join("clickndrag", "gui", "resources", "*")))
+INCLUDE_FILES.extend(glob.glob(os.path.join("clickndrag", "gui", "resources", "*.png")))
+INCLUDE_FILES.extend(glob.glob(os.path.join("clickndrag", "gui", "resources", "*.ttf")))
 
 # Include default room
 #
@@ -94,7 +95,7 @@ setup(name = PACKAGE,
       version = fabula.VERSION,
       author = "Florian Berger",
       author_email = "fberger@florian-berger.de",
-      url = "http://florian-berger.de/en/software/{}/".format(PACKAGE),
+      url = "http://fabula-engine.org/",
       description = "An Open Source Python Game Engine suitable for adventure, role-playing and strategy games and digital interactive storytelling.",
       license = "GPL",
       packages = [PACKAGE,

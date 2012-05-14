@@ -488,11 +488,13 @@ class App:
         """Aux method to add a stderr handler to fabula.LOGGER.
         """
 
+        # TODO: For log levels WARNING, ERROR and CRITICAL, these levels should be displayed in the log message.
+
         # Creating an instance without arguments defaults to STDERR.
         #
         self.stderr_handler = logging.StreamHandler()
 
-        # Fix log level at logging.WARNING
+        # Pin log level at logging.WARNING
         #
         self.stderr_handler.setLevel(logging.WARNING)
 

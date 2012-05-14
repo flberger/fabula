@@ -484,7 +484,7 @@ class Client(fabula.core.Engine):
             fabula.LOGGER.warning("attempt failed for '{}', now at {}".format(event.identifier,
                                                                               location))
 
-            # TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
+            # !!! TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
             #
             vector = self.plugin.direction_vector_dict[entity.direction]
 

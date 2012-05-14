@@ -24,6 +24,7 @@ help:
 	@echo '    commit'
 	@echo '    sign'
 	@echo '    freecode'
+	@echo '    pypi'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -111,6 +112,9 @@ exe: sdist
 	rm -rf build/exe.*
 	$(PYTHON) setup.py build
 
+pypi:
+	$(PYTHON) setup.py register
+
 else
 
 doctest:
@@ -123,6 +127,9 @@ sdist:
 	@echo Please supply Python executable as PYTHON=executable.
 
 exe: sdist
+	@echo Please supply Python executable as PYTHON=executable.
+
+pypi:
 	@echo Please supply Python executable as PYTHON=executable.
 
 endif

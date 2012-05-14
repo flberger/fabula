@@ -450,9 +450,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def __init__(self, assets, framerate, host, fullscreen = False):
         """This method initialises the PygameUserInterface.
+
            assets must be an instance of fabula.Assets or a subclass.
+
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run at.
+
            fullscreen is a Boolean flag.
         """
 
@@ -710,6 +713,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                  return_callback = None))
 
             # Provide a default
+            # !!! TODO: remember older IPs somehow. Config file?
             #
             container.connector.text = "127.0.0.1"
 
@@ -1013,6 +1017,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # accordingly.
 
         try:
+            fabula.LOGGER.info("attempting to center room view on player")
+
             player_position = list(self.host.room.entity_locations[self.host.client_id])
 
             # Convert to pixels, refering to the center of the tile
@@ -1103,7 +1109,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 option_list = clickndrag.gui.tmb.TMBOptionSelector("select_sentence",
                                                                    event.sentences,
-                                                                   callback)
+                                                                   callback,
+                                                                   style = clickndrag.gui.tmb.C_512_STYLE)
 
                 option_list.rect.center = self.window.rect.center
 
@@ -2308,8 +2315,9 @@ class PygameEditor(PygameUserInterface):
 
             image_width, image_height = new_image.get_size()
 
-            fabula.LOGGER.debug("original dimensions of loaded image: {}x{}".format(image_width,
-                                                                                   image_height))
+            msg = "original dimensions of loaded image: {}x{}"
+
+            fabula.LOGGER.debug(msg.format(image_width, image_height))
 
             # Get width and height that are multiples of self.spacing
             #
@@ -2321,6 +2329,8 @@ class PygameEditor(PygameUserInterface):
                 #
                 fitted_width = fitted_width + spacing
 
+                fabula.LOGGER.debug("width does not fit spacing, adding {}px".format(spacing))
+
             fitted_height = int(image_height / spacing) * spacing
 
             if image_height % spacing:
@@ -2328,6 +2338,8 @@ class PygameEditor(PygameUserInterface):
                 # Add a whole spacing unit to catch the leftover pixels
                 #
                 fitted_height = fitted_height + spacing
+
+                fabula.LOGGER.debug("height does not fit spacing, adding {}px".format(spacing))
 
             # Create a new Surface with the new size, and blit the image on it
             #

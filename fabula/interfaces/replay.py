@@ -24,7 +24,18 @@
 # work started on 7. Dec 2009
 
 import fabula.interfaces
+import sys
+import logging
 from time import sleep
+
+# Set up stdout logger
+#
+LOGGER = logging.getLogger("fabula.replay")
+
+STDOUT_HANDLER = logging.StreamHandler(sys.stdout)
+STDOUT_HANDLER.setLevel(logging.DEBUG)
+
+LOGGER.addHandler(STDOUT_HANDLER)
 
 class PythonReplayInterface(fabula.interfaces.Interface):
     """An Interface which replays Python message logs.
@@ -63,6 +74,7 @@ class PythonReplayInterface(fabula.interfaces.Interface):
                 message_log.append((float(tab_separated.split("\t")[0]),
                                     eval(tab_separated.split("\t")[1])))
 
+        LOGGER.info("wating for first connection")
         fabula.LOGGER.info("wating for first connection")
 
         while not self.connections:
@@ -71,6 +83,7 @@ class PythonReplayInterface(fabula.interfaces.Interface):
             #
             sleep(1/60)
 
+        LOGGER.info("connection found: '{}'".format(list(self.connections.keys())[0]))
         fabula.LOGGER.info("connection found: '{}'".format(list(self.connections.keys())[0]))
 
         message_buffer = list(self.connections.values())[0]
@@ -81,14 +94,20 @@ class PythonReplayInterface(fabula.interfaces.Interface):
 
             time_message_tuple = message_log.pop(0)
 
+            LOGGER.debug("sleeping {} s".format(time_message_tuple[0]))
             fabula.LOGGER.debug("sleeping {} s".format(time_message_tuple[0]))
 
             sleep(time_message_tuple[0])
 
+            LOGGER.debug("adding message: {}".format(time_message_tuple[1]))
             fabula.LOGGER.debug("adding message: {}".format(time_message_tuple[1]))
 
             message_buffer.messages_for_local.append(time_message_tuple[1])
 
+            LOGGER.debug("{} messages left for replay".format(len(message_log)))
+            fabula.LOGGER.debug("{} messages left for replay".format(len(message_log)))
+
+        LOGGER.info("done with replay or shutdown request")
         fabula.LOGGER.info("done with replay or shutdown request")
 
         # Run thread as long as no shutdown is requested

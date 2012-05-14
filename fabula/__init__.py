@@ -159,6 +159,11 @@
 #
 # TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, clickndrag, attempt_*.png, cancel.png, default.floorplan etc.
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
+#
+# TODO: invisible audio Entites for music
+#
+# TODO: thin clients. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
+# TODO: maybe it's enough to implement a replay interface for client data in the server interface.
 
 # Fabula will not work with Python versions prior to 3.x.
 #
