@@ -1447,13 +1447,24 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 container_style = clickndrag.gui.tmb.C_512_STYLE
 
-            # Using a OkBox for now.
-            # Taken from PygameEditor.open_image().
-            #
-            perception_box = clickndrag.gui.tmb.TMBOkBox(event.perception,
-                                                         style = container_style)
+            perception_box = clickndrag.gui.tmb.TMBFadingContainer("perception",
+                                                                   self._chars_to_frames(event.perception),
+                                                                   self.action_frames,
+                                                                   style = container_style)
+            lines = event.perception.split("\n")
 
-            perception_box.rect.center = self.window.rect.center
+            for line_no in range(len(lines)):
+
+                perception_box.sub(clickndrag.gui.Label("perception_line_{0}".format(line_no),
+                                   lines[line_no],
+                                   pygame.Rect((0, 0), (512, 30)),
+                                   background_color = (128, 128, 128, 0)))
+
+            perception_box.rect.centerx = self.window.rect.centerx
+
+            # Stay away from the window center
+            #
+            perception_box.rect.centery = int(self.window.rect.height / 5)
 
             self.window.sub(perception_box)
 
@@ -1686,16 +1697,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         self.window.room.sub(says_box)
 
-        # Display for (action_time / 8) per character, but at least for
-        # 2 * action_time
-        #
-        frames = int(self.action_frames / 8 * len(event.text))
-
-        if frames < 2 * self.action_frames:
-
-            frames = 2 * self.action_frames
-
-        for frame in range(frames):
+        for frame in range(self._chars_to_frames(event.text)):
 
             self.display_single_frame()
 
@@ -2034,6 +2036,22 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            self.window.room.rect.bottom = SCREENSIZE[1] - self.window.inventory.rect.height
 
         return
+
+    def _chars_to_frames(self, characters):
+        """Auxiliary method to compute how many frames to display a string.
+           characters is the string to display.
+        """
+
+        # Display for (action_time / 8) per character, but at least for
+        # 2 * action_time
+        #
+        frames = int(self.action_frames / 8 * len(characters))
+
+        if frames < 2 * self.action_frames:
+
+            frames = 2 * self.action_frames
+
+        return frames
 
 class EventEditor(clickndrag.gui.Container):
     """A clickndrag Container that implements an editor for Fabula Events.

@@ -164,6 +164,8 @@
 #
 # TODO: thin clients. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
 # TODO: maybe it's enough to implement a replay interface for client data in the server interface.
+#
+# TODO: build in in-game questionnaires for research games
 
 # Fabula will not work with Python versions prior to 3.x.
 #
