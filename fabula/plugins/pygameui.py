@@ -34,6 +34,9 @@ import clickndrag.gui.lmr
 import clickndrag.gui.tmb
 import tkinter.filedialog
 import tkinter.simpledialog
+import datetime
+import os
+import surfacecatcher
 
 # For cx_Freeze
 #
@@ -42,8 +45,6 @@ import tkinter._fix
 # Not present in Pygame 1.9.1
 #
 #import pygame._view
-
-import os
 
 # Pixels per character, for width estimation of text renderings
 #
@@ -446,6 +447,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.stats
            A dict mapping names of different metrics to their current vaule.
            Updated in PygameUserInterface.update_frame_timer().
+
+       PygameUserInterface.screen_dump_folder
+           A string with the name of a local folder to save screen dumps to.
+           This also acts as a flag: if it is different from the empty string,
+           PygameUserInterface.display_single_frame() will save screen dumps
+           there.
+
+       PygameUserInterface.surfacecatcher
+           An instance of surfacecatcher.SurfaceCatcher. Initially None.
     """
 
     def __init__(self, assets, framerate, host, fullscreen = False):
@@ -606,6 +616,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.osd = PygameOSD(self.window)
 
+        # Stub for the screen recording directory
+        #
+        self.screen_dump_folder = ""
+
+        self.surfacecatcher = None
+
         fabula.LOGGER.debug("complete")
 
         return
@@ -760,9 +776,22 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Also, update PygameUserInterface.stats.
         """
 
+        # TODO: both clocks leave spikes of > 200 FPS through. Check if a custom implementation using time.time() (Unix) / time.clock() (MS Win) and time.sleep() is more reliable.
+        #
         self.clock.tick(self.framerate)
 
         self.stats["fps"] = int(self.clock.get_fps())
+
+        # Measue re-entry time
+        #
+        #interval = time.time() - self._timestamp
+        #
+        #if interval != 0:
+        #
+        #    fabula.LOGGER.critical("interval {:.2}, {} FPS".format(interval,
+        #                                                        int(1 / interval)))
+        #
+        #self._timestamp = time.time()
 
         return
 
@@ -770,6 +799,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """Update and render all click'd'drag planes.
            This method also handles scrolling.
         """
+
+        # TODO: Catch some statistics. See also update_frame_timer().
+
+        # To have an effect, this must be the first thing to be called in the
+        # loop.
+        #
+        self.update_frame_timer()
 
         if not self.freeze:
 
@@ -810,7 +846,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             pygame.display.flip()
 
-        self.update_frame_timer()
+            # Screen dump recording
+            #
+            if self.screen_dump_folder:
+
+                self.surfacecatcher.catch(self.window.display)
 
         # Pump the Pygame Event Queue
         #
@@ -835,6 +875,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 fabula.LOGGER.info("exit request from user")
                 self.exit_requested = True
 
+                if self.screen_dump_folder:
+
+                    fabula.LOGGER.info("stopping recording screen dumps")
+
+                    self.screen_dump_folder = ""
+
+                    self.surfacecatcher.stop()
+                    self.surfacecatcher = None
+
                 # Quit pygame here, though there is still shutdown work to be
                 # done Client and ClientInterface.
                 #
@@ -848,9 +897,49 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     self.osd.remove("Framerate: ")
                     self.osd.remove("FPS: ")
 
+                    # Tie recording display to FPS display
+                    #
+                    if "Screen recorder: " in self.osd.caption_list:
+
+                        self.osd.remove("Screen recorder: ")
+
                 else:
                     self.osd.display("Framerate: ", self.stats, "framerate")
                     self.osd.display("FPS: ", self.stats, "fps")
+
+                    if self.screen_dump_folder:
+
+                        self.osd.display("Screen recorder: ",
+                                         {"state" : "running"},
+                                         "state")
+
+            elif (event.type == pygame.KEYDOWN
+                  and event.key == pygame.K_F2):
+
+                if self.screen_dump_folder:
+
+                    fabula.LOGGER.info("stopping recording screen dumps")
+
+                    self.screen_dump_folder = ""
+
+                    self.surfacecatcher.stop()
+                    self.surfacecatcher = None
+
+                else:
+                    self.screen_dump_folder = "{}-{}".format(datetime.date.today(),
+                                                             os.getpid())
+
+                    msg = "starting to record screen dumps to folder '{}'"
+
+                    fabula.LOGGER.info(msg.format(self.screen_dump_folder))
+
+                    if not os.path.exists(self.screen_dump_folder):
+
+                        os.mkdir(self.screen_dump_folder)
+
+                    self.surfacecatcher = surfacecatcher.SurfaceCatcher(self.screen_dump_folder)
+
+                    # Rest will be handled by display_single_frame()
 
 #            elif (self.host.room is not None
 #                  and event.type == pygame.KEYDOWN
@@ -2042,14 +2131,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            characters is the string to display.
         """
 
-        # Display for (action_time / 8) per character, but at least for
-        # 2 * action_time
+        # Display for (action_time / 6) per character, but at least for
+        # 2.5 * action_time
         #
-        frames = int(self.action_frames / 8 * len(characters))
+        frames = int(self.action_frames / 6 * len(characters))
 
-        if frames < 2 * self.action_frames:
+        if frames < 2.5 * self.action_frames:
 
-            frames = 2 * self.action_frames
+            frames = int(2.5 * self.action_frames)
 
         return frames
 

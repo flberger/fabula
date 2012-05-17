@@ -389,6 +389,8 @@ class TCPServerInterface(fabula.interfaces.Interface):
                         #
                         representation = repr(message_buffer.messages_for_remote.popleft())
 
+                        # TODO: this is where we could / should log outgoing messages on the server side.
+
                         try:
                             # Add a double newline as separator.
                             #

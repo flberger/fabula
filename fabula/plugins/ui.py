@@ -257,12 +257,16 @@ class UserInterface(fabula.plugins.Plugin):
            display the game and accept input.
         """
 
+        # If the call to update_frame_timer() conditionally limits the
+        # framerate, it must be the first thing to be called in the loop.
+        #
+        self.update_frame_timer()
+
         # You might want to restrict your updates to
         # visible Entities
         #
         pass
 
-        self.update_frame_timer()
 
         return
 
