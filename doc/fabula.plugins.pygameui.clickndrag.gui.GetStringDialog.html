@@ -1,0 +1,160 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.clickndrag.gui.GetStringDialog&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.c.g.GetStringDialog(<a href="fabula.plugins.pygameui.clickndrag.gui.Container.html">Container</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.clickndrag.html">clickndrag</a>.<a href="fabula.plugins.pygameui.clickndrag.gui.html">gui</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.clickndrag.gui.GetStringDialog">View In Hierarchy</a>
+    </p>
+    <div>
+      
+    </div>
+    <pre>A combination of Container, Label, TextBox and Button that asks the user for a string.
+
+Additional attributes:
+
+GetStringDialog.callback
+    The callback to be called callback(string) when the input is confirmed.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id158">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.html#ok">ok</a></td>
+    <td><tt>Button callback to destroy the GetStringDialog and call GetStringDialog.callback(string).</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.html#return_key">return_key</a></td>
+    <td><tt>Return key callback to destroy the GetStringDialog and call GetStringDialog.callback(string).</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.plugins.pygameui.clickndrag.gui.Container.html">Container</a>:
+        </p>
+        <table class="children sortable" id="id159">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#redraw">redraw</a></td>
+    <td><tt>Redraw Container.image from the dimensions in Containter.rect.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#sub">sub</a></td>
+    <td><tt>Resize the container, update the position of plane and add it as a subplane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#remove">remove</a></td>
+    <td><tt>Remove the subplane, then reposition remaining subplanes and resize the container.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#remove_all">remove_all</a></td>
+    <td><tt>Remove all subplanes and shrink accordingly.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, prompt, callback, display):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#__init__">fabula.plugins.pygameui.clickndrag.gui.Container.__init__</a></div>
+    <pre>Initialise.
+callback will be called callback(GetStringDialog.textbox.text)
+after the GetStringDialog is destroyed. It should call render()
+and flip the display to remove the GetStringDialog from the screen.
+display.key_sensitive() will be used to register the TextBox of this
+dialog.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.ok">
+    
+  </a>
+  <a name="ok">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    ok(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Button callback to destroy the GetStringDialog and call GetStringDialog.callback(string).
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.return_key">
+    
+  </a>
+  <a name="return_key">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    return_key(self, text):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return key callback to destroy the GetStringDialog and call GetStringDialog.callback(string).
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-05-22 20:35:24.
+    </address>
+  </body>
+</html>

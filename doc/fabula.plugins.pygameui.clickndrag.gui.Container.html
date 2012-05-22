@@ -1,0 +1,175 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.clickndrag.gui.Container&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.c.g.Container(<span title="clickndrag.Plane">clickndrag.Plane</span>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.clickndrag.html">clickndrag</a>.<a href="fabula.plugins.pygameui.clickndrag.gui.html">gui</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.clickndrag.gui.Container">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.plugins.pygameui.clickndrag.gui.FadingContainer.html">fabula.plugins.pygameui.clickndrag.gui.FadingContainer</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.html">fabula.plugins.pygameui.clickndrag.gui.GetStringDialog</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OkBox.html">fabula.plugins.pygameui.clickndrag.gui.OkBox</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OptionList.html">fabula.plugins.pygameui.clickndrag.gui.OptionList</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OptionSelector.html">fabula.plugins.pygameui.clickndrag.gui.OptionSelector</a></p>
+    </div>
+    <pre>A Container for Planes.
+If a subplane is added via sub(), the container places it below any existing
+subplanes and resizes itself to fit the width and height of the subplanes.
+
+Additional attributes:
+
+Container.padding
+    Space between subplanes and border, in pixels
+
+Container.background_color
+    The original background color for this Container</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id147">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#redraw">redraw</a></td>
+    <td><tt>Redraw Container.image from the dimensions in Containter.rect.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#sub">sub</a></td>
+    <td><tt>Resize the container, update the position of plane and add it as a subplane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#remove">remove</a></td>
+    <td><tt>Remove the subplane, then reposition remaining subplanes and resize the container.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Container.html#remove_all">remove_all</a></td>
+    <td><tt>Remove all subplanes and shrink accordingly.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.Container.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, name, padding=0, background_color=None):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.clickndrag.gui.FadingContainer.html">fabula.plugins.pygameui.clickndrag.gui.FadingContainer</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.GetStringDialog.html">fabula.plugins.pygameui.clickndrag.gui.GetStringDialog</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OkBox.html">fabula.plugins.pygameui.clickndrag.gui.OkBox</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OptionList.html">fabula.plugins.pygameui.clickndrag.gui.OptionList</a>, <a href="fabula.plugins.pygameui.clickndrag.gui.OptionSelector.html">fabula.plugins.pygameui.clickndrag.gui.OptionSelector</a></div>
+    <pre>Initialise.
+Container.image is initialised to a 0x0 px Surface.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.Container.redraw">
+    
+  </a>
+  <a name="redraw">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    redraw(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Redraw Container.image from the dimensions in Containter.rect.
+This also creates a new Container.rendersurface.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.Container.sub">
+    
+  </a>
+  <a name="sub">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    sub(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Resize the container, update the position of plane and add it as a subplane.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.Container.remove">
+    
+  </a>
+  <a name="remove">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    remove(self, plane_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove the subplane, then reposition remaining subplanes and resize the container.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.Container.remove_all">
+    
+  </a>
+  <a name="remove_all">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    remove_all(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove all subplanes and shrink accordingly.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-05-22 20:35:24.
+    </address>
+  </body>
+</html>

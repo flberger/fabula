@@ -1,0 +1,193 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.clickndrag.gui.TextBox&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.c.g.TextBox(<a href="fabula.plugins.pygameui.clickndrag.gui.Label.html">Label</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.clickndrag.html">clickndrag</a>.<a href="fabula.plugins.pygameui.clickndrag.gui.html">gui</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.clickndrag.gui.TextBox">View In Hierarchy</a>
+    </p>
+    <div>
+      
+    </div>
+    <pre>A box where the user can type text.
+
+To actually receive key events, the TextBox must be registered with the
+Display using Display.key_sensitive(TextBox).
+
+Attributes:
+
+TextBox.text
+    Standard Label attribute, holding the text typed so far.
+
+TextBox.active
+    Boolean flag whether this TextBox is active, initally False.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id156">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.TextBox.html#__init__">__init__</a></td>
+    <td><tt>Initialise the TextBox.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.TextBox.html#keydown">keydown</a></td>
+    <td><tt>If printable, add keydown_event.unicode to self.text.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.TextBox.html#activate">activate</a></td>
+    <td><tt>Call to show the user that the TextBox is ready for input.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.TextBox.html#deactivate">deactivate</a></td>
+    <td><tt>Call to show the user that the TextBox no longer accepts input.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.TextBox.html#redraw">redraw</a></td>
+    <td><tt>Redraw the TextBox if necessary.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.plugins.pygameui.clickndrag.gui.Label.html">Label</a>:
+        </p>
+        <table class="children sortable" id="id157">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.clickndrag.gui.Label.html#update">update</a></td>
+    <td><tt>Renew the text on the label, then call the base class method.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.TextBox.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, name, rect, return_callback=None, background_color=(250, 250, 250)):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.clickndrag.gui.Label.html#__init__">fabula.plugins.pygameui.clickndrag.gui.Label.__init__</a></div>
+    <pre>Initialise the TextBox.
+If return_callback is given, return_callback(TextBox.text) will be
+called when [RETURN] is pressed.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.TextBox.keydown">
+    
+  </a>
+  <a name="keydown">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    keydown(self, keydown_event):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>If printable, add keydown_event.unicode to self.text.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.TextBox.activate">
+    
+  </a>
+  <a name="activate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    activate(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call to show the user that the TextBox is ready for input.
+Sets TextBox.active to True.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.TextBox.deactivate">
+    
+  </a>
+  <a name="deactivate">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    deactivate(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call to show the user that the TextBox no longer accepts input.
+Sets TextBox.active to False.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.clickndrag.gui.TextBox.redraw">
+    
+  </a>
+  <a name="redraw">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    redraw(self, force=False):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.clickndrag.gui.Label.html#redraw">fabula.plugins.pygameui.clickndrag.gui.Label.redraw</a></div>
+    <pre>Redraw the TextBox if necessary.
+If the TextBox is active, display a cursor behind the text.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-05-22 20:35:24.
+    </address>
+  </body>
+</html>
