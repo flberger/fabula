@@ -28,6 +28,16 @@
 # TODO: in PygameEditor, display all assets from local folder for visual editing
 # TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
 
+# Add the pygameui directoy to the search path. We will put modules required by
+# pygameui (but not Fabula in general) here.
+# This is especially important for clickndrag submodules.
+#
+import sys
+
+# __path__ is a list
+#
+sys.path.extend(__path__)
+
 import fabula.plugins.ui
 import pygame
 import clickndrag.gui.lmr

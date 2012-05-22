@@ -153,6 +153,7 @@
 #
 # TODO: demos: pacman, chess
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
+#
 # TODO: support and test Python package managers, as pip, easyinstall etc.
 # TODO: makeself binary release for Linux - http://megastep.org/makeself
 # TODO: support zeroinstall - http://0install.net/
@@ -166,6 +167,8 @@
 # TODO: maybe it's enough to implement a replay interface for client data in the server interface.
 #
 # TODO: build in in-game questionnaires for research games
+#
+# TODO: use a single ZIP file for all assets, instead of cluttering the main directory.
 
 # Fabula will not work with Python versions prior to 3.x.
 #

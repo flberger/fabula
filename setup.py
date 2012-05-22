@@ -65,8 +65,23 @@ INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
 
 # Include clickndrag resources
 #
-INCLUDE_FILES.extend(glob.glob(os.path.join("clickndrag", "gui", "resources", "*.png")))
-INCLUDE_FILES.extend(glob.glob(os.path.join("clickndrag", "gui", "resources", "*.ttf")))
+import fabula.plugins.pygameui as pygamui
+
+INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
+                                            "plugins",
+                                            "pygameui",
+                                            "clickndrag",
+                                            "gui",
+                                            "resources",
+                                            "*.png")))
+
+INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
+                                            "plugins",
+                                            "pygameui",
+                                            "clickndrag",
+                                            "gui",
+                                            "resources",
+                                            "*.ttf")))
 
 # Include default room
 #
@@ -102,16 +117,19 @@ setup(name = PACKAGE,
                   "{}.core".format(PACKAGE),
                   "{}.interfaces".format(PACKAGE),
                   "{}.plugins".format(PACKAGE),
-                  "clickndrag"],
-      py_modules = ["surfacecatcher"],
+                  "{}.plugins.pygameui".format(PACKAGE),
+                  "{}.plugins.pygameui.clickndrag".format(PACKAGE),
+                  "{}.plugins.pygameui.clickndrag.gui".format(PACKAGE)],
+      py_modules = [],
       requires = ["pygame (>=1.9.1)"],
       provides = [PACKAGE,
                   "{}.core".format(PACKAGE),
                   "{}.interfaces".format(PACKAGE),
                   "{}.plugins".format(PACKAGE),
-                  "clickndrag",
-                  "surfacecatcher"],
-      package_data = {"clickndrag" : ["Vera.ttf", "VeraBd.ttf"]},
+                  "{}.plugins.pygameui".format(PACKAGE),
+                  "{}.plugins.pygameui.clickndrag".format(PACKAGE),
+                  "{}.plugins.pygameui.clickndrag.gui".format(PACKAGE)],
+      package_data = {},
       scripts = SCRIPTS,
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
                      glob.glob(os.path.join("doc", "*.*")) + ["README", "NEWS"]),
