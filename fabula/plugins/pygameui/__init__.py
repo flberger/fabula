@@ -2121,18 +2121,30 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """
 
         if self.window.room.rect.left > 0:
-           self.window.room.rect.left = 0
+
+            fabula.LOGGER.debug("snapping window.room.rect.left = 0")
+
+            self.window.room.rect.left = 0
 
         if self.window.room.rect.top > 0:
-           self.window.room.rect.top = 0
+
+            fabula.LOGGER.debug("snapping window.room.rect.top = 0")
+
+            self.window.room.rect.top = 0
 
         if self.window.room.rect.right < SCREENSIZE[0]:
-           self.window.room.rect.right = SCREENSIZE[0]
+
+            fabula.LOGGER.debug("snapping window.room.rect.right = {}".format(SCREENSIZE[0]))
+
+            self.window.room.rect.right = SCREENSIZE[0]
 
         # Mind the inventory
         #
         if self.window.room.rect.bottom < SCREENSIZE[1] - self.window.inventory.rect.height:
-           self.window.room.rect.bottom = SCREENSIZE[1] - self.window.inventory.rect.height
+
+            fabula.LOGGER.debug("snapping window.room.rect.bottom")
+
+            self.window.room.rect.bottom = SCREENSIZE[1] - self.window.inventory.rect.height
 
         return
 
@@ -3497,7 +3509,15 @@ class PygameOSD:
 
                 self.text =  "{} {}".format(self.caption, value)
 
+                # OutlinedText is centered. We don't want that.
+                #
+                x, y = self.rect.topleft
+
                 clickndrag.gui.OutlinedText.update(self)
+
+                # Restore
+                #
+                self.rect.topleft = (x, y)
 
                 return
 
@@ -3506,7 +3526,7 @@ class PygameOSD:
         return
 
     def display(self, caption, dictionary, key):
-        """Create an OSDText instance and register it as a subplane of display_plane.
+        """Create a PygameOSD.OSDText instance and register it as a subplane of display_plane.
         """
 
         # Use caption as Plane name
@@ -3526,6 +3546,10 @@ class PygameOSD:
         self.display_plane.sub(osdtext)
 
         self.caption_list.append(caption)
+
+        fabula.LOGGER.debug("displaying caption '{}' at ({}, {})".format(caption,
+                                                                         osdtext.rect.left,
+                                                                         osdtext.rect.top))
 
         return
 

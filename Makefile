@@ -161,9 +161,13 @@ commit.txt:
 	#
 	bzr diff > commit.txt ; nano commit.txt
 
-# Taken from the StepSim Makefile
+# First taken from the StepSim Makefile
 #
 commit:
+	@echo commit.txt:
+	@echo ------------------------------------------------------
+	@cat commit.txt
+	@echo ------------------------------------------------------
 	@echo RETURN to commit using commit.txt, CTRL-C to cancel:
 	@read DUMMY
 	bzr commit --file commit.txt && rm -v commit.txt
