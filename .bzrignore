@@ -11,7 +11,7 @@ commit.txt
 dist/
 build
 MANIFEST
-clickndrag
+planes
 user_install-filelist.txt
 *.backup
 __pycache__

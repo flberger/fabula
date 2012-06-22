@@ -158,7 +158,7 @@
 # TODO: makeself binary release for Linux - http://megastep.org/makeself
 # TODO: support zeroinstall - http://0install.net/
 #
-# TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, clickndrag, attempt_*.png, cancel.png, default.floorplan etc.
+# TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, planes, attempt_*.png, cancel.png, default.floorplan etc.
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
 #
 # TODO: invisible audio Entites for music

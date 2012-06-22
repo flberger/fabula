@@ -30,7 +30,7 @@
 
 # Add the pygameui directoy to the search path. We will put modules required by
 # pygameui (but not Fabula in general) here.
-# This is especially important for clickndrag submodules.
+# This is especially important for planes submodules.
 #
 import sys
 
@@ -40,8 +40,8 @@ sys.path.extend(__path__)
 
 import fabula.plugins.ui
 import pygame
-import clickndrag.gui.lmr
-import clickndrag.gui.tmb
+import planes.gui.lmr
+import planes.gui.tmb
 import tkinter.filedialog
 import tkinter.simpledialog
 import datetime
@@ -97,7 +97,7 @@ def load_image(title):
 
     return (surface, filename)
 
-class EntityPlane(clickndrag.Plane):
+class EntityPlane(planes.Plane):
     """Subclass of Plane with an extended update() method that handles movement.
 
        Additional attributes:
@@ -129,7 +129,7 @@ class EntityPlane(clickndrag.Plane):
 
         # Call base class
         #
-        clickndrag.Plane.__init__(self,
+        planes.Plane.__init__(self,
                                   name,
                                   rect,
                                   draggable = draggable,
@@ -151,7 +151,7 @@ class EntityPlane(clickndrag.Plane):
 
         # Call base class to update() all subplanes
         #
-        clickndrag.Plane.update(self)
+        planes.Plane.update(self)
 
         # Change position
         #
@@ -186,7 +186,7 @@ class PygameEntity(fabula.Entity):
            The number of frames per action.
 
        PygameEntity.caption_plane
-           A clickndrag.gui.Label with the caption for this PygameEntity.
+           A planes.gui.Label with the caption for this PygameEntity.
            Initially None.
     """
 
@@ -364,7 +364,7 @@ class PygameEntity(fabula.Entity):
                 # Create a new caption Label
                 # TODO: arbitrary width formula
                 #
-                self.caption_plane = clickndrag.gui.OutlinedText(self.identifier + "_caption",
+                self.caption_plane = planes.gui.OutlinedText(self.identifier + "_caption",
                                                                  event.property_value)
 
             self.display_caption()
@@ -426,21 +426,21 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Number of pixels to scroll per call to display_single_frame().
 
        PygameUserInterface.window
-           An instance of clickndrag.Display. Dimensions are given by
+           An instance of planes.Display. Dimensions are given by
            SCREENSIZE. By default opened in windowed mode, this can be changed
            by editing the file fabula.conf.
 
        PygameUserInterface.window.inventory
-           clickndrag Plane for the inventory. By default this is 800x100px
+           planes Plane for the inventory. By default this is 800x100px
            with space for 8 100x100px icons and located at the bottom of the
            window.
 
        PygameUserInterface.window.room
-           clickndrag Plane for the room. Initially it will have a size of
+           planes Plane for the room. Initially it will have a size of
            0x0 px. The final Plane is created by process_RoomCompleteEvent.
 
        PygameUserInterface.window.room.tiles
-           clickndrag Plane which has the Tile Planes as subplanes.
+           planes Plane which has the Tile Planes as subplanes.
 
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
@@ -521,9 +521,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         os.environ["SDL_VIDEO_CENTERED"] = "1"
 
-        # Open a click'n'drag window.
+        # Open a planes window.
         #
-        self.window = clickndrag.Display(SCREENSIZE, fullscreen)
+        self.window = planes.Display(SCREENSIZE, fullscreen)
 
         # Create a black pygame surface for fade effects.
         #
@@ -531,13 +531,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Create loading text surface to be used in process_EnterRoomEvent
         #
-        self.loading_surface = clickndrag.gui.BIG_FONT.render("Loading, please wait...",
+        self.loading_surface = planes.gui.BIG_FONT.render("Loading, please wait...",
                                                               True,
                                                               (255, 255, 255))
 
         # Create inventory plane.
         #
-        self.inventory_plane = clickndrag.Plane("inventory",
+        self.inventory_plane = planes.Plane("inventory",
                                                 pygame.Rect((0, 500), (800, 100)),
                                                 dropped_upon_callback = self.inventory_callback)
 
@@ -596,7 +596,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Create Plane
             #
-            plane = clickndrag.Plane(name,
+            plane = planes.Plane(name,
                                      rect,
                                      left_click_callback = self.attempt_icon_callback)
 
@@ -614,12 +614,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # This Plane is only there to collect subplanes and hence is initialised
         # with 0x0 pixels. The final Plane will be created by process_RoomCompleteEvent().
         #
-        self.window.sub(clickndrag.Plane("room",
+        self.window.sub(planes.Plane("room",
                                          pygame.Rect((0, 0), (0, 0))))
 
         # Create a subplane as a sort-of buffer for Tiles.
         #
-        self.window.room.sub(clickndrag.Plane("tiles",
+        self.window.room.sub(planes.Plane("tiles",
                                               pygame.Rect((0, 0), (0, 0))))
 
         # Initialise on screen display.
@@ -698,19 +698,19 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 return
 
-        container = clickndrag.gui.tmb.TMBContainer("get_connection_details",
-                                                    clickndrag.gui.tmb.C_256_STYLE,
+        container = planes.gui.tmb.TMBContainer("get_connection_details",
+                                                    planes.gui.tmb.C_256_STYLE,
                                                     padding = 5)
 
         # Login name prompt
         #
-        container.sub(clickndrag.gui.Label("id_caption",
+        container.sub(planes.gui.Label("id_caption",
                                            "Login name:",
                                            pygame.Rect((0, 0),
                                                        (200, 30)),
                                            background_color = (128, 128, 128, 0)))
 
-        container.sub(clickndrag.gui.TextBox("identifier",
+        container.sub(planes.gui.TextBox("identifier",
                                              pygame.Rect((0, 0),
                                                          (200, 30)),
                                              return_callback = None))
@@ -727,13 +727,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         if prompt_connector:
 
-            container.sub(clickndrag.gui.Label("connector_caption",
+            container.sub(planes.gui.Label("connector_caption",
                                                "Server IP",
                                                pygame.Rect((0, 0),
                                                            (200, 30)),
                                                background_color = (128, 128, 128, 0)))
 
-            container.sub(clickndrag.gui.TextBox("connector",
+            container.sub(planes.gui.TextBox("connector",
                                                  pygame.Rect((0, 0),
                                                              (200, 30)),
                                                  return_callback = None))
@@ -749,7 +749,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # OK button
         #
-        container.sub(clickndrag.gui.lmr.LMRButton("OK",
+        container.sub(planes.gui.lmr.LMRButton("OK",
                                                    50,
                                                    dialog_callback))
 
@@ -806,7 +806,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def display_single_frame(self):
-        """Update and render all click'd'drag planes.
+        """Update and render all planes.
            This method also handles scrolling.
         """
 
@@ -869,7 +869,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         return
 
     def collect_player_input(self):
-        """Gather Pygame events, scan for QUIT or special keys and let the clickndrag Display evaluate the events.
+        """Gather Pygame events, scan for QUIT or special keys and let the planes Display evaluate the events.
         """
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
@@ -1069,12 +1069,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Create new 'room' and 'tiles' Planes based on the max size
         #
-        room_plane = clickndrag.Plane("room",
+        room_plane = planes.Plane("room",
                                       pygame.Rect((0, 0),
                                                   ((max_right + 1) * self.spacing,
                                                    (max_bottom + 1) * self.spacing)))
 
-        room_plane.sub(clickndrag.Plane("tiles",
+        room_plane.sub(planes.Plane("tiles",
                                         pygame.Rect((0, 0),
                                                     room_plane.rect.size)))
 
@@ -1206,10 +1206,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 callback = lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text))
 
-                option_list = clickndrag.gui.tmb.TMBOptionSelector("select_sentence",
+                option_list = planes.gui.tmb.TMBOptionSelector("select_sentence",
                                                                    event.sentences,
                                                                    callback,
-                                                                   style = clickndrag.gui.tmb.C_512_STYLE)
+                                                                   style = planes.gui.tmb.C_512_STYLE)
 
                 option_list.rect.center = self.window.rect.center
 
@@ -1218,7 +1218,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             else:
                 callback = lambda text: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, text))
 
-                dialog = clickndrag.gui.tmb.TMBGetStringDialog("You say:",
+                dialog = planes.gui.tmb.TMBGetStringDialog("You say:",
                                                                callback,
                                                                self.window)
 
@@ -1503,12 +1503,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Now tile_from_list.asset is present
 
         # Do we already have a tile there?
-        # Tiles are clickndrag subplanes of self.window.room, indexed by their
+        # Tiles are planes subplanes of self.window.room, indexed by their
         # location as string representation.
         #
         if str(event.location) not in self.window.room.tiles.subplanes:
 
-            tile_plane = clickndrag.Plane(str(event.location),
+            tile_plane = planes.Plane(str(event.location),
                                           pygame.Rect((event.location[0] * self.spacing,
                                                        event.location[1] * self.spacing),
                                                       (100, 100)),
@@ -1540,13 +1540,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # Choose container width depending on text length
             # Copied from process_SaysEvent().
             #
-            container_style = clickndrag.gui.tmb.C_256_STYLE
+            container_style = planes.gui.tmb.C_256_STYLE
 
             if len(event.perception) * PIX_PER_CHAR > 200:
 
-                container_style = clickndrag.gui.tmb.C_512_STYLE
+                container_style = planes.gui.tmb.C_512_STYLE
 
-            perception_box = clickndrag.gui.tmb.TMBFadingContainer("perception",
+            perception_box = planes.gui.tmb.TMBFadingContainer("perception",
                                                                    self._chars_to_frames(event.perception),
                                                                    self.action_frames,
                                                                    style = container_style)
@@ -1554,7 +1554,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             for line_no in range(len(lines)):
 
-                perception_box.sub(clickndrag.gui.Label("perception_line_{0}".format(line_no),
+                perception_box.sub(planes.gui.Label("perception_line_{0}".format(line_no),
                                    lines[line_no],
                                    pygame.Rect((0, 0), (512, 30)),
                                    background_color = (128, 128, 128, 0)))
@@ -1768,16 +1768,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Choose container width depending on text length
         #
-        container_style = clickndrag.gui.tmb.C_256_STYLE
+        container_style = planes.gui.tmb.C_256_STYLE
 
         if len(event.text) * PIX_PER_CHAR > 200:
 
-            container_style = clickndrag.gui.tmb.C_512_STYLE
+            container_style = planes.gui.tmb.C_512_STYLE
 
-        says_box = clickndrag.gui.tmb.TMBContainer("{}_says".format(event.identifier),
+        says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
                                                    container_style)
 
-        says_box.sub(clickndrag.gui.Label("text",
+        says_box.sub(planes.gui.Label("text",
                                           event.text,
                                           pygame.Rect((0, 0),
                                                       (len(event.text) * PIX_PER_CHAR, 30)),
@@ -1966,7 +1966,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             icon_plane.sync(plane)
 
             # This will remove and re-add the Plane to room.
-            # <3 clickndrag :-)
+            # <3 planes :-)
             #
             self.window.room.sub(icon_plane)
 
@@ -2060,7 +2060,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             displaystring = str(obj).center(128)
 
-            self.window.display.blit(clickndrag.gui.SMALL_FONT.render(displaystring,
+            self.window.display.blit(planes.gui.SMALL_FONT.render(displaystring,
                                                             True,
                                                             (127, 127, 127),
                                                             (0, 0, 0)),
@@ -2164,8 +2164,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         return frames
 
-class EventEditor(clickndrag.gui.Container):
-    """A clickndrag Container that implements an editor for Fabula Events.
+class EventEditor(planes.gui.Container):
+    """A planes Container that implements an editor for Fabula Events.
 
        Additional attributes:
 
@@ -2186,17 +2186,17 @@ class EventEditor(clickndrag.gui.Container):
         # Call base class
         # We need a random and unique name - use the id of the Event.
         #
-        clickndrag.gui.Container.__init__(self,
+        planes.gui.Container.__init__(self,
                                           str(id(event)),
                                           padding = 5,
                                           background_color = (128, 128, 128, 0))
 
         # Title
         #
-        self.sub(clickndrag.gui.Label("title",
+        self.sub(planes.gui.Label("title",
                                       event.__class__.__name__,
                                       pygame.Rect((0, 0), (300, 25)),
-                                      background_color = clickndrag.gui.HIGHLIGHT_COLOR))
+                                      background_color = planes.gui.HIGHLIGHT_COLOR))
 
         # Show Event attributes
 
@@ -2207,13 +2207,13 @@ class EventEditor(clickndrag.gui.Container):
 
         for key in keys:
 
-            key_label = clickndrag.gui.Label("key_{}".format(key),
+            key_label = planes.gui.Label("key_{}".format(key),
                                              "{}:".format(key),
                                              pygame.Rect((0, 0), (150, 25)),
                                              background_color = (64, 64, 64, 0),
                                              text_color = (250, 250, 250))
 
-            value_textbox = clickndrag.gui.TextBox("value_{}".format(key),
+            value_textbox = planes.gui.TextBox("value_{}".format(key),
                                                    pygame.Rect((key_label.rect.width, 0),
                                                                (150, 25)))
 
@@ -2223,7 +2223,7 @@ class EventEditor(clickndrag.gui.Container):
             #
             value_textbox.left_click_callback = lambda plane : display.key_sensitive(plane)
 
-            key_value = clickndrag.Plane("keyvalue_{}".format(key),
+            key_value = planes.Plane("keyvalue_{}".format(key),
                                          pygame.Rect((0, 0),
                                                      (300, 25)))
 
@@ -2282,11 +2282,11 @@ class PygameEditor(PygameUserInterface):
        Additional PygameEditor attributes:
 
        PygameUserInterface.window.buttons
-           clickndrag Plane for the buttons, 100x600px and located at the left
+           planes Plane for the buttons, 100x600px and located at the left
            border of the window.
 
        PygameUserInterface.window.properties
-           clickndrag Plane for Entity properties, 100x600px and located at the
+           planes Plane for Entity properties, 100x600px and located at the
            right border of the window.
 
        PygameUserInterface.plane_cache
@@ -2334,75 +2334,75 @@ class PygameEditor(PygameUserInterface):
 
         # Create Container for the editor buttons.
         #
-        container = clickndrag.gui.Container("buttons",
+        container = planes.gui.Container("buttons",
                                              padding = 4,
                                              background_color = (64, 64, 64))
         self.window.sub(container)
 
         # Add buttons
 
-        room = clickndrag.gui.Container("room",
+        room = planes.gui.Container("room",
                                         padding = 4,
                                         background_color = (64, 64, 64))
 
-        room.sub(clickndrag.gui.Label("title",
+        room.sub(planes.gui.Label("title",
                                       "Room",
                                       pygame.Rect((0, 0),
                                                   (80, 25)),
                                       background_color = (64, 64, 64),
                                       text_color = (250, 250, 250)))
 
-        room.sub(clickndrag.gui.Button("Load Room",
+        room.sub(planes.gui.Button("Load Room",
                                        pygame.Rect((0, 0), (80, 25)),
                                        self.load_room))
 
-        room.sub(clickndrag.gui.Button("Save Room",
+        room.sub(planes.gui.Button("Save Room",
                                        pygame.Rect((0, 0), (80, 25)),
                                        self.save_room))
 
-        room.sub(clickndrag.gui.Button("Add Entity",
+        room.sub(planes.gui.Button("Add Entity",
                                        pygame.Rect((0, 0), (80, 25)),
                                        lambda plane: self.edit_entity_attributes(self.add_entity)))
 
-        room.sub(clickndrag.gui.Button("Edit Walls",
+        room.sub(planes.gui.Button("Edit Walls",
                                        pygame.Rect((0, 0), (80, 25)),
                                        self.edit_walls))
 
-        background = clickndrag.gui.Container("background",
+        background = planes.gui.Container("background",
                                               padding = 4,
                                               background_color = (64, 64, 64))
 
-        background.sub(clickndrag.gui.Label("title",
+        background.sub(planes.gui.Label("title",
                                             "Background",
                                             pygame.Rect((0, 0),
                                                         (80, 25)),
                                             background_color = (64, 64, 64),
                                             text_color = (250, 250, 250)))
 
-        background.sub(clickndrag.gui.Button("Open Image",
+        background.sub(planes.gui.Button("Open Image",
                                              pygame.Rect((0, 0), (80, 25)),
                                              self.open_image))
 
-        logic = clickndrag.gui.Container("logic",
+        logic = planes.gui.Container("logic",
                                          padding = 4,
                                          background_color = (64, 64, 64))
 
-        logic.sub(clickndrag.gui.Label("title",
+        logic.sub(planes.gui.Label("title",
                                        "Logic",
                                        pygame.Rect((0, 0),
                                                    (80, 25)),
                                        background_color = (64, 64, 64),
                                        text_color = (250, 250, 250)))
 
-        logic.sub(clickndrag.gui.Button("Save Logic",
+        logic.sub(planes.gui.Button("Save Logic",
                                         pygame.Rect((0, 0), (80, 25)),
                                         lambda plane : self.host.save_condition_response_dict("default.logic")))
 
-        logic.sub(clickndrag.gui.Button("Load Logic",
+        logic.sub(planes.gui.Button("Load Logic",
                                         pygame.Rect((0, 0), (80, 25)),
                                         lambda plane: self.host.load_condition_response_dict("default.logic")))
 
-        logic.sub(clickndrag.gui.Button("Clear Logic",
+        logic.sub(planes.gui.Button("Clear Logic",
                                         pygame.Rect((0, 0), (80, 25)),
                                         lambda plane: self.host.clear_condition_response_dict()))
 
@@ -2410,13 +2410,13 @@ class PygameEditor(PygameUserInterface):
         self.window.buttons.sub(background)
         self.window.buttons.sub(logic)
 
-        self.window.buttons.sub(clickndrag.gui.Button("Quit",
+        self.window.buttons.sub(planes.gui.Button("Quit",
                                                       pygame.Rect((0, 0), (80, 25)),
                                                       self.quit))
 
         # Create Container for the properties
         #
-        container = clickndrag.gui.Container("properties",
+        container = planes.gui.Container("properties",
                                              padding = 5,
                                              background_color = (64, 64, 64))
 
@@ -2626,7 +2626,7 @@ class PygameEditor(PygameUserInterface):
                 room_list.append(filename.split(".floorplan")[0])
 
         if len(room_list):
-            option_list = clickndrag.gui.OptionSelector("select_room",
+            option_list = planes.gui.OptionSelector("select_room",
                                                         room_list,
                                                         self.host.send_room_events,
                                                         background_color = (64, 64, 64))
@@ -2649,13 +2649,13 @@ class PygameEditor(PygameUserInterface):
 
         fabula.LOGGER.debug("called")
 
-        container = clickndrag.gui.Container("get_entity_attributes",
+        container = planes.gui.Container("get_entity_attributes",
                                              padding = 5,
                                              background_color = (64, 64, 64))
 
         # Identifier
         #
-        container.sub(clickndrag.gui.Label("id_caption",
+        container.sub(planes.gui.Label("id_caption",
                                            "Identifier:",
                                            pygame.Rect((0, 0),
                                                             (200, 30)),
@@ -2666,7 +2666,7 @@ class PygameEditor(PygameUserInterface):
 
             # Shouldn't change identifier of a live Entity
             #
-            container.sub(clickndrag.gui.Label("identifier",
+            container.sub(planes.gui.Label("identifier",
                                                entity.identifier,
                                                pygame.Rect((0, 0),
                                                                 (200, 30)),
@@ -2674,7 +2674,7 @@ class PygameEditor(PygameUserInterface):
                                                text_color = (250, 250, 250)))
 
         else:
-            container.sub(clickndrag.gui.TextBox("identifier",
+            container.sub(planes.gui.TextBox("identifier",
                                                  pygame.Rect((0, 0),
                                                                 (200, 30)),
                                                  return_callback = None))
@@ -2686,7 +2686,7 @@ class PygameEditor(PygameUserInterface):
 
         # Type
         #
-        container.sub(clickndrag.gui.Label("type_caption",
+        container.sub(planes.gui.Label("type_caption",
                                            "Type:",
                                            pygame.Rect((0, 0),
                                                             (200, 30)),
@@ -2697,7 +2697,7 @@ class PygameEditor(PygameUserInterface):
 
             if entity.entity_type == fabula.PLAYER:
 
-                container.sub(clickndrag.gui.Label("select_entity_type",
+                container.sub(planes.gui.Label("select_entity_type",
                                                    "PLAYER",
                                                    pygame.Rect((0, 0),
                                                                     (200, 30)),
@@ -2710,17 +2710,17 @@ class PygameEditor(PygameUserInterface):
                 type_list = {fabula.ITEM: ["ITEM", "NPC"],
                              fabula.NPC: ["NPC", "ITEM"]}[entity.entity_type]
 
-                container.sub(clickndrag.gui.OptionList("select_entity_type",
+                container.sub(planes.gui.OptionList("select_entity_type",
                                                         type_list,
                                                         width = 200))
         else:
-            container.sub(clickndrag.gui.OptionList("select_entity_type",
+            container.sub(planes.gui.OptionList("select_entity_type",
                                                     ["ITEM", "NPC"],
                                                     width = 200))
 
         # Blocking
         #
-        container.sub(clickndrag.gui.Label("blocking_caption",
+        container.sub(planes.gui.Label("blocking_caption",
                                            "Blocking:",
                                            pygame.Rect((0, 0),
                                                             (200, 30)),
@@ -2736,14 +2736,14 @@ class PygameEditor(PygameUserInterface):
             blocking_list = {True: ["block", "no-block"],
                              False: ["no-block", "block"]}[entity.blocking]
 
-        container.sub(clickndrag.gui.OptionList("select_blocking",
+        container.sub(planes.gui.OptionList("select_blocking",
                                                 blocking_list,
                                                 width = 200))
 
         # Mobility
         # TODO: shouldn't be able to change mobility of PLAYER
         #
-        container.sub(clickndrag.gui.Label("mobility_caption",
+        container.sub(planes.gui.Label("mobility_caption",
                                            "Mobility:",
                                            pygame.Rect((0, 0),
                                                             (200, 30)),
@@ -2759,13 +2759,13 @@ class PygameEditor(PygameUserInterface):
             mobility_list = {True: ["mobile", "immobile"],
                              False: ["immobile", "mobile"]}[entity.mobile]
 
-        container.sub(clickndrag.gui.OptionList("select_mobile",
+        container.sub(planes.gui.OptionList("select_mobile",
                                                 mobility_list,
                                                 width = 200))
 
         # OK button
         #
-        container.sub(clickndrag.gui.Button("OK",
+        container.sub(planes.gui.Button("OK",
                                             pygame.Rect((0, 0), (80, 25)),
                                             callback))
 
@@ -2846,7 +2846,7 @@ class PygameEditor(PygameUserInterface):
         # Get user input
         #
         if isinstance(buttonplane.parent.select_entity_type,
-                      clickndrag.gui.OptionList):
+                      planes.gui.OptionList):
 
             entity_type = buttonplane.parent.select_entity_type.selected.text
 
@@ -2914,13 +2914,13 @@ class PygameEditor(PygameUserInterface):
         #
         self.window.buttons.remove_all()
 
-        self.window.buttons.sub(clickndrag.gui.Label("title",
+        self.window.buttons.sub(planes.gui.Label("title",
                                                      "Edit Walls",
                                                       pygame.Rect((0, 0),
                                                                   (80, 25)),
                                                       background_color = (120, 120, 120)))
 
-        self.window.buttons.sub(clickndrag.gui.Button("Done",
+        self.window.buttons.sub(planes.gui.Button("Done",
                                                       pygame.Rect((5, 35),
                                                                   (80, 25)),
                                                       self.wall_edit_done))
@@ -2951,7 +2951,7 @@ class PygameEditor(PygameUserInterface):
 
             if self.host.room.floor_plan[coordinates].tile.tile_type == fabula.OBSTACLE:
 
-                overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
+                overlay_plane = planes.Plane(str(coordinates) + "_overlay",
                                                  pygame.Rect(self.window.room.tiles.subplanes[str(coordinates)].rect),
                                                  left_click_callback = self.make_tile_floor)
 
@@ -2982,7 +2982,7 @@ class PygameEditor(PygameUserInterface):
         # rect can be taken from the Plane that received the click, but we make
         # a copy to be on the safe side.
         #
-        overlay_plane = clickndrag.Plane(str(coordinates) + "_overlay",
+        overlay_plane = planes.Plane(str(coordinates) + "_overlay",
                                          pygame.Rect(plane.rect),
                                          left_click_callback = self.make_tile_floor)
 
@@ -3035,7 +3035,7 @@ class PygameEditor(PygameUserInterface):
 
         # Restore Entity Planes in room
         #
-        while not isinstance(self.plane_cache[-1], clickndrag.gui.Button):
+        while not isinstance(self.plane_cache[-1], planes.gui.Button):
             self.window.room.sub(self.plane_cache.pop())
 
         # Make Entity Planes in inventory sensitive to drags
@@ -3136,7 +3136,7 @@ class PygameEditor(PygameUserInterface):
 
         # Entity.identifier
         #
-        self.window.properties.sub(clickndrag.gui.Label("identifier",
+        self.window.properties.sub(planes.gui.Label("identifier",
                                                         entity.identifier,
                                                         pygame.Rect((0, 0), (80, 25)),
                                                         background_color = (64, 64, 64),
@@ -3146,7 +3146,7 @@ class PygameEditor(PygameUserInterface):
         #
         rect = pygame.Rect((0, 0), entity.asset.image.get_rect().size)
 
-        asset_plane = clickndrag.Plane("asset", rect)
+        asset_plane = planes.Plane("asset", rect)
 
         asset_plane.image = entity.asset.image
 
@@ -3154,7 +3154,7 @@ class PygameEditor(PygameUserInterface):
 
         # Entity.asset_desc
         #
-        self.window.properties.sub(clickndrag.gui.Label("asset_desc",
+        self.window.properties.sub(planes.gui.Label("asset_desc",
                                                         entity.asset_desc,
                                                         pygame.Rect((0, 0), (80, 25)),
                                                         background_color = (64, 64, 64),
@@ -3162,7 +3162,7 @@ class PygameEditor(PygameUserInterface):
 
         # Entity.entity_type
         #
-        self.window.properties.sub(clickndrag.gui.Label("entity_type",
+        self.window.properties.sub(planes.gui.Label("entity_type",
                                                         entity.entity_type,
                                                         pygame.Rect((0, 0), (80, 25)),
                                                         background_color = (64, 64, 64),
@@ -3170,7 +3170,7 @@ class PygameEditor(PygameUserInterface):
 
         # Entity.blocking
         #
-        self.window.properties.sub(clickndrag.gui.Label("blocking",
+        self.window.properties.sub(planes.gui.Label("blocking",
                                                         {True: "block", False: "no-block"}[entity.blocking],
                                                         pygame.Rect((0, 0), (80, 25)),
                                                         background_color = (64, 64, 64),
@@ -3178,7 +3178,7 @@ class PygameEditor(PygameUserInterface):
 
         # Entity.mobile
         #
-        self.window.properties.sub(clickndrag.gui.Label("mobile",
+        self.window.properties.sub(planes.gui.Label("mobile",
                                                         {True: "mobile", False: "immobile"}[entity.mobile],
                                                         pygame.Rect((0, 0), (80, 25)),
                                                         background_color = (64, 64, 64),
@@ -3186,14 +3186,14 @@ class PygameEditor(PygameUserInterface):
 
         # Edit
         #
-        self.window.properties.sub(clickndrag.gui.Button("Edit Entity",
+        self.window.properties.sub(planes.gui.Button("Edit Entity",
                                                          pygame.Rect((0, 0),
                                                                      (80, 25)),
                                                          lambda plane: self.edit_entity_attributes(self.update_entity, entity)))
 
         # Logic
         #
-        self.window.properties.sub(clickndrag.gui.Button("Edit Logic",
+        self.window.properties.sub(planes.gui.Button("Edit Logic",
                                                          pygame.Rect((0, 0),
                                                                      (80, 25)),
                                                          lambda plane : self.edit_logic(entity.identifier)))
@@ -3244,7 +3244,7 @@ class PygameEditor(PygameUserInterface):
         # TODO: DropsEvent
         # TODO: specify multiple Events as response
 
-        option_list = clickndrag.gui.OptionSelector("select_response",
+        option_list = planes.gui.OptionSelector("select_response",
                                                     event_list,
                                                     lambda option : self.edit_event(event, option),
                                                     background_color = (64, 64, 64))
@@ -3265,7 +3265,7 @@ class PygameEditor(PygameUserInterface):
 
             # TODO: taken from update_logic(). Replace with a general Plane/Editor.
             #
-            editor_window = clickndrag.gui.Container("edit_event",
+            editor_window = planes.gui.Container("edit_event",
                                                      padding = 4,
                                                      background_color = (64, 64, 64))
 
@@ -3273,7 +3273,7 @@ class PygameEditor(PygameUserInterface):
 
             editor_window.sub(event_editor)
 
-            editor_window.sub(clickndrag.gui.Button("OK",
+            editor_window.sub(planes.gui.Button("OK",
                                                     pygame.Rect((0, 0), (50, 25)),
                                                     lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
 
@@ -3285,7 +3285,7 @@ class PygameEditor(PygameUserInterface):
 
             # TODO: copied from above, replace
             #
-            editor_window = clickndrag.gui.Container("edit_event",
+            editor_window = planes.gui.Container("edit_event",
                                                      padding = 4,
                                                      background_color = (64, 64, 64))
 
@@ -3293,7 +3293,7 @@ class PygameEditor(PygameUserInterface):
 
             editor_window.sub(event_editor)
 
-            editor_window.sub(clickndrag.gui.Button("OK",
+            editor_window.sub(planes.gui.Button("OK",
                                                     pygame.Rect((0, 0), (50, 25)),
                                                     lambda string: self.event_edit_done(event, event_editor.get_updated_event())))
 
@@ -3330,17 +3330,17 @@ class PygameEditor(PygameUserInterface):
 
         fabula.LOGGER.debug("called")
 
-        editor_window = clickndrag.gui.Container("display_logic",
+        editor_window = planes.gui.Container("display_logic",
                                                  padding = 4,
                                                  background_color = (64, 64, 64))
 
-        editor_window.sub(clickndrag.gui.Label("title",
+        editor_window.sub(planes.gui.Label("title",
                                                "Logic affecting Entity '{}'".format(identifier),
                                                pygame.Rect((0, 0), (300, 25)),
                                                background_color = (64, 64, 64),
                                                text_color = (250, 250, 250)))
 
-        rules_container = clickndrag.gui.Container("rules",
+        rules_container = planes.gui.Container("rules",
                                                    padding = 4,
                                                    background_color = (64, 64, 64))
 
@@ -3377,7 +3377,7 @@ class PygameEditor(PygameUserInterface):
                     # Need a unique name.
                     # See below for width - 1
                     #
-                    rule_plane = clickndrag.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
+                    rule_plane = planes.Plane("rule_{}_{}".format(trigger_editor.name, response_editor.name),
                                                   pygame.Rect((0, 0), (trigger_editor.rect.width + response_editor.rect.width - 1, trigger_editor.rect.height)))
 
                     rule_plane.image.fill((64, 64, 64))
@@ -3394,12 +3394,12 @@ class PygameEditor(PygameUserInterface):
 
         if len(rules_container.subplanes_list):
 
-            editor_window.sub(clickndrag.gui.ScrollingPlane("scrolling_rules",
+            editor_window.sub(planes.gui.ScrollingPlane("scrolling_rules",
                                                             pygame.Rect((0, 0),
                                                                         (rules_container.subplanes[rules_container.subplanes_list[0]].rect.width + 8, 400)),
                                                             rules_container))
 
-        editor_window.sub(clickndrag.gui.Button("Update",
+        editor_window.sub(planes.gui.Button("Update",
                                                 pygame.Rect((0, 0), (100, 25)),
                                                 self.update_logic))
 
@@ -3450,12 +3450,12 @@ class PygameOSD:
            A (x, y) tuple giving the rendering offset relative to (0, 0).
 
        PygameOSD.display_plane
-           An instance of clickndrag.Display.
+           An instance of planes.Display.
     """
 
     def __init__(self, display_plane):
         """Initialise.
-           display is an instance of clickndrag.Display.
+           display is an instance of planes.Display.
         """
 
         self.display_plane = display_plane
@@ -3464,7 +3464,7 @@ class PygameOSD:
 
         self.offset = (0, 0)
 
-        class OSDText(clickndrag.gui.OutlinedText):
+        class OSDText(planes.gui.OutlinedText):
             """Subclass that updates the text to a dict value in update().
 
                Additional attributes:
@@ -3483,7 +3483,7 @@ class PygameOSD:
                 """Call base class and register caption, dictionary and key.
                 """
 
-                clickndrag.gui.OutlinedText.__init__(self, name, "", text_color)
+                planes.gui.OutlinedText.__init__(self, name, "", text_color)
 
                 self.caption = caption
                 self.dictionary = dictionary
@@ -3513,7 +3513,7 @@ class PygameOSD:
                 #
                 x, y = self.rect.topleft
 
-                clickndrag.gui.OutlinedText.update(self)
+                planes.gui.OutlinedText.update(self)
 
                 # Restore
                 #

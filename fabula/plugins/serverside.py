@@ -970,7 +970,7 @@ class Editor(DefaultGame):
 
             # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
             #
-            ok_box = self.pygameui.clickndrag.gui.OkBox("Logic saved to file '{}'.".format(filename))
+            ok_box = self.pygameui.planes.gui.OkBox("Logic saved to file '{}'.".format(filename))
 
             ok_box.rect.center = self.pygame_editor.window.rect.center
 
@@ -991,7 +991,7 @@ class Editor(DefaultGame):
 
         # TODO: there should be something like pygame_ui.feedback or pygame_ui.okbox to display a message from here
         #
-        ok_box = self.pygameui.clickndrag.gui.OkBox("Logic cleared.")
+        ok_box = self.pygameui.planes.gui.OkBox("Logic cleared.")
 
         ok_box.rect.center = self.pygame_editor.window.rect.center
 
