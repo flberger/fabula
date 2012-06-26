@@ -1070,13 +1070,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Create new 'room' and 'tiles' Planes based on the max size
         #
         room_plane = planes.Plane("room",
-                                      pygame.Rect((0, 0),
-                                                  ((max_right + 1) * self.spacing,
-                                                   (max_bottom + 1) * self.spacing)))
+                                  pygame.Rect((0, 0),
+                                              ((max_right + 1) * self.spacing,
+                                               (max_bottom + 1) * self.spacing)))
 
         room_plane.sub(planes.Plane("tiles",
-                                        pygame.Rect((0, 0),
-                                                    room_plane.rect.size)))
+                                    pygame.Rect((0, 0),
+                                                room_plane.rect.size)))
 
         # Transfer all Tile Planes to the new 'tiles' Plane
         #
@@ -1763,38 +1763,76 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         fabula.LOGGER.debug("called")
 
         # Call base class
+        # This will forward the event to the Entity.
         #
         fabula.plugins.ui.UserInterface.process_SaysEvent(self, event)
 
-        # Choose container width depending on text length
+        says_box = None
+
+        # Choose mode of presentation by text length
+        # TODO: threshold should be configurable somewhere
         #
-        container_style = planes.gui.tmb.C_256_STYLE
+        if len(event.text) <= 10:
 
-        if len(event.text) * PIX_PER_CHAR > 200:
+            # Small container
+            #
+            says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
+                                                   planes.gui.tmb.C_256_STYLE)
 
-            container_style = planes.gui.tmb.C_512_STYLE
-
-        says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
-                                                   container_style)
-
-        says_box.sub(planes.gui.Label("text",
+            says_box.sub(planes.gui.Label("text",
                                           event.text,
                                           pygame.Rect((0, 0),
                                                       (len(event.text) * PIX_PER_CHAR, 30)),
                                           background_color = (128, 128, 128, 0)))
 
-        entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
+            # Display above Entity
+            #
+            entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
 
-        # Display above Entity
-        #
-        says_box.rect.center = (entity_rect.centerx, entity_rect.top)
+            # Lower a bit, to make sure to touch the Entity.
+            #
+            says_box.rect.midbottom = (entity_rect.centerx,
+                                       entity_rect.top + 10)
 
-        # Make sure it's completely visible
-        # TODO: but maybe the room is not completely visible
-        #
-        says_box.rect.clamp_ip(pygame.Rect((0, 0), self.window.room.rect.size))
+            # Make sure it's completely visible
+            #
+            says_box.rect.clamp_ip(pygame.Rect((0, 0), self.window.rect.size))
 
-        self.window.room.sub(says_box)
+            # To actually align with the Entity coordinates, this must be a
+            # subplane of the room.
+            #
+            self.window.room.sub(says_box)
+
+        else:
+            # Large container
+            #
+            says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
+                                                   planes.gui.tmb.C_512_STYLE)
+
+            # Additional speaker string
+            #
+            speaker_str = "{}:".format(event.identifier)
+
+            says_box.sub(planes.gui.Label("speaker",
+                                          speaker_str,
+                                          pygame.Rect((0, 0),
+                                                      (len(speaker_str) * PIX_PER_CHAR, 30)),
+                                          background_color = (128, 128, 128, 0)))
+
+            says_box.sub(planes.gui.Label("text",
+                                          event.text,
+                                          pygame.Rect((0, 0),
+                                                      (len(event.text) * PIX_PER_CHAR, 30)),
+                                          background_color = (128, 128, 128, 0)))
+
+            # Display at the bottom of the screen
+            #
+            says_box.rect.midbottom = (self.window.rect.centerx,
+                                       self.window.rect.bottom - self.inventory_plane.rect.height)
+
+            # This is just put in the window, on top.
+            #
+            self.window.sub(says_box)
 
         for frame in range(self._chars_to_frames(event.text)):
 
@@ -2122,19 +2160,20 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if self.window.room.rect.left > 0:
 
-            fabula.LOGGER.debug("snapping window.room.rect.left = 0")
+            fabula.LOGGER.debug("snapping window.room.rect.left from {} to 0".format(self.window.room.rect.left))
 
             self.window.room.rect.left = 0
 
         if self.window.room.rect.top > 0:
 
-            fabula.LOGGER.debug("snapping window.room.rect.top = 0")
+            fabula.LOGGER.debug("snapping window.room.rect.top from {} to 0".format(self.window.room.rect.top))
 
             self.window.room.rect.top = 0
 
         if self.window.room.rect.right < SCREENSIZE[0]:
 
-            fabula.LOGGER.debug("snapping window.room.rect.right = {}".format(SCREENSIZE[0]))
+            fabula.LOGGER.debug("snapping window.room.rect.right from {} to {}".format(self.window.room.rect.right,
+                                                                                       SCREENSIZE[0]))
 
             self.window.room.rect.right = SCREENSIZE[0]
 
@@ -2153,10 +2192,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            characters is the string to display.
         """
 
-        # Display for (action_time / 6) per character, but at least for
+        # Display for (action_time / 7) per character, but at least for
         # 2.5 * action_time
         #
-        frames = int(self.action_frames / 6 * len(characters))
+        frames = int(self.action_frames / 7 * len(characters))
 
         if frames < 2.5 * self.action_frames:
 
