@@ -1,0 +1,151 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.planes.gui.tmb.TMBContainer&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.p.g.t.TMBContainer(<span title="planes.gui.Container">planes.gui.Container</span>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.planes.html">planes</a>.<a href="fabula.plugins.pygameui.planes.gui.html">gui</a>.<a href="fabula.plugins.pygameui.planes.gui.tmb.html">tmb</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.planes.gui.tmb.TMBContainer">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBFadingContainer.html">fabula.plugins.pygameui.planes.gui.tmb.TMBFadingContainer</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBGetStringDialog.html">fabula.plugins.pygameui.planes.gui.tmb.TMBGetStringDialog</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBOkBox.html">fabula.plugins.pygameui.planes.gui.tmb.TMBOkBox</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBOptionSelector.html">fabula.plugins.pygameui.planes.gui.tmb.TMBOptionSelector</a></p>
+    </div>
+    <pre>A planes.gui.Container with fixed width and TMB background.
+
+Additional attributes:
+
+TMBContainer.style
+    An instance of TMBStyle.
+
+TMBContainer.background
+    A Pygame Surface, holding the rendered background.
+    Initially None, repainted in TMBContainer.sub().</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id174">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.html#sub">sub</a></td>
+    <td><tt>Resize the container, update the position of plane and add it as a subplane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.html#redraw">redraw</a></td>
+    <td><tt>Redraw TMBContainer.image using TMBContainer.background.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.html#remove">remove</a></td>
+    <td><tt>Remove the subplane, then reposition remaining subplanes and resize the container.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, name, style, padding=0):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBFadingContainer.html">fabula.plugins.pygameui.planes.gui.tmb.TMBFadingContainer</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBGetStringDialog.html">fabula.plugins.pygameui.planes.gui.tmb.TMBGetStringDialog</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBOkBox.html">fabula.plugins.pygameui.planes.gui.tmb.TMBOkBox</a>, <a href="fabula.plugins.pygameui.planes.gui.tmb.TMBOptionSelector.html">fabula.plugins.pygameui.planes.gui.tmb.TMBOptionSelector</a></div>
+    <pre>Initialise.
+
+style is an instance of TMBStyle.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.sub">
+    
+  </a>
+  <a name="sub">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    sub(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Resize the container, update the position of plane and add it as a subplane.
+This will also repaint TMBContainer.background.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.redraw">
+    
+  </a>
+  <a name="redraw">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    redraw(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Redraw TMBContainer.image using TMBContainer.background.
+This also creates a new TMBContainer.rendersurface.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.tmb.TMBContainer.remove">
+    
+  </a>
+  <a name="remove">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    remove(self, plane_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove the subplane, then reposition remaining subplanes and resize the container.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-06-26 18:17:40.
+    </address>
+  </body>
+</html>

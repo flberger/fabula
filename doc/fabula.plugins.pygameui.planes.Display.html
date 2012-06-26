@@ -1,0 +1,258 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.planes.Display&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.p.Display(<a href="fabula.plugins.pygameui.planes.Plane.html">Plane</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.planes.html">planes</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.planes.Display">View In Hierarchy</a>
+    </p>
+    <div>
+      
+    </div>
+    <pre>planes main screen class.
+A Display instance serves as the root Plane in planes.
+
+Additional attributes:
+
+Display.display
+    The Pygame display Surface
+
+Display.dragged_plane
+    The currently dragged plane
+
+Display.key_sensitive_plane
+    The Plane to be notified of Pygame keyboard events. Initially None.
+
+Display.last_mouseover_plane
+    The last Plane a mouseover condition was found for. Initially None.
+
+Display.mouse_buttons
+    A dict mapping Pygame mouse button numbers to description strings.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id139">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Display.html#__init__">__init__</a></td>
+    <td><tt>Calling pygame.display.set_mode().</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Display.html#key_sensitive">key_sensitive</a></td>
+    <td><tt>Register the Plane given as sensitive to Pygame keyboard events.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Display.html#process">process</a></td>
+    <td><tt>Process a pygame event list.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Display.html#render">render</a></td>
+    <td><tt>Call base class render(), then blit to the Pygame display if something has changed.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.plugins.pygameui.planes.Plane.html">Plane</a>:
+        </p>
+        <table class="children sortable" id="id140">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#sub">sub</a></td>
+    <td><tt>Remove the Plane given from its current parent and add it as a subplane of this Plane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#remove">remove</a></td>
+    <td><tt>Remove subplane by name or Plane instance.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#remove_all">remove_all</a></td>
+    <td><tt>Convenience method to call Plane.remove() for all subplanes.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#__getattr__">__getattr__</a></td>
+    <td><tt>Access subplanes as attributes.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#get_plane_at">get_plane_at</a></td>
+    <td><tt>Return the (sub)plane and the succeeding parent coordinates at the given coordinates.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#update">update</a></td>
+    <td><tt>Update hook.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#clicked">clicked</a></td>
+    <td><tt>Called when there is a MOUSEDOWN event on this plane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#dropped_upon">dropped_upon</a></td>
+    <td><tt>If a plane is dropped on top of this one, call dropped_upon_callback() and conditionally grab it.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#destroy">destroy</a></td>
+    <td><tt>Remove this Plane from the parent plane, remove all subplanes and delete all pygame Surfaces.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#sync">sync</a></td>
+    <td><tt>Save the Plane given as master Plane and the position offset to that Plane for position synchronisation in Plane.update().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#unsync">unsync</a></td>
+    <td><tt>Remove the position synchronisation to the sync master Plane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#mouseover_callback">mouseover_callback</a></td>
+    <td><tt>Callback function when the mouse cursor moves over this plane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#mouseout_callback">mouseout_callback</a></td>
+    <td><tt>Callback function when the mouse cursor has left this plane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#__repr__">__repr__</a></td>
+    <td><tt>Readable string representation.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.planes.Display.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, resolution_tuple, fullscreen=False):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.planes.Plane.html#__init__">fabula.plugins.pygameui.planes.Plane.__init__</a></div>
+    <pre>Calling pygame.display.set_mode().
+If fullscreen is True, the display will use the full screen.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Display.key_sensitive">
+    
+  </a>
+  <a name="key_sensitive">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    key_sensitive(self, plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Register the Plane given as sensitive to Pygame keyboard events.
+Display will call plane.keydown(KEYDOWN_event) when a key is
+pressed and the Plane has a parent.
+plane.activate() will be called when the plane is registered.
+plane.deactivate() will be called on the old plane.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Display.process">
+    
+  </a>
+  <a name="process">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process(self, event_list):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Process a pygame event list.
+This is the main method of planes and should be called once per
+frame.
+It will also check mouseover conditions, even if event_list is empty.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Display.render">
+    
+  </a>
+  <a name="render">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    render(self, force=False):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.planes.Plane.html#render">fabula.plugins.pygameui.planes.Plane.render</a></div>
+    <pre>Call base class render(), then blit to the Pygame display if something has changed.
+If force is True, blit to Pygame display regardless.</pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-06-26 18:17:40.
+    </address>
+  </body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.planes.Plane&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.p.Plane:</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.planes.html">planes</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.planes.Plane">View In Hierarchy</a>
+    </p>
+    <div>
+      <p>Known subclasses: <a href="fabula.plugins.pygameui.EntityPlane.html">fabula.plugins.pygameui.EntityPlane</a>, <a href="fabula.plugins.pygameui.planes.Display.html">fabula.plugins.pygameui.planes.Display</a></p>
+    </div>
+    <pre>A Plane is a surface in a hierarchy of surfaces.
+Concept-wise it bears some similarities to pygame.sprite.Sprite.
+
+Planes are currently not thread safe! Accessing a Plane from several
+threads may produce unexpected results and errors.
+
+Attributes:
+
+Plane.name
+    Name of the plane.
+
+Plane.image
+    The pygame.Surface for this Plane.
+
+Plane.rendersurface
+    A pygame.Surface displaying the composite of this plane and all
+    subplanes.
+
+Plane.rect
+    The render position on the parent plane.
+
+Plane.parent
+    The parent plane.
+
+Plane.subplanes
+    Dict of subplanes, identified by their name.
+
+Plane.subplanes_list
+    A list of subplane names, in order of their addition
+
+Plane.draggable
+    If True, this Plane can be dragged and dropped.
+
+Plane.grab
+    If True, this Plane will remove dropped Planes from
+    their parent Plane and make it a subplane of this one.
+    Handled in Plane.dropped_upon()
+
+Plane.highlight
+    If True, the Plane be highlighted when the mouse cursor moves over it.
+
+Plane.last_image_id
+    Caches object id of the image at last rendering for efficiency.
+
+Plane.last_rect
+    Caches rect at last rendering for efficiency.
+
+Plane.left_click_callback
+    Callback function when this plane has been clicked with the left
+    mouse button.
+
+Plane.right_click_callback
+    Callback function when this plane has been clicked with the right
+    mouse button.
+
+Plane.dropped_upon_callback
+    Callback function when a plane has been dropped upon this plane.
+
+Plane.mouseover_callback
+    Callback function when the mouse cursor moves over this plane.
+
+Plane.mouseout_callback
+    Callback function when the mouse cursor has left this plane.
+
+Plane.mouseover
+    Flag indicating whether the mouse cursor is over this Plane.
+    Initially False.
+
+Plane.sync_master_plane
+   A Plane that this Plane's position will sync to. Initally None.
+
+Plane.offset
+   A tuple (x, y) describing the offset to the sync master plane.
+   Initially None.</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id138">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#__init__">__init__</a></td>
+    <td><tt>Initialize the Plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#sub">sub</a></td>
+    <td><tt>Remove the Plane given from its current parent and add it as a subplane of this Plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#remove">remove</a></td>
+    <td><tt>Remove subplane by name or Plane instance.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#remove_all">remove_all</a></td>
+    <td><tt>Convenience method to call Plane.remove() for all subplanes.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#__getattr__">__getattr__</a></td>
+    <td><tt>Access subplanes as attributes.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#render">render</a></td>
+    <td><tt>Draw a composite surface of this plane and all subplanes, in order of their addition.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#get_plane_at">get_plane_at</a></td>
+    <td><tt>Return the (sub)plane and the succeeding parent coordinates at the given coordinates.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#update">update</a></td>
+    <td><tt>Update hook.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#clicked">clicked</a></td>
+    <td><tt>Called when there is a MOUSEDOWN event on this plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#dropped_upon">dropped_upon</a></td>
+    <td><tt>If a plane is dropped on top of this one, call dropped_upon_callback() and conditionally grab it.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#destroy">destroy</a></td>
+    <td><tt>Remove this Plane from the parent plane, remove all subplanes and delete all pygame Surfaces.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#sync">sync</a></td>
+    <td><tt>Save the Plane given as master Plane and the position offset to that Plane for position synchronisation in Plane.update().</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#unsync">unsync</a></td>
+    <td><tt>Remove the position synchronisation to the sync master Plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#mouseover_callback">mouseover_callback</a></td>
+    <td><tt>Callback function when the mouse cursor moves over this plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#mouseout_callback">mouseout_callback</a></td>
+    <td><tt>Callback function when the mouse cursor has left this plane.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.Plane.html#__repr__">__repr__</a></td>
+    <td><tt>Readable string representation.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, name, rect, draggable=False, grab=False, highlight=False, left_click_callback=None, right_click_callback=None, dropped_upon_callback=None):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.EntityPlane.html">fabula.plugins.pygameui.EntityPlane</a>, <a href="fabula.plugins.pygameui.planes.Display.html">fabula.plugins.pygameui.planes.Display</a></div>
+    <pre>Initialize the Plane.
+name is the name of the plane which can also be used
+as an attribute.
+rect is an instance of pygame.Rect giving width, height
+and render position.
+draggable is a flag indicating whether this plane can be dragged.
+grab is a flag indicating whether other planes can be dropped
+on this one.
+clicked_callback and dropped_upon_callback, if given, must be
+functions.
+Planes are filled with solid black color by default.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.sub">
+    
+  </a>
+  <a name="sub">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    sub(self, plane, insert_after=None):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove the Plane given from its current parent and add it as a subplane of this Plane.
+
+If insert_after is given, the new subplane will be inserted
+immediately after the subplane with that name in Plane.subplanes_list,
+else it will simply be appended.
+
+If a subplane with the same name already exists, it is silently
+replaced by the new plane.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.remove">
+    
+  </a>
+  <a name="remove">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    remove(self, plane_identifier):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove subplane by name or Plane instance.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.remove_all">
+    
+  </a>
+  <a name="remove_all">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    remove_all(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Convenience method to call Plane.remove() for all subplanes.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.__getattr__">
+    
+  </a>
+  <a name="__getattr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __getattr__(self, name):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Access subplanes as attributes.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.render">
+    
+  </a>
+  <a name="render">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    render(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.planes.Display.html">fabula.plugins.pygameui.planes.Display</a></div>
+    <pre>Draw a composite surface of this plane and all subplanes, in order of their addition.
+Returns True if anything has been rendered (i.e. if
+Plane.rendersurface has changed), False otherwise.
+This method wil highlight subplanes that have the Plane.mousover flag
+set.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.get_plane_at">
+    
+  </a>
+  <a name="get_plane_at">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    get_plane_at(self, coordinates):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Return the (sub)plane and the succeeding parent coordinates at the given coordinates.
+Subplanes are tested in reverse order of their addition (i.e. latest first).</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.update">
+    
+  </a>
+  <a name="update">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    update(self):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overridden in <a href="fabula.plugins.pygameui.EntityPlane.html">fabula.plugins.pygameui.EntityPlane</a></div>
+    <pre>Update hook.
+The default implementation calls update() on all subplanes. If
+Plane.sync_master_plane is not None, the position of this Plane will
+be synced to that of the master Plane, using Plane.offset.
+Compare pygame.sprite.Sprite.update.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.clicked">
+    
+  </a>
+  <a name="clicked">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    clicked(self, button_name):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Called when there is a MOUSEDOWN event on this plane.
+If Plane.left_click_callback or Plane.right_click_callback are set,
+the appropriate is called with this Plane as argument.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.dropped_upon">
+    
+  </a>
+  <a name="dropped_upon">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    dropped_upon(self, plane, coordinates):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>If a plane is dropped on top of this one, call dropped_upon_callback() and conditionally grab it.
+
+If Plane.grab is True, the default implementation will remove the
+dropped Plane from its parent and make it a subplane of this one.
+
+If the dropped Plane is already a subplane of this one, its position
+is updated.
+
+If Plane.dropped_upon_callback is set, it is called with
+Plane.dropped_upon_callback(self, plane, coordinates)</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.destroy">
+    
+  </a>
+  <a name="destroy">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    destroy(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove this Plane from the parent plane, remove all subplanes and delete all pygame Surfaces.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.sync">
+    
+  </a>
+  <a name="sync">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    sync(self, master_plane):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Save the Plane given as master Plane and the position offset to that Plane for position synchronisation in Plane.update().
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.unsync">
+    
+  </a>
+  <a name="unsync">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    unsync(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Remove the position synchronisation to the sync master Plane.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.mouseover_callback">
+    
+  </a>
+  <a name="mouseover_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    mouseover_callback(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Callback function when the mouse cursor moves over this plane.
+The default implementation sets Plan.mouseover to True when
+Plane.highlight is set.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.mouseout_callback">
+    
+  </a>
+  <a name="mouseout_callback">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    mouseout_callback(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Callback function when the mouse cursor has left this plane.
+The default implementation sets Plan.mouseover to False.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.Plane.__repr__">
+    
+  </a>
+  <a name="__repr__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __repr__(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Readable string representation.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-06-26 18:17:40.
+    </address>
+  </body>
+</html>

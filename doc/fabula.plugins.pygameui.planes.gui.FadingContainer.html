@@ -1,0 +1,167 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>API docs for &ldquo;fabula.plugins.pygameui.planes.gui.FadingContainer&rdquo;</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link href="apidocs.css" type="text/css" rel="stylesheet" />
+    
+    
+  </head>
+  <body>
+    <h1 class="class">Class f.p.p.p.g.FadingContainer(<a href="fabula.plugins.pygameui.planes.gui.Container.html">Container</a>):</h1>
+    <p>
+      <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a>.<a href="fabula.plugins.pygameui.planes.html">planes</a>.<a href="fabula.plugins.pygameui.planes.gui.html">gui</a></span>
+      
+      <a href="classIndex.html#fabula.plugins.pygameui.planes.gui.FadingContainer">View In Hierarchy</a>
+    </p>
+    <div>
+      
+    </div>
+    <pre>A Container that, once visible, will fade out and destroy itself.
+
+Additional attributes:
+
+FadingContainer.display_duration
+    The number of calls to update() that the FadingContainer will be
+    displayed. Will be decremented in FadingContainer.update().
+
+FadingContainer.alpha_steps
+    A list of decreasing alpha values to be applied to the
+    Surface of the FadingContainer, computed from fade_duration
+    in FadingContainer.__init__().</pre>
+
+    
+    
+    <div id="splitTables">
+      <table class="children sortable" id="id163">
+  
+  
+<tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.FadingContainer.html#__init__">__init__</a></td>
+    <td><tt>Initialise.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.FadingContainer.html#update">update</a></td>
+    <td><tt>Call Plane.update(), then decrement FadingContainer.display_duration and destroy when len(self.alpha_steps) has reached zero.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.FadingContainer.html#render">render</a></td>
+    <td><tt>Call Plane.render(), the pop the first value from self.alpha_steps and apply it as alpha.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.plugins.pygameui.planes.gui.Container.html">Container</a>:
+        </p>
+        <table class="children sortable" id="id164">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.Container.html#redraw">redraw</a></td>
+    <td><tt>Redraw Container.image from the dimensions in Containter.rect.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.Container.html#sub">sub</a></td>
+    <td><tt>Resize the container, update the position of plane and add it as a subplane.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.Container.html#remove">remove</a></td>
+    <td><tt>Remove the subplane, then reposition remaining subplanes and resize the container.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.plugins.pygameui.planes.gui.Container.html#remove_all">remove_all</a></td>
+    <td><tt>Remove all subplanes and shrink accordingly.</tt></td>
+  </tr>
+  
+</table>
+      
+      
+    </div>
+    
+    
+    
+
+    <div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.FadingContainer.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    __init__(self, name, display_duration, fade_duration, padding=0, background_color=None):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.plugins.pygameui.planes.gui.Container.html#__init__">fabula.plugins.pygameui.planes.gui.Container.__init__</a></div>
+    <pre>Initialise.
+
+display_duration is the number of calls to update() that the
+FadingContainer will be displayed.
+
+fade_duration is the number of calls to update() that the
+FadingContainer will take to fade out.</pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.FadingContainer.update">
+    
+  </a>
+  <a name="update">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    update(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call Plane.update(), then decrement FadingContainer.display_duration and destroy when len(self.alpha_steps) has reached zero.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.plugins.pygameui.planes.gui.FadingContainer.render">
+    
+  </a>
+  <a name="render">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    render(self):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Call Plane.render(), the pop the first value from self.alpha_steps and apply it as alpha.
+        </pre>
+  </div>
+</div>
+    <address>
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2012-06-26 18:17:40.
+    </address>
+  </body>
+</html>
