@@ -99,12 +99,12 @@ user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt
 
 sdist:
-	# On April 14, 2011 11:34am, Xandar Kablandar (eternalcheesecake) hinted at 
-	# symbolic links in the .tar.bz2 file. These are stored by --formats=bztar 
-	# but not by --formats=zip. Since there is no setup.py option to dereference 
-	# symbolic links, we only use zip for the time being.
-	# Filed issue 12585 at http://bugs.python.org for this.
-	#
+	@# On April 14, 2011 11:34am, Xandar Kablandar (eternalcheesecake) hinted at 
+	@# symbolic links in the .tar.bz2 file. These are stored by --formats=bztar 
+	@# but not by --formats=zip. Since there is no setup.py option to dereference 
+	@# symbolic links, we only use zip for the time being.
+	@# Filed issue 12585 at http://bugs.python.org for this.
+	@#
 	rm -fv MANIFEST
 	$(PYTHON) setup.py sdist --force-manifest --formats=zip
 
@@ -137,8 +137,7 @@ endif
 winxp_update: clean
 	mount /mnt/winxp/
 	rm -vrf /mnt/winxp/Documents\ and\ Settings/winxp/My\ Documents/fabula/*
-	cp -v -r --dereference ./clickndrag \
-	                       ./COPYING \
+	cp -v -r --dereference ./COPYING \
 	                       ./doc \
 	                       ./fabula \
 	                       ./Makefile \

@@ -1,6 +1,40 @@
 NEWS for Fabula
 ===============
 
+0.8.3
+-----
+
+Released on 27 June 2012.
+
+There are a lot of changes in this release.
+
+fabula.interfaces is now a package. Added module interfaces.replay, containing 
+PythonReplayInterface, and the script 'run_pygame_replay.py' which replays 
+Fabula game logs.
+
+The classes Event, Message, Entity and Tile now have a JSON representation.
+Added fabula.interfaces.json_rpc which implements a JSON-RPC server interface.
+Added a JSON-RPC doctest.
+
+Removed mouse-based scrolling in PygameUserInterface. Insted the screen will 
+scroll when the player has moved one Tile away from the window border.
+
+PygameUserInterface now uses the surfacecatcher module for screen capturing.
+Press 'F2' to start capturing, and check with 'F1' whether the recorder runs.
+
+'clickndrag', the graphics engine behind Fabula, has been renamed to 'planes'. 
+Fabula now uses a new 'planes' version which allows for slick GUI elements with 
+bitmap backgrounds. They are used in all GUI elements in the game now, while the 
+editor keeps the old style.
+
+Fabula will now display SaysEvents longer that 10 characters at the bottom of 
+the screen, preparing for a style known from other RPG and adventure games..
+
+The Fabula server can now be run without Pygame installed.
+
+Lots of fixes, improvements, and a documentation update.
+
+
 0.8.2
 -----
 

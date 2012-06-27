@@ -63,14 +63,14 @@ INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
                  os.path.join("scripts", "inventory.png"),
                  os.path.join("scripts", "fabula.conf")]
 
-# Include clickndrag resources
+# Include planes resources
 #
 import fabula.plugins.pygameui as pygamui
 
 INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
                                             "plugins",
                                             "pygameui",
-                                            "clickndrag",
+                                            "planes",
                                             "gui",
                                             "resources",
                                             "*.png")))
@@ -78,7 +78,7 @@ INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
 INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
                                             "plugins",
                                             "pygameui",
-                                            "clickndrag",
+                                            "planes",
                                             "gui",
                                             "resources",
                                             "*.ttf")))
@@ -118,8 +118,8 @@ setup(name = PACKAGE,
                   "{}.interfaces".format(PACKAGE),
                   "{}.plugins".format(PACKAGE),
                   "{}.plugins.pygameui".format(PACKAGE),
-                  "{}.plugins.pygameui.clickndrag".format(PACKAGE),
-                  "{}.plugins.pygameui.clickndrag.gui".format(PACKAGE)],
+                  "{}.plugins.pygameui.planes".format(PACKAGE),
+                  "{}.plugins.pygameui.planes.gui".format(PACKAGE)],
       py_modules = [],
       requires = ["pygame (>=1.9.1)"],
       provides = [PACKAGE,
@@ -127,8 +127,8 @@ setup(name = PACKAGE,
                   "{}.interfaces".format(PACKAGE),
                   "{}.plugins".format(PACKAGE),
                   "{}.plugins.pygameui".format(PACKAGE),
-                  "{}.plugins.pygameui.clickndrag".format(PACKAGE),
-                  "{}.plugins.pygameui.clickndrag.gui".format(PACKAGE)],
+                  "{}.plugins.pygameui.planes".format(PACKAGE),
+                  "{}.plugins.pygameui.planes.gui".format(PACKAGE)],
       package_data = {},
       scripts = SCRIPTS,
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),
