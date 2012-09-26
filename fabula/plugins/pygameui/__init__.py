@@ -27,6 +27,7 @@
 # TODO: always diplay and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
 # TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
+# TODO: support three layers: background layer (for parallax scrolling etc.), main layer and overlay layer (for clouds, sunbeams etc.)
 
 # Add the pygameui directoy to the search path. We will put modules required by
 # pygameui (but not Fabula in general) here.
@@ -425,23 +426,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.scroll_amount
            Number of pixels to scroll per call to display_single_frame().
 
-       PygameUserInterface.window
-           An instance of planes.Display. Dimensions are given by
-           SCREENSIZE. By default opened in windowed mode, this can be changed
-           by editing the file fabula.conf.
-
-       PygameUserInterface.window.inventory
-           planes Plane for the inventory. By default this is 800x100px
-           with space for 8 100x100px icons and located at the bottom of the
-           window.
-
-       PygameUserInterface.window.room
-           planes Plane for the room. Initially it will have a size of
-           0x0 px. The final Plane is created by process_RoomCompleteEvent.
-
-       PygameUserInterface.window.room.tiles
-           planes Plane which has the Tile Planes as subplanes.
-
        PygameUserInterface.fade_surface
            A black pygame surface for fade effects
 
@@ -466,6 +450,44 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.surfacecatcher
            An instance of surfacecatcher.SurfaceCatcher. Initially None.
+
+
+       PygameUserInterface utilises the planes module for 2D bitmap rendering.
+       The planes hierarchy is organised as follows:
+
+       window +
+              |
+              + room +
+              |      |
+              |      + tiles +
+              |      |       |
+              |      |       + tile
+              |      |       |
+              |      |       + ...
+              |      |
+              |      + entity plane
+              |      |
+              |      + ...
+              |
+              + inventory
+
+       The planes are attributes of PygameUserInterface:
+
+       PygameUserInterface.window
+           An instance of planes.Display. Dimensions are given by SCREENSIZE.
+           By default opened in windowed mode, this can be changed by editing
+           the file fabula.conf.
+
+       PygameUserInterface.window.room
+           planes Plane for the room. Initially it will have a size of 0x0 px.
+           The final Plane is created by process_RoomCompleteEvent().
+
+       PygameUserInterface.window.room.tiles
+           planes Plane which has the Tile Planes as subplanes.
+
+       PygameUserInterface.window.inventory
+           planes Plane for the inventory. By default this is 800x100 px with
+           space for 8 100x100 px icons and located at the bottom of the window.
     """
 
     def __init__(self, assets, framerate, host, fullscreen = False):

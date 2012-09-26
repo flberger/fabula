@@ -28,7 +28,7 @@ bitmap backgrounds. They are used in all GUI elements in the game now, while the
 editor keeps the old style.
 
 Fabula will now display SaysEvents longer that 10 characters at the bottom of 
-the screen, preparing for a style known from other RPG and adventure games..
+the screen, preparing for a style known from other RPG and adventure games.
 
 The Fabula server can now be run without Pygame installed.
 

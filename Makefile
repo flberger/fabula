@@ -25,6 +25,7 @@ help:
 	@echo '    sign'
 	@echo '    freecode'
 	@echo '    pypi'
+	@echo '    lp'
 
 docs: clean
 	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
@@ -180,3 +181,7 @@ freecode:
 	@echo RETURN to submit to freecode.com using freecode-submit.txt, CTRL-C to cancel:
 	@read DUMMY
 	freecode-submit < freecode-submit.txt
+
+lp:
+	bzr launchpad-login fberger-fbmd
+	bzr push lp:~fberger-fbmd/fabula/trunk
