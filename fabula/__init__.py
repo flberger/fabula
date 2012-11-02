@@ -169,6 +169,9 @@
 # TODO: build in in-game questionnaires for research games
 #
 # TODO: use a single ZIP file for all assets, instead of cluttering the main directory.
+#
+# TODO: optional login screen with options regarding display resolutions, sound etc.
+# TODO: logoff confirmation screen for clients
 
 # Fabula will not work with Python versions prior to 3.x.
 #

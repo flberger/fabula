@@ -488,9 +488,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.window.inventory
            planes Plane for the inventory. By default this is 800x100 px with
            space for 8 100x100 px icons and located at the bottom of the window.
+
+       PygameUserInterface.mousescroll
+           Boolen flag, indicating whether to scroll the screen when the mouse
+           reaches a screen border.
     """
 
-    def __init__(self, assets, framerate, host, fullscreen = False):
+    def __init__(self, assets, framerate, host, fullscreen = False, mousescroll = False):
         """This method initialises the PygameUserInterface.
 
            assets must be an instance of fabula.Assets or a subclass.
@@ -499,6 +503,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            frames per second the client will run at.
 
            fullscreen is a Boolean flag.
+
+           mousescroll is a Boolen flag, indicating whether to scroll the screen
+           when the mouse reaches a screen border.
         """
 
         # Call original __init__()
@@ -653,6 +660,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.screen_dump_folder = ""
 
         self.surfacecatcher = None
+
+        self.mousescroll = mousescroll
 
         fabula.LOGGER.debug("complete")
 
@@ -895,6 +904,30 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
+
+        # Check mouse position, and trigger window scrolling.
+        # Also check whether the display window has the focus.
+        # Scrolling will be done in display_single_frame().
+        #
+        if self.mousescroll and not self.scroll:
+
+            mouse_position = pygame.mouse.get_pos()
+
+            if (pygame.mouse.get_focused()
+                and 0 <= mouse_position[0] <= 25
+                and self.window.room.rect.left < 0):
+
+                # Scroll to the left
+                #
+                self.scroll = self.spacing
+
+            elif (pygame.mouse.get_focused()
+                  and SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]
+                  and self.window.room.rect.right > SCREENSIZE[0]):
+
+                # Scroll to right
+                #
+                self.scroll = 0 - self.spacing
 
         # Handle events
         #
@@ -1852,7 +1885,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             says_box.rect.midbottom = (self.window.rect.centerx,
                                        self.window.rect.bottom - self.inventory_plane.rect.height)
 
-            # This is just put in the window, on top.
+            # This is just being put in the window, on top.
             #
             self.window.sub(says_box)
 
@@ -3526,7 +3559,7 @@ class PygameOSD:
         self.offset = (0, 0)
 
         class OSDText(planes.gui.OutlinedText):
-            """Subclass that updates the text to a dict value in update().
+            """Subclass that updates the text from a dict value in update().
 
                Additional attributes:
 

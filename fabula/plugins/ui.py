@@ -409,7 +409,15 @@ class UserInterface(fabula.plugins.Plugin):
 
         fabula.LOGGER.debug("forwarding Event to Entity and displaying a single frame")
 
-        self.host.room.entity_dict[event.identifier].process_MovesToEvent(event)
+        try:
+            self.host.room.entity_dict[event.identifier].process_MovesToEvent(event)
+
+        except KeyError:
+
+            msg = "Entity '{}' is not in room '{}', cannot forward Event"
+
+            fabula.LOGGER.error(msg.format(event.identifier,
+                                           self.host.room.identifier))
 
         return
 
