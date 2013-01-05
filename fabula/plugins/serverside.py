@@ -42,10 +42,11 @@ def load_room_from_file(filename, complete = True):
        Note that this example uses spaces in place of TABs.
     """
 
-    # Will raise an IOError if the file does not exist. This must be handled by
-    # the caller.
+    # Use a Fabula asset manager to locate the file.
+    # Will raise an IOError if the file does not exist.
+    # This must be handled by the caller.
     #
-    roomfile = open(filename, "rt")
+    roomfile = fabula.assets.Assets().fetch(filename, "t")
 
     event_list = []
 

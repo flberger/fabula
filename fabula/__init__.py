@@ -172,6 +172,10 @@
 #
 # TODO: optional login screen with options regarding display resolutions, sound etc.
 # TODO: logoff confirmation screen for clients
+#
+# TODO: in standalone mode, can client and server use the same instances of entities etc.? I.e. use the same Engine instance.
+#
+# TODO: Make Fabula component-based. Implement independet event handlers, 'ihandle "DropsEvent"', make a handler dict and a handle(Event) method. Strip EventProcessor down to that. Allow for custom events and handlers.
 
 # Fabula will not work with Python versions prior to 3.x.
 #

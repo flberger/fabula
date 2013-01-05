@@ -204,6 +204,10 @@ class Client(fabula.core.Engine):
 
         self.message_buffer.send_message(fabula.Message([init_event]))
 
+        # This requires a confirmation by ServerParametersEvent
+        #
+        self.await_confirmation = True
+
         # Now loop
         #
         while not self.plugin.exit_requested:
@@ -300,6 +304,8 @@ class Client(fabula.core.Engine):
 
                         timedifference = datetime.datetime.today() - self.timestamp
 
+                        # TODO: This should also happen when a timeout occurs, not only after repeated player attempts. See `elif not self.got_empty_message` above.
+                        #
                         if timedifference.seconds >= 3:
 
                             fabula.LOGGER.warning("waited 3s, still no confirmation, notifying user and resetting timer")
@@ -732,3 +738,15 @@ class Client(fabula.core.Engine):
         self.plugin.exit_requested = True
 
         return
+
+    def process_ServerParametersEvent(self, event, **kwargs):
+        """Unblock the client and call the base class implementation.
+        """
+
+        self.await_confirmation = False
+
+        # Call default implementation
+        #
+        fabula.core.Engine.process_ServerParametersEvent(self,
+                                                         event,
+                                                         message = kwargs["message"])

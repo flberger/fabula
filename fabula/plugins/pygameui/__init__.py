@@ -26,6 +26,7 @@
 
 # TODO: always diplay and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
+# TODO: Make PygameEditor Tkinter based, with multiple windows. Use planes.gui only for in-game-GUI.
 # TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
 # TODO: support three layers: background layer (for parallax scrolling etc.), main layer and overlay layer (for clouds, sunbeams etc.)
 
@@ -560,7 +561,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Create loading text surface to be used in process_EnterRoomEvent
         #
-        self.loading_surface = planes.gui.BIG_FONT.render("Loading, please wait...",
+        self.loading_surface = planes.gui.FONTS.big_font.render("Loading, please wait...",
                                                               True,
                                                               (255, 255, 255))
 
@@ -935,7 +936,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         for event in events:
 
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN
+                                             and event.key == pygame.K_q
+                                             and pygame.key.get_mods() & pygame.KMOD_CTRL):
 
                 fabula.LOGGER.info("exit request from user")
                 self.exit_requested = True
@@ -2153,7 +2156,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             displaystring = str(obj).center(128)
 
-            self.window.display.blit(planes.gui.SMALL_FONT.render(displaystring,
+            self.window.display.blit(planes.gui.FONTS.small_font.render(displaystring,
                                                             True,
                                                             (127, 127, 127),
                                                             (0, 0, 0)),
@@ -3545,11 +3548,24 @@ class PygameOSD:
 
        PygameOSD.display_plane
            An instance of planes.Display.
+
+       PygameOSD.font
+           A pygame.fonts.Font instance.
+
+       PygameOSD.text_color
+           A list [R, G, B] giving the text color. Change this list in place
+           to change the text color.
     """
 
-    def __init__(self, display_plane):
+    def __init__(self, display_plane, font = None, text_color = None):
         """Initialise.
-           display is an instance of planes.Display.
+
+           display_plane is an instance of planes.Display.
+
+           If present, font is a pygame.fonts.Font instance.
+
+           If present, text_color must be a list [R, G, B] giving the text
+           color. Change PygameOSD.text_color in place to change the text color.
         """
 
         self.display_plane = display_plane
@@ -3557,6 +3573,18 @@ class PygameOSD:
         self.caption_list = []
 
         self.offset = (0, 0)
+
+        self.font = font
+
+        self.text_color = text_color
+
+        if self.text_color is None:
+
+            self.text_color = [255, 255, 255]
+
+        # Proxy for access from inside the class
+        #
+        text_color_proxy = self.text_color
 
         class OSDText(planes.gui.OutlinedText):
             """Subclass that updates the text from a dict value in update().
@@ -3573,11 +3601,14 @@ class PygameOSD:
                                caption,
                                dictionary,
                                key,
-                               text_color=(255, 255, 255)):
+                               text_color = text_color_proxy,
+                               font = None):
                 """Call base class and register caption, dictionary and key.
                 """
 
-                planes.gui.OutlinedText.__init__(self, name, "", text_color)
+                planes.gui.OutlinedText.__init__(self, name, "",
+                                                 text_color = text_color,
+                                                 font = font)
 
                 self.caption = caption
                 self.dictionary = dictionary
@@ -3625,7 +3656,7 @@ class PygameOSD:
 
         # Use caption as Plane name
         #
-        osdtext = self.OSDText(caption, caption, dictionary, key)
+        osdtext = self.OSDText(caption, caption, dictionary, key, font = self.font)
 
         osdtext.rect.left = self.offset[0]
 
