@@ -126,8 +126,12 @@
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PerceptionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
+#
 # TODO: support the Tiled editor, http://www.mapeditor.org/, see http://silveiraneto.net/2009/12/19/tiled-tmx-map-loader-for-pygame/
 # TODO: HD support (at least 1280x720)
+# TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
+# TODO: abandon tile-based maps, and rather use large bitmap (GIMP XCF) or vector (Inkscape SVG) data for level backgrounds.
+# TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vectos (Inkscape SVG) overlay.
 #
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: level format should be a list of JSON-encoded Events that establish the room, including fancyness as captions. Provide a tool to convert TSV to this.
@@ -143,8 +147,10 @@
 # TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.
 #
-# TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value
-# TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
+# TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
+# TODO: Make Fabula component-based. Implement independet event handlers, 'ihandle "DropsEvent"', make a handler dict and a handle(Event) method. Strip EventProcessor down to that. Allow for custom events and handlers.
+# TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value -> but that is bad GET REST
+#
 # TODO: all of Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
 #
 # TODO: finally - add event to cleanly disconnect a client session, initiated by client or server
@@ -152,7 +158,6 @@
 # TODO: allow refusal of logins by the server
 #
 # TODO: demos: pacman, chess
-# TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 #
 # TODO: support and test Python package managers, as pip, easyinstall etc.
 # TODO: makeself binary release for Linux - http://megastep.org/makeself
@@ -175,7 +180,7 @@
 #
 # TODO: in standalone mode, can client and server use the same instances of entities etc.? I.e. use the same Engine instance.
 #
-# TODO: Make Fabula component-based. Implement independet event handlers, 'ihandle "DropsEvent"', make a handler dict and a handle(Event) method. Strip EventProcessor down to that. Allow for custom events and handlers.
+# TODO: libGDX user interface, http://libgdx.badlogicgames.com/ : Windows, Linux, Mac OS X, Android, (iOS), Javascript/WebGL (GWT)
 
 # Fabula will not work with Python versions prior to 3.x.
 #

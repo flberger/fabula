@@ -437,7 +437,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Cache for the last right-clicked Entity.
 
        PygameUserInterface.osd
-           An instance of PygameOSD.
+           An instance of PygameOSD. PygameOSD creates a Plane on screen which
+           will be updated during the normal Plane.update() cycle.
 
        PygameUserInterface.stats
            A dict mapping names of different metrics to their current vaule.
@@ -452,6 +453,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.surfacecatcher
            An instance of surfacecatcher.SurfaceCatcher. Initially None.
 
+       PygameUserInterface.mousescroll
+           Boolen flag, indicating whether to scroll the screen when the mouse
+           reaches a screen border.
 
        PygameUserInterface utilises the planes module for 2D bitmap rendering.
        The planes hierarchy is organised as follows:
@@ -489,10 +493,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.window.inventory
            planes Plane for the inventory. By default this is 800x100 px with
            space for 8 100x100 px icons and located at the bottom of the window.
-
-       PygameUserInterface.mousescroll
-           Boolen flag, indicating whether to scroll the screen when the mouse
-           reaches a screen border.
     """
 
     def __init__(self, assets, framerate, host, fullscreen = False, mousescroll = False):
@@ -2154,13 +2154,17 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         if self.freeze:
 
+            # Center for easy overwriting of Surfaces
+            #
             displaystring = str(obj).center(128)
 
-            self.window.display.blit(planes.gui.FONTS.small_font.render(displaystring,
-                                                            True,
-                                                            (127, 127, 127),
-                                                            (0, 0, 0)),
-                                     (120, 500))
+            surface = planes.gui.FONTS.small_font.render(displaystring,
+                                                         True,
+                                                         (127, 127, 127),
+                                                         (0, 0, 0))
+
+            self.window.display.blit(surface, (self.window.rect.width / 2 - surface.get_rect().width / 2,
+                                               500))
 
             pygame.display.flip()
 

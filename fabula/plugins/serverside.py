@@ -323,11 +323,19 @@ class DefaultGame(fabula.plugins.Plugin):
 
     def queue_messages(self, *messages):
         """Queue messages to be executed after host.action_time seconds have passed.
+
            If multiple messages are given, host.action_time will pass between
            each of them.
+
+           Multiple calls to this method will merge the message list given to
+           the existing queue. Symbolically, if the queue is [[1], [2], [3]], a
+           call of queue_messages([4, 5, 6]) will result in a queue of
+           [[1, 4], [2, 5], [3, 6]]
         """
 
         # Superseding fabula.join_lists()
+
+        # TODO: the current implementation requires argument unpacking when called with a list (queue_messages(*COMPUTED_LIST)). Support calling with lists.
 
         if len(messages):
 
