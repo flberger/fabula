@@ -65,23 +65,12 @@ INCLUDE_FILES = [os.path.join("scripts", "100x100-gray.png"),
 
 # Include planes resources
 #
-import fabula.plugins.pygameui as pygamui
-
 INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
                                             "plugins",
                                             "pygameui",
                                             "planes",
                                             "gui",
-                                            "resources",
-                                            "*.png")))
-
-INCLUDE_FILES.extend(glob.glob(os.path.join("fabula",
-                                            "plugins",
-                                            "pygameui",
-                                            "planes",
-                                            "gui",
-                                            "resources",
-                                            "*.ttf")))
+                                            "resources.zip")))
 
 # Include default room
 #
@@ -120,7 +109,8 @@ setup(name = PACKAGE,
                   "{}.plugins.pygameui".format(PACKAGE),
                   "{}.plugins.pygameui.planes".format(PACKAGE),
                   "{}.plugins.pygameui.planes.gui".format(PACKAGE)],
-      py_modules = [],
+      py_modules = ["{}.plugins.pygameui.planes.gui.lmr".format(PACKAGE),
+                    "{}.plugins.pygameui.planes.gui.tmb".format(PACKAGE)],
       requires = ["pygame (>=1.9.1)"],
       provides = [PACKAGE,
                   "{}.core".format(PACKAGE),
@@ -128,7 +118,9 @@ setup(name = PACKAGE,
                   "{}.plugins".format(PACKAGE),
                   "{}.plugins.pygameui".format(PACKAGE),
                   "{}.plugins.pygameui.planes".format(PACKAGE),
-                  "{}.plugins.pygameui.planes.gui".format(PACKAGE)],
+                  "{}.plugins.pygameui.planes.gui".format(PACKAGE),
+                  "{}.plugins.pygameui.planes.gui.lmr".format(PACKAGE),
+                  "{}.plugins.pygameui.planes.gui.tmb".format(PACKAGE)],
       package_data = {},
       scripts = SCRIPTS,
       data_files = [(os.path.join("share", "doc", "{}-{}").format(PACKAGE, fabula.VERSION),

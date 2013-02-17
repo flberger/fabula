@@ -42,13 +42,16 @@ sys.path.extend(__path__)
 
 import fabula.plugins.ui
 import pygame
-import planes.gui.lmr
-import planes.gui.tmb
 import tkinter.filedialog
 import tkinter.simpledialog
 import datetime
 import os
-import surfacecatcher
+# Since we distribute a local copy, `import planes.gui.lmr` etc. would also work
+# here. This is for cx_Freeze.
+#
+import fabula.plugins.pygameui.planes.gui.lmr
+import fabula.plugins.pygameui.planes.gui.tmb
+import fabula.plugins.pygameui.surfacecatcher
 
 # For cx_Freeze
 #
