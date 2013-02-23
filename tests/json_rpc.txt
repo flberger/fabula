@@ -10,8 +10,8 @@ JSON-RPC
     >>> from time import sleep
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 5)
-    ...     interface_class = fabula.interfaces.json_rpc.JSONRPCServerInterface
-    ...     app.run_server(60, interface_class, 0.5, threadsafe = True)
+    ...     interface = fabula.interfaces.json_rpc.JSONRPCServerInterface()
+    ...     app.run_server(60, interface, 0.5, threadsafe = True)
     ...
     >>> def run_client():
     ...     connection = socket.create_connection(("127.0.0.1", 4011), timeout = 5.0)

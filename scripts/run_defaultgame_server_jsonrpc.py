@@ -38,4 +38,4 @@ if __name__ == "__main__":
 
     app = fabula.run.App(timeout = 0)
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
-    app.run_server(30, fabula.interfaces.json_rpc.JSONRPCServerInterface, 0.8)
+    app.run_server(30, fabula.interfaces.json_rpc.JSONRPCServerInterface(), 0.8)

@@ -39,7 +39,7 @@ def main():
 
     app.server_plugin_class = fabula.plugins.serverside.Editor
 
-    app.run_server(60, fabula.interfaces.Interface, 0.5)
+    app.run_server(60, fabula.interfaces.Interface(), 0.5)
 
 if __name__ == "__main__":
 

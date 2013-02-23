@@ -51,6 +51,9 @@ class ReplayPygameUserInterface(fabula.plugins.pygameui.PygameUserInterface):
 
 if __name__ == "__main__":
 
+    if len(sys.argv) == 1:
+        raise RuntimeError("Please supply a logfile as an argument.")
+
     app = fabula.run.App(timeout = 0)
     app.user_interface_class = ReplayPygameUserInterface
-    app.run_client(30, fabula.interfaces.replay.PythonReplayInterface)
+    app.run_client(30, fabula.interfaces.replay.PythonReplayInterface(sys.argv[1]))

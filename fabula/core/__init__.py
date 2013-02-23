@@ -35,6 +35,10 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
        Engine.interface
 
+       Engine.logfile_name
+           The name of a logfile that Engine.run() will log incoming
+           messages to. Initially "messages.log".
+
        Engine.plugin
            This is None upon initialisation and must be set to an instance of
            fabula.plugins.Plugin using Engine.set_plugin().
@@ -65,6 +69,8 @@ class Engine(fabula.eventprocessor.EventProcessor):
         fabula.eventprocessor.EventProcessor.__init__(self)
 
         self.interface = interface_instance
+
+        self.logfile_name = "messages.log"
 
         self.plugin = None
 
@@ -109,10 +115,14 @@ class Engine(fabula.eventprocessor.EventProcessor):
         return
 
     def run(self):
-        """This is the main loop of an Engine.
-           Put all the business logic here.
+        """This is the main loop of an Engine. Put all the business logic here.
+
            This is a blocking method which should call all the process methods
            to process events, and then call the plugin.
+
+           This method should log incoming messages to a file
+           named Engine.logfile_name.
+
            The default implementation waits for self.plugin.exit_requested to be True.
         """
 

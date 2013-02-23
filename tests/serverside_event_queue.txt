@@ -23,10 +23,13 @@ Serverside Event Queue
     ...             print(self.message_for_host)
     ...         return self.message_for_host
     ...
+    ...     def process_InitEvent(self, event):
+    ...         return
+    ...
     >>> app = fabula.run.App(timeout = 5)
     >>> app.server_plugin_class = QueueTest
-    >>> interface_class = fabula.interfaces.Interface
-    >>> app.run_server(60, interface_class, 1.0) # doctest: +ELLIPSIS
+    >>> interface = fabula.interfaces.Interface()
+    >>> app.run_server(60, interface, 1.0) # doctest: +ELLIPSIS
     ============================================================
     Fabula ... Server
     ------------------------------------------------------------

@@ -224,10 +224,6 @@ class TCPClientInterface(fabula.interfaces.Interface):
                     fabula.LOGGER.debug(msg.format(len(message_str),
                                                    len(self.received_data)))
 
-                    # Write to message log file
-                    #
-                    self.log_message(message_str)
-
                     # TODO: eval() is the most dangerous thing you can do with data just received over the network.
                     #
                     message_buffer.messages_for_local.append(eval(message_str))
@@ -388,8 +384,6 @@ class TCPServerInterface(fabula.interfaces.Interface):
                         # be a Python expression to recreate the instance.
                         #
                         representation = repr(message_buffer.messages_for_remote.popleft())
-
-                        # TODO: this is where we could / should log outgoing messages on the server side.
 
                         try:
                             # Add a double newline as separator.

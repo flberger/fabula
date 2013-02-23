@@ -26,6 +26,7 @@ import fabula
 import fabula.core
 import time
 import traceback
+import datetime
 
 # TODO: Add a decent default server CLI.
 
@@ -59,6 +60,10 @@ class Server(fabula.core.Engine):
         #
         fabula.core.Engine.__init__(self,
                                    interface_instance)
+
+        # Override logfile name
+        #
+        self.logfile_name = "messages-server.log"
 
         # If framerate is 0, run as fast as possible
         #
@@ -131,6 +136,10 @@ class Server(fabula.core.Engine):
 
         print("Press [Ctrl] + [C] to stop the server.")
 
+        # Local timestamp for messages
+        #
+        message_timestamp = None
+
         fabula.LOGGER.info("starting main loop")
 
         # MAIN LOOP
@@ -178,6 +187,41 @@ class Server(fabula.core.Engine):
                 if len(message.event_list):
 
                     fabula.LOGGER.debug("{0} incoming: {1}".format(connector, message))
+
+                    # Log to logfile
+                    # TODO: this could be a method. But the we would have to maintain the message_timestamp in the instance.
+
+                    # Clear file and start Message log timer with first incoming
+                    # message
+                    #
+                    if message_timestamp is None:
+
+                        fabula.LOGGER.debug("Clearing log file")
+
+                        message_log_file = open(self.logfile_name, "wt")
+                        message_log_file.write("")
+                        message_log_file.close()
+
+                        fabula.LOGGER.debug("Starting message log timer")
+
+                        message_timestamp = datetime.datetime.today()
+
+                    message_log_file = open(self.logfile_name, "at")
+
+                    timedifference = datetime.datetime.today() - message_timestamp
+
+                    # Logging time difference in seconds and message, tab-separated,
+                    # terminated with double-newline.
+                    # timedifference as seconds + tenth of a second
+                    #
+                    message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
+                                                               repr(message)))
+
+                    message_log_file.close()
+
+                    # Renew timestamp
+                    #
+                    message_timestamp = datetime.datetime.today()
 
                     for event in message.event_list:
 

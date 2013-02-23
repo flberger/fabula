@@ -110,7 +110,7 @@ class App:
 
         return
 
-    def run_client(self, framerate, interface_class):
+    def run_client(self, framerate, interface):
         """Run a Fabula client with the parameters given.
         """
 
@@ -125,8 +125,6 @@ class App:
         fabula.LOGGER.info("running with framerate {}/s".format(framerate))
 
         assets = self.assets_class()
-
-        interface = interface_class()
 
         client = fabula.core.client.Client(interface)
 
@@ -160,7 +158,7 @@ class App:
 
         return
 
-    def run_server(self, framerate, interface_class, action_time, threadsafe = False):
+    def run_server(self, framerate, interface, action_time, threadsafe = False):
         """Run a Fabula server with the parameters given.
         """
 
@@ -172,8 +170,6 @@ class App:
         fabula.LOGGER.info("Fabula {} starting up".format(fabula.VERSION))
         fabula.LOGGER.info("running in server mode")
         fabula.LOGGER.info("running with interval (framerate) {}/s".format(framerate))
-
-        interface = interface_class()
 
         server = fabula.core.server.Server(interface,
                                            framerate,
@@ -276,8 +272,7 @@ class App:
         # Setting up interfaces
         #
         server_interface = fabula.interfaces.StandaloneInterface(framerate)
-        client_interface = fabula.interfaces.StandaloneInterface(framerate,
-                                                                 logging = True)
+        client_interface = fabula.interfaces.StandaloneInterface(framerate)
 
         server_interface.connect("client")
         client_interface.connect("server")

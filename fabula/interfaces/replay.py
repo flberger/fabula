@@ -39,17 +39,36 @@ LOGGER.addHandler(STDOUT_HANDLER)
 
 class PythonReplayInterface(fabula.interfaces.Interface):
     """An Interface which replays Python message logs.
+
+       Additional attributes:
+
+       PythonReplayInterface.filename
+           The name of the message logfile to replay.
     """
 
-    def handle_messages(self):
-        """Read a file created by Interface.log_message(), and fill MessageBuffer.messages_for_local with these messages.
+    def __init__(self, filename):
+        """Initialisation.
         """
 
-        fabula.LOGGER.debug("opening file 'messages.log'")
+        fabula.interfaces.Interface.__init__(self)
+
+        self.filename = filename
+
+        return
+
+    def handle_messages(self):
+        """Read the file and fill MessageBuffer.messages_for_local with these messages.
+        """
+
+        fabula.LOGGER.debug("opening file '{}'".format(self.filename))
+
+        if self.filename in ("messages-client.log", "messages-server.log"):
+
+            raise RuntimeError("Can not read from '{}', it might be overwritten during replay. Please rename the file and try again.".format(self.filename))
 
         # Default to 'messages.log', see Interface.log_message()
         #
-        message_log_file = open("messages.log", "rt")
+        message_log_file = open(self.filename, "rt")
 
         fabula.LOGGER.debug("reading data")
 

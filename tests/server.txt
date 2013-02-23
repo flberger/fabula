@@ -7,8 +7,8 @@ Server Execution
     >>> import fabula.interfaces
     >>> import fabula.run
     >>> app = fabula.run.App(timeout = 5)
-    >>> interface_class = fabula.interfaces.Interface
-    >>> app.run_server(60, interface_class, 0.5) # doctest: +ELLIPSIS
+    >>> interface = fabula.interfaces.Interface()
+    >>> app.run_server(60, interface, 0.5) # doctest: +ELLIPSIS
     ============================================================
     Fabula ... Server
     ------------------------------------------------------------
