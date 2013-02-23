@@ -45,7 +45,7 @@ class PythonReplayInterface(fabula.interfaces.Interface):
         """Read a file created by Interface.log_message(), and fill MessageBuffer.messages_for_local with these messages.
         """
 
-        fabula.LOGGER.debug("opening file")
+        fabula.LOGGER.debug("opening file 'messages.log'")
 
         # Default to 'messages.log', see Interface.log_message()
         #

@@ -20,6 +20,8 @@
 
 # work started on 10. December 2010
 
+# TODO: update data_files and include_files handling according to make_python_skeleton.py
+
 import sys
 
 # Fabula will not work with Python versions prior to 3.x.

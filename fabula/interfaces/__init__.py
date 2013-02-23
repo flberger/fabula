@@ -84,7 +84,8 @@ class Interface:
         self.shutdown_confirmed = False
 
         # The message log file records a list of Messages and time intervals.
-        # TODO: It will be opened...when and where?
+        # It will be opened in Interface.log_message() upon arrival of the first
+        # message.
         #
         self.message_log_file = None
 

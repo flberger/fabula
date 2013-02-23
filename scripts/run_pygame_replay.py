@@ -35,6 +35,8 @@ import fabula.plugins.ui
 import fabula.interfaces.replay
 import fabula.run
 
+# NOTE: this would be so much easier with a component-based design
+
 class ReplayPygameUserInterface(fabula.plugins.pygameui.PygameUserInterface):
     """A PygameUserInterface that does not display CanSpeakEvents.
     """
