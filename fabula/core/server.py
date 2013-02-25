@@ -63,7 +63,7 @@ class Server(fabula.core.Engine):
 
         # Override logfile name
         #
-        self.logfile_name = "messages-server.log"
+        self.logfile_name = "messages-server-received.log"
 
         # If framerate is 0, run as fast as possible
         #

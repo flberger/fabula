@@ -94,7 +94,7 @@ class Client(fabula.core.Engine):
 
         # Override logfile name
         #
-        self.logfile_name = "messages-client.log"
+        self.logfile_name = "messages-client-received.log"
 
         # Set up flags used by self.run()
         #
