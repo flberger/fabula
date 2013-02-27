@@ -2742,6 +2742,8 @@ class PygameEditor(PygameUserInterface):
         else:
             fabula.LOGGER.warning("no floorplan files found in '{}'".format(os.getcwd()))
 
+            self.window.sub(planes.gui.OkBox("No room files in current directory."))
+
         return
 
     def edit_entity_attributes(self, callback, entity = None):
