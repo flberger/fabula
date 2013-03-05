@@ -164,6 +164,11 @@ class DefaultGame(fabula.plugins.Plugin):
        DefaultGame.action_time_reference
            A time value used as reference to compute time between calls to
            DefaultGame.next_action().
+
+       DefaultGame.taken_locations
+           A list of locations that are going to be occupied as a result of
+           processing an incoming message. Will be reset to an empty list
+           by DefaultGame.process_message().
    """
 
     def __init__(self, host):
@@ -182,6 +187,8 @@ class DefaultGame(fabula.plugins.Plugin):
         self.message_queue = []
 
         self.action_time_reference = time.time()
+
+        self.taken_locations = []
 
         # Load default logic.
         #
@@ -222,6 +229,10 @@ class DefaultGame(fabula.plugins.Plugin):
         # Append events returned by next_action()
         #
         self.message_for_host.event_list.extend(next_action_events)
+
+        # Clear this step's list of taken locations
+        #
+        self.taken_locations = []
 
         return self.message_for_host
 
@@ -281,7 +292,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 location = self.move_towards(identifier,
                                              target_identifier,
-                                             self.path_dict[identifier])
+                                             self.path_dict[identifier] + self.taken_locations)
 
                 if location is None:
 
@@ -295,6 +306,15 @@ class DefaultGame(fabula.plugins.Plugin):
                 else:
                     fabula.LOGGER.info("movement pending for '{}'".format(identifier))
                     fabula.LOGGER.debug("last positions {}, best move towards {} is {}".format(self.path_dict[identifier], target_identifier, location))
+
+                    # Check if the Entity is blocking, and if so, block the new
+                    # location internally
+                    #
+                    if self.host.room.entity_dict[identifier].blocking:
+
+                        fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(target_identifier))
+
+                        self.taken_locations.append(target_identifier)
 
                     # Save current position before movement as last position
                     #
@@ -452,7 +472,7 @@ class DefaultGame(fabula.plugins.Plugin):
         if event.identifier in self.tries_to_move_dict.keys():
 
             fabula.LOGGER.debug("removing existing target {} for '{}'".format(self.tries_to_move_dict[event.identifier],
-                                                                            event.identifier))
+                                                                              event.identifier))
 
             del self.tries_to_move_dict[event.identifier]
 
@@ -464,7 +484,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         location = self.move_towards(event.identifier,
                                      event.target_identifier,
-                                     self.path_dict[event.identifier])
+                                     self.path_dict[event.identifier] + self.taken_locations)
 
         if location is None:
 
@@ -474,11 +494,20 @@ class DefaultGame(fabula.plugins.Plugin):
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:
-            msg = "movement requested for '{}', last positions, best move towards {} is {}"
+            msg = "movement requested for '{}', best move towards {} is {}"
 
             fabula.LOGGER.debug(msg.format(event.identifier,
                                         event.target_identifier,
                                         location))
+
+            # Check if the Entity is blocking, and if so, block the new location
+            # internally
+            #
+            if self.host.room.entity_dict[event.identifier].blocking:
+
+                fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier))
+
+                self.taken_locations.append(event.target_identifier)
 
             # Save current position before movement as last position
             #
@@ -495,7 +524,7 @@ class DefaultGame(fabula.plugins.Plugin):
             else:
 
                 fabula.LOGGER.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
-                                                                                  event.target_identifier))
+                                                                                    event.target_identifier))
 
                 self.tries_to_move_dict[event.identifier] = event.target_identifier
 
@@ -565,15 +594,33 @@ class DefaultGame(fabula.plugins.Plugin):
                 # Still, the Entity to be dropped may originate either from Room
                 # or from Rack.
                 #
+                entity = None
+
                 if event.item_identifier not in self.host.rack.entity_dict.keys():
+
                     fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
+
                     self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
-                                                                               event.item_identifier))
+                                                                                event.item_identifier))
+
+                    entity = self.host.room.entity_dict[event.item_identifier]
 
                 fabula.LOGGER.info("returning DropsEvent")
+
                 self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
                                                                          event.item_identifier,
                                                                          event.target_identifier))
+
+                entity = self.host.rack.entity_dict[event.item_identifier]
+
+                # Check if the dropped Entity is blocking, and if so, block
+                # the spot internally
+                #
+                if entity.blocking:
+
+                    fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier))
+
+                    self.taken_locations.append(event.target_identifier)
 
         return
 

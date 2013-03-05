@@ -131,12 +131,12 @@
 # TODO: HD support (at least 1280x720)
 # TODO: real node-based rooms; no more tiles; refactor client to use mouse hit zones around node points
 # TODO: abandon tile-based maps, and rather use large bitmap (GIMP XCF) or vector (Inkscape SVG) data for level backgrounds.
-# TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vectos (Inkscape SVG) overlay.
+# TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: level format should be a list of JSON-encoded Events that establish the room, including fancyness as captions. Provide a tool to convert TSV to this.
 #
-# TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen!
+# TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen! "post crash logging fast forwarder" :-)
 #
 # TODO: Use conventional names. Call maps maps, tiles tiles.
 # TODO: Fabula is not event-based, it is turn-based. Reflect that in method names: next_turn(), or something like that.
@@ -158,6 +158,7 @@
 # TODO: allow refusal of logins by the server
 #
 # TODO: demos: pacman, chess
+# TODO: rougue-like game, or interface to nethack. See http://www.nethack.org/ http://www.darkarts.co.za/newt http://www.zincland.com/powder/index.php?pagename=about
 #
 # TODO: support and test Python package managers, as pip, easyinstall etc.
 # TODO: makeself binary release for Linux - http://megastep.org/makeself
@@ -168,8 +169,10 @@
 #
 # TODO: invisible audio Entites for music
 #
-# TODO: thin clients. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
+# TODO: thin clients for performance tests, bug hunting, unit tests. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
 # TODO: maybe it's enough to implement a replay interface for client data in the server interface.
+#
+# TODO: extended command line and GUI replay interface. Allow stopping, single or multiple step forward, stopping at step #n, obeying or discarding wait times
 #
 # TODO: build in in-game questionnaires for research games
 #
@@ -181,6 +184,14 @@
 # TODO: in standalone mode, can client and server use the same instances of entities etc.? I.e. use the same Engine instance.
 #
 # TODO: libGDX user interface, http://libgdx.badlogicgames.com/ : Windows, Linux, Mac OS X, Android, (iOS), Javascript/WebGL (GWT)
+# TODO: cross-platform OpenGL- or Irrlicht-based client. Preferably a compiled Python module.
+# TODO: HTML4+JS or HTML5 or WebGL browser client.
+#
+# TODO: the server should sanity check messages returned by the plugin as it does for incoming client messages, e.g. blocked positions
+#
+# TODO: efficient, packed UDP protocol with bookkeeping.
+#
+# TODO: fuzzing tool for the Fabula protocol
 
 # Fabula will not work with Python versions prior to 3.x.
 #
