@@ -30,28 +30,16 @@
 # TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
 # TODO: support three layers: background layer (for parallax scrolling etc.), main layer and overlay layer (for clouds, sunbeams etc.)
 
-# Add the pygameui directoy to the search path. We will put modules required by
-# pygameui (but not Fabula in general) here.
-# This is especially important for planes submodules.
-#
-import sys
-
-# __path__ is a list
-#
-sys.path.extend(__path__)
-
 import fabula.plugins.ui
 import pygame
 import tkinter.filedialog
 import tkinter.simpledialog
 import datetime
 import os
-# Since we distribute a local copy, `import planes.gui.lmr` etc. would also work
-# here. This is for cx_Freeze.
-#
-import fabula.plugins.pygameui.planes.gui.lmr
-import fabula.plugins.pygameui.planes.gui.tmb
-import fabula.plugins.pygameui.surfacecatcher
+import planes.gui.lmr
+import planes.gui.tmb
+# TODO: re-enable surfacecatcher
+#import fabula.plugins.pygameui.surfacecatcher
 
 # For cx_Freeze
 #
