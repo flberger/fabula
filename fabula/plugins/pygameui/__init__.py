@@ -38,8 +38,7 @@ import datetime
 import os
 import planes.gui.lmr
 import planes.gui.tmb
-# TODO: re-enable surfacecatcher
-#import fabula.plugins.pygameui.surfacecatcher
+import surfacecatcher
 
 # For cx_Freeze
 #
