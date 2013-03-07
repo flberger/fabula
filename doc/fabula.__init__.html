@@ -3,14 +3,14 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.__init__&rdquo;</title>
+    <title>fabula.__init__ : API documentation</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="module">Module f.__init__</h1>
+    <h1 class="module">f.__init__ : module documentation</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a></span>
       
@@ -87,7 +87,7 @@ happen in parallel.</pre>
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id3">
+      <table class="children sortable" id="id74">
   
   
 <tr class="class">
@@ -119,7 +119,7 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.TriesToPickUpEvent.html">TriesToPickUpEvent</a></td>
-    <td><tt>Issued when the player or an NPC tries to pick up an item.</tt></td>
+    <td><tt>Issued when the player or an NPC tries to pick up an item. Attempts to pick up NPCs are discarded or answered with an error.</tt></td>
   </tr><tr class="class">
     
     
@@ -131,13 +131,13 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.TriesToManipulateEvent.html">TriesToManipulateEvent</a></td>
-    <td><tt>Issued when the player or an NPC tries to manipulate an item.</tt></td>
+    <td><tt>Issued when the player or an NPC tries to manipulate an item. NPCs cannot be manipulated.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.TriesToTalkToEvent.html">TriesToTalkToEvent</a></td>
-    <td><tt>Issued when the player or an NPC wants to start a conversation with another entity.</tt></td>
+    <td><tt>Issued when the player or an NPC wants to start a conversation with another entity. It is not possible to talk to items.</tt></td>
   </tr><tr class="class">
     
     
@@ -155,43 +155,43 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.PicksUpEvent.html">PicksUpEvent</a></td>
-    <td><tt>This is a server confirmation of a TriesToPickUpEvent</tt></td>
+    <td><tt>This is a server confirmation of a TriesToPickUpEvent issued by the player or an NPC.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.DropsEvent.html">DropsEvent</a></td>
-    <td><tt>This is the server confirmation for an attempt to drop an item</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.CanSpeakEvent.html">CanSpeakEvent</a></td>
-    <td><tt>This is a server invitation for the player or an NPC to speak.</tt></td>
+    <td><tt>This is a server invitation for the player or an NPC to speak. Since this event requires immediate user input, it is always executed as the last event of a Message by the UserInterface.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.AttemptFailedEvent.html">AttemptFailedEvent</a></td>
-    <td><tt>Server announcement that the last AttemptEvent failed.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.PerceptionEvent.html">PerceptionEvent</a></td>
-    <td><tt>This is a perception for the player or an NPC issued by the server,</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.ManipulatesEvent.html">ManipulatesEvent</a></td>
-    <td><tt>This is a server confirmation of an item manipulation.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.InitEvent.html">InitEvent</a></td>
-    <td><tt>This event is sent by the client upon startup.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
@@ -203,13 +203,13 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.SaysEvent.html">SaysEvent</a></td>
-    <td><tt>This normally is a reaction to the CanSpeakEvent, to be sent by the player.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.ChangePropertyEvent.html">ChangePropertyEvent</a></td>
-    <td><tt>This Event is issued to trigger a property change.</tt></td>
+    <td><tt>This Event is issued to trigger a property change. Each instance of fabula.Entity has a property.</tt></td>
   </tr><tr class="class">
     
     
@@ -245,7 +245,7 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.ServerEvent.html">ServerEvent</a></td>
-    <td><tt>Base class for various events issued by the server</tt></td>
+    <td><tt>Base class for various events issued by the server that are no ConfirmEvents, including map and room events.</tt></td>
   </tr><tr class="class">
     
     
@@ -257,13 +257,13 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.DeleteEvent.html">DeleteEvent</a></td>
-    <td><tt>This event deletes an item or NPC from the map.</tt></td>
+    <td><tt>This event deletes an item or NPC from the map. Note that items may still persist in the players posessions.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.EnterRoomEvent.html">EnterRoomEvent</a></td>
-    <td><tt>This event announces that the player enters a new room.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="class">
     
     
@@ -275,13 +275,13 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.ChangeMapElementEvent.html">ChangeMapElementEvent</a></td>
-    <td><tt>This event changes a single element of the two-dimensional map.</tt></td>
+    <td><tt>This event changes a single element of the two-dimensional map. When sent in a Message, these events are executed immediately and in parallel upon the rendering of the Message by the UserInterface.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.ServerParametersEvent.html">ServerParametersEvent</a></td>
-    <td><tt>This Event is sent by the Server when an InitEvent has been received.</tt></td>
+    <td><tt>This Event is sent by the Server when an InitEvent has been received. It informs the client about the Server parameters.</tt></td>
   </tr><tr class="class">
     
     
@@ -293,19 +293,19 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.Entity.html">Entity</a></td>
-    <td><tt>An Entity is a Fabula game object.</tt></td>
+    <td><tt>An Entity is a Fabula game object. This is the base class for the player, NPCs and items. An Entity holds information used by the Fabula game logic:</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.Tile.html">Tile</a></td>
-    <td><tt>A Tile is an element of a two-dimensional map.</tt></td>
+    <td><tt>A Tile is an element of a two-dimensional map. It is never meant to perform any active logic, so its only property is a type and an asset.</tt></td>
   </tr><tr class="class">
     
     
     <td>Class</td>
     <td><a href="fabula.Room.html">Room</a></td>
-    <td><tt>A Room instance saves the map as well as Entities and their locations.</tt></td>
+    <td><tt>A Room instance saves the map as well as Entities and their locations. It is maintained for the current room in the Client and for all active rooms in the Server.</tt></td>
   </tr><tr class="class">
     
     
@@ -317,7 +317,7 @@ happen in parallel.</pre>
     
     <td>Class</td>
     <td><a href="fabula.Rack.html">Rack</a></td>
-    <td><tt>A Rack stores Entities removed from a room.</tt></td>
+    <td><tt>A Rack stores Entities removed from a room. An instance of Rack is used by each Engine.</tt></td>
   </tr><tr class="function">
     
     
@@ -335,7 +335,7 @@ happen in parallel.</pre>
     
     <td>Function</td>
     <td><a href="fabula.html#representation">representation</a></td>
-    <td><tt>Compute an official string representation of object. eval(representation(object)) should recreate the object.</tt></td>
+    <td><tt>Compute an official string representation of object. eval(representation(object)) should recreate the object. attributes is a list of strings giving the attributes to include.</tt></td>
   </tr><tr class="function">
     
     
@@ -347,7 +347,7 @@ happen in parallel.</pre>
     
     <td>Function</td>
     <td><a href="fabula.html#surrounding_positions">surrounding_positions</a></td>
-    <td><tt>Return a list of tuples, representing the 8 surrounding positions around the tuple given.</tt></td>
+    <td><tt>Return a list of tuples, representing the 8 surrounding positions around the tuple given. The list starts with the top left position and proceeds clockwise.</tt></td>
   </tr>
   
 </table>
@@ -450,7 +450,7 @@ The list starts with the top left position and proceeds clockwise.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-01-05 14:32:02.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-03-07 08:40:05.
     </address>
   </body>
 </html>

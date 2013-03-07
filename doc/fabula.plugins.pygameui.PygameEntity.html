@@ -3,14 +3,14 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.plugins.pygameui.PygameEntity&rdquo;</title>
+    <title>fabula.plugins.pygameui.PygameEntity : API documentation</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.p.p.PygameEntity(<a href="fabula.Entity.html">fabula.Entity</a>):</h1>
+    <h1 class="class">f.p.p.PygameEntity(<a href="fabula.Entity.html">fabula.Entity</a>) : class documentation</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a></span>
       
@@ -42,7 +42,7 @@ PygameEntity.caption_plane
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id120">
+      <table class="children sortable" id="id35">
   
   
 <tr class="method">
@@ -50,7 +50,7 @@ PygameEntity.caption_plane
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEntity.html#__init__">__init__</a></td>
-    <td><tt>Initialise.</tt></td>
+    <td><tt>Initialise. spacing is the spacing between tiles. action_frames is the number of frames per action.</tt></td>
   </tr><tr class="method">
     
     
@@ -76,7 +76,7 @@ PygameEntity.caption_plane
         <p>
           Inherited from <a href="fabula.Entity.html">Entity</a>:
         </p>
-        <table class="children sortable" id="id121">
+        <table class="children sortable" id="id36">
   
   
 <tr class="basemethod">
@@ -84,25 +84,25 @@ PygameEntity.caption_plane
     
     <td>Method</td>
     <td><a href="fabula.Entity.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>This method is called by the UserInterface.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.Entity.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>This method is called by the UserInterface.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.Entity.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>This method is called by the UserInterface.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.Entity.html#clone">clone</a></td>
-    <td><tt>Return a new fabula.Entity instance, derived from this Entity.</tt></td>
+    <td><tt>Return a new fabula.Entity instance, derived from this Entity. Useful to create an Entity object from a subclass of Entity.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -121,6 +121,160 @@ PygameEntity.caption_plane
     <td>Method</td>
     <td><a href="fabula.Entity.html#json">json</a></td>
     <td><tt>Return a JSON representation of the Entity.</tt></td>
+  </tr>
+  
+</table>
+      
+        <p>
+          Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.Entity.html">Entity</a>):
+        </p>
+        <table class="children sortable" id="id37">
+  
+  
+<tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__getstate__">__getstate__</a></td>
+    <td><tt>Return a copy of self.__dict__ with un-pickleable items removed to the pickle module.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#__setstate__">__setstate__</a></td>
+    <td><tt>Update self.__dict__ with state_dict provided by the pickle module, then call __init__().</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_AttemptFailedEvent">process_AttemptFailedEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ExitEvent">process_ExitEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
+  </tr><tr class="basemethod">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.eventprocessor.EventProcessor.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr>
   
 </table>
@@ -206,7 +360,7 @@ action_frames is the number of frames per action.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-01-05 14:32:02.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-03-07 08:40:05.
     </address>
   </body>
 </html>

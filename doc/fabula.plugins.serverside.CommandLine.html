@@ -3,14 +3,14 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.plugins.serverside.CommandLine&rdquo;</title>
+    <title>fabula.plugins.serverside.CommandLine : API documentation</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.p.s.CommandLine(<a href="fabula.plugins.serverside.DefaultGame.html">DefaultGame</a>):</h1>
+    <h1 class="class">f.p.s.CommandLine(<a href="fabula.plugins.serverside.DefaultGame.html">DefaultGame</a>) : class documentation</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.serverside.html">serverside</a></span>
       
@@ -25,7 +25,7 @@
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id109">
+      <table class="children sortable" id="id53">
   
   
 <tr class="method">
@@ -45,7 +45,7 @@
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.CommandLine.html#parse">parse</a></td>
-    <td><tt>This method parses the input string and returns a tuple (string, event_list).</tt></td>
+    <td><tt>This method parses the input string and returns a tuple (string, event_list). The string and event list may be empty.</tt></td>
   </tr>
   
 </table>
@@ -53,7 +53,7 @@
         <p>
           Inherited from <a href="fabula.plugins.serverside.DefaultGame.html">DefaultGame</a>:
         </p>
-        <table class="children sortable" id="id110">
+        <table class="children sortable" id="id54">
   
   
 <tr class="basemethod">
@@ -67,7 +67,7 @@
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#next_action">next_action</a></td>
-    <td><tt>Called after after Server.action_time has passed to compute and return the next Events.</tt></td>
+    <td><tt>Called after after Server.action_time has passed to compute and return the next Events. The default implementation processes pending Entity movements and should be called from all subclasses of DefaultGame.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -109,19 +109,19 @@
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#process_SaysEvent">process_SaysEvent</a></td>
-    <td><tt>This is a convenience hook to override.</tt></td>
+    <td><tt>This is a convenience hook to override. The default implementation sends the SaysEvent back to the Client and calls DefaultGame.respond().</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>This is a convenience hook to override.</tt></td>
+    <td><tt>This is a convenience hook to override. The default implementation calls DefaultGame.respond().</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>This is a convenience hook to override.</tt></td>
+    <td><tt>This is a convenience hook to override. The default implementation calls DefaultGame.respond().</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -133,7 +133,7 @@
     
     <td>Method</td>
     <td><a href="fabula.plugins.serverside.DefaultGame.html#move_towards">move_towards</a></td>
-    <td><tt>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room.</tt></td>
+    <td><tt>Return the coordinates of the next move of Entity 'identifier' towards target_identifier in the current room. forbidden_moves is a list of targets that should be considered as not walkable.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -147,7 +147,7 @@
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.serverside.DefaultGame.html">DefaultGame</a>, <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id111">
+        <table class="children sortable" id="id55">
   
   
 <tr class="basemethod">
@@ -167,109 +167,109 @@
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_CanSpeakEvent">process_CanSpeakEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PerceptionEvent">process_PerceptionEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangePropertyEvent">process_ChangePropertyEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">process_EnterRoomEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ExitEvent">process_ExitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr>
   
 </table>
@@ -336,7 +336,7 @@ The string and event list may be empty.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-01-05 14:32:02.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-03-07 08:40:05.
     </address>
   </body>
 </html>

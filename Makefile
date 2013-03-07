@@ -28,10 +28,10 @@ help:
 	@echo '    lp'
 
 docs: clean
-	/home/florian/temp/python/pydoctor/bin/pydoctor --verbose \
-	                                                --add-package fabula \
-	                                                --make-html \
-	                                                --html-output doc/
+	pydoctor --verbose \
+	         --add-package fabula \
+	         --make-html \
+	         --html-output doc/
 
 check:
 	@echo WARNING: using pylint for Python 2.x instead of 3.x.

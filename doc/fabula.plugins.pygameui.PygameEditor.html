@@ -3,14 +3,14 @@
   "DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>API docs for &ldquo;fabula.plugins.pygameui.PygameEditor&rdquo;</title>
+    <title>fabula.plugins.pygameui.PygameEditor : API documentation</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <link href="apidocs.css" type="text/css" rel="stylesheet" />
     
     
   </head>
   <body>
-    <h1 class="class">Class f.p.p.PygameEditor(<a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>):</h1>
+    <h1 class="class">f.p.p.PygameEditor(<a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>) : class documentation</h1>
     <p>
       <span id="part">Part of <a href="fabula.html">fabula</a>.<a href="fabula.plugins.html">plugins</a>.<a href="fabula.plugins.pygameui.html">pygameui</a></span>
       
@@ -43,7 +43,7 @@ PygameUserInterface.overlay_surface
     
     
     <div id="splitTables">
-      <table class="children sortable" id="id126">
+      <table class="children sortable" id="id42">
   
   
 <tr class="method">
@@ -75,7 +75,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#edit_entity_attributes">edit_entity_attributes</a></td>
-    <td><tt>Open an editor to enter or edit Entity properties.</tt></td>
+    <td><tt>Open an editor to enter or edit Entity properties. callback will be attached to the OK button.</tt></td>
   </tr><tr class="method">
     
     
@@ -105,13 +105,13 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#make_tile_obstacle">make_tile_obstacle</a></td>
-    <td><tt>Clicked callback which changes the Tile type to fabula.OBSTACLE.</tt></td>
+    <td><tt>Clicked callback which changes the Tile type to fabula.OBSTACLE. More specific, a ChangeMapElementEvent is sent to the Server, and an overlay is applied to visualize the OBSTACLE type.</tt></td>
   </tr><tr class="method">
     
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameEditor.html#make_tile_floor">make_tile_floor</a></td>
-    <td><tt>Clicked callback which changes the Tile type to fabula.FLOOR.</tt></td>
+    <td><tt>Clicked callback which changes the Tile type to fabula.FLOOR. More specific, a ChangeMapElementEvent is sent to the Server, and the overlay to visualize the OBSTACLE type is deleted.</tt></td>
   </tr><tr class="method">
     
     
@@ -185,7 +185,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>:
         </p>
-        <table class="children sortable" id="id127">
+        <table class="children sortable" id="id43">
   
   
 <tr class="basemethod">
@@ -199,13 +199,13 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#update_frame_timer">update_frame_timer</a></td>
-    <td><tt>Use pygame.time.Clock.tick() to slow down to given framerate.</tt></td>
+    <td><tt>Use pygame.time.Clock.tick() to slow down to given framerate. Also, update PygameUserInterface.stats.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#display_single_frame">display_single_frame</a></td>
-    <td><tt>Update and render all planes.</tt></td>
+    <td><tt>Update and render all planes. This method also handles scrolling.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -229,7 +229,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Fetch asset and register/replace tile.</tt></td>
+    <td><tt>Fetch asset and register/replace tile. Tile.asset is the Pygame Surface since possibly multiple Planes must be derived from a single Tile.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -265,7 +265,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Check the affected Entity, then either move the item's Plane from window.room to PygameUserInterface.inventory_plane or delete it.</tt></td>
+    <td><tt>Check the affected Entity, then either move the item's Plane from window.room to PygameUserInterface.inventory_plane or delete it. Then call the base class implementation to notify the Entity.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -301,7 +301,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#entity_dropped_callback">entity_dropped_callback</a></td>
-    <td><tt>Dropped upon callback for Entities.</tt></td>
+    <td><tt>Dropped upon callback for Entities. Adds appropriate Events to PygameUserInterface.message_for_host.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -331,7 +331,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.pygameui.PygameUserInterface.html#_chars_to_frames">_chars_to_frames</a></td>
-    <td><tt>Auxiliary method to compute how many frames to display a string.</tt></td>
+    <td><tt>Auxiliary method to compute how many frames to display a string. characters is the string to display.</tt></td>
   </tr>
   
 </table>
@@ -339,7 +339,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>):
         </p>
-        <table class="children sortable" id="id128">
+        <table class="children sortable" id="id44">
   
   
 <tr class="basemethod">
@@ -359,7 +359,7 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.plugins.ui.UserInterface.html#display_asset_exception">display_asset_exception</a></td>
-    <td><tt>Called when assets is unable to retrieve the asset.</tt></td>
+    <td><span class="undocumented">No summary</span></td>
   </tr>
   
 </table>
@@ -367,7 +367,7 @@ PygameUserInterface.overlay_surface
         <p>
           Inherited from <a href="fabula.eventprocessor.EventProcessor.html">EventProcessor</a> (via <a href="fabula.plugins.pygameui.PygameUserInterface.html">PygameUserInterface</a>, <a href="fabula.plugins.ui.UserInterface.html">UserInterface</a>, <a href="fabula.plugins.Plugin.html">Plugin</a>):
         </p>
-        <table class="children sortable" id="id129">
+        <table class="children sortable" id="id45">
   
   
 <tr class="basemethod">
@@ -387,79 +387,79 @@ PygameUserInterface.overlay_surface
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">process_TriesToMoveEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">process_TriesToLookAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">process_TriesToPickUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">process_TriesToDropEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">process_TriesToManipulateEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">process_TriesToTalkToEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ManipulatesEvent">process_ManipulatesEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PassedEvent">process_PassedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_LookedAtEvent">process_LookedAtEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_PickedUpEvent">process_PickedUpEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_DroppedEvent">process_DroppedEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">process_InitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
     <td><a href="fabula.eventprocessor.EventProcessor.html#process_ExitEvent">process_ExitEvent</a></td>
-    <td><tt>Process the Event.</tt></td>
+    <td><tt>Process the Event. The default implementation does nothing.</tt></td>
   </tr>
   
 </table>
@@ -870,7 +870,7 @@ overlay to visualize the OBSTACLE type is deleted.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-01-05 14:32:02.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-03-07 08:40:05.
     </address>
   </body>
 </html>
