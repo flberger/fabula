@@ -152,7 +152,7 @@ winxp_update: clean
 	umount /mnt/winxp/
 
 clean:
-	rm -vf `find . -iname '*.log'`
+	@echo About to remove all log files. RETURN to proceed && read DUMMY && rm -vf `find . -iname '*.log'`
 	rm -rvf `find . -type d -iname '__pycache__'`
 	rm -vf `find . -iname '*.pyc'`
 

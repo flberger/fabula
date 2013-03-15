@@ -534,8 +534,6 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return a PicksUpEvent to the Server.
         """
 
-        fabula.LOGGER.info("returning PicksUpEvent")
-
         # The Server has performed basic sanity checks.
         # In addition, we restrict picking up to items right next to the player.
         #
@@ -544,6 +542,8 @@ class DefaultGame(fabula.plugins.Plugin):
         surrounding_positions = fabula.surrounding_positions(player_location)
 
         if self.host.room.entity_locations[event.target_identifier] in surrounding_positions:
+
+            fabula.LOGGER.info("returning PicksUpEvent")
 
             self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
                                                                        event.target_identifier))
@@ -608,10 +608,12 @@ class DefaultGame(fabula.plugins.Plugin):
                 fabula.LOGGER.info("returning DropsEvent")
 
                 self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                         event.item_identifier,
-                                                                         event.target_identifier))
+                                                                          event.item_identifier,
+                                                                          event.target_identifier))
 
-                entity = self.host.rack.entity_dict[event.item_identifier]
+                if entity is None:
+
+                    entity = self.host.rack.entity_dict[event.item_identifier]
 
                 # Check if the dropped Entity is blocking, and if so, block
                 # the spot internally
@@ -935,6 +937,70 @@ class Editor(DefaultGame):
             # Force recreation of the tiles plane
             #
             self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
+
+    def process_TriesToDropEvent(self, event):
+        """A custom version of DefaultGame.process_TriesToDropEvent(), allowing to drop Entities anywhere.
+        """
+
+        # NOTE: tons of duplicated code
+
+        # Server.process_TriesToDropEvent() has already done some checks,
+        # so we can be sure that target_identifier is either a valid
+        # coordinate tuple or an instance of fabula.Entity.
+        #
+        if event.target_identifier in self.host.room.entity_dict.keys():
+
+            fabula.LOGGER.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
+            self.respond(event)
+
+        else:
+            fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier))
+
+            # Still, the Entity to be dropped may originate either from Room
+            # or from Rack.
+            #
+            entity = None
+
+            if event.item_identifier not in self.host.rack.entity_dict.keys():
+
+                fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
+
+                self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
+                                                                            event.item_identifier))
+
+                entity = self.host.room.entity_dict[event.item_identifier]
+
+            fabula.LOGGER.info("returning DropsEvent")
+
+            self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                     event.item_identifier,
+                                                                     event.target_identifier))
+
+            if entity is None:
+
+                entity = self.host.rack.entity_dict[event.item_identifier]
+
+            # Check if the dropped Entity is blocking, and if so, block
+            # the spot internally
+            #
+            if entity.blocking:
+
+                fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier))
+
+                self.taken_locations.append(event.target_identifier)
+
+        return
+
+    def process_TriesToPickUpEvent(self, event):
+        """A custom version of DefaultGame.process_TriesToPickUpEvent(), allowing to pick up Entities from anywhere.
+        """
+
+        fabula.LOGGER.info("returning PicksUpEvent")
+
+        self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
+                                                                   event.target_identifier))
+
+        return
 
     def send_room_events(self, option):
         """OptionSelector callback to read a Room from a file and send it to the Server.

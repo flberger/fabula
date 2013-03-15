@@ -122,14 +122,14 @@ class EntityPlane(planes.Plane):
         # Call base class
         #
         planes.Plane.__init__(self,
-                                  name,
-                                  rect,
-                                  draggable = draggable,
-                                  grab = grab,
-                                  highlight = True,
-                                  left_click_callback = left_click_callback,
-                                  right_click_callback = right_click_callback,
-                                  dropped_upon_callback = dropped_upon_callback)
+                              name,
+                              rect,
+                              draggable = draggable,
+                              grab = grab,
+                              highlight = True,
+                              left_click_callback = left_click_callback,
+                              right_click_callback = right_click_callback,
+                              dropped_upon_callback = dropped_upon_callback)
 
         self.position_list = []
         self.spritesheet = spritesheet
@@ -357,7 +357,7 @@ class PygameEntity(fabula.Entity):
                 # TODO: arbitrary width formula
                 #
                 self.caption_plane = planes.gui.OutlinedText(self.identifier + "_caption",
-                                                                 event.property_value)
+                                                             event.property_value)
 
             self.display_caption()
 
