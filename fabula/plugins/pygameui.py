@@ -2372,18 +2372,18 @@ class PygameEditor(PygameUserInterface):
 
        Additional PygameEditor attributes:
 
-       PygameUserInterface.window.buttons
+       PygameEditor.window.buttons
            planes Plane for the buttons, 100x600px and located at the left
            border of the window.
 
-       PygameUserInterface.window.properties
+       PygameEditor.window.properties
            planes Plane for Entity properties, 100x600px and located at the
            right border of the window.
 
-       PygameUserInterface.plane_cache
+       PygameEditor.plane_cache
            A list to cache temporarily invisible planes
 
-       PygameUserInterface.overlay_surface
+       PygameEditor.overlay_surface
            A semi-transparent red Surface to be used as an OBSTACLE indicator
            overlay
     """
@@ -2426,90 +2426,90 @@ class PygameEditor(PygameUserInterface):
         # Create Container for the editor buttons.
         #
         container = planes.gui.Container("buttons",
-                                             padding = 4,
-                                             background_color = (64, 64, 64))
+                                         padding = 4,
+                                         background_color = (64, 64, 64))
         self.window.sub(container)
 
         # Add buttons
 
         room = planes.gui.Container("room",
-                                        padding = 4,
-                                        background_color = (64, 64, 64))
+                                    padding = 4,
+                                    background_color = (64, 64, 64))
 
         room.sub(planes.gui.Label("title",
-                                      "Room",
-                                      pygame.Rect((0, 0),
-                                                  (80, 25)),
-                                      background_color = (64, 64, 64),
-                                      text_color = (250, 250, 250)))
+                                  "Room",
+                                  pygame.Rect((0, 0),
+                                              (80, 25)),
+                                  background_color = (64, 64, 64),
+                                  text_color = (250, 250, 250)))
 
         room.sub(planes.gui.Button("Load Room",
-                                       pygame.Rect((0, 0), (80, 25)),
-                                       self.load_room))
+                                   pygame.Rect((0, 0), (80, 25)),
+                                   self.load_room))
 
         room.sub(planes.gui.Button("Save Room",
-                                       pygame.Rect((0, 0), (80, 25)),
-                                       self.save_room))
+                                   pygame.Rect((0, 0), (80, 25)),
+                                   self.save_room))
 
         room.sub(planes.gui.Button("Add Entity",
-                                       pygame.Rect((0, 0), (80, 25)),
-                                       lambda plane: self.edit_entity_attributes(self.add_entity)))
+                                   pygame.Rect((0, 0), (80, 25)),
+                                   lambda plane: self.edit_entity_attributes(self.add_entity)))
 
         room.sub(planes.gui.Button("Edit Walls",
-                                       pygame.Rect((0, 0), (80, 25)),
-                                       self.edit_walls))
+                                   pygame.Rect((0, 0), (80, 25)),
+                                   self.edit_walls))
 
         background = planes.gui.Container("background",
-                                              padding = 4,
-                                              background_color = (64, 64, 64))
+                                          padding = 4,
+                                          background_color = (64, 64, 64))
 
         background.sub(planes.gui.Label("title",
-                                            "Background",
-                                            pygame.Rect((0, 0),
-                                                        (80, 25)),
-                                            background_color = (64, 64, 64),
-                                            text_color = (250, 250, 250)))
+                                        "Background",
+                                        pygame.Rect((0, 0),
+                                                    (80, 25)),
+                                        background_color = (64, 64, 64),
+                                        text_color = (250, 250, 250)))
 
         background.sub(planes.gui.Button("Open Image",
-                                             pygame.Rect((0, 0), (80, 25)),
-                                             self.open_image))
+                                         pygame.Rect((0, 0), (80, 25)),
+                                         self.open_image))
 
         logic = planes.gui.Container("logic",
-                                         padding = 4,
-                                         background_color = (64, 64, 64))
+                                     padding = 4,
+                                     background_color = (64, 64, 64))
 
         logic.sub(planes.gui.Label("title",
-                                       "Logic",
-                                       pygame.Rect((0, 0),
-                                                   (80, 25)),
-                                       background_color = (64, 64, 64),
-                                       text_color = (250, 250, 250)))
+                                   "Logic",
+                                   pygame.Rect((0, 0),
+                                               (80, 25)),
+                                   background_color = (64, 64, 64),
+                                   text_color = (250, 250, 250)))
 
         logic.sub(planes.gui.Button("Save Logic",
-                                        pygame.Rect((0, 0), (80, 25)),
-                                        lambda plane : self.host.save_condition_response_dict("default.logic")))
+                                    pygame.Rect((0, 0), (80, 25)),
+                                    lambda plane : self.host.save_condition_response_dict("default.logic")))
 
         logic.sub(planes.gui.Button("Load Logic",
-                                        pygame.Rect((0, 0), (80, 25)),
-                                        lambda plane: self.host.load_condition_response_dict("default.logic")))
+                                    pygame.Rect((0, 0), (80, 25)),
+                                    lambda plane: self.host.load_condition_response_dict("default.logic")))
 
         logic.sub(planes.gui.Button("Clear Logic",
-                                        pygame.Rect((0, 0), (80, 25)),
-                                        lambda plane: self.host.clear_condition_response_dict()))
+                                    pygame.Rect((0, 0), (80, 25)),
+                                    lambda plane: self.host.clear_condition_response_dict()))
 
         self.window.buttons.sub(room)
         self.window.buttons.sub(background)
         self.window.buttons.sub(logic)
 
         self.window.buttons.sub(planes.gui.Button("Quit",
-                                                      pygame.Rect((0, 0), (80, 25)),
-                                                      self.quit))
+                                                  pygame.Rect((0, 0), (80, 25)),
+                                                  self.quit))
 
         # Create Container for the properties
         #
         container = planes.gui.Container("properties",
-                                             padding = 5,
-                                             background_color = (64, 64, 64))
+                                         padding = 5,
+                                         background_color = (64, 64, 64))
 
         container.rect.topleft = (700, 0)
         self.window.sub(container)
@@ -3171,6 +3171,28 @@ class PygameEditor(PygameUserInterface):
                 #
                 self.scroll = 0 - self.spacing
 
+            # TODO: this is ugly, as it's processed too often. Remove once we have an Tkinter GUI.
+            #
+            if pygame.key.get_pressed()[pygame.K_F10]:
+
+                for plane_name in ("buttons", "properties"):
+
+                    if plane_name in self.window.subplanes_list:
+
+                        self.plane_cache.append(self.window.subplanes[plane_name])
+                        self.window.remove(plane_name)
+
+                    else:
+                        for plane in self.plane_cache:
+
+                            if plane.name == plane_name:
+
+                                self.plane_cache.remove(plane)
+
+                                self.window.sub(plane)
+
+                                break
+
         return
 
     def process_SpawnEvent(self, event):
@@ -3208,6 +3230,14 @@ class PygameEditor(PygameUserInterface):
         """Click callback for entities to show their properties in the properties Plane.
         """
 
+        # Is the property plane currently visible?
+        #
+        if "properties" not in self.window.subplanes_list:
+
+            fabula.LOGGER.debug("properties not visible, not updating plane")
+
+            return
+
         # Always update property display.
         #
         fabula.LOGGER.debug("showing properties of '{}'".format(plane.name))
@@ -3230,10 +3260,10 @@ class PygameEditor(PygameUserInterface):
         # Entity.identifier
         #
         self.window.properties.sub(planes.gui.Label("identifier",
-                                                        entity.identifier,
-                                                        pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (64, 64, 64),
-                                                        text_color = (250, 250, 250)))
+                                                    entity.identifier,
+                                                    pygame.Rect((0, 0), (80, 25)),
+                                                    background_color = (64, 64, 64),
+                                                    text_color = (250, 250, 250)))
 
         # Entity.asset
         #
@@ -3248,48 +3278,48 @@ class PygameEditor(PygameUserInterface):
         # Entity.asset_desc
         #
         self.window.properties.sub(planes.gui.Label("asset_desc",
-                                                        entity.asset_desc,
-                                                        pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (64, 64, 64),
-                                                        text_color = (250, 250, 250)))
+                                                    entity.asset_desc,
+                                                    pygame.Rect((0, 0), (80, 25)),
+                                                    background_color = (64, 64, 64),
+                                                    text_color = (250, 250, 250)))
 
         # Entity.entity_type
         #
         self.window.properties.sub(planes.gui.Label("entity_type",
-                                                        entity.entity_type,
-                                                        pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (64, 64, 64),
-                                                        text_color = (250, 250, 250)))
+                                                    entity.entity_type,
+                                                    pygame.Rect((0, 0), (80, 25)),
+                                                    background_color = (64, 64, 64),
+                                                    text_color = (250, 250, 250)))
 
         # Entity.blocking
         #
         self.window.properties.sub(planes.gui.Label("blocking",
-                                                        {True: "block", False: "no-block"}[entity.blocking],
-                                                        pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (64, 64, 64),
-                                                        text_color = (250, 250, 250)))
+                                                    {True: "block", False: "no-block"}[entity.blocking],
+                                                    pygame.Rect((0, 0), (80, 25)),
+                                                    background_color = (64, 64, 64),
+                                                    text_color = (250, 250, 250)))
 
         # Entity.mobile
         #
         self.window.properties.sub(planes.gui.Label("mobile",
-                                                        {True: "mobile", False: "immobile"}[entity.mobile],
-                                                        pygame.Rect((0, 0), (80, 25)),
-                                                        background_color = (64, 64, 64),
-                                                        text_color = (250, 250, 250)))
+                                                    {True: "mobile", False: "immobile"}[entity.mobile],
+                                                    pygame.Rect((0, 0), (80, 25)),
+                                                    background_color = (64, 64, 64),
+                                                    text_color = (250, 250, 250)))
 
         # Edit
         #
         self.window.properties.sub(planes.gui.Button("Edit Entity",
-                                                         pygame.Rect((0, 0),
-                                                                     (80, 25)),
-                                                         lambda plane: self.edit_entity_attributes(self.update_entity, entity)))
+                                                     pygame.Rect((0, 0),
+                                                                 (80, 25)),
+                                                     lambda plane: self.edit_entity_attributes(self.update_entity, entity)))
 
         # Logic
         #
         self.window.properties.sub(planes.gui.Button("Edit Logic",
-                                                         pygame.Rect((0, 0),
-                                                                     (80, 25)),
-                                                         lambda plane : self.edit_logic(entity.identifier)))
+                                                     pygame.Rect((0, 0),
+                                                                 (80, 25)),
+                                                     lambda plane : self.edit_logic(entity.identifier)))
 
         # Make sure it's on top
         #
