@@ -312,9 +312,9 @@ class DefaultGame(fabula.plugins.Plugin):
                     #
                     if self.host.room.entity_dict[identifier].blocking:
 
-                        fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(target_identifier))
+                        fabula.LOGGER.debug("adding location '{}' to the list of taken locations".format(location))
 
-                        self.taken_locations.append(target_identifier)
+                        self.taken_locations.append(location)
 
                     # Save current position before movement as last position
                     #

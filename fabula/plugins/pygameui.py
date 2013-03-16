@@ -3656,7 +3656,7 @@ class PygameOSD:
 
                 except KeyError:
 
-                    value = "ERROR"
+                    value = "not available"
 
                 self.text =  "{} {}".format(self.caption, value)
 
