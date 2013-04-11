@@ -1255,9 +1255,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 callback = lambda option: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, option.text))
 
                 option_list = planes.gui.tmb.TMBOptionSelector("select_sentence",
-                                                                   event.sentences,
-                                                                   callback,
-                                                                   style = planes.gui.tmb.C_512_STYLE)
+                                                               event.sentences,
+                                                               callback,
+                                                               style = planes.gui.tmb.C_512_STYLE)
 
                 option_list.rect.center = self.window.rect.center
 
@@ -1267,8 +1267,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 callback = lambda text: self.message_for_host.event_list.append(fabula.SaysEvent(self.host.client_id, text))
 
                 dialog = planes.gui.tmb.TMBGetStringDialog("You say:",
-                                                               callback,
-                                                               self.window)
+                                                           callback,
+                                                           self.window)
 
                 dialog.rect.center = self.window.rect.center
 
@@ -1904,6 +1904,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         captions = []
         other = []
 
+        # NOTE: there might be a difference in what self.host.room.entity_dict
+        # and self.window.room.subplanes think is in the current room, e.g.
+        # when we are in the middle of a transition, as self.host.room is
+        # managed in the Engine, and self.window.room here.
+        #
         for name in self.window.room.subplanes_list:
 
             if name in self.host.room.entity_dict.keys():
@@ -1932,7 +1937,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         for name in captions:
 
-            entities.insert(entities.index(name.split("_caption")[0]) + 1, name)
+            if name.split("_caption")[0] in entities:
+
+                entities.insert(entities.index(name.split("_caption")[0]) + 1, name)
+
+            else:
+
+                msg = "Entity '{}' not found in Room, not inserting caption plane '{}'"
+
+                fabula.LOGGER.warning(msg.format(name.split("_caption")[0], name))
 
         # Observe the Tiles Plane
         #

@@ -749,11 +749,28 @@ class Client(fabula.core.Engine):
         #
         self.deleted_entities_dict = {}
 
+        # Discard most events in message, as they are of no practical use
+        # to any following handler.
+        # ChangeProperyEvent might change a property persistent from room to
+        # room.
+        # ServerParametersEvent is crucial for general setup.
+        #
+        # kwargs["message"] is supposed to be self.message_for_plugin
+        #
+        kept_event_types = (fabula.ChangePropertyEvent,
+                            fabula.ServerParametersEvent)
+
+        kwargs["message"].event_list = [event for event in kwargs["message"].event_list if isinstance(event, kept_event_types)]
+
+        msg = 'discarding former events in kwargs["message"], new event_list is {}'
+
+        fabula.LOGGER.info(msg.format(kwargs["message"].event_list))
+
         # Call default implementation
         #
         fabula.core.Engine.process_EnterRoomEvent(self,
-                                                 event,
-                                                 message = kwargs["message"])
+                                                  event,
+                                                  message = kwargs["message"])
 
     def process_RoomCompleteEvent(self, event, **kwargs):
         """The event is queued for the UserInterface here.

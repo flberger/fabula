@@ -218,8 +218,8 @@ class UserInterface(fabula.plugins.Plugin):
         msg = "{} s action_time from server * {} fps framerate = {} action_frames"
 
         fabula.LOGGER.debug(msg.format(event.action_time,
-                                     self.framerate,
-                                     self.action_frames))
+                                       self.framerate,
+                                       self.action_frames))
 
         return
 
