@@ -497,17 +497,17 @@ class DefaultGame(fabula.plugins.Plugin):
             msg = "movement requested for '{}', best move towards {} is {}"
 
             fabula.LOGGER.debug(msg.format(event.identifier,
-                                        event.target_identifier,
-                                        location))
+                                           event.target_identifier,
+                                           location))
 
             # Check if the Entity is blocking, and if so, block the new location
             # internally
             #
             if self.host.room.entity_dict[event.identifier].blocking:
 
-                fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier))
+                fabula.LOGGER.debug("adding current target '{}' to the list of taken locations".format(location))
 
-                self.taken_locations.append(event.target_identifier)
+                self.taken_locations.append(location)
 
             # Save current position before movement as last position
             #
