@@ -157,9 +157,7 @@ clean:
 	rm -vf `find . -iname '*.pyc'`
 
 commit.txt:
-	# single line because bzr diff returns false when there are diffs
-	#
-	bzr diff > commit.txt ; nano commit.txt
+	hg diff > commit.txt ; nano commit.txt
 
 # First taken from the StepSim Makefile
 #
@@ -170,7 +168,7 @@ commit:
 	@echo ------------------------------------------------------
 	@echo RETURN to commit using commit.txt, CTRL-C to cancel:
 	@read DUMMY
-	bzr commit --file commit.txt && rm -v commit.txt
+	hg commit --logfile commit.txt && rm -v commit.txt
 
 sign:
 	rm -vf dist/*.asc
@@ -182,6 +180,5 @@ freecode:
 	@read DUMMY
 	freecode-submit < freecode-submit.txt
 
-lp:
-	bzr launchpad-login fberger-fbmd
-	bzr push lp:~fberger-fbmd/fabula/trunk
+bitbucket:
+	hg push https://flberger@bitbucket.org/flberger/fabula
