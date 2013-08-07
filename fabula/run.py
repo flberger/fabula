@@ -26,6 +26,8 @@
 #
 # Converted from run_shard.py on 06. Oct 2009
 
+# TODO: App should expose client etc. instances as API.
+
 import fabula.assets
 import fabula.core.client
 import fabula.core.server

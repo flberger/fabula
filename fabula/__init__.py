@@ -136,8 +136,6 @@
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: level format should be a list of JSON-encoded Events that establish the room, including fancyness as captions. Provide a tool to convert TSV to this.
 #
-# TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen! "post crash logging fast forwarder" :-)
-#
 # TODO: Use conventional names. Call maps maps, tiles tiles.
 # TODO: Fabula is not event-based, it is turn-based. Reflect that in method names: next_turn(), or something like that.
 #
@@ -149,6 +147,9 @@
 #
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
 # TODO: Make Fabula component-based. Implement independet event handlers, 'ihandle "DropsEvent"', make a handler dict and a handle(Event) method. Strip EventProcessor down to that. Allow for custom events and handlers.
+#     TODO: check test case for applicability of component-based design: replacing a method of an Entity
+#     TODO: check test case for applicability of component-based design: implementing a new Event type for Entities to react to
+#     TODO: check test case for applicability of component-based design: real-time method swaps in the editor
 # TODO: Replace Events by ("EVENTNAME", dict). Observe that Events can already be written as URIs: eventprocessor/EVENTNAME?key=value&key=value -> but that is bad GET REST
 #
 # TODO: all of Fabula except pygameui should work without Pygame installed. Get rid of imports of pygameui in other modules, especially plugins.serverside
@@ -172,6 +173,7 @@
 # TODO: thin clients for performance tests, bug hunting, unit tests. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
 # TODO: maybe it's enough to implement a replay interface for client data in the server interface.
 #
+# TODO: Idee von Prof. Dr. Knut Hartmann: es müsste eine Art Image mitgeschrieben werden, so dass man bei einem Fehler sofort wieder an der (oder kurz vor der) kritischen Stelle einsteigen kann, *ohne* nochmal das ganze Spiel bis dahin durchspielen muss -> ggf. Event-Log dafür benutzen! "post crash logging fast forwarder" :-)
 # TODO: extended command line and GUI replay interface. Allow stopping, single or multiple step forward, stopping at step #n, obeying or discarding wait times
 #
 # TODO: build in in-game questionnaires for research games

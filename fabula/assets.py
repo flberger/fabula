@@ -29,6 +29,10 @@ import fabula
 import os.path
 import glob
 
+# TODO: support tar files with lzma compression
+# TODO: work as a standalone module
+# TODO: support archive creation; possibly transparent compared to working with actual files on disk
+
 # TODO: importing "site" leads to defunct executables using cx_Freeze 2.4.3 with Python 3.2 on Unix
 #
 import site
