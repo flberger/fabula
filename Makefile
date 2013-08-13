@@ -25,7 +25,7 @@ help:
 	@echo '    sign'
 	@echo '    freecode'
 	@echo '    pypi'
-	@echo '    lp'
+	@echo '    bitbucket'
 
 docs: clean
 	pydoctor --verbose \
