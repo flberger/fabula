@@ -161,7 +161,7 @@ commit.txt:
 
 # First taken from the StepSim Makefile
 #
-commit:
+commit: commit.txt
 	@echo commit.txt:
 	@echo ------------------------------------------------------
 	@cat commit.txt

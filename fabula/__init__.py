@@ -134,7 +134,7 @@
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
 # TODO: multiple rooms in server
-#     TODO: make tile_is_walkable() a room method
+#     TODO: fix all uses of tile_is_walkable() accordingly
 #     TODO: replace all uses of self.room in Server
 #     TODO: make Server fill new room dicts
 #     TODO: check plugins, esp. default game, for needed changes
@@ -1356,6 +1356,44 @@ class Room(fabula.eventprocessor.EventProcessor):
             fabula.LOGGER.warning("could not delete Entity '{}': Entity does not exist".format(event.identifier))
 
         return
+
+    def tile_is_walkable(self, target_identifier):
+        """Auxiliary method which returns True if the tile exists in Room and can be accessed by Entities.
+        """
+
+        if target_identifier not in self.floor_plan.keys():
+
+            fabula.LOGGER.debug("{} not walkable: not in floor_plan".format(target_identifier))
+
+            return False
+
+        else:
+            floor_plan_element = self.floor_plan[target_identifier]
+
+            if floor_plan_element.tile.tile_type != fabula.FLOOR:
+
+                fabula.LOGGER.debug("{} not walkable: target tile_type != fabula.FLOOR".format(target_identifier))
+
+                return False
+
+            else:
+                occupied = False
+
+                for entity in floor_plan_element.entities:
+
+                    if entity.blocking:
+
+                        occupied = True
+
+                if occupied:
+
+                    fabula.LOGGER.debug("{} not walkable: target occupied by blocking Entity".format(target_identifier))
+
+                    return False
+
+                else:
+
+                    return True
 
     def __repr__(self):
         """Official string representation.
