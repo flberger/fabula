@@ -165,6 +165,8 @@
 # TODO: makeself binary release for Linux - http://megastep.org/makeself
 # TODO: support zeroinstall - http://0install.net/
 #
+# TODO: The planes and surfacecatcher modules, required by pygameui, are bundled in distributions, but not part of the VCS repository. This leaves repository clones defunct, which should at least be documented.
+#
 # TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, planes, attempt_*.png, cancel.png, default.floorplan etc.
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
 #

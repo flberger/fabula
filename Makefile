@@ -181,4 +181,4 @@ freecode:
 	freecode-submit < freecode-submit.txt
 
 bitbucket:
-	hg push https://flberger@bitbucket.org/flberger/fabula
+	hg push `gawk '{ ORS = " " ; print "-B " $2 }' .hg/bookmarks` https://flberger@bitbucket.org/flberger/fabula
