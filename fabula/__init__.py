@@ -133,6 +133,15 @@
 # TODO: abandon tile-based maps, and rather use large bitmap (GIMP XCF) or vector (Inkscape SVG) data for level backgrounds.
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
+# TODO: multiple rooms in server
+#     TODO: make tile_is_walkable() a room method
+#     TODO: replace all uses of self.room in Server
+#     TODO: make Server fill new room dicts
+#     TODO: check plugins, esp. default game, for needed changes
+#     TODO: make default standalone single room game work
+#     TODO: write a test for multiple rooms
+#     TODO: fix hacks
+#
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: level format should be a list of JSON-encoded Events that establish the room, including fancyness as captions. Provide a tool to convert TSV to this.
 #

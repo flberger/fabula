@@ -47,9 +47,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
        Engine.message_for_remote
 
-       Engine.room
-           An instance of fabula.Room, initialy None.
-
        Engine.rack
            An instance of fabula.Rack.
     """
@@ -87,12 +84,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
         # sent to the remote host in each loop.
         #
         self.message_for_remote = fabula.Message([])
-
-        # self.room keeps track of the map and active Entites.
-        # An actual room is created when the first EnterRoomEvent is
-        # encountered.
-        #
-        self.room = None
 
         # self.rack serves as a storage for deleted Entities
         # because there may be the need to respawn them.
@@ -218,75 +209,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         return
 
-    def process_MovesToEvent(self, event, **kwargs):
-        """Let self.room process the event and pass it on.
-        """
-
-        fabula.LOGGER.debug("%s location before: %s "
-                          % (event.identifier,
-                             self.room.entity_locations[event.identifier]))
-
-        self.room.process_MovesToEvent(event)
-
-        fabula.LOGGER.info("%s location after: %s "
-                          % (event.identifier,
-                             self.room.entity_locations[event.identifier]))
-
-        kwargs["message"].event_list.append(event)
-
-        return
-
-    def process_PicksUpEvent(self, event, **kwargs):
-        """Save the Entity to be picked up in Engine.rack, delete it from Engine.room and pass the PicksUpEvent on.
-        """
-
-        fabula.LOGGER.debug("called")
-
-        # Save the Entity to be picked up in Engine.rack
-        #
-        picked_entity = self.room.entity_dict[event.item_identifier]
-
-        self.rack.store(picked_entity, event.identifier)
-
-        # Delete it from Engine.room
-        #
-        # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
-        #
-        delete_event = fabula.DeleteEvent(event.item_identifier)
-
-        self.room.process_DeleteEvent(delete_event)
-
-        # and pass the PicksUpEvent on
-        #
-        kwargs["message"].event_list.append(event)
-
-        return
-
-    def process_DropsEvent(self, event, **kwargs):
-        """Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.
-        """
-
-        fabula.LOGGER.debug("called")
-
-        # Respawn the Entity to be dropped in Engine.room
-        # Delete it from Engine.rack
-        #
-        # TODO: Fails when Entity not in rack. Contracts.
-        #
-        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
-
-        dropped_entity = self.rack.retrieve(event.item_identifier)
-
-        spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
-
-        self.room.process_SpawnEvent(spawn_event)
-
-        # and pass the DropsEvent on
-        #
-        kwargs["message"].event_list.append(event)
-
-        return
-
     def process_ManipulatesEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds the event to the message.
@@ -342,27 +264,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         return
 
-    def process_ChangePropertyEvent(self, event, **kwargs):
-        """Let the Entity handle the Event. Then add the event to the message.
-        """
-
-        msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
-
-        fabula.LOGGER.debug(msg.format(event.property_key,
-                                       event.property_value,
-                                       event.identifier))
-
-        if self.room:
-
-            self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
-
-        else:
-            fabula.LOGGER.warning("received ChangePropertyEvent before Room was established")
-
-        kwargs["message"].event_list.append(event)
-
-        return
-
     def process_PassedEvent(self, event, **kwargs):
         """Process the Event.
            The default implementation adds the event to the message.
@@ -407,36 +308,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         return
 
-    def process_SpawnEvent(self, event, **kwargs):
-        """Let self.room process the event and pass it on.
-        """
-
-        fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
-                                                                               event.entity.entity_type,
-                                                                               event.location))
-
-        self.room.process_SpawnEvent(event)
-
-        kwargs["message"].event_list.append(event)
-
-        return
-
-    def process_DeleteEvent(self, event, **kwargs):
-        """Delete the Entity from Engine.room and pass the DeleteEvent on.
-        """
-
-        fabula.LOGGER.debug("called")
-
-        # Delete it from Engine.room
-        #
-        self.room.process_DeleteEvent(event)
-
-        # and pass the Event on
-        #
-        kwargs["message"].event_list.append(event)
-
-        return
-
     def process_EnterRoomEvent(self, event, **kwargs):
         """The default implementation simply forwards the Event.
            On the client side, an EnterRoomEvent means that the server is about
@@ -460,19 +331,6 @@ class Engine(fabula.eventprocessor.EventProcessor):
         """
 
         fabula.LOGGER.debug("called")
-
-        kwargs["message"].event_list.append(event)
-
-        return
-
-    def process_ChangeMapElementEvent(self, event, **kwargs):
-        """Let the fabula.Room instance in self.room process the Event
-           and add it to message.
-        """
-
-        fabula.LOGGER.debug("called")
-
-        self.room.process_ChangeMapElementEvent(event)
 
         kwargs["message"].event_list.append(event)
 

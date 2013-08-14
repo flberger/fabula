@@ -43,6 +43,12 @@ class Server(fabula.core.Engine):
            The time between actions that do not happen instantly.
            Used by the Server Plugin.
 
+       Server.room_by_id
+           A dict, mapping room identifiers to Room instances.
+
+       Server.room_by_client
+           A dict, mapping client identifiers to Room instances.
+
        Server.message_for_all
            Message to be broadcasted to all clients
 
@@ -76,6 +82,11 @@ class Server(fabula.core.Engine):
         # Server Plugin.
         #
         self.action_time = action_time
+
+        # The server manages multiple rooms
+        #
+        self.room_by_id = {}
+        self.room_by_client = {}
 
         # Message to be broadcasted to all clients
         #
@@ -807,6 +818,186 @@ class Server(fabula.core.Engine):
                                                                           event.room_identifier))
 
         self.room.active_clients[kwargs["connector"]] = event.client_identifier
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_MovesToEvent(self, event, **kwargs):
+        """Let the according room process the event and pass it on.
+        """
+
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        fabula.LOGGER.debug("%s location before: %s "
+                          % (event.identifier,
+                             room.entity_locations[event.identifier]))
+
+        room.process_MovesToEvent(event)
+
+        fabula.LOGGER.info("%s location after: %s "
+                          % (event.identifier,
+                             room.entity_locations[event.identifier]))
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_PicksUpEvent(self, event, **kwargs):
+        """Save the Entity to be picked up in Engine.rack, delete it from respective room and pass the PicksUpEvent on.
+        """
+
+        fabula.LOGGER.debug("called")
+
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.item_identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        # Save the Entity to be picked up in Engine.rack
+        #
+        picked_entity = room.entity_dict[event.item_identifier]
+
+        self.rack.store(picked_entity, event.identifier)
+
+        # Delete it from Engine.room
+        #
+        # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
+        #
+        delete_event = fabula.DeleteEvent(event.item_identifier)
+
+        room.process_DeleteEvent(delete_event)
+
+        # and pass the PicksUpEvent on
+        #
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_DropsEvent(self, event, **kwargs):
+        """Respawn the Entity to be dropped in the respective room, delete it from Engine.rack and pass the PicksUpEvent on.
+        """
+
+        fabula.LOGGER.debug("called")
+
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        # Respawn the Entity to be dropped in room
+        # Delete it from Engine.rack
+        #
+        # TODO: Fails when Entity not in rack. Contracts.
+        #
+        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+
+        dropped_entity = self.rack.retrieve(event.item_identifier)
+
+        spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
+
+        room.process_SpawnEvent(spawn_event)
+
+        # and pass the DropsEvent on
+        #
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_ChangePropertyEvent(self, event, **kwargs):
+        """Let the Entity handle the Event. Then add the event to the message.
+        """
+
+        msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
+
+        fabula.LOGGER.debug(msg.format(event.property_key,
+                                       event.property_value,
+                                       event.identifier))
+
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        if room:
+
+            room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
+
+        else:
+            fabula.LOGGER.warning("received ChangePropertyEvent before Room was established")
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_SpawnEvent(self, event, **kwargs):
+        """Let the first room process the event and pass it on.
+        """
+
+        # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
+        #
+        fabula.LOGGER.warning("spawning in random room - this is a hack and will cause errors in multiple room games!")
+
+        fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
+                                                                               event.entity.entity_type,
+                                                                               event.location))
+
+        list(self.room_by_id.values())[0].process_SpawnEvent(event)
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_DeleteEvent(self, event, **kwargs):
+        """Delete the Entity from the respective room and pass the DeleteEvent on.
+        """
+
+        fabula.LOGGER.debug("called")
+
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        # Delete it from room
+        #
+        room.process_DeleteEvent(event)
+
+        # and pass the Event on
+        #
+        kwargs["message"].event_list.append(event)
+
+        return
+
+    def process_ChangeMapElementEvent(self, event, **kwargs):
+        """Let the Room instance process the Event and add it to message.
+        """
+
+        fabula.LOGGER.debug("called")
+
+        # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
+        #
+        fabula.LOGGER.warning("changing map element in random room - this is a hack and will cause errors in multiple room games!")
+
+        list(self.room_by_id.values())[0].process_ChangeMapElementEvent(event)
 
         kwargs["message"].event_list.append(event)
 

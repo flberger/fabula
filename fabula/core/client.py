@@ -49,6 +49,9 @@ class Client(fabula.core.Engine):
 
        Client.local_moves_to_event
            Cache for the latest local MovesToEvent
+
+       Client.room
+           An instance of fabula.Room, initialy None.
     """
 
     ####################
@@ -72,25 +75,16 @@ class Client(fabula.core.Engine):
 
         # Now we have:
         #
-        # self.room = fabula.Room()
-        #
-        #     self.room.entity_dict
-        #         A dict of all Entities in this room,
-        #         mapping Entity identifiers to Entity
-        #         instances.
-        #
-        #     self.room.floor_plan
-        #         A dict mapping 2D coordinate tuples
-        #         to a FloorPlanElement instance.
-        #
-        #     self.room.entity_locations
-        #         A dict mapping Entity identifiers to a
-        #         2D coordinate tuple.
-        #
         # self.rack
         #
         #     self.rack serves as a storage for deleted Entities
         #     because there may be the need to respawn them.
+
+        # self.room keeps track of the map and active Entites.
+        # An actual room is created when the first EnterRoomEvent is
+        # encountered.
+        #
+        self.room = None
 
         # Override logfile name
         #
@@ -583,11 +577,26 @@ class Client(fabula.core.Engine):
 
         # TODO: the DropsEvent and PicksUpEvent handling in Client and Plugin are asymmetrical. This is ugly. Unify.
 
-        # Call default.
+        # Former default
         #
-        fabula.core.Engine.process_DropsEvent(self,
-                                             event,
-                                             message = kwargs["message"])
+        fabula.LOGGER.debug("called")
+
+        # Respawn the Entity to be dropped in Engine.room
+        # Delete it from Engine.rack
+        #
+        # TODO: Fails when Entity not in rack. Contracts.
+        #
+        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+
+        dropped_entity = self.rack.retrieve(event.item_identifier)
+
+        spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
+
+        self.room.process_SpawnEvent(spawn_event)
+
+        # and pass the DropsEvent on
+        #
+        kwargs["message"].event_list.append(event)
 
         # Drop confirmed
         #
@@ -595,21 +604,48 @@ class Client(fabula.core.Engine):
 
             self.await_confirmation = False
 
+        return
+
     def process_ChangePropertyEvent(self, event, **kwargs):
         """Call default and unblock client.
         """
 
-        # Call default.
+        # Former default.
         #
-        fabula.core.Engine.process_ChangePropertyEvent(self,
-                                                   event,
-                                                   message = kwargs["message"])
+        msg = "forwarding property change '{}'->'{}' to Entity '{}' in current room"
+
+        fabula.LOGGER.debug(msg.format(event.property_key,
+                                       event.property_value,
+                                       event.identifier))
+
+        if self.room:
+
+            self.room.entity_dict[event.identifier].process_ChangePropertyEvent(event)
+
+        else:
+            fabula.LOGGER.warning("received ChangePropertyEvent before Room was established")
+
+        kwargs["message"].event_list.append(event)
 
         # ChangeProperty confirmed
         #
         if event.identifier == self.client_id:
 
             self.await_confirmation = False
+
+        return
+
+    def process_ChangeMapElementEvent(self, event, **kwargs):
+        """Let the fabula.Room instance in self.room process the Event and add it to message.
+        """
+
+        fabula.LOGGER.debug("called")
+
+        self.room.process_ChangeMapElementEvent(event)
+
+        kwargs["message"].event_list.append(event)
+
+        return
 
     def process_ManipulatesEvent(self, event, **kwargs):
         """Unset await confirmation flag.
@@ -648,11 +684,19 @@ class Client(fabula.core.Engine):
 
         else:
 
-            # Call default implementation
+            # Former default implementation
             #
-            fabula.core.Engine.process_MovesToEvent(self,
-                                                   event,
-                                                   message = kwargs["message"])
+            fabula.LOGGER.debug("%s location before: %s "
+                              % (event.identifier,
+                                 self.room.entity_locations[event.identifier]))
+
+            self.room.process_MovesToEvent(event)
+
+            fabula.LOGGER.info("%s location after: %s "
+                              % (event.identifier,
+                                 self.room.entity_locations[event.identifier]))
+
+            kwargs["message"].event_list.append(event)
 
             # Only allow new input if the last
             # MovesToEvent has been confirmed.
@@ -665,15 +709,33 @@ class Client(fabula.core.Engine):
 
                     self.await_confirmation = False
 
+        return
+
     def process_PicksUpEvent(self, event, **kwargs):
         """The entity is deleted from the Room and added to Client.rack
         """
 
-        # Call default
+        # Former default
         #
-        fabula.core.Engine.process_PicksUpEvent(self,
-                                                event,
-                                                message = kwargs["message"])
+        fabula.LOGGER.debug("called")
+
+        # Save the Entity to be picked up in Engine.rack
+        #
+        picked_entity = self.room.entity_dict[event.item_identifier]
+
+        self.rack.store(picked_entity, event.identifier)
+
+        # Delete it from Engine.room
+        #
+        # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
+        #
+        delete_event = fabula.DeleteEvent(event.item_identifier)
+
+        self.room.process_DeleteEvent(delete_event)
+
+        # and pass the PicksUpEvent on
+        #
+        kwargs["message"].event_list.append(event)
 
         # picking up confirmed
         #
@@ -711,20 +773,38 @@ class Client(fabula.core.Engine):
                                                    event,
                                                    message = kwargs["message"])
 
+    def process_SpawnEvent(self, event, **kwargs):
+        """Let self.room process the event and pass it on.
+        """
+
+        fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
+                                                                               event.entity.entity_type,
+                                                                               event.location))
+
+        self.room.process_SpawnEvent(event)
+
+        kwargs["message"].event_list.append(event)
+
+        return
+
     def process_DeleteEvent(self, event, **kwargs):
         """Sanity check, then let self.room process the Event.
         """
 
-        # TODO: This is just a hack, see TODO for run() for details
+        fabula.LOGGER.debug("called")
+
+        # TODO: This is just a HACK: see TODO for run() for details
         #
         if event.identifier in self.room.entity_dict:
 
-            # Now call default implementation which lets self.room process the
-            # Event and queues it in the Message given
+            # Former default
+            # Delete it from Client.room
             #
-            fabula.core.Engine.process_DeleteEvent(self,
-                                                   event,
-                                                   message = kwargs["message"])
+            self.room.process_DeleteEvent(event)
+
+            # and pass the Event on
+            #
+            kwargs["message"].event_list.append(event)
 
         else:
             fabula.LOGGER.warning("Entity to delete does not exist.")
