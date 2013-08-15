@@ -134,7 +134,6 @@
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
 # TODO: multiple rooms in server
-#     TODO: fix all uses of tile_is_walkable() accordingly
 #     TODO: replace all uses of self.room in Server
 #     TODO: make Server fill new room dicts
 #     TODO: check plugins, esp. default game, for needed changes

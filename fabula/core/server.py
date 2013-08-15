@@ -490,13 +490,21 @@ class Server(fabula.core.Engine):
 
         fabula.LOGGER.info("{0} -> {1}".format(event.identifier, event.target_identifier))
 
-        if not self.room.entity_dict[event.identifier].mobile:
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        if not room.entity_dict[event.identifier].mobile:
 
             fabula.LOGGER.info("'{}' is not mobile".format(event.identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
-        elif not self.tile_is_walkable(event.target_identifier):
+        elif not room.tile_is_walkable(event.target_identifier):
 
             fabula.LOGGER.info("{} not walkable".format(event.target_identifier))
 

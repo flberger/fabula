@@ -685,7 +685,15 @@ class DefaultGame(fabula.plugins.Plugin):
            forbidden_moves is a list of targets that should be considered as not walkable.
         """
 
-        location = self.host.room.entity_locations[identifier]
+        room = None
+
+        for current_room in self.host.room_by_id.values():
+
+            if identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        location = room.entity_locations[identifier]
 
         possible_moves = []
 
@@ -693,7 +701,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
             possible_move = (location[0] + vector[0], location[1] + vector[1])
 
-            if (self.host.tile_is_walkable(possible_move)
+            if (room.tile_is_walkable(possible_move)
                 and possible_move not in forbidden_moves):
 
                 possible_moves.append(possible_move)
