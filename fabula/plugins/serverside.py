@@ -26,6 +26,8 @@ import math
 import time
 import re
 
+# TODO: DefaultGame data structures as DefaultGame.tries_to_move_dict, DefaultGame.path_dict should most certainly bee room specific, and be cared for when Entities change rooms
+
 def load_room_from_file(filename, complete = True):
     """This function reads a Fabula room from the file and returns a list of corresponding Events.
 
@@ -278,16 +280,28 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         for identifier in list(self.tries_to_move_dict.keys()):
 
+            # TODO: HACK: selecting room by checking where the Entity exists right now. When the Entity has changed rooms, this will lead to leftover movements being executed.
+
+            room = None
+
+            for current_room in self.host.room_by_id.keys():
+
+                if identifier in current_room.entity_dict.keys():
+
+                    room = current_room
+
             # Check if the Entity still exists
             #
-            if identifier not in self.host.room.entity_dict.keys():
+            if room is None:
 
-                fabula.LOGGER.debug("Entity '{}' gone from entity_dict, removing from tries_to_move_dict".format(identifier))
+                fabula.LOGGER.debug("Entity '{}' gone from all rooms, removing from tries_to_move_dict".format(identifier))
 
                 del self.tries_to_move_dict[identifier]
                 del self.path_dict[identifier]
 
             else:
+                fabula.LOGGER.debug("Using inferred room '{}' for Entity '{}'".format(room.identifier, identifier))
+
                 target_identifier = self.tries_to_move_dict[identifier]
 
                 location = self.move_towards(identifier,
@@ -310,7 +324,7 @@ class DefaultGame(fabula.plugins.Plugin):
                     # Check if the Entity is blocking, and if so, block the new
                     # location internally
                     #
-                    if self.host.room.entity_dict[identifier].blocking:
+                    if room.entity_dict[identifier].blocking:
 
                         fabula.LOGGER.debug("adding location '{}' to the list of taken locations".format(location))
 
@@ -318,7 +332,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                     # Save current position before movement as last position
                     #
-                    self.path_dict[identifier].append(self.host.room.entity_locations[identifier])
+                    self.path_dict[identifier].append(room.entity_locations[identifier])
 
                     event_list.append(fabula.MovesToEvent(identifier, location))
 
@@ -410,9 +424,13 @@ class DefaultGame(fabula.plugins.Plugin):
 
             return
 
-        if self.host.room is not None:
+        if len(self.host.room_by_id):
 
-            fabula.LOGGER.info("Server already has room '{}', only sending SpawnEvent and RoomCompleteEvent".format(self.host.room.identifier))
+            # NOTE: using first room by default
+            #
+            room = list(self.host.room_by_id.values())[0]
+
+            fabula.LOGGER.info("Server already has room '{}', only sending SpawnEvent and RoomCompleteEvent".format(room.identifier))
 
             for returned_event in event_list:
 
@@ -452,7 +470,7 @@ class DefaultGame(fabula.plugins.Plugin):
                         removed_events = removed_events + 1
 
                 else:
-                        new_list.append(returned_event)
+                    new_list.append(returned_event)
 
             fabula.LOGGER.info("found {} SpawnEvents, removed {}".format(spawn_events,
                                                                          removed_events))
@@ -468,6 +486,14 @@ class DefaultGame(fabula.plugins.Plugin):
     def process_TriesToMoveEvent(self, event):
         """Queue the target to make the Entity move one step at a time.
         """
+
+        room = None
+
+        for current_room in self.host.room_by_id.keys():
+
+            if event.identifier in current_room.entity_dict.keys():
+
+                room = current_room
 
         if event.identifier in self.tries_to_move_dict.keys():
 
@@ -503,7 +529,7 @@ class DefaultGame(fabula.plugins.Plugin):
             # Check if the Entity is blocking, and if so, block the new location
             # internally
             #
-            if self.host.room.entity_dict[event.identifier].blocking:
+            if room.entity_dict[event.identifier].blocking:
 
                 fabula.LOGGER.debug("adding current target '{}' to the list of taken locations".format(location))
 
@@ -511,7 +537,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
             # Save current position before movement as last position
             #
-            self.path_dict[event.identifier].append(self.host.room.entity_locations[event.identifier])
+            self.path_dict[event.identifier].append(room.entity_locations[event.identifier])
 
             self.message_for_host.event_list.append(fabula.MovesToEvent(event.identifier, location))
 
@@ -534,14 +560,22 @@ class DefaultGame(fabula.plugins.Plugin):
         """Return a PicksUpEvent to the Server.
         """
 
+        room = None
+
+        for current_room in self.host.room_by_id.keys():
+
+            if event.identifier in current_room.entity_dict.keys():
+
+                room = current_room
+
         # The Server has performed basic sanity checks.
         # In addition, we restrict picking up to items right next to the player.
         #
-        player_location = self.host.room.entity_locations[event.identifier]
+        player_location = room.entity_locations[event.identifier]
 
         surrounding_positions = fabula.surrounding_positions(player_location)
 
-        if self.host.room.entity_locations[event.target_identifier] in surrounding_positions:
+        if room.entity_locations[event.target_identifier] in surrounding_positions:
 
             fabula.LOGGER.info("returning PicksUpEvent")
 
@@ -559,9 +593,17 @@ class DefaultGame(fabula.plugins.Plugin):
         """If the target is an Entity, forward to respond(). If the target is a position, create a DropsEvent.
         """
 
+        room = None
+
+        for current_room in self.host.room_by_id.keys():
+
+            if event.identifier in current_room.entity_dict.keys():
+
+                room = current_room
+
         # Restrict drops to tiles right next to the player.
         #
-        player_location = self.host.room.entity_locations[event.identifier]
+        player_location = room.entity_locations[event.identifier]
 
         surrounding_positions = fabula.surrounding_positions(player_location)
 
@@ -569,13 +611,19 @@ class DefaultGame(fabula.plugins.Plugin):
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of fabula.Entity.
         #
-        if event.target_identifier in self.host.room.entity_dict.keys():
+        if event.target_identifier in room.entity_dict.keys():
 
             fabula.LOGGER.debug("target '{}' is an entity identifier".format(event.target_identifier))
 
-            if self.host.room.entity_locations[event.target_identifier] not in surrounding_positions:
+            if room.entity_locations[event.target_identifier] not in surrounding_positions:
 
-                fabula.LOGGER.info("AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}".format(event.item_identifier, event.target_identifier, self.host.room.entity_locations[event.target_identifier], surrounding_positions))
+                msg = "AttemptFailed: drop of '{}' on '{}' at {} not next to player: {}"
+
+                fabula.LOGGER.info(msg.format(event.item_identifier,
+                                              event.target_identifier,
+                                              room.entity_locations[event.target_identifier],
+                                              surrounding_positions))
+
                 self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
@@ -603,7 +651,7 @@ class DefaultGame(fabula.plugins.Plugin):
                     self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
                                                                                 event.item_identifier))
 
-                    entity = self.host.room.entity_dict[event.item_identifier]
+                    entity = room.entity_dict[event.item_identifier]
 
                 fabula.LOGGER.info("returning DropsEvent")
 
@@ -812,9 +860,6 @@ class Editor(DefaultGame):
 
        Additional attributes:
 
-       Editor.current_room
-           Name of the current room.
-
        Editor.pygameui
            The fabula.plugins.pygameui module.
 
@@ -848,16 +893,11 @@ class Editor(DefaultGame):
 
         self.host.interface.connections["dummy_client"].messages_for_local.append(init_event)
 
-        # TODO: When handling of multiple rooms is implemented, this should go into the base class.
-        # TODO: Or is that one obsolete, since the name can be guessed from host.room.identifier?
-        #
-        self.current_room = ''
-
         # Impersonate a decent host.
         # self.room will point to self.host.room later, but chances are there
         # is no host yet.
         #
-        self.room = self.host.room
+        self.room = None
         self.rack = self.host.rack
         self.client_id = "player"
 
@@ -878,8 +918,9 @@ class Editor(DefaultGame):
 
         # Upon first call we have a host and thus a decent room and rack
         # TODO: of course it is a waste to set that on every call
+        # NOTE: using first room in host
         #
-        self.room = self.host.room
+        self.room = list(self.host.room_by_id.values())[0]
         self.rack = self.host.rack
 
         self.message_for_host = DefaultGame.process_message(self, message)
@@ -918,7 +959,7 @@ class Editor(DefaultGame):
 
         fabula.LOGGER.debug("called")
 
-        if self.host.room is None:
+        if not len(self.host.room_by_id):
 
             fabula.LOGGER.info("no room sent yet, sending initial room")
 
@@ -956,7 +997,7 @@ class Editor(DefaultGame):
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of fabula.Entity.
         #
-        if event.target_identifier in self.host.room.entity_dict.keys():
+        if event.target_identifier in self.room.entity_dict.keys():
 
             fabula.LOGGER.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
             self.respond(event)
@@ -976,7 +1017,7 @@ class Editor(DefaultGame):
                 self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
                                                                             event.item_identifier))
 
-                entity = self.host.room.entity_dict[event.item_identifier]
+                entity = self.room.entity_dict[event.item_identifier]
 
             fabula.LOGGER.info("returning DropsEvent")
 

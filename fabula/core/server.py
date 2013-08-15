@@ -935,7 +935,7 @@ class Server(fabula.core.Engine):
 
         self.rack.store(picked_entity, event.identifier)
 
-        # Delete it from Engine.room
+        # Delete it from room
         #
         # TODO: Why not pass the PicksUpEvent to the room and let it handle an according removal?
         #
