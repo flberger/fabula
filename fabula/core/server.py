@@ -27,6 +27,7 @@ import fabula.core
 import time
 import traceback
 import datetime
+import collections
 
 # TODO: Add a decent default server CLI.
 
@@ -44,7 +45,7 @@ class Server(fabula.core.Engine):
            Used by the Server Plugin.
 
        Server.room_by_id
-           A dict, mapping room identifiers to Room instances.
+           A collections.OrderedDict, mapping room identifiers to Room instances.
 
        Server.room_by_client
            A dict, mapping client identifiers to Room instances.
@@ -85,7 +86,7 @@ class Server(fabula.core.Engine):
 
         # The server manages multiple rooms
         #
-        self.room_by_id = {}
+        self.room_by_id = collections.OrderedDict()
         self.room_by_client = {}
 
         # Message to be broadcasted to all clients
@@ -165,17 +166,17 @@ class Server(fabula.core.Engine):
 
             # Check if someone has left who is supposed to be there
             #
-            if self.room is not None:
+            for room in self.room_by_id.values():
 
                 # Create a list copy, for the same reason as above
                 #
-                active_list = list(self.room.active_clients.keys())
+                active_list = list(room.active_clients.keys())
 
                 for connector in active_list:
 
                     if not connector in connector_list:
 
-                        client_id = self.room.active_clients[connector]
+                        client_id = room.active_clients[connector]
 
                         msg = "client '{}' {} has left without notice, removing"
 
@@ -332,6 +333,14 @@ class Server(fabula.core.Engine):
            Auxiliary method.
         """
 
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if connector in current_room.active_clients.keys():
+
+                room = current_room
+
         # Put in a method to avoid duplication.
         # Must not take too long since the client is waiting.
         # Call Plugin even if there were no Events from the client to catch
@@ -376,8 +385,6 @@ class Server(fabula.core.Engine):
                 fabula.LOGGER.error(msg.format(connector))
 
             ### Build broadcast message for all clients
-            #
-            # TODO: this of course has to be refactored thoroughly for multiple room handling
 
             # Triple flag:
             # True: skip on EnterRoomEvent
@@ -412,7 +419,7 @@ class Server(fabula.core.Engine):
 
                 elif (skip_room_events == "now"
                       and isinstance(event, fabula.SpawnEvent)
-                      and event.entity.identifier == self.room.active_clients[connector]):
+                      and event.entity.identifier == room.active_clients[connector]):
 
                     fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one".format(event.entity.identifier))
 
@@ -452,7 +459,7 @@ class Server(fabula.core.Engine):
 
                 fabula.LOGGER.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
-                for active_connector in self.room.active_clients.keys():
+                for active_connector in room.active_clients.keys():
 
                     # Leave out current client which already has reveived the
                     # events above.
@@ -526,12 +533,16 @@ class Server(fabula.core.Engine):
 
         self.message_for_remote.event_list.append(fabula.ServerParametersEvent(self.action_time))
 
-        if self.room is not None:
+        if len(self.room_by_id):
+
+            # TODO: HACK: Spawning in first room in room_by_id by default. Is this ok as a convention, or do we need some way to configure that? Or a standard name for the first room to spawn in?
+
+            room = list(self.room_by_id.values())[0]
 
             fabula.LOGGER.debug("creating and processing EnterRoomEvent for new client")
 
             enter_room_event = fabula.EnterRoomEvent(event.identifier,
-                                                     self.room.identifier)
+                                                     room.identifier)
 
             # Process the Event right away, since it is not going through the
             # Plugin. This will also append the Event to self.message_for_remote.
@@ -542,9 +553,9 @@ class Server(fabula.core.Engine):
 
             fabula.LOGGER.info("sending existing floor_plan and entities")
 
-            for tuple in self.room.floor_plan:
+            for tuple in room.floor_plan:
 
-                tile = self.room.floor_plan[tuple].tile
+                tile = room.floor_plan[tuple].tile
 
                 change_map_element_event = fabula.ChangeMapElementEvent(tile, tuple)
 
@@ -552,12 +563,12 @@ class Server(fabula.core.Engine):
                 #
                 self.message_for_remote.event_list.append(change_map_element_event)
 
-            for identifier in self.room.entity_locations:
+            for identifier in room.entity_locations:
 
-                entity = self.room.entity_dict[identifier]
+                entity = room.entity_dict[identifier]
 
                 spawn_event = fabula.SpawnEvent(entity,
-                                                self.room.entity_locations[identifier])
+                                                room.entity_locations[identifier])
 
                 self.message_for_remote.event_list.append(spawn_event)
 
@@ -582,7 +593,7 @@ class Server(fabula.core.Engine):
                     # picked up in an instant anyway.
                     #
                     spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                                    list(self.room.floor_plan.keys())[0])
+                                                    list(room.floor_plan.keys())[0])
 
                     self.message_for_remote.event_list.append(spawn_event)
 
@@ -605,10 +616,18 @@ class Server(fabula.core.Engine):
 
         # TODO: contracts...
 
-        if event.target_identifier in self.room.floor_plan:
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        if room is not None and event.target_identifier in room.floor_plan:
 
             new_events = [event]
-            entities = self.room.floor_plan[event.target_identifier].entities
+            entities = room.floor_plan[event.target_identifier].entities
 
             for entity in entities:
 
@@ -616,7 +635,7 @@ class Server(fabula.core.Engine):
 
                 new_events = [event,
                               fabula.LookedAtEvent(entity.identifier,
-                                                  event.identifier)]
+                                                   event.identifier)]
 
             fabula.LOGGER.info("forwarding event(s)")
             kwargs["message"].event_list.extend(new_events)
@@ -634,19 +653,27 @@ class Server(fabula.core.Engine):
         """Check who is being talked to and forward the Event.
         """
 
-        if event.target_identifier in self.room.floor_plan:
+        room = None
 
-            if not self.room.floor_plan[event.target_identifier].entities:
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        if room is not None and event.target_identifier in room.floor_plan:
+
+            if not room.floor_plan[event.target_identifier].entities:
 
                 fabula.LOGGER.info("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
-                fabula.LOGGER.debug("room.entity_locations == {}".format(self.room.entity_locations))
+                fabula.LOGGER.debug("room.entity_locations == {}".format(room.entity_locations))
 
                 kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
                 # Pick last Entity
                 #
-                event.target_identifier = self.room.floor_plan[event.target_identifier].entities[-1].identifier
+                event.target_identifier = room.floor_plan[event.target_identifier].entities[-1].identifier
 
                 fabula.LOGGER.info("forwarding event")
 
@@ -671,16 +698,24 @@ class Server(fabula.core.Engine):
 
         new_event = None
 
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
         # TODO: contracts...
         #
-        if event.target_identifier in self.room.floor_plan:
+        if room is not None and event.target_identifier in room.floor_plan:
 
-            for entity in self.room.floor_plan[event.target_identifier].entities:
+            for entity in room.floor_plan[event.target_identifier].entities:
 
                 if entity.entity_type == fabula.ITEM:
 
                     new_event = fabula.TriesToManipulateEvent(event.identifier,
-                                                             entity.identifier)
+                                                              entity.identifier)
                 else:
                     fabula.LOGGER.info("Entity type '{}' can not be manipulated".format(entity.entity_type))
 
@@ -707,21 +742,29 @@ class Server(fabula.core.Engine):
 
         new_event = None
 
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
         # TODO: contracts...
         #
-        if event.target_identifier in self.room.floor_plan:
+        if room is not None and event.target_identifier in room.floor_plan:
 
             # TODO: This only tries to pick up the very last Entity encountered.
             #
-            for entity in self.room.floor_plan[event.target_identifier].entities:
+            for entity in room.floor_plan[event.target_identifier].entities:
 
                 if entity.entity_type == fabula.ITEM and entity.mobile:
 
                     fabula.LOGGER.info("trying to pick up '{}' at {}".format(entity.identifier,
-                                                                            event.target_identifier))
+                                                                             event.target_identifier))
 
                     new_event = fabula.TriesToPickUpEvent(event.identifier,
-                                                         entity.identifier)
+                                                          entity.identifier)
 
         if new_event is None:
 
@@ -752,9 +795,25 @@ class Server(fabula.core.Engine):
 
         fabula.LOGGER.debug("called")
 
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
+        if room is None:
+
+            fabula.LOGGER.warning("AttemptFailed: no room containing {}".format(event.identifier))
+
+            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+            return
+
         # Check target
         #
-        if event.target_identifier not in self.room.floor_plan:
+        elif event.target_identifier not in room.floor_plan:
 
             fabula.LOGGER.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
 
@@ -762,7 +821,7 @@ class Server(fabula.core.Engine):
 
             return
 
-        elif self.room.floor_plan[event.target_identifier].tile.tile_type != fabula.FLOOR:
+        elif room.floor_plan[event.target_identifier].tile.tile_type != fabula.FLOOR:
 
             fabula.LOGGER.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
 
@@ -773,19 +832,19 @@ class Server(fabula.core.Engine):
         # If event.target_identifier has at least one Entity on it, replace
         # target_identifier with the first Entity's identifier.
         #
-        if len(self.room.floor_plan[event.target_identifier].entities):
+        if len(room.floor_plan[event.target_identifier].entities):
 
-            target_identifier = self.room.floor_plan[event.target_identifier].entities[0].identifier
+            target_identifier = room.floor_plan[event.target_identifier].entities[0].identifier
 
             event = fabula.TriesToDropEvent(event.identifier,
-                                           event.item_identifier,
-                                           target_identifier)
+                                            event.item_identifier,
+                                            target_identifier)
 
         # Check Rack and owner
         #
         if event.item_identifier not in self.rack.entity_dict.keys():
 
-            if event.item_identifier in self.room.entity_dict.keys():
+            if event.item_identifier in room.entity_dict.keys():
                 fabula.LOGGER.info("'{}' not in rack but in room, forwarding event to plugin".format(event.item_identifier))
                 kwargs["message"].event_list.append(event)
 
@@ -809,23 +868,22 @@ class Server(fabula.core.Engine):
            If the room does not exist, it will be created.
         """
 
-        # TODO: Implement handling of multiple rooms.
-
         state = "new"
 
-        if (self.room is None
-            or self.room.identifier != event.room_identifier):
+        if event.room_identifier not in self.room_by_id.keys():
 
-            self.room = fabula.Room(event.room_identifier)
+            self.room_by_id[event.room_identifier] = fabula.Room(event.room_identifier)
 
         else:
             state = "existing"
 
         fabula.LOGGER.info("registering client '{}' in {} room '{}'".format(str(kwargs["connector"]),
-                                                                          state,
-                                                                          event.room_identifier))
+                                                                            state,
+                                                                            event.room_identifier))
 
-        self.room.active_clients[kwargs["connector"]] = event.client_identifier
+        self.room_by_id[event.room_identifier].active_clients[kwargs["connector"]] = event.client_identifier
+
+        self.room_by_client[event.client_identifier] = self.room_by_id[event.room_identifier]
 
         kwargs["message"].event_list.append(event)
 
@@ -959,12 +1017,15 @@ class Server(fabula.core.Engine):
 
         # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
         #
-        fabula.LOGGER.warning("spawning in random room - this is a hack and will cause errors in multiple room games!")
+        fabula.LOGGER.warning("spawning in first room - this is a hack and will cause errors in multiple room games!")
 
         fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
                                                                                event.entity.entity_type,
                                                                                event.location))
 
+        # Since Server.room_by_id is an ordered dict, this will always be the
+        # first room created.
+        #
         list(self.room_by_id.values())[0].process_SpawnEvent(event)
 
         kwargs["message"].event_list.append(event)
@@ -1027,15 +1088,23 @@ class Server(fabula.core.Engine):
 
             fabula.LOGGER.warning("connection {} is already gone".format(kwargs["connector"]))
 
+        room = None
+
+        for current_room in self.room_by_id.values():
+
+            if event.identifier in room.entity_dict.keys():
+
+                room = current_room
+
         # No room, nothing to delete.
         #
-        if self.room:
+        if room:
 
             fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
 
             # TODO: Manage active clients rather in Room methods than here, from the outside?
             #
-            del self.room.active_clients[kwargs["connector"]]
+            del room.active_clients[kwargs["connector"]]
 
             # Delete player Entity
             # Process the Event right away, since it is not going through the
