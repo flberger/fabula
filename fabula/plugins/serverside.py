@@ -284,7 +284,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
             room = None
 
-            for current_room in self.host.room_by_id.keys():
+            for current_room in self.host.room_by_id.values():
 
                 if identifier in current_room.entity_dict.keys():
 
@@ -489,7 +489,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         room = None
 
-        for current_room in self.host.room_by_id.keys():
+        for current_room in self.host.room_by_id.values():
 
             if event.identifier in current_room.entity_dict.keys():
 
@@ -562,7 +562,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         room = None
 
-        for current_room in self.host.room_by_id.keys():
+        for current_room in self.host.room_by_id.values():
 
             if event.identifier in current_room.entity_dict.keys():
 
@@ -595,7 +595,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         room = None
 
-        for current_room in self.host.room_by_id.keys():
+        for current_room in self.host.room_by_id.values():
 
             if event.identifier in current_room.entity_dict.keys():
 
@@ -737,7 +737,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         for current_room in self.host.room_by_id.values():
 
-            if identifier in room.entity_dict.keys():
+            if identifier in current_room.entity_dict.keys():
 
                 room = current_room
 

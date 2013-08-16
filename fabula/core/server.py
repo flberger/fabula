@@ -333,14 +333,6 @@ class Server(fabula.core.Engine):
            Auxiliary method.
         """
 
-        room = None
-
-        for current_room in self.room_by_id.values():
-
-            if connector in current_room.active_clients.keys():
-
-                room = current_room
-
         # Put in a method to avoid duplication.
         # Must not take too long since the client is waiting.
         # Call Plugin even if there were no Events from the client to catch
@@ -372,6 +364,16 @@ class Server(fabula.core.Engine):
         #
         if self.message_for_remote.event_list:
 
+            # Looking for room now, might not exist at start of method
+            #
+            room = None
+
+            for current_room in self.room_by_id.values():
+
+                if connector in current_room.active_clients.keys():
+
+                    room = current_room
+
             fabula.LOGGER.debug("{0} outgoing: {1}".format(connector,
                                                            self.message_for_remote))
 
@@ -383,6 +385,10 @@ class Server(fabula.core.Engine):
                 msg = "connection to client '{}' not found, could not send Message"
 
                 fabula.LOGGER.error(msg.format(connector))
+
+            if room is None:
+
+                fabula.LOGGER.error("connector '{}' is not an active client in any room of {}, no current room found".format(connector, list(self.room_by_id.values())))
 
             ### Build broadcast message for all clients
 
@@ -501,7 +507,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -620,7 +626,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -657,7 +663,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -702,7 +708,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -746,7 +752,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -799,7 +805,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -897,7 +903,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -925,7 +931,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.item_identifier in room.entity_dict.keys():
+            if event.item_identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -959,7 +965,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -996,7 +1002,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -1042,7 +1048,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 
@@ -1064,7 +1070,7 @@ class Server(fabula.core.Engine):
 
         # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
         #
-        fabula.LOGGER.warning("changing map element in random room - this is a hack and will cause errors in multiple room games!")
+        fabula.LOGGER.warning("changing map element in first room - this is a hack and will cause errors in multiple room games!")
 
         list(self.room_by_id.values())[0].process_ChangeMapElementEvent(event)
 
@@ -1092,7 +1098,7 @@ class Server(fabula.core.Engine):
 
         for current_room in self.room_by_id.values():
 
-            if event.identifier in room.entity_dict.keys():
+            if event.identifier in current_room.entity_dict.keys():
 
                 room = current_room
 

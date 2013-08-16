@@ -134,7 +134,6 @@
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
 # TODO: multiple rooms in server
-#     TODO: make default standalone single room game work
 #     TODO: write a test for multiple rooms
 #     TODO: fix hacks
 #
