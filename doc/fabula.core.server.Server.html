@@ -31,6 +31,12 @@ Server.action_time
     The time between actions that do not happen instantly.
     Used by the Server Plugin.
 
+Server.room_by_id
+    A collections.OrderedDict, mapping room identifiers to Room instances.
+
+Server.room_by_client
+    A dict, mapping client identifiers to Room instances.
+
 Server.message_for_all
     Message to be broadcasted to all clients
 
@@ -119,6 +125,48 @@ Server.exit_requested
     
     
     <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_MovesToEvent">process_MovesToEvent</a></td>
+    <td><tt>Let the according room process the event and pass it on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
+    <td><tt>Save the Entity to be picked up in Engine.rack, delete it from respective room and pass the PicksUpEvent on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_DropsEvent">process_DropsEvent</a></td>
+    <td><tt>Respawn the Entity to be dropped in the respective room, delete it from Engine.rack and pass the PicksUpEvent on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_ChangePropertyEvent">process_ChangePropertyEvent</a></td>
+    <td><tt>Let the Entity handle the Event. Then add the event to the message.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_SpawnEvent">process_SpawnEvent</a></td>
+    <td><tt>Let the first room process the event and pass it on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_DeleteEvent">process_DeleteEvent</a></td>
+    <td><tt>Delete the Entity from the respective room and pass the DeleteEvent on.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
+    <td><tt>Let the Room instance process the Event and add it to message.</tt></td>
+  </tr><tr class="method">
+    
+    
+    <td>Method</td>
     <td><a href="fabula.core.server.Server.html#process_ExitEvent">process_ExitEvent</a></td>
     <td><tt>Handle ExitEvent. Items that the player has picked up will be kept in self.rack.</tt></td>
   </tr>
@@ -137,24 +185,6 @@ Server.exit_requested
     <td>Method</td>
     <td><a href="fabula.core.Engine.html#set_plugin">set_plugin</a></td>
     <td><tt>Set the Plugin which controls or presents the game. plugin_instance must be an instance of fabula.plugins.Plugin.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_MovesToEvent">process_MovesToEvent</a></td>
-    <td><tt>Let self.room process the event and pass it on.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_PicksUpEvent">process_PicksUpEvent</a></td>
-    <td><tt>Save the Entity to be picked up in Engine.rack, delete it from Engine.room and pass the PicksUpEvent on.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_DropsEvent">process_DropsEvent</a></td>
-    <td><tt>Respawn the Entity to be dropped in Engine.room, delete it from Engine.rack and pass the PicksUpEvent on.</tt></td>
   </tr><tr class="basemethod">
     
     
@@ -189,12 +219,6 @@ Server.exit_requested
     
     
     <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_ChangePropertyEvent">process_ChangePropertyEvent</a></td>
-    <td><tt>Let the Entity handle the Event. Then add the event to the message.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="fabula.core.Engine.html#process_PassedEvent">process_PassedEvent</a></td>
     <td><tt>Process the Event. The default implementation adds the event to the message.</tt></td>
   </tr><tr class="basemethod">
@@ -219,38 +243,14 @@ Server.exit_requested
     
     
     <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_SpawnEvent">process_SpawnEvent</a></td>
-    <td><tt>Let self.room process the event and pass it on.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_DeleteEvent">process_DeleteEvent</a></td>
-    <td><tt>Delete the Entity from Engine.room and pass the DeleteEvent on.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="fabula.core.Engine.html#process_RoomCompleteEvent">process_RoomCompleteEvent</a></td>
     <td><tt>Process the Event. The default implementation adds the event to the message.</tt></td>
   </tr><tr class="basemethod">
     
     
     <td>Method</td>
-    <td><a href="fabula.core.Engine.html#process_ChangeMapElementEvent">process_ChangeMapElementEvent</a></td>
-    <td><tt>Let the fabula.Room instance in self.room process the Event and add it to message.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
     <td><a href="fabula.core.Engine.html#process_ServerParametersEvent">process_ServerParametersEvent</a></td>
     <td><tt>Process the Event. The default implementation adds the event to the message.</tt></td>
-  </tr><tr class="basemethod">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.Engine.html#tile_is_walkable">tile_is_walkable</a></td>
-    <td><tt>Auxiliary method which returns True if the tile exists in self.room and can be accessed by Entities.</tt></td>
   </tr>
   
 </table>
@@ -509,6 +509,132 @@ In any other case, the Event is forwarded to the Plugin.</pre>
 If the room does not exist, it will be created.</pre>
   </div>
 </div><div class="function">
+  <a name="fabula.core.server.Server.process_MovesToEvent">
+    
+  </a>
+  <a name="process_MovesToEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_MovesToEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_MovesToEvent">fabula.eventprocessor.EventProcessor.process_MovesToEvent</a></div>
+    <pre>Let the according room process the event and pass it on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_PicksUpEvent">
+    
+  </a>
+  <a name="process_PicksUpEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_PicksUpEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_PicksUpEvent">fabula.eventprocessor.EventProcessor.process_PicksUpEvent</a></div>
+    <pre>Save the Entity to be picked up in Engine.rack, delete it from respective room and pass the PicksUpEvent on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_DropsEvent">
+    
+  </a>
+  <a name="process_DropsEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DropsEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DropsEvent">fabula.eventprocessor.EventProcessor.process_DropsEvent</a></div>
+    <pre>Respawn the Entity to be dropped in the respective room, delete it from Engine.rack and pass the PicksUpEvent on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_ChangePropertyEvent">
+    
+  </a>
+  <a name="process_ChangePropertyEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangePropertyEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangePropertyEvent">fabula.eventprocessor.EventProcessor.process_ChangePropertyEvent</a></div>
+    <pre>Let the Entity handle the Event. Then add the event to the message.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_SpawnEvent">
+    
+  </a>
+  <a name="process_SpawnEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_SpawnEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_SpawnEvent">fabula.eventprocessor.EventProcessor.process_SpawnEvent</a></div>
+    <pre>Let the first room process the event and pass it on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_DeleteEvent">
+    
+  </a>
+  <a name="process_DeleteEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_DeleteEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_DeleteEvent">fabula.eventprocessor.EventProcessor.process_DeleteEvent</a></div>
+    <pre>Delete the Entity from the respective room and pass the DeleteEvent on.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server.process_ChangeMapElementEvent">
+    
+  </a>
+  <a name="process_ChangeMapElementEvent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    process_ChangeMapElementEvent(self, event, **kwargs):
+    
+  </div>
+  <div class="functionBody">
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_ChangeMapElementEvent">fabula.eventprocessor.EventProcessor.process_ChangeMapElementEvent</a></div>
+    <pre>Let the Room instance process the Event and add it to message.
+        </pre>
+  </div>
+</div><div class="function">
   <a name="fabula.core.server.Server.process_ExitEvent">
     
   </a>
@@ -528,7 +654,7 @@ Items that the player has picked up will be kept in self.rack.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-03-07 08:40:05.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-08-16 12:32:28.
     </address>
   </body>
 </html>
