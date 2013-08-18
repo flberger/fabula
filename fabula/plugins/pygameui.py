@@ -1086,6 +1086,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 self.window.room.remove(plane_name)
 
+        # But clear all tiles nonetheless.
+        #
+        for plane_name in list(self.window.room.tiles.subplanes_list):
+
+            self.window.room.tiles.remove(plane_name)
+
         # No more rendering until RoomComplete
         #
         fabula.LOGGER.info("freezing")
@@ -1557,18 +1563,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if str(event.location) not in self.window.room.tiles.subplanes:
 
             tile_plane = planes.Plane(str(event.location),
-                                          pygame.Rect((event.location[0] * self.spacing,
-                                                       event.location[1] * self.spacing),
-                                                      (100, 100)),
-                                          left_click_callback = self.tile_clicked_callback,
-                                          dropped_upon_callback = self.tile_drop_callback)
+                                      pygame.Rect((event.location[0] * self.spacing,
+                                                   event.location[1] * self.spacing),
+                                                  (100, 100)),
+                                      left_click_callback = self.tile_clicked_callback,
+                                      dropped_upon_callback = self.tile_drop_callback)
 
             self.window.room.tiles.sub(tile_plane)
 
         # Update image regardless whether the tile existed or not
         #
         fabula.LOGGER.debug("changing image for tile at {0} to {1}".format(str(event.location),
-                                                                        tile_from_list.asset))
+                                                                           tile_from_list.asset))
 
         self.window.room.tiles.subplanes[str(event.location)].image = tile_from_list.asset
 

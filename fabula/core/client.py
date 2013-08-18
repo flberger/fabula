@@ -831,7 +831,7 @@ class Client(fabula.core.Engine):
 
         # Discard most events in message, as they are of no practical use
         # to any following handler.
-        # ChangeProperyEvent might change a property persistent from room to
+        # ChangePropertyEvent might change a property persistent from room to
         # room.
         # ServerParametersEvent is crucial for general setup.
         #
