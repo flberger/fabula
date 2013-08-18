@@ -374,6 +374,10 @@ class Server(fabula.core.Engine):
 
                     room = current_room
 
+            if room is None:
+
+                fabula.LOGGER.warning("connector '{}' is not an active client in any room of {}, no current room found".format(connector, list(self.room_by_id.values())))
+
             fabula.LOGGER.debug("{0} outgoing: {1}".format(connector,
                                                            self.message_for_remote))
 
@@ -385,10 +389,6 @@ class Server(fabula.core.Engine):
                 msg = "connection to client '{}' not found, could not send Message"
 
                 fabula.LOGGER.error(msg.format(connector))
-
-            if room is None:
-
-                fabula.LOGGER.error("connector '{}' is not an active client in any room of {}, no current room found".format(connector, list(self.room_by_id.values())))
 
             ### Build broadcast message for all clients
 
@@ -425,6 +425,7 @@ class Server(fabula.core.Engine):
 
                 elif (skip_room_events == "now"
                       and isinstance(event, fabula.SpawnEvent)
+                      and room is not None
                       and event.entity.identifier == room.active_clients[connector]):
 
                     fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one".format(event.entity.identifier))
@@ -461,7 +462,8 @@ class Server(fabula.core.Engine):
 
             # Only send self.message_for_all when not empty
             #
-            if len(self.message_for_all.event_list):
+            if (len(self.message_for_all.event_list)
+                and room is not None):
 
                 fabula.LOGGER.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
 
@@ -1127,9 +1129,9 @@ class Server(fabula.core.Engine):
 
             # TODO: Manage active clients rather in Room methods than here, from the outside?
             #
-            del self.room_by_client[event.client_identifier].active_clients[kwargs["connector"]]
+            del self.room_by_client[event.identifier].active_clients[kwargs["connector"]]
 
-            del self.room_by_client[event.client_identifier]
+            del self.room_by_client[event.identifier]
 
             # Delete player Entity
             # Process the Event right away, since it is not going through the
