@@ -870,9 +870,27 @@ class Server(fabula.core.Engine):
         return
 
     def process_EnterRoomEvent(self, event, **kwargs):
-        """Register the client in the room and forward the Event.
+        """Remove the client from its old room, register the client in the room and forward the Event.
            If the room does not exist, it will be created.
         """
+
+        if event.client_identifier in self.room_by_client.keys():
+
+            fabula.LOGGER.info("removing client '{}' from room '{}'".format(event.client_identifier,
+                                                                            self.room_by_client[event.client_identifier]))
+
+            # TODO: remove player Entity here?
+            #
+            msg = "NOT removing possible player Entity for '{}' from room '{}'"
+
+            fabula.LOGGER.warning(msg.format(event.client_identifier,
+                                             self.room_by_client[event.client_identifier]))
+
+            # TODO: Manage active clients rather in Room methods than here, from the outside? See also process_ExitEvent().
+            #
+            del self.room_by_client[event.client_identifier].active_clients[kwargs["connector"]]
+
+            del self.room_by_client[event.client_identifier]
 
         state = "new"
 
@@ -1094,23 +1112,17 @@ class Server(fabula.core.Engine):
 
             fabula.LOGGER.warning("connection {} is already gone".format(kwargs["connector"]))
 
-        room = None
-
-        for current_room in self.room_by_id.values():
-
-            if event.identifier in current_room.entity_dict.keys():
-
-                room = current_room
-
         # No room, nothing to delete.
         #
-        if room:
+        if event.identifier in self.room_by_client.keys():
 
             fabula.LOGGER.debug("removing room.active_clients[{}]".format(kwargs["connector"]))
 
             # TODO: Manage active clients rather in Room methods than here, from the outside?
             #
-            del room.active_clients[kwargs["connector"]]
+            del self.room_by_client[event.client_identifier].active_clients[kwargs["connector"]]
+
+            del self.room_by_client[event.client_identifier]
 
             # Delete player Entity
             # Process the Event right away, since it is not going through the
