@@ -541,11 +541,13 @@ class Server(fabula.core.Engine):
 
         if len(self.room_by_id):
 
-            # TODO: HACK: Spawning in first room in room_by_id by default. Is this ok as a convention, or do we need some way to configure that? Or a standard name for the first room to spawn in?
+            # TODO: Spawning in first room in room_by_id by default. Is this ok as a convention, or do we need some way to configure that? Or a standard name for the first room to spawn in?
 
             room = list(self.room_by_id.values())[0]
 
             fabula.LOGGER.debug("creating and processing EnterRoomEvent for new client")
+
+            fabula.LOGGER.info("Spawning client '{}' in first room '{}' by convention".format(event.identifier, room.identifier))
 
             enter_room_event = fabula.EnterRoomEvent(event.identifier,
                                                      room.identifier)
@@ -1037,20 +1039,27 @@ class Server(fabula.core.Engine):
 
     def process_SpawnEvent(self, event, **kwargs):
         """Let the first room process the event and pass it on.
-        """
 
-        # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
-        #
-        fabula.LOGGER.warning("spawning in first room - this is a hack and will cause errors in multiple room games!")
+           This method assumes that event.location is (x, y, "room_identifier").
+        """
 
         fabula.LOGGER.info("spawning entity '{}', type {}, location {}".format(event.entity.identifier,
                                                                                event.entity.entity_type,
                                                                                event.location))
 
-        # Since Server.room_by_id is an ordered dict, this will always be the
-        # first room created.
-        #
-        list(self.room_by_id.values())[0].process_SpawnEvent(event)
+        if len(event.location) == 3:
+
+            self.room_by_id[event.location[2]].process_SpawnEvent(event)
+
+        else:
+            # Fall back to first room.
+            #
+            # TODO: remove this default behaviour?
+            #
+            # Since Server.room_by_id is an ordered dict, this will always be
+            # the first room created.
+            #
+            list(self.room_by_id.values())[0].process_SpawnEvent(event)
 
         kwargs["message"].event_list.append(event)
 
@@ -1082,15 +1091,13 @@ class Server(fabula.core.Engine):
 
     def process_ChangeMapElementEvent(self, event, **kwargs):
         """Let the Room instance process the Event and add it to message.
+
+           This method assumes that event.location is (x, y, "room_identifier").
         """
 
         fabula.LOGGER.debug("called")
 
-        # TODO: HACK: This will work in single room games, but is of course complete nonsense. Room information needs to be added to SpawnEvent.
-        #
-        fabula.LOGGER.warning("changing map element in first room - this is a hack and will cause errors in multiple room games!")
-
-        list(self.room_by_id.values())[0].process_ChangeMapElementEvent(event)
+        self.room_by_id[event.location[2]].process_ChangeMapElementEvent(event)
 
         kwargs["message"].event_list.append(event)
 

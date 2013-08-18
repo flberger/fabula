@@ -133,9 +133,6 @@
 # TODO: abandon tile-based maps, and rather use large bitmap (GIMP XCF) or vector (Inkscape SVG) data for level backgrounds.
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
-# TODO: multiple rooms in server
-#     TODO: fix hacks
-#
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
 # TODO: level format should be a list of JSON-encoded Events that establish the room, including fancyness as captions. Provide a tool to convert TSV to this.
 #
@@ -307,17 +304,20 @@ class AttemptEvent(Event):
            identifier of the object where the attempt originates
 
        AttemptEvent.target_identifier
-           target location of the attempt / item, NPC or player identifier
+           target location of the attempt or item / NPC / player identifier
            if appropriate after server processing
     """
 
     def __init__(self, identifier, target_identifier):
         """Event initialisation.
+
            When sent by the client, target_identifier must describe the target
            location of the attempt.
+
            On a two-dimensional map with rectangular elements target_identifier
-           is a tuple of (x, y) integer coordinates, with (0, 0) being the upper
-           left corner.
+           is a tuple of (x, y, "room_identifier"). x and y are integer
+           coordinates, with (0, 0) being the upper left corner.
+
            The server determines what is being looked at / picked up /
            manipulated / talked to at that location, and replaces the location
            string with an item, NPC or player identifier if appropriate.
@@ -691,9 +691,13 @@ class SpawnEvent(ServerEvent):
 
     def __init__(self, entity, location):
         """Event initialisation.
+
            entity is an instance of fabula.Entity, having a type, identifier and
            asset.
-           location is a tuple of 2D integer coordinates.
+
+           location is a tuple (x, y, "room_identifier") with x, y being
+           2D integer coordinates.
+
            The server stores the relevant information and passes the entity on
            to the client.
         """
@@ -778,8 +782,8 @@ class ChangeMapElementEvent(ServerEvent):
            tile is a fabula map object having a type (obstacle or floor) and an
            asset.
            location is an object describing the location of the tile in the game
-           world, most probably a tuple of coordinates, but possibly only a
-           string like "lobby".
+           world, most probably a tuple of coordinates and room identifier, but
+           possibly only a string like "lobby".
            The server stores the relevant information and passes the tile and
            the location on to the client.
         """
@@ -1194,7 +1198,7 @@ class Room(fabula.eventprocessor.EventProcessor):
            Entity instances.
 
        Room.floor_plan
-           A dict mapping 2D coordinate tuples to a FloorPlanElement instance.
+           A dict mapping (x, y) 2D coordinate tuples to a FloorPlanElement instance.
 
        Room.entity_locations
            A dict mapping Entity identifiers to a 2D coordinate tuple.
@@ -1244,15 +1248,17 @@ class Room(fabula.eventprocessor.EventProcessor):
 
     def process_ChangeMapElementEvent(self, event):
         """Update all affected dicts.
+
+           This method assumes that event.location is (x, y, "room_identifier").
         """
 
-        if event.location in self.floor_plan:
+        if event.location[:2] in self.floor_plan:
 
-            self.floor_plan[event.location].tile = event.tile
+            self.floor_plan[event.location[:2]].tile = event.tile
 
         else:
 
-            self.floor_plan[event.location] = FloorPlanElement(event.tile)
+            self.floor_plan[event.location[:2]] = FloorPlanElement(event.tile)
 
         # Avoid duplicates
         #
@@ -1264,8 +1270,11 @@ class Room(fabula.eventprocessor.EventProcessor):
 
     def process_SpawnEvent(self, event):
         """Update all affected dicts.
+
+           This method assumes that event.location is (x, y, "room_identifier").
         """
-        if event.location not in self.floor_plan:
+
+        if event.location[:2] not in self.floor_plan:
 
             msg = "cannot spawn entity '{}' at undefined location {}"
 
@@ -1284,11 +1293,11 @@ class Room(fabula.eventprocessor.EventProcessor):
                                              self.entity_locations))
 
         else:
-            self.floor_plan[event.location].entities.append(event.entity)
+            self.floor_plan[event.location[:2]].entities.append(event.entity)
 
             self.entity_dict[event.entity.identifier] = event.entity
 
-            self.entity_locations[event.entity.identifier] = event.location
+            self.entity_locations[event.entity.identifier] = event.location[:2]
 
         return
 

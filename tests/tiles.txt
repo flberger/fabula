@@ -23,10 +23,10 @@ Tile Fetching and Display in PygameUserInterface
     ...             self.message_for_host.event_list.append(fabula.EnterRoomEvent("player", "test"))
     ...             for x in range(0, 8, 2):
     ...                 for y in range(0, 5, 2):
-    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x, y)))
-    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x + 1, y)))
-    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x, y + 1)))
-    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x + 1, y + 1)))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x, y, "test")))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x + 1, y, "test")))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_green, (x, y + 1, "test")))
+    ...                     self.message_for_host.event_list.append(fabula.ChangeMapElementEvent(tile_red, (x + 1, y + 1, "test")))
     ...             self.message_for_host.event_list.append(fabula.RoomCompleteEvent())
     ...             return self.message_for_host
     ...         else:
