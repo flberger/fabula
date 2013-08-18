@@ -1081,11 +1081,17 @@ class Server(fabula.core.Engine):
 
                 room = current_room
 
-        # Delete it from room
-        #
-        room.process_DeleteEvent(event)
+        if room is None:
 
-        # and pass the Event on
+            fabula.LOGGER.error("Cannot delete Entity '{}', no room found to delete from".format(event.identifier))
+
+        else:
+
+            # Delete it from room
+            #
+            room.process_DeleteEvent(event)
+
+        # Pass the Event on
         #
         kwargs["message"].event_list.append(event)
 
