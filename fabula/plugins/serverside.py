@@ -37,6 +37,9 @@ def load_room_from_file(filename, complete = True):
        If 'complete' is True, a RoomCompleteEvent will be added, otherwise it
        will be left out.
 
+       The ChangeMapElementEvents created by this function will use
+       the filename minus extension as the room identifier.
+
        The file must consist of lines of tab-separated elements:
 
        (x, y)    tile_type    tile_asset_desc    entity_type,identifier,entity_asset_desc
@@ -44,11 +47,15 @@ def load_room_from_file(filename, complete = True):
        Note that this example uses spaces in place of TABs.
     """
 
+    # TODO: add parameter for Room identifier
+
     # Use a Fabula asset manager to locate the file.
     # Will raise an IOError if the file does not exist.
     # This must be handled by the caller.
     #
     roomfile = fabula.assets.Assets().fetch(filename, "t")
+
+    room_identifier = os.path.splitext(os.path.basename(filename))[0]
 
     event_list = []
 
@@ -68,7 +75,7 @@ def load_room_from_file(filename, complete = True):
         type = splitted_line.pop(0)
         asset_desc = splitted_line.pop(0)
 
-        coordinates = eval(coordiantes_string)
+        location = None
 
         # Match only "(x, y)" coordinates
         #
@@ -76,7 +83,9 @@ def load_room_from_file(filename, complete = True):
 
             tile = fabula.Tile(type, asset_desc)
 
-            event = fabula.ChangeMapElementEvent(tile, coordinates)
+            location = eval(coordiantes_string) + (room_identifier, )
+
+            event = fabula.ChangeMapElementEvent(tile, location)
 
             event_list.append(event)
 
@@ -99,14 +108,14 @@ def load_room_from_file(filename, complete = True):
                     blocking = eval(blocking)
 
                 else:
-                    blocking = "False"
+                    blocking = False
 
                 if mobile in ("True", "False"):
 
                     mobile = eval(mobile)
 
                 else:
-                    mobile = "True"
+                    mobile = True
 
                 entity = fabula.Entity(identifier,
                                        entity_type,
@@ -114,7 +123,7 @@ def load_room_from_file(filename, complete = True):
                                        mobile,
                                        asset_desc)
 
-                event_list.append(fabula.SpawnEvent(entity, coordinates))
+                event_list.append(fabula.SpawnEvent(entity, location))
 
     roomfile.close()
 
