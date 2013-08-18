@@ -134,7 +134,6 @@
 # TODO: also, replace tiles by graphs made of polygons, done in an bitmap (GIMP XCF) or vector (Inkscape SVG) overlay.
 #
 # TODO: multiple rooms in server
-#     TODO: write a test for multiple rooms
 #     TODO: fix hacks
 #
 # TODO: JSON file format for all files written (from http://pound-python.org/: "When storing data, use SQLite or JSON")
@@ -1395,6 +1394,17 @@ class Room(fabula.eventprocessor.EventProcessor):
         """
 
         return representation(self, ("identifier",))
+
+    def __str__(self):
+        """Inofficial, informative string representation.
+        """
+
+        msg = "<Room '{}', {} Entities, {} FloorPlanElements, active_clients: {}>"
+
+        return(msg.format(self.identifier,
+                          len(self.entity_dict),
+                          len(self.floor_plan),
+                          list(self.active_clients.values())))
 
 class FloorPlanElement:
     """Convenience class for floor plan elements.

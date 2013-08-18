@@ -1,0 +1,78 @@
+Doctests for the Fabula Package
+==============================
+
+Multiple Rooms
+--------------
+
+    >>> import fabula.plugins.serverside
+    >>> import fabula.interfaces
+    >>> import fabula.run
+    >>> class MultipleRoomsTest(fabula.plugins.serverside.DefaultGame):
+    ...     def __init__(self, host):
+    ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)
+    ...         self.host.interface.connect("dummy_client")
+    ...         init_message = fabula.Message([fabula.InitEvent("dummy_client")])
+    ...         self.host.interface.connections["dummy_client"].messages_for_local.append(init_message)
+    ...
+    ...         tile = fabula.Tile(fabula.FLOOR, "dummy")
+    ...         player_entity = fabula.Entity("player", fabula.PLAYER, True, True, "dummy")
+    ...         npc_entity = fabula.Entity("npc", fabula.NPC, True, True, "dummy")
+    ...
+    ...         first_room_message = fabula.Message([fabula.EnterRoomEvent("player", "first_room"),
+    ...                                              fabula.ChangeMapElementEvent(tile, (0, 0, "first_room")),
+    ...                                              fabula.SpawnEvent(player_entity, (0, 0, "first_room")),
+    ...                                              fabula.RoomCompleteEvent()])
+    ...
+    ...         clear_first_room_message = fabula.Message([fabula.DeleteEvent("player")])
+    ...
+    ...         second_room_message = fabula.Message([fabula.EnterRoomEvent("player", "second_room"),
+    ...                                               fabula.ChangeMapElementEvent(tile, (0, 0, "second_room")),
+    ...                                               fabula.ChangeMapElementEvent(tile, (1, 0, "second_room")),
+    ...                                               fabula.SpawnEvent(player_entity, (0, 0, "second_room")),
+    ...                                               fabula.SpawnEvent(npc_entity, (1, 0, "second_room")),
+    ...                                               fabula.RoomCompleteEvent()])
+    ...
+    ...         dummy_display_room_message = fabula.Message([fabula.PerceptionEvent("player", "Dummy")])
+    ...
+    ...         self.queue_messages(first_room_message,
+    ...                             clear_first_room_message,
+    ...                             second_room_message,
+    ...                             dummy_display_room_message)
+    ...
+    ...     def process_message(self, message):
+    ...         fabula.plugins.serverside.DefaultGame.process_message(self, message)
+    ...         if len(self.host.room_by_id):
+    ...             for room in self.host.room_by_id.values():
+    ...                 print(room)
+    ...             print("------------------------------")
+    ...         return self.message_for_host
+    ...
+    ...     def process_InitEvent(self, event):
+    ...         return
+    ...
+    >>> app = fabula.run.App(timeout = 4)
+    >>> app.server_plugin_class = MultipleRoomsTest
+    >>> interface = fabula.interfaces.Interface()
+    >>> # Running at extremely low FPS to reduce log noise
+    >>> app.run_server(2, interface, 1.0) # doctest: +ELLIPSIS
+    ============================================================
+    Fabula ... Server
+    ------------------------------------------------------------
+    <BLANKLINE>
+    Press [Ctrl] + [C] to stop the server.
+    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    ------------------------------
+    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    ------------------------------
+    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    ------------------------------
+    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    ------------------------------
+    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: []>
+    <Room 'second_room', 2 Entities, 2 FloorPlanElements, active_clients: ['player']>
+    ------------------------------
+    <BLANKLINE>
+    Shutting down server.
+    <BLANKLINE>
+    Shutdown complete. A log file should be at fabula-server.log
+    <BLANKLINE>
