@@ -208,10 +208,11 @@ Excluding passive Events.
             "tile_type": "FLOOR"
         }
     }
-    >>> print(fabula.ServerParametersEvent(0.5).json())
+    >>> print(fabula.ServerParametersEvent("test_client", 0.5).json())
     {
         "action_time": 0.5, 
-        "class": "ServerParametersEvent"
+        "class": "ServerParametersEvent", 
+        "client_identifier": "test_client"
     }
     >>> print(fabula.Message([fabula.Event("identifier")]).json())
     {

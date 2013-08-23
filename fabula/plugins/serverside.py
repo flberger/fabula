@@ -518,7 +518,7 @@ class DefaultGame(fabula.plugins.Plugin):
         # Partly copied from next_action()
 
         location = self.move_towards(event.identifier,
-                                     event.target_identifier,
+                                     event.target_identifier[:2],
                                      self.path_dict[event.identifier] + self.taken_locations)
 
         if location is None:
@@ -532,7 +532,7 @@ class DefaultGame(fabula.plugins.Plugin):
             msg = "movement requested for '{}', best move towards {} is {}"
 
             fabula.LOGGER.debug(msg.format(event.identifier,
-                                           event.target_identifier,
+                                           event.target_identifier[:2],
                                            location))
 
             # Check if the Entity is blocking, and if so, block the new location
@@ -550,7 +550,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
             self.message_for_host.event_list.append(fabula.MovesToEvent(event.identifier, location))
 
-            if location == event.target_identifier:
+            if location == event.target_identifier[:2]:
 
                 fabula.LOGGER.debug("target reached, not recording in tries_to_move_dict")
 
@@ -559,9 +559,9 @@ class DefaultGame(fabula.plugins.Plugin):
             else:
 
                 fabula.LOGGER.debug("saving '{} : {}' in tries_to_move_dict".format(event.identifier,
-                                                                                    event.target_identifier))
+                                                                                    event.target_identifier[:2]))
 
-                self.tries_to_move_dict[event.identifier] = event.target_identifier
+                self.tries_to_move_dict[event.identifier] = event.target_identifier[:2]
 
         return
 
@@ -640,11 +640,11 @@ class DefaultGame(fabula.plugins.Plugin):
                 self.respond(event)
 
         else:
-            fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier))
+            fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier[:2]))
 
-            if event.target_identifier not in surrounding_positions:
+            if event.target_identifier[:2] not in surrounding_positions:
 
-                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier, surrounding_positions))
+                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier[:2], surrounding_positions))
                 self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             else:
@@ -666,7 +666,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
                                                                           event.item_identifier,
-                                                                          event.target_identifier))
+                                                                          event.target_identifier[:2]))
 
                 if entity is None:
 
@@ -677,9 +677,9 @@ class DefaultGame(fabula.plugins.Plugin):
                 #
                 if entity.blocking:
 
-                    fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier))
+                    fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier[:2]))
 
-                    self.taken_locations.append(event.target_identifier)
+                    self.taken_locations.append(event.target_identifier[:2])
 
         return
 

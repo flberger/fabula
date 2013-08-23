@@ -119,6 +119,8 @@
 #
 # IMPROVEMENTS
 #
+# TODO: multiple rooms: make anything that parses and emits locations support the (x, y, "room_identifier") syntax, and get rid of location[:2] hacks.
+#
 # TODO: introduce a client-specific Server timeout when an Event which requires multiple frames has been sent. Possibly send action_time in InitEvent to Server.
 # TODO: readable __repr__ of fabula objects: Rack
 # TODO: one should be able to evaluate Messages to True and False for if clauses testing if there are any events in the message
@@ -126,6 +128,7 @@
 # TODO: there is no ConfirmEvent associated with TriesToManipulateEvent
 # TODO: There currently is no way Plugins can directly issue Events for other clients (for example PerceptionEvents or EnterRoomEvents)
 # TODO: join Tile and FloorPlanElement?
+# TODO: Make Events either completely stateful (relying on preceding and following events, e.g. for room information) or stateless (all information required is encoded in the Event).
 #
 # TODO: support the Tiled editor, http://www.mapeditor.org/, see http://silveiraneto.net/2009/12/19/tiled-tmx-map-loader-for-pygame/
 # TODO: HD support (at least 1280x720)
@@ -825,15 +828,23 @@ class ServerParametersEvent(ServerEvent):
 
        Attributes:
 
+       ServerParametersEvent.client_identifier
+           The client identifier to receive this Event.
+           This attribute is mainly for bookkeeping purposes in the Server.
+
        ServerParametersEvent.action_time
            The time the Server waits between actions that do not happen instantly.
     """
 
-    def __init__(self, action_time):
+    def __init__(self, client_identifier, action_time):
         """action_time is the time the Server waits between actions that do not happen instantly.
         """
 
+        self.client_identifier = client_identifier
+
         self.action_time = action_time
+
+        return
 
 ####################
 # Client Events
@@ -1307,23 +1318,20 @@ class Room(fabula.eventprocessor.EventProcessor):
 
         if event.identifier not in self.entity_dict:
 
-            raise Exception("cannot move unknown entity %s"
-                                 % event.identifier)
+            raise RuntimeError("cannot move unknown entity {}".format(event.identifier))
 
-        if event.location not in self.floor_plan:
+        if event.location[:2] not in self.floor_plan:
 
-            raise Exception("cannot move entity %s to undefined location %s"
-                                 % (event.identifier, event.location))
+            raise RuntimeError("cannot move entity {} to undefined location {}".format(event.identifier, event.location))
 
         # Only process changed locations
         #
-        if self.entity_locations[event.identifier] != event.location:
+        if self.entity_locations[event.identifier] != event.location[:2]:
 
             # Remove old entity location
             #
-            # identifier should point to the same
-            # object that is in the respective
-            # FloorPlanElement list
+            # identifier should point to the same object that is in the
+            # respective FloorPlanElement list
             #
             entity = self.entity_dict[event.identifier]
             location = self.entity_locations[event.identifier]
@@ -1332,9 +1340,9 @@ class Room(fabula.eventprocessor.EventProcessor):
 
             # (Over)write new entity location
             #
-            self.floor_plan[event.location].entities.append(entity)
+            self.floor_plan[event.location[:2]].entities.append(entity)
 
-            self.entity_locations[event.identifier] = event.location
+            self.entity_locations[event.identifier] = event.location[:2]
 
         return
 
@@ -1363,6 +1371,20 @@ class Room(fabula.eventprocessor.EventProcessor):
     def tile_is_walkable(self, target_identifier):
         """Auxiliary method which returns True if the tile exists in Room and can be accessed by Entities.
         """
+
+        if len(target_identifier) == 3:
+
+            if target_identifier[2] != self.identifier:
+
+                msg = "{} not walkable: not in Room '{}'"
+
+                fabula.LOGGER.debug(msg.format(target_identifier,
+                                               self.identifier))
+
+                return False
+
+            else:
+                target_identifier = target_identifier[:2]
 
         if target_identifier not in self.floor_plan.keys():
 
@@ -1527,10 +1549,10 @@ def difference_2d(start_tuple, end_tuple):
             end_tuple[1] - start_tuple[1])
 
 def str_is_tuple(str):
-    """Return True if the string represents a (int, int) tuple.
+    """Return True if the string represents a (int, int[, str]) location tuple.
     """
 
-    if re.match("^\([0-9]+\s*,\s*[0-9]+\)$", str):
+    if re.match("^\(\d+\s*,\s*\d+(,\s*[\"'].+?[\"'])?\)$", str):
 
         return True
 

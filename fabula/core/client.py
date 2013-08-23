@@ -415,10 +415,10 @@ class Client(fabula.core.Engine):
                                 # resolved by the server in very short time.
                                 #
                                 try:
-                                    if self.room.tile_is_walkable(event.target_identifier):
+                                    if self.room.tile_is_walkable(event.target_identifier[:2]):
 
                                         moves_to_event = fabula.MovesToEvent(event.identifier,
-                                                                            event.target_identifier)
+                                                                             event.target_identifier[:2])
 
                                         # Update room, needed for UserInterface
                                         #
@@ -666,48 +666,54 @@ class Client(fabula.core.Engine):
         # Is this the very same as the latest
         # local MovesToEvent?
         #
-        if (event.identifier == self.local_moves_to_event.identifier
-            and event.location == self.local_moves_to_event.location):
+        if event.identifier == self.local_moves_to_event.identifier:
 
-            # Fine, we already had that.
-            #
-            fabula.LOGGER.info("server issued MovesToEvent already applied: ('%s', '%s')"
-                              % (event.identifier, event.location))
+            if event.location == self.local_moves_to_event.location:
 
-            # Reset copy of local event
-            #
-            self.local_moves_to_event = fabula.MovesToEvent(None, None)
-
-            if event.identifier == self.client_id:
-
-                self.await_confirmation = False
-
-        else:
-
-            # Former default implementation
-            #
-            fabula.LOGGER.debug("%s location before: %s "
-                              % (event.identifier,
-                                 self.room.entity_locations[event.identifier]))
-
-            self.room.process_MovesToEvent(event)
-
-            fabula.LOGGER.info("%s location after: %s "
-                              % (event.identifier,
-                                 self.room.entity_locations[event.identifier]))
-
-            kwargs["message"].event_list.append(event)
-
-            # Only allow new input if the last
-            # MovesToEvent has been confirmed.
-            #
-            if self.local_moves_to_event.identifier == None:
-
-                # TODO: check location == None as well?
+                # Fine, we already had that.
                 #
+                msg = "server issued MovesToEvent already applied: ('{}', {})"
+                fabula.LOGGER.info(msg.format(event.identifier, event.location))
+
+                # Reset copy of local event
+                #
+                self.local_moves_to_event = fabula.MovesToEvent(None, None)
+
                 if event.identifier == self.client_id:
 
                     self.await_confirmation = False
+
+                return
+
+            else:
+                msg = "Recorded location {} for Entity '{}' does not match incoming location {}"
+
+                fabula.LOGGER.debug(msg.format(self.local_moves_to_event.location,
+                                               event.identifier,
+                                               event.location))
+
+        # Former default implementation
+        #
+        fabula.LOGGER.debug("'{}' location before: {}".format(event.identifier,
+                                                              self.room.entity_locations[event.identifier]))
+
+        self.room.process_MovesToEvent(event)
+
+        fabula.LOGGER.info("'{}' location after: {}".format(event.identifier,
+                                                            self.room.entity_locations[event.identifier]))
+
+        kwargs["message"].event_list.append(event)
+
+        # Only allow new input if the last
+        # MovesToEvent has been confirmed.
+        #
+        if self.local_moves_to_event.identifier == None:
+
+            # TODO: check location == None as well?
+            #
+            if event.identifier == self.client_id:
+
+                self.await_confirmation = False
 
         return
 
@@ -769,9 +775,9 @@ class Client(fabula.core.Engine):
 
         # Call default implementation
         #
-        fabula.core.Engine.process_PerceptionEvent(self,
-                                                   event,
-                                                   message = kwargs["message"])
+        fabula.core.Engine.process_SaysEvent(self,
+                                             event,
+                                             message = kwargs["message"])
 
     def process_SpawnEvent(self, event, **kwargs):
         """Let self.room process the event and pass it on.

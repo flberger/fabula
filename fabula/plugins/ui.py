@@ -213,6 +213,8 @@ class UserInterface(fabula.plugins.Plugin):
         """Compute action_frames from event.action_time and UserInterface.framerate.
         """
 
+        # NOTE: not checking ServerParametersEvent.client_identifier
+
         self.action_frames = int(event.action_time * self.framerate)
 
         msg = "{} s action_time from server * {} fps framerate = {} action_frames"

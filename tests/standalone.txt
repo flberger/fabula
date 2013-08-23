@@ -5,7 +5,14 @@ Standalone Execution (Client and Server)
 ----------------------------------------
 
     >>> import fabula.run
+    >>> class DummyServerPlugin(fabula.plugins.Plugin):
+    ...     def process_InitEvent(self, event, **kwargs):
+    ...         self.message_for_host.event_list.extend([fabula.EnterRoomEvent(client_identifier = event.identifier,
+    ...                                                                       room_identifier = "dummy_room"),
+    ...                                                  fabula.RoomCompleteEvent()])
+    ...         return
     >>> app = fabula.run.App(timeout = 5)
+    >>> app.server_plugin_class = DummyServerPlugin
     >>> app.run_standalone(60, 0.5) # doctest: +ELLIPSIS
     ============================================================
     Fabula ... Server

@@ -7,6 +7,9 @@ Multiple Rooms
     >>> import fabula.plugins.serverside
     >>> import fabula.interfaces
     >>> import fabula.run
+    >>> tile = fabula.Tile(fabula.FLOOR, "dummy")
+    >>> player_entity = fabula.Entity("player", fabula.PLAYER, True, True, "dummy")
+    >>> npc_entity = fabula.Entity("npc", fabula.NPC, True, True, "dummy")
     >>> class MultipleRoomsTest(fabula.plugins.serverside.DefaultGame):
     ...     def __init__(self, host):
     ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)
@@ -14,18 +17,9 @@ Multiple Rooms
     ...         init_message = fabula.Message([fabula.InitEvent("dummy_client")])
     ...         self.host.interface.connections["dummy_client"].messages_for_local.append(init_message)
     ...
-    ...         tile = fabula.Tile(fabula.FLOOR, "dummy")
-    ...         player_entity = fabula.Entity("player", fabula.PLAYER, True, True, "dummy")
-    ...         npc_entity = fabula.Entity("npc", fabula.NPC, True, True, "dummy")
-    ...
-    ...         first_room_message = fabula.Message([fabula.EnterRoomEvent("player", "first_room"),
-    ...                                              fabula.ChangeMapElementEvent(tile, (0, 0, "first_room")),
-    ...                                              fabula.SpawnEvent(player_entity, (0, 0, "first_room")),
-    ...                                              fabula.RoomCompleteEvent()])
-    ...
     ...         clear_first_room_message = fabula.Message([fabula.DeleteEvent("player")])
     ...
-    ...         second_room_message = fabula.Message([fabula.EnterRoomEvent("player", "second_room"),
+    ...         second_room_message = fabula.Message([fabula.EnterRoomEvent("dummy_client", "second_room"),
     ...                                               fabula.ChangeMapElementEvent(tile, (0, 0, "second_room")),
     ...                                               fabula.ChangeMapElementEvent(tile, (1, 0, "second_room")),
     ...                                               fabula.SpawnEvent(player_entity, (0, 0, "second_room")),
@@ -34,8 +28,7 @@ Multiple Rooms
     ...
     ...         dummy_display_room_message = fabula.Message([fabula.PerceptionEvent("player", "Dummy")])
     ...
-    ...         self.queue_messages(first_room_message,
-    ...                             clear_first_room_message,
+    ...         self.queue_messages(clear_first_room_message,
     ...                             second_room_message,
     ...                             dummy_display_room_message)
     ...
@@ -47,10 +40,17 @@ Multiple Rooms
     ...             print("------------------------------")
     ...         return self.message_for_host
     ...
-    ...     def process_InitEvent(self, event):
+    ...     def process_InitEvent(self, event, **kwargs):
+    ...         first_room_message = fabula.Message([fabula.EnterRoomEvent(event.identifier, "first_room"),
+    ...                                              fabula.ChangeMapElementEvent(tile, (0, 0, "first_room")),
+    ...                                              fabula.SpawnEvent(player_entity, (0, 0, "first_room")),
+    ...                                              fabula.RoomCompleteEvent()])
+    ...
+    ...         self.message_for_host.event_list.extend(first_room_message.event_list)
+    ...
     ...         return
     ...
-    >>> app = fabula.run.App(timeout = 4)
+    >>> app = fabula.run.App(timeout = 3)
     >>> app.server_plugin_class = MultipleRoomsTest
     >>> interface = fabula.interfaces.Interface()
     >>> # Running at extremely low FPS to reduce log noise
@@ -60,16 +60,16 @@ Multiple Rooms
     ------------------------------------------------------------
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
-    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['dummy_client']>
     ------------------------------
-    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    <Room 'first_room', 1 Entities, 1 FloorPlanElements, active_clients: ['dummy_client']>
     ------------------------------
-    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['dummy_client']>
     ------------------------------
-    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['player']>
+    <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: ['dummy_client']>
     ------------------------------
     <Room 'first_room', 0 Entities, 1 FloorPlanElements, active_clients: []>
-    <Room 'second_room', 2 Entities, 2 FloorPlanElements, active_clients: ['player']>
+    <Room 'second_room', 2 Entities, 2 FloorPlanElements, active_clients: ['dummy_client']>
     ------------------------------
     <BLANKLINE>
     Shutting down server.

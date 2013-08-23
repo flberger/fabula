@@ -54,17 +54,17 @@ class App:
        App.assets_class
            Class of the asset engine to be used.
            This should be adjusted from the outside after creating
-           an App instance.
+           an App instance. Intially fabula.assets.Assets.
 
        App.user_interface_class
            Class of the user interface to be used.
            This should be adjusted from the outside after creating
-           an App instance.
+           an App instance. Initially fabula.plugins.ui.UserInterface.
 
        App.server_plugin_class
            Class of the server plugin to be used.
            This should be adjusted from the outside after creating
-           an App instance.
+           an App instance. Initially fabula.plugins.Plugin.
 
        App.file_handler
            The logging.FileHandler instance created in App._setup_file_logging().

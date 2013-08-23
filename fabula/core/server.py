@@ -28,6 +28,7 @@ import time
 import traceback
 import datetime
 import collections
+import itertools
 
 # TODO: Add a decent default server CLI.
 
@@ -50,8 +51,11 @@ class Server(fabula.core.Engine):
        Server.room_by_client
            A dict, mapping client identifiers to Room instances.
 
-       Server.message_for_all
-           Message to be broadcasted to all clients
+       Server.message_by_room_id
+           A dict of outgoing Messages, indexed by room identifier.
+
+       Server.message_timestamp
+           Timestamp for messages. Initially None.
 
        Server.exit_requested
            Flag to be changed by signal handler
@@ -72,6 +76,10 @@ class Server(fabula.core.Engine):
         #
         self.logfile_name = "messages-server-received.log"
 
+        # Timestamp for messages
+        #
+        self.message_timestamp = None
+
         # If framerate is 0, run as fast as possible
         #
         if framerate:
@@ -89,9 +97,9 @@ class Server(fabula.core.Engine):
         self.room_by_id = collections.OrderedDict()
         self.room_by_client = {}
 
-        # Message to be broadcasted to all clients
+        # Outgoing Messages, indexed by room identifier
         #
-        self.message_for_all = fabula.Message([])
+        self.message_by_room_id = {}
 
         # Flag to be changed by signal handler
         #
@@ -119,9 +127,11 @@ class Server(fabula.core.Engine):
         return
 
     def run(self):
-        """Main loop of the Server.
+        """Main method of the Server.
+
            This is a blocking method. It calls all the process methods to
            process events, and then the plugin.
+
            This method will print usage information and status reports to STDOUT.
         """
 
@@ -148,10 +158,6 @@ class Server(fabula.core.Engine):
 
         print("Press [Ctrl] + [C] to stop the server.")
 
-        # Local timestamp for messages
-        #
-        message_timestamp = None
-
         fabula.LOGGER.info("starting main loop")
 
         # MAIN LOOP
@@ -159,148 +165,7 @@ class Server(fabula.core.Engine):
         #
         while not self.exit_requested:
 
-            # Client connections may come and go. So rebuild the list of
-            # connections at every run.
-            #
-            connector_list = list(self.interface.connections.keys())
-
-            # Check if someone has left who is supposed to be there
-            #
-            for room in self.room_by_id.values():
-
-                # Create a list copy, for the same reason as above
-                #
-                active_list = list(room.active_clients.keys())
-
-                for connector in active_list:
-
-                    if not connector in connector_list:
-
-                        client_id = room.active_clients[connector]
-
-                        msg = "client '{}' {} has left without notice, removing"
-
-                        fabula.LOGGER.warning(msg.format(client_id, connector))
-
-                        self.process_ExitEvent(fabula.ExitEvent(client_id),
-                                               connector = connector)
-
-                        # Since we do this outside the loop, we have to clean
-                        # up to not confuse the next iteration
-                        #
-                        self.message_for_remote = fabula.Message([])
-
-                        self.message_for_all.event_list.append(fabula.DeleteEvent(client_id))
-
-            for connector in connector_list:
-
-                message = self.interface.connections[connector].grab_message()
-
-                if len(message.event_list):
-
-                    fabula.LOGGER.debug("{0} incoming: {1}".format(connector, message))
-
-                    # Log to logfile
-                    # TODO: this could be a method. But the we would have to maintain the message_timestamp in the instance.
-
-                    # Clear file and start Message log timer with first incoming
-                    # message
-                    #
-                    if message_timestamp is None:
-
-                        fabula.LOGGER.debug("Clearing log file")
-
-                        message_log_file = open(self.logfile_name, "wt")
-                        message_log_file.write("")
-                        message_log_file.close()
-
-                        fabula.LOGGER.debug("Starting message log timer")
-
-                        message_timestamp = datetime.datetime.today()
-
-                    message_log_file = open(self.logfile_name, "at")
-
-                    timedifference = datetime.datetime.today() - message_timestamp
-
-                    # Logging time difference in seconds and message, tab-separated,
-                    # terminated with double-newline.
-                    # timedifference as seconds + tenth of a second
-                    #
-                    message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
-                                                               repr(message)))
-
-                    message_log_file.close()
-
-                    # Renew timestamp
-                    #
-                    message_timestamp = datetime.datetime.today()
-
-                    for event in message.event_list:
-
-                        # TODO: most client implementations should be allowed to send a single event per turn only!
-                        # Otherwise, a long burst of events might unfairly
-                        # block other clients. (hint by Alexander Marbach)
-
-                        # Be sceptical. Only accept typical client events.
-                        # TODO: Include fabula.ChangePropertyEvent?
-                        #
-                        if isinstance(event, (fabula.InitEvent,
-                                              fabula.ExitEvent,
-                                              fabula.AttemptEvent,
-                                              fabula.SaysEvent)):
-
-                            # This is a bit of Python magic.
-                            # self.event_dict is a dict which maps classes to
-                            # handling functions. We use the class of the event
-                            # supplied as a key to call the appropriate handler, and
-                            # hand over the event.
-                            # These methods may add events for the plugin engine
-                            # to self.message_for_plugin
-                            #
-                            # connector is not needed by all methods, but to
-                            # avoid splitting this beautiful call we submit
-                            # it to all of them.
-                            #
-                            self.event_dict[event.__class__](event,
-                                                             message = self.message_for_plugin,
-                                                             connector = connector)
-
-                        else:
-                            # Looks like the Client sent an Event typically
-                            # issued by the Server. Let the Plugin handle that.
-                            #
-                            fabula.LOGGER.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
-
-                            self.message_for_plugin.event_list.append(event)
-
-                        # Contrary to the Client, the Server calls its plugin
-                        # engine on an event-by-event rather than on a
-                        # message-by-message base to allow for quick and
-                        # real-time reaction.
-
-                        self.call_plugin(connector)
-
-                        # process next event in message from this client
-
-                else:
-                    # len(message.event_list) == 0
-                    # Call Plugin anyway to catch Plugin initiated Events
-                    # self.message_for_plugin is already set to an empty Message
-                    #
-                    self.call_plugin(connector)
-
-                # read from next client message_buffer
-
-            # There is no need to run as fast as possible.
-            # We slow it down a bit to prevent high CPU load.
-            # Interval between loops has been computed from
-            # framerate given.
-            #
-            time.sleep(self.interval)
-
-            # reiterate over client connections
-            #
-            #fabula.LOGGER.info("reading client messages")
+            self._main_loop()
 
         # exit has been requested
         #
@@ -328,9 +193,168 @@ class Server(fabula.core.Engine):
 
         return
 
-    def call_plugin(self, connector):
-        """Call Plugin and process Plugin message.
-           Auxiliary method.
+    def _main_loop(self):
+        """Auxiliary method. Execute the main loop of the server once.
+        """
+
+        # Client connections may come and go. So rebuild the list of
+        # connections at every run.
+        #
+        connector_list = list(self.interface.connections.keys())
+
+        self._check_exit(connector_list)
+
+        for connector in connector_list:
+
+            message = self.interface.connections[connector].grab_message()
+
+            if len(message.event_list):
+
+                fabula.LOGGER.debug("'{0}' incoming: {1}".format(connector, message))
+
+                self._write_logfile(message)
+
+                for event in message.event_list:
+
+                    # TODO: most client implementations should be allowed to send a single event per turn only!
+                    # Otherwise, a long burst of events might unfairly
+                    # block other clients. (hint by Alexander Marbach)
+
+                    # Be sceptical. Only accept typical client events.
+                    # TODO: Include fabula.ChangePropertyEvent?
+                    #
+                    if isinstance(event, (fabula.InitEvent,
+                                          fabula.ExitEvent,
+                                          fabula.AttemptEvent,
+                                          fabula.SaysEvent)):
+
+                        # This is a bit of Python magic.
+                        # self.event_dict is a dict which maps classes to
+                        # handling functions. We use the class of the event
+                        # supplied as a key to call the appropriate handler, and
+                        # hand over the event.
+                        # These methods may add events for the plugin engine
+                        # to self.message_for_plugin
+                        #
+                        # connector is not needed by all methods, but to
+                        # avoid splitting this beautiful call we submit
+                        # it to all of them.
+                        #
+                        self.event_dict[event.__class__](event,
+                                                         message = self.message_for_plugin,
+                                                         connector = connector)
+
+                    else:
+                        # Looks like the Client sent an Event typically
+                        # issued by the Server. Let the Plugin handle that.
+                        #
+                        fabula.LOGGER.warning("'{}' is no typical client event, forwarding to Plugin".format(event.__class__.__name__))
+
+                        self.message_for_plugin.event_list.append(event)
+
+                    # Contrary to the Client, the Server calls its plugin
+                    # on an event-by-event rather than on a
+                    # message-by-message base to allow for quick and
+                    # real-time reaction.
+
+                    self._call_plugin(connector)
+
+                    # process next event in message from this client
+
+            else:
+                # len(message.event_list) == 0
+                # Call Plugin anyway to catch Plugin initiated Events
+                # self.message_for_plugin is already set to an empty Message
+                #
+                self._call_plugin(connector)
+
+            # read from next client message_buffer
+
+        # There is no need to run as fast as possible.
+        # We slow it down a bit to prevent high CPU load.
+        # Interval between loops has been computed from
+        # framerate given.
+        #
+        time.sleep(self.interval)
+
+        # reiterate over client connections
+        #
+        #fabula.LOGGER.info("reading client messages")
+
+        return
+
+    def _check_exit(self, connector_list):
+        """Auxiliary method. Check if someone has left who is supposed to be there.
+        """
+
+        for room in self.room_by_id.values():
+
+            # Create a list copy, for the same reason as above
+            #
+            active_list = list(room.active_clients.keys())
+
+            for connector in active_list:
+
+                if not connector in connector_list:
+
+                    client_id = room.active_clients[connector]
+
+                    msg = "client '{}' {} has left without notice, removing"
+
+                    fabula.LOGGER.warning(msg.format(client_id, connector))
+
+                    self.process_ExitEvent(fabula.ExitEvent(client_id),
+                                           connector = connector)
+
+                    # Since we do this outside the loop, we have to clean
+                    # up to not confuse the next iteration
+                    #
+                    self.message_for_remote = fabula.Message([])
+
+                    self._add_event_to_room_message(fabula.DeleteEvent(client_id), room)
+
+        return
+
+    def _write_logfile(self, message):
+        """Auxiliary method. Log to logfile.
+        """
+
+        # Clear file and start Message log timer with first incoming
+        # message
+        #
+        if self.message_timestamp is None:
+
+            fabula.LOGGER.debug("Clearing log file")
+
+            message_log_file = open(self.logfile_name, "wt")
+            message_log_file.write("")
+            message_log_file.close()
+
+            fabula.LOGGER.debug("Starting message log timer")
+
+            self.message_timestamp = datetime.datetime.today()
+
+        message_log_file = open(self.logfile_name, "at")
+
+        timedifference = datetime.datetime.today() - self.message_timestamp
+
+        # Logging time difference in seconds and message, tab-separated,
+        # terminated with double-newline.
+        # timedifference as seconds + tenth of a second
+        #
+        message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
+                                                   repr(message)))
+
+        message_log_file.close()
+
+        # Renew timestamp
+        #
+        self.message_timestamp = datetime.datetime.today()
+
+        return
+
+    def _call_plugin(self, connector):
+        """Auxiliary method. Call Plugin and process Plugin message.
         """
 
         # Put in a method to avoid duplication.
@@ -364,122 +388,187 @@ class Server(fabula.core.Engine):
         #
         if self.message_for_remote.event_list:
 
-            # Looking for room now, might not exist at start of method
-            #
-            room = None
+            if not len(self.room_by_id):
 
-            for current_room in self.room_by_id.values():
+                msg = "The plugin has not established any rooms. Cannot continue."
 
-                if connector in current_room.active_clients.keys():
+                fabula.LOGGER.critical(msg)
 
-                    room = current_room
+                raise RuntimeError(msg)
 
-            if room is None:
+            # Sort Events by Room
 
-                fabula.LOGGER.warning("connector '{}' is not an active client in any room of {}, no current room found".format(connector, list(self.room_by_id.values())))
-
-            fabula.LOGGER.debug("{0} outgoing: {1}".format(connector,
-                                                           self.message_for_remote))
-
-            try:
-                self.interface.connections[connector].send_message(self.message_for_remote)
-
-            except KeyError:
-
-                msg = "connection to client '{}' not found, could not send Message"
-
-                fabula.LOGGER.error(msg.format(connector))
-
-            ### Build broadcast message for all clients
-
-            # Triple flag:
-            # True: skip on EnterRoomEvent
-            # "now": now skip all events
-            # False: stop skipping
-            #
-            skip_room_events = False
-
-            # TODO: Skipping is not all too clever. There might be SpawnEvents that should go to all clients but are missed now.
-            # TODO: The following ifs and loops can surely be optimized.
-            #
-            for event in self.message_for_remote.event_list:
-
-                if isinstance(event, fabula.RoomCompleteEvent):
-
-                    fabula.LOGGER.info("found RoomCompleteEvent, will skip room events")
-
-                    skip_room_events = True
-
-            if not skip_room_events:
-
-                fabula.LOGGER.info("no RoomCompleteEvent found, will broadcast all events")
+            entered_room_id = None
 
             for event in self.message_for_remote.event_list:
 
-                if (skip_room_events
-                    and isinstance(event, fabula.EnterRoomEvent)):
+                if isinstance(event, fabula.EnterRoomEvent):
 
-                    fabula.LOGGER.info("EnterRoomEvent found, starting to skip")
+                    entered_room_id = event.room_identifier
 
-                    skip_room_events = "now"
+                    self._add_event_to_room_message(event)
 
-                elif (skip_room_events == "now"
-                      and isinstance(event, fabula.SpawnEvent)
-                      and room is not None
-                      and event.entity.identifier == room.active_clients[connector]):
+                elif isinstance(event, fabula.RoomCompleteEvent):
 
-                    fabula.LOGGER.debug("SpawnEvent for current player entity '{}' while skipping, broadcasting this one".format(event.entity.identifier))
+                    if entered_room_id is not None:
 
-                    self.message_for_all.event_list.append(event)
+                        self._add_event_to_room_message(event, self.room_by_id[entered_room_id])
 
-                elif (skip_room_events == "now"
-                      and isinstance(event, fabula.RoomCompleteEvent)):
-
-                    fabula.LOGGER.info("RoomCompleteEvent found, stopping to skip")
-
-                    skip_room_events = False
-
-                elif not skip_room_events == "now":
-
-                    if event.__class__ in [fabula.DropsEvent,
-                                           fabula.MovesToEvent,
-                                           fabula.PicksUpEvent,
-                                           fabula.SaysEvent,
-                                           fabula.SpawnEvent,
-                                           fabula.DeleteEvent,
-                                           fabula.ChangePropertyEvent,
-                                           fabula.ChangeMapElementEvent,
-                                           fabula.CanSpeakEvent,
-                                           fabula.ManipulatesEvent,
-                                           fabula.PerceptionEvent]:
-
-                        # TODO: Is this Event type filter still necessary? We check identifiers in the Client. Most of them.
-
-                        self.message_for_all.event_list.append(event)
+                        entered_room_id = None
 
                     else:
-                        fabula.LOGGER.warning("Event not in whitelist for broadcasting, discarding: {}".format(event))
+                        msg = "No EnterRoomEvent preceding {}".format(event)
 
-            # Only send self.message_for_all when not empty
-            #
-            if (len(self.message_for_all.event_list)
-                and room is not None):
+                        fabula.LOGGER.error(msg)
 
-                fabula.LOGGER.debug("message for all clients in current room: {}".format(self.message_for_all.event_list))
+                        raise RuntimeError(msg)
 
-                for active_connector in room.active_clients.keys():
+                elif isinstance(event, fabula.DeleteEvent):
 
-                    # Leave out current client which already has reveived the
-                    # events above.
+                    # NOTE: HACK: as the Entity is already removed from all rooms, we have no way of knowing where it was before. So add DeleteEvent to all rooms.
                     #
-                    if not active_connector == connector:
+                    map(self._add_event_to_room_message,
+                        itertools.repeat(event),
+                        self.room_by_id.values())
 
-                        self.interface.connections[active_connector].send_message(self.message_for_all)
+                else:
+
+                    self._add_event_to_room_message(event)
+
+            # Now process each room's message
+            #
+            for room_identifier, room_message in self.message_by_room_id.items():
+
+                # Find active clients and build a message for each client
+                #
+                client_message_dict = {}
+
+                for client_identifier in self.room_by_id[room_identifier].active_clients.values():
+
+                    client_message_dict[client_identifier] = fabula.Message([])
+
+                # Sort this room's events into client messages. Not everyone
+                # might get the same ones.
+
+                single_client = None
+
+                for event in room_message.event_list:
+
+                    if isinstance(event, fabula.EnterRoomEvent):
+
+                        single_client = event.client_identifier
+
+                        client_message_dict[single_client].event_list.append(event)
+
+                    elif isinstance(event, fabula.RoomCompleteEvent):
+
+                        client_message_dict[single_client].event_list.append(event)
+
+                        single_client = None
+
+                    else:
+
+                        if single_client is None:
+
+                            # That's for all, folks
+                            #
+                            for message in client_message_dict.values():
+
+                                message.event_list.append(event)
+
+                        else:
+
+                            client_message_dict[single_client].event_list.append(event)
+
+                # Now. Off with them!
+                #
+                for connector, client_identifier in self.room_by_id[room_identifier].active_clients.items():
+
+                    message = client_message_dict[client_identifier]
+
+                    if len(message.event_list):
+
+                        fabula.LOGGER.debug("'{0}' outgoing: {1}".format(connector,
+                                                                         message))
+
+                        try:
+                            self.interface.connections[connector].send_message(message)
+
+                        except KeyError:
+
+                            msg = "connection to client '{}' not found, could not send Message"
+
+                            fabula.LOGGER.error(msg.format(connector))
 
         # Clean up
         #
         self.message_for_remote = fabula.Message([])
-        self.message_for_all = fabula.Message([])
+        self.message_by_room_id = {}
+
+        return
+
+    def _add_event_to_room_message(self, event, room = None):
+        """Add event to the respective Message in Server.message_by_room_id.
+
+           If room is not given, it will be inferred from the event.
+        """
+
+        if room is None:
+
+            fabula.LOGGER.debug("No room given, trying to infer from event")
+
+            if (isinstance(event, fabula.SpawnEvent)
+                  or isinstance(event, fabula.ChangeMapElementEvent)):
+
+                # Assuming Event.location == (x, y, "room_identifier")
+                #
+                room = self.room_by_id[event.location[2]]
+
+            elif isinstance(event, fabula.EnterRoomEvent):
+
+                # Room should be established
+                #
+                room = self.room_by_id[event.room_identifier]
+
+            elif isinstance(event, fabula.ServerParametersEvent):
+
+                room = self.room_by_client[event.client_identifier]
+
+            elif "identifier" in event.__dict__.keys():
+
+                for current_room in self.room_by_id.values():
+
+                    if event.identifier in current_room.entity_dict.keys():
+
+                        room = current_room
+
+                if room is None:
+
+                    msg = "Identifier '{}' of Event {} not found in any room: {}"
+
+                    msg = msg.format(event.identifier,
+                                     event,
+                                     [str(room) for room in self.room_by_id.values()])
+
+                    fabula.LOGGER.error(msg)
+
+                    raise RuntimeError(msg)
+
+            else:
+                msg = "No Room found that fits Event {}".format(event)
+
+                fabula.LOGGER.error(msg)
+
+                raise RuntimeError(msg)
+
+            fabula.LOGGER.debug("Inferred Room '{}' for Event {}".format(room.identifier, event))
+
+        if room.identifier in self.message_by_room_id.keys():
+
+            self.message_by_room_id[room.identifier].event_list.append(event)
+
+        else:
+            self.message_by_room_id[room.identifier] = fabula.Message([event])
 
         return
 
@@ -539,7 +628,7 @@ class Server(fabula.core.Engine):
 
         fabula.LOGGER.info("sending Server parameters")
 
-        self.message_for_remote.event_list.append(fabula.ServerParametersEvent(self.action_time))
+        self.message_for_remote.event_list.append(fabula.ServerParametersEvent(event.identifier, self.action_time))
 
         if len(self.room_by_id):
 
@@ -823,28 +912,28 @@ class Server(fabula.core.Engine):
 
         # Check target
         #
-        elif event.target_identifier not in room.floor_plan:
+        elif event.target_identifier[:2] not in room.floor_plan:
 
-            fabula.LOGGER.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier, event.item_identifier))
-
-            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
-
-            return
-
-        elif room.floor_plan[event.target_identifier].tile.tile_type != fabula.FLOOR:
-
-            fabula.LOGGER.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier, event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier[:2], event.item_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
             return
 
-        # If event.target_identifier has at least one Entity on it, replace
-        # target_identifier with the first Entity's identifier.
+        elif room.floor_plan[event.target_identifier[:2]].tile.tile_type != fabula.FLOOR:
+
+            fabula.LOGGER.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier[:2], event.item_identifier))
+
+            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+            return
+
+        # If event.target_identifier[:2] has at least one Entity on it, replace
+        # target_identifier[:2] with the first Entity's identifier.
         #
-        if len(room.floor_plan[event.target_identifier].entities):
+        if len(room.floor_plan[event.target_identifier[:2]].entities):
 
-            target_identifier = room.floor_plan[event.target_identifier].entities[0].identifier
+            target_identifier = room.floor_plan[event.target_identifier[:2]].entities[0].identifier
 
             event = fabula.TriesToDropEvent(event.identifier,
                                             event.item_identifier,

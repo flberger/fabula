@@ -7,8 +7,15 @@ TCP Networking
     >>> import fabula.interfaces.python_tcp
     >>> import fabula.run
     >>> from time import sleep
+    >>> class DummyServerPlugin(fabula.plugins.Plugin):
+    ...     def process_InitEvent(self, event, **kwargs):
+    ...         self.message_for_host.event_list.extend([fabula.EnterRoomEvent(client_identifier = event.identifier,
+    ...                                                                       room_identifier = "dummy_room"),
+    ...                                                  fabula.RoomCompleteEvent()])
+    ...         return
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 10)
+    ...     app.server_plugin_class = DummyServerPlugin
     ...     interface = fabula.interfaces.python_tcp.TCPServerInterface()
     ...     app.run_server(60, interface, 0.5, threadsafe = True)
     ...
