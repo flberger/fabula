@@ -37,8 +37,11 @@ Server.room_by_id
 Server.room_by_client
     A dict, mapping client identifiers to Room instances.
 
-Server.message_for_all
-    Message to be broadcasted to all clients
+Server.message_by_room_id
+    A dict of outgoing Messages, indexed by room identifier.
+
+Server.message_timestamp
+    Timestamp for messages. Initially None.
 
 Server.exit_requested
     Flag to be changed by signal handler</pre>
@@ -60,13 +63,7 @@ Server.exit_requested
     
     <td>Method</td>
     <td><a href="fabula.core.server.Server.html#run">run</a></td>
-    <td><span class="undocumented">No summary</span></td>
-  </tr><tr class="method">
-    
-    
-    <td>Method</td>
-    <td><a href="fabula.core.server.Server.html#call_plugin">call_plugin</a></td>
-    <td><tt>Call Plugin and process Plugin message. Auxiliary method.</tt></td>
+    <td><tt>Main method of the Server.</tt></td>
   </tr><tr class="method">
     
     
@@ -169,6 +166,36 @@ Server.exit_requested
     <td>Method</td>
     <td><a href="fabula.core.server.Server.html#process_ExitEvent">process_ExitEvent</a></td>
     <td><tt>Handle ExitEvent. Items that the player has picked up will be kept in self.rack.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#_main_loop">_main_loop</a></td>
+    <td><tt>Auxiliary method. Execute the main loop of the server once.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#_check_exit">_check_exit</a></td>
+    <td><tt>Auxiliary method. Check if someone has left who is supposed to be there.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#_write_logfile">_write_logfile</a></td>
+    <td><tt>Auxiliary method. Log to logfile.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#_call_plugin">_call_plugin</a></td>
+    <td><tt>Auxiliary method. Call Plugin and process Plugin message.</tt></td>
+  </tr><tr class="method private">
+    
+    
+    <td>Method</td>
+    <td><a href="fabula.core.server.Server.html#_add_event_to_room_message">_add_event_to_room_message</a></td>
+    <td><tt>Add event to the respective Message in Server.message_by_room_id.</tt></td>
   </tr>
   
 </table>
@@ -316,28 +343,103 @@ If threadsafe is True (default), no signal handlers are installed.</pre>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overrides <a href="fabula.core.Engine.html#run">fabula.core.Engine.run</a></div>
-    <pre>Main loop of the Server.
+    <pre>Main method of the Server.
+
 This is a blocking method. It calls all the process methods to
 process events, and then the plugin.
+
 This method will print usage information and status reports to STDOUT.</pre>
   </div>
 </div><div class="function">
-  <a name="fabula.core.server.Server.call_plugin">
+  <a name="fabula.core.server.Server._main_loop">
     
   </a>
-  <a name="call_plugin">
+  <a name="_main_loop">
     
   </a>
   <div class="functionHeader">
     
     def
-    call_plugin(self, connector):
+    _main_loop(self):
     
   </div>
   <div class="functionBody">
     
-    <pre>Call Plugin and process Plugin message.
-Auxiliary method.</pre>
+    <pre>Auxiliary method. Execute the main loop of the server once.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server._check_exit">
+    
+  </a>
+  <a name="_check_exit">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    _check_exit(self, connector_list):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Auxiliary method. Check if someone has left who is supposed to be there.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server._write_logfile">
+    
+  </a>
+  <a name="_write_logfile">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    _write_logfile(self, message):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Auxiliary method. Log to logfile.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server._call_plugin">
+    
+  </a>
+  <a name="_call_plugin">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    _call_plugin(self, connector):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Auxiliary method. Call Plugin and process Plugin message.
+        </pre>
+  </div>
+</div><div class="function">
+  <a name="fabula.core.server.Server._add_event_to_room_message">
+    
+  </a>
+  <a name="_add_event_to_room_message">
+    
+  </a>
+  <div class="functionHeader">
+    
+    def
+    _add_event_to_room_message(self, event, room=None):
+    
+  </div>
+  <div class="functionBody">
+    
+    <pre>Add event to the respective Message in Server.message_by_room_id.
+
+If room is not given, it will be inferred from the event.</pre>
   </div>
 </div><div class="function">
   <a name="fabula.core.server.Server.handle_exit">
@@ -656,7 +758,7 @@ Items that the player has picked up will be kept in self.rack.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-08-18 22:17:03.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-08-23 16:48:07.
     </address>
   </body>
 </html>
