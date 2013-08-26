@@ -160,7 +160,7 @@ class App:
 
         return
 
-    def run_server(self, framerate, interface, action_time, threadsafe = False):
+    def run_server(self, framerate, interface, action_time, ipaddress = "0.0.0.0", threadsafe = False):
         """Run a Fabula server with the parameters given.
         """
 
@@ -176,6 +176,7 @@ class App:
         server = fabula.core.server.Server(interface,
                                            framerate,
                                            action_time,
+                                           ipaddress,
                                            threadsafe)
 
         plugin = self.server_plugin_class(server)

@@ -45,6 +45,9 @@ class Server(fabula.core.Engine):
            The time between actions that do not happen instantly.
            Used by the Server Plugin.
 
+       Server.ipaddress
+           A string holding the IP address to listen on. Initially "0.0.0.0".
+
        Server.room_by_id
            A collections.OrderedDict, mapping room identifiers to Room instances.
 
@@ -61,7 +64,12 @@ class Server(fabula.core.Engine):
            Flag to be changed by signal handler
      """
 
-    def __init__(self, interface_instance, framerate, action_time, threadsafe = True):
+    def __init__(self,
+                 interface_instance,
+                 framerate,
+                 action_time,
+                 ipaddress = "0.0.0.0",
+                 threadsafe = True):
         """Initialise the Server.
            If threadsafe is True (default), no signal handlers are installed.
         """
@@ -91,6 +99,8 @@ class Server(fabula.core.Engine):
         # Server Plugin.
         #
         self.action_time = action_time
+
+        self.ipaddress = ipaddress
 
         # The server manages multiple rooms
         #
@@ -140,9 +150,8 @@ class Server(fabula.core.Engine):
         print("------------------------------------------------------------\n")
 
         # Listen on port 0xfab == 4011 :-)
-        # TODO: retrieve connector from somewhere
         #
-        connector = ("0.0.0.0", 4011)
+        connector = (self.ipaddress, 4011)
 
         fabula.LOGGER.info("attempting to connect server interface to '{}'".format(connector))
 

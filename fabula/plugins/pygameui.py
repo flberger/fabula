@@ -24,10 +24,11 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
-# TODO: always diplay and log full paths of saved or loaded files
+# TODO: Make screen resolution and tile size configurable
+# TODO: always display and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
 # TODO: Make PygameEditor Tkinter based, with multiple windows. Use planes.gui only for in-game-GUI.
-# TODO: ESC key should not end the game, but open a generic menu for setup and quitting the game
+# TODO: Ctrl+Q should not end the game, but open a generic menu for setup and quitting the game
 # TODO: support three layers: background layer (for parallax scrolling etc.), main layer and overlay layer (for clouds, sunbeams etc.)
 
 import fabula.plugins.ui
@@ -558,8 +559,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Create inventory plane.
         #
         self.inventory_plane = planes.Plane("inventory",
-                                                pygame.Rect((0, 500), (800, 100)),
-                                                dropped_upon_callback = self.inventory_callback)
+                                            pygame.Rect((0, 500), (800, 100)),
+                                            dropped_upon_callback = self.inventory_callback)
 
         self.inventory_plane.image.fill((64, 64, 64))
 
@@ -635,12 +636,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # with 0x0 pixels. The final Plane will be created by process_RoomCompleteEvent().
         #
         self.window.sub(planes.Plane("room",
-                                         pygame.Rect((0, 0), (0, 0))))
+                                     pygame.Rect((0, 0), (0, 0))))
 
         # Create a subplane as a sort-of buffer for Tiles.
         #
         self.window.room.sub(planes.Plane("tiles",
-                                              pygame.Rect((0, 0), (0, 0))))
+                                          pygame.Rect((0, 0), (0, 0))))
 
         # Initialise on screen display.
         #
