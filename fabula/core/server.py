@@ -520,6 +520,10 @@ class Server(fabula.core.Engine):
         """Add event to the respective Message in Server.message_by_room_id.
 
            If room is not given, it will be inferred from the event.
+
+           This method will raise a RuntimeError if no fitting room can
+           be found. Make sure to calls this only for events for which a room
+           can be found.
         """
 
         if room is None:
@@ -634,6 +638,35 @@ class Server(fabula.core.Engine):
         """Check if we already have a room and entities. If yes, send the data. If not, pass on to the plugin.
         """
         # TODO: update docstring
+
+        # A guard clause first.
+        #
+        if event.identifier in self.room_by_client.keys():
+
+            msg = "Client id '{}' already exists in room_by_client == {}, sending ExitEvent at once and terminating connection"
+
+            fabula.LOGGER.warning(msg.format(event.identifier,
+                                             self.room_by_client))
+
+            try:
+                self.interface.connections[kwargs["connector"]].send_message(fabula.Message([fabula.ExitEvent(event.identifier)]))
+
+            except KeyError:
+
+                msg = "connection to client '{}' not found, could not send Message"
+
+                fabula.LOGGER.error(msg.format(kwargs["connector"]))
+
+            fabula.LOGGER.debug("removing interface.connections[{}]".format(kwargs["connector"]))
+
+            try:
+                del self.interface.connections[kwargs["connector"]]
+
+            except KeyError:
+
+                fabula.LOGGER.warning("connection {} is already gone".format(kwargs["connector"]))
+
+            return
 
         fabula.LOGGER.info("sending Server parameters")
 
