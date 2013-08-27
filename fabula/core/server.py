@@ -524,10 +524,10 @@ class Server(fabula.core.Engine):
 
         if room is None:
 
-            fabula.LOGGER.debug("No room given, trying to infer from event")
+            fabula.LOGGER.debug("No room given, trying to infer from Event {}".format(event))
 
             if (isinstance(event, fabula.SpawnEvent)
-                  or isinstance(event, fabula.ChangeMapElementEvent)):
+                or isinstance(event, fabula.ChangeMapElementEvent)):
 
                 # Assuming Event.location == (x, y, "room_identifier")
                 #
@@ -570,7 +570,7 @@ class Server(fabula.core.Engine):
 
                 raise RuntimeError(msg)
 
-            fabula.LOGGER.debug("Inferred Room '{}' for Event {}".format(room.identifier, event))
+            fabula.LOGGER.debug("Inferred Room '{}'".format(room.identifier))
 
         if room.identifier in self.message_by_room_id.keys():
 
@@ -665,7 +665,7 @@ class Server(fabula.core.Engine):
 
                 tile = room.floor_plan[tuple].tile
 
-                change_map_element_event = fabula.ChangeMapElementEvent(tile, tuple)
+                change_map_element_event = fabula.ChangeMapElementEvent(tile, tuple + (room.identifier, ))
 
                 # TODO: It's not very clean to write to self.message_for_remote directly since the procces_() methods are not supposed to do so.
                 #
