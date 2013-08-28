@@ -522,7 +522,7 @@ class Server(fabula.core.Engine):
            If room is not given, it will be inferred from the event.
 
            This method will raise a RuntimeError if no fitting room can
-           be found. Make sure to calls this only for events for which a room
+           be found. Make sure to call this only for events for which a room
            can be found.
         """
 
@@ -709,7 +709,7 @@ class Server(fabula.core.Engine):
                 entity = room.entity_dict[identifier]
 
                 spawn_event = fabula.SpawnEvent(entity,
-                                                room.entity_locations[identifier])
+                                                room.entity_locations[identifier] + (room.identifier, ))
 
                 self.message_for_remote.event_list.append(spawn_event)
 
@@ -734,7 +734,7 @@ class Server(fabula.core.Engine):
                     # picked up in an instant anyway.
                     #
                     spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                                    list(room.floor_plan.keys())[0])
+                                                    list(room.floor_plan.keys())[0] + (room.identifier, ))
 
                     self.message_for_remote.event_list.append(spawn_event)
 
