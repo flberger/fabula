@@ -30,6 +30,7 @@
 # TODO: Make PygameEditor Tkinter based, with multiple windows. Use planes.gui only for in-game-GUI.
 # TODO: Ctrl+Q should not end the game, but open a generic menu for setup and quitting the game
 # TODO: support three layers: background layer (for parallax scrolling etc.), main layer and overlay layer (for clouds, sunbeams etc.)
+# TODO: actually honour input_dict["mouse"] == False, i.e. disable mouse
 
 import fabula.plugins.ui
 import pygame
@@ -486,13 +487,16 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            space for 8 100x100 px icons and located at the bottom of the window.
     """
 
-    def __init__(self, assets, framerate, host, fullscreen = False, mousescroll = False):
+    def __init__(self, assets, framerate, host, input = "mouse", fullscreen = False, mousescroll = False):
         """This method initialises the PygameUserInterface.
 
            assets must be an instance of fabula.Assets or a subclass.
 
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run at.
+
+           input must be a string which is a key in UserInterface.input_dict.
+           PygameUserInterface.input_dict[input] will be set to True.
 
            fullscreen is a Boolean flag.
 
@@ -506,7 +510,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                                  assets,
                                                  framerate,
                                                  host,
-                                                 fullscreen)
+                                                 input = input,
+                                                 fullscreen = fullscreen)
 
         fabula.LOGGER.debug("called")
 
@@ -1000,24 +1005,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                     # Rest will be handled by display_single_frame()
 
-#            elif (self.host.room is not None
-#                  and event.type == pygame.KEYDOWN
-#                  and event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d)):
-#
-#                fabula.LOGGER.debug("got key '{}' from user, returning TriesToMoveToEvent".format(event.key))
-#
-#                surrounding_positions = fabula.surrounding_positions(self.host.room.entity_locations[self.host.client_id])
-#
-#                event = fabula.TriesToMoveEvent(self.host.client_id,
-#                                                {pygame.K_w : surrounding_positions[1],
-#                                                 pygame.K_d : surrounding_positions[3],
-#                                                 pygame.K_s : surrounding_positions[5],
-#                                                 pygame.K_a : surrounding_positions[7],
-#                                                 }[event.key])
-#
-#                # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
-#                #
-#                self.message_for_host.event_list.append(event)
+            elif (self.host.room is not None
+                  and self.input_dict["keyboard"]
+                  and event.type == pygame.KEYDOWN
+                  and event.key in (pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d)):
+
+                fabula.LOGGER.debug("got key '{}' from user, returning TriesToMoveToEvent".format(event.key))
+
+                surrounding_positions = fabula.surrounding_positions(self.host.room.entity_locations[self.host.client_id])
+
+                event = fabula.TriesToMoveEvent(self.host.client_id,
+                                                {pygame.K_w : surrounding_positions[1],
+                                                 pygame.K_d : surrounding_positions[3],
+                                                 pygame.K_s : surrounding_positions[5],
+                                                 pygame.K_a : surrounding_positions[7],
+                                                 }[event.key])
+
+                # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
+                #
+                self.message_for_host.event_list.append(event)
 
         self.window.process(events)
 

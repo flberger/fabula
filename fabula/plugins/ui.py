@@ -43,6 +43,11 @@ class UserInterface(fabula.plugins.Plugin):
        UserInterface.assets
            framerate and assets manager
 
+       UserInterface.input_dict
+           A dict mapping input methods to boolean flags, indicating which
+           input methods will be used by the client instance.
+           Initially {"mouse" : False, "keyboard" : False}
+
        UserInterface.action_frames
            The number of frames per action. This can only be set when a
            ServerParametersEvent has been received, so it is initially None.
@@ -66,11 +71,17 @@ class UserInterface(fabula.plugins.Plugin):
     ####################
     # Initialization
 
-    def __init__(self, assets, framerate, host, fullscreen = False):
+    def __init__(self, assets, framerate, host, input = "mouse", fullscreen = False):
         """This method initialises the UserInterface.
+
            assets must be an instance of fabula.Assets or a subclass.
+
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run in.
+
+           input must be a string which is a key in UserInterface.input_dict.
+           UserInterface.input_dict[input] will be set to True.
+
            fullscreen is a Boolean flag that indicates whether the game should
            run in a window or use the full screen. Its effect is implementation
            dependent.
@@ -87,12 +98,16 @@ class UserInterface(fabula.plugins.Plugin):
 
         # See docstring
         #
+        self.input_dict = {"mouse" : False, "keyboard" : False}
+        self.input_dict[input] = True
+
+        # See docstring
+        #
         self.action_frames = None
 
-        # Since it represents the GUI, the UserInterface
-        # is responsible for catching an
-        # exit request by the user. This value is
-        # checked in the Client main loop.
+        # Since it represents the GUI, the UserInterface is responsible for
+        # catching an exit request by the user. This value is checked in the
+        # Client main loop.
         # TODO: maybe return self.exit_requested along with client events in a tuple
         #
         self.exit_requested = False

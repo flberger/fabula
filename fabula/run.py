@@ -112,7 +112,7 @@ class App:
 
         return
 
-    def run_client(self, framerate, interface):
+    def run_client(self, framerate, interface, input = "mouse"):
         """Run a Fabula client with the parameters given.
         """
 
@@ -143,7 +143,8 @@ class App:
         plugin = self.user_interface_class(assets,
                                            framerate,
                                            client,
-                                           fullscreen)
+                                           input = input,
+                                           fullscreen = fullscreen)
 
         client.set_plugin(plugin)
 
@@ -258,7 +259,7 @@ class App:
 
         return
 
-    def run_standalone(self, framerate, action_time):
+    def run_standalone(self, framerate, action_time, input = "mouse"):
         """Run Fabula client and server on the local machine.
         """
 
@@ -301,7 +302,8 @@ class App:
         user_interface = self.user_interface_class(assets,
                                                    framerate,
                                                    client,
-                                                   fullscreen)
+                                                   input = input,
+                                                   fullscreen = fullscreen)
 
         client.set_plugin(user_interface)
 
