@@ -199,6 +199,8 @@
 # TODO: efficient, packed UDP protocol with bookkeeping.
 #
 # TODO: fuzzing tool for the Fabula protocol
+#
+# TODO: client and server logfile gets mixed up when running in threads in one process, as in 'multiple_clients.txt' doctest. Investigage and separate by using different loggers. Fix multiple clients doctest to use threads and print to STDOUT after that.
 
 # Fabula will not work with Python versions prior to 3.x.
 #

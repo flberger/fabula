@@ -1,0 +1,56 @@
+Doctests for the Fabula Package
+==============================
+
+Multiple Clients
+----------------
+
+    >>> import fabula.interfaces.python_tcp
+    >>> import fabula.run
+    >>> import fabula.plugins.serverside
+    >>> from time import sleep
+    >>> f = open("default.floorplan", "wt")
+    >>> # NOTE: Each PLAYER Entity name must correspond to a later client id
+    >>> f.write("(0, 0)\tFLOOR\tdummy_asset\tFirst_Client,PLAYER,True,True,dummy_asset\n")
+    67
+    >>> f.write("(1, 0)\tFLOOR\tdummy_asset\tSecond_Client,PLAYER,True,True,dummy_asset\n")
+    68
+    >>> f.close()
+    >>> def run_server():
+    ...     app = fabula.run.App(timeout = 20)
+    ...     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
+    ...     interface = fabula.interfaces.python_tcp.TCPServerInterface()
+    ...     app.run_server(60, interface, 0.5, threadsafe = True)
+    ...
+    >>> def client_factory(client_identifier):
+    ...     class MultipleClientsUI(fabula.plugins.ui.UserInterface):
+    ...         def get_connection_details(self):
+    ...             fabula.LOGGER.info('returning ("{}", ("127.0.0.1", 4011))'.format(client_identifier))
+    ...             return(client_identifier, ("127.0.0.1", 4011))
+    ...         def collect_player_input(self):
+    ...             pass
+    ...     def run_client():
+    ...         app = fabula.run.App()
+    ...         app.user_interface_class = MultipleClientsUI
+    ...         interface = fabula.interfaces.python_tcp.TCPClientInterface()
+    ...         app.run_client(60, interface)
+    ...     return run_client
+    ...
+    >>> import multiprocessing
+    >>> server_process = multiprocessing.Process(target = run_server)
+    >>> first_client_process = multiprocessing.Process(target = client_factory("First_Client"))
+    >>> second_client_process = multiprocessing.Process(target = client_factory("Second_Client"))
+    >>> double_client_process = multiprocessing.Process(target = client_factory("Second_Client"))
+    >>> server_process.start()
+    >>> sleep(5)
+    >>> first_client_process.start()
+    >>> sleep(5)
+    >>> second_client_process.start()
+    >>> sleep(5)
+    >>> double_client_process.start()
+    >>> first_client_process.join()
+    >>> second_client_process.join()
+    >>> double_client_process.join()
+    >>> server_process.join()
+    >>> import os
+    >>> os.remove("default.floorplan")
+    >>>

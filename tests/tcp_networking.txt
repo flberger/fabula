@@ -27,7 +27,7 @@ TCP Networking
     ...         pass
     ...
     >>> def run_client():
-    ...     app = fabula.run.App(timeout = 5)
+    ...     app = fabula.run.App()
     ...     app.user_interface_class = TCPUI
     ...     interface = fabula.interfaces.python_tcp.TCPClientInterface()
     ...     app.run_client(60, interface)

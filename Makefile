@@ -97,6 +97,9 @@ doctest: clean
 	echo --------------------------- && \
 	$(PYTHON) -m doctest tests/multiple_rooms.txt && \
 	echo --------------------------- && \
+	echo Testing  tests/multiple_clients.txt && \
+	echo --------------------------- && \
+	$(PYTHON) -m doctest tests/multiple_clients.txt && \
 	echo Done testing. && \
 	echo ---------------------------
 
@@ -104,9 +107,9 @@ user_install:
 	$(PYTHON) setup.py install --user --record user_install-filelist.txt
 
 sdist:
-	@# On April 14, 2011 11:34am, Xandar Kablandar (eternalcheesecake) hinted at 
-	@# symbolic links in the .tar.bz2 file. These are stored by --formats=bztar 
-	@# but not by --formats=zip. Since there is no setup.py option to dereference 
+	@# On April 14, 2011 11:34am, Xandar Kablandar (eternalcheesecake) hinted at
+	@# symbolic links in the .tar.bz2 file. These are stored by --formats=bztar
+	@# but not by --formats=zip. Since there is no setup.py option to dereference
 	@# symbolic links, we only use zip for the time being.
 	@# Filed issue 12585 at http://bugs.python.org for this.
 	@#

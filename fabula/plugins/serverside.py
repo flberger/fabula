@@ -42,7 +42,7 @@ def load_room_from_file(filename, complete = True):
 
        The file must consist of lines of tab-separated elements:
 
-       (x, y)    tile_type    tile_asset_desc    entity_type,identifier,entity_asset_desc
+       (x, y)    tile_type    tile_asset_desc    identifier,entity_type,blocking,mobile,asset_desc
 
        Note that this example uses spaces in place of TABs.
     """

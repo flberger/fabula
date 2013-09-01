@@ -487,7 +487,7 @@ class Client(fabula.core.Engine):
 
         # exit has been requested
 
-        fabula.LOGGER.info("exit requested from UserInterface")
+        fabula.LOGGER.info("exit requested via plugin.exit_requested")
 
         fabula.LOGGER.info("sending ExitEvent to Server")
 
