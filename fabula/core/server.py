@@ -465,6 +465,8 @@ class Server(fabula.core.Engine):
 
                     if isinstance(event, fabula.EnterRoomEvent):
 
+                        # Start collecting messages for single client only
+                        #
                         single_client = event.client_identifier
 
                         client_message_dict[single_client].event_list.append(event)
@@ -473,7 +475,22 @@ class Server(fabula.core.Engine):
 
                         client_message_dict[single_client].event_list.append(event)
 
+                        # Stop collecting messages for single client only
+                        #
                         single_client = None
+
+                    # TODO: re-check the multiple room entity.id == client_id convention, and possibly make that visible in attribute names
+                    #
+                    elif (isinstance(event, fabula.SpawnEvent)
+                          and single_client is not None
+                          and event.entity.identifier == single_client):
+
+                            # This is supposed to be the SpawnEvent for the
+                            # new player - send to all
+                            #
+                            for message in client_message_dict.values():
+
+                                message.event_list.append(event)
 
                     else:
 
