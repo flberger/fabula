@@ -616,6 +616,10 @@ class DefaultGame(fabula.plugins.Plugin):
 
         surrounding_positions = fabula.surrounding_positions(player_location)
 
+        # Include own position to allow drop on self
+        #
+        surrounding_positions += [player_location]
+
         # Server.process_TriesToDropEvent() has already done some checks,
         # so we can be sure that target_identifier is either a valid
         # coordinate tuple or an instance of fabula.Entity.

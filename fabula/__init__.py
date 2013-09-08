@@ -174,6 +174,7 @@
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
 #
 # TODO: invisible audio Entites for music
+# TODO: implement API to change Entity attributes als blocking, mobile.
 #
 # TODO: thin clients for performance tests, bug hunting, unit tests. replace client plugin with a player of recorded scripts, for example, similar to replay interface.
 # TODO: maybe it's enough to implement a replay interface for client data in the server interface.
