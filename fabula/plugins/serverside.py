@@ -525,7 +525,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
             fabula.LOGGER.warning("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
 
-            fabula.LOGGER.warning("AttemptFailed for '{}'".format(event.identifier))
+            fabula.LOGGER.info("AttemptFailed for '{}'".format(event.identifier))
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         else:

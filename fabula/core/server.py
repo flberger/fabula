@@ -436,9 +436,7 @@ class Server(fabula.core.Engine):
 
                     # NOTE: HACK: as the Entity is already removed from all rooms, we have no way of knowing where it was before. So add DeleteEvent to all rooms.
                     #
-                    map(self._add_event_to_room_message,
-                        itertools.repeat(event),
-                        self.room_by_id.values())
+                    [self._add_event_to_room_message(event, current_room) for current_room in self.room_by_id.values()]
 
                 else:
 
