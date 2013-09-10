@@ -602,6 +602,22 @@ class DefaultGame(fabula.plugins.Plugin):
         """If the target is an Entity, forward to respond(). If the target is a position, create a DropsEvent.
         """
 
+        # Server.process_TriesToDropEvent() has already done some checks,
+        # so we can be sure that target_identifier is either a valid
+        # coordinate tuple or an instance of fabula.Entity.
+        #
+        if event.target_identifier in self.host.rack.entity_dict.keys():
+
+            fabula.LOGGER.debug("target '{}' is an entity identifier in Rack".format(event.target_identifier))
+
+            fabula.LOGGER.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
+
+            self.respond(event)
+
+            return
+
+        # Not in Rack - try to infer a Room.
+        #
         room = None
 
         for current_room in self.host.room_by_id.values():
@@ -620,13 +636,9 @@ class DefaultGame(fabula.plugins.Plugin):
         #
         surrounding_positions += [player_location]
 
-        # Server.process_TriesToDropEvent() has already done some checks,
-        # so we can be sure that target_identifier is either a valid
-        # coordinate tuple or an instance of fabula.Entity.
-        #
         if event.target_identifier in room.entity_dict.keys():
 
-            fabula.LOGGER.debug("target '{}' is an entity identifier".format(event.target_identifier))
+            fabula.LOGGER.debug("target '{}' is an entity identifier in room '{}'".format(event.target_identifier, room.identifier))
 
             if room.entity_locations[event.target_identifier] not in surrounding_positions:
 
@@ -643,47 +655,49 @@ class DefaultGame(fabula.plugins.Plugin):
                 fabula.LOGGER.info("'{}' dropped on Entity '{}', forwarding to respond()".format(event.item_identifier, event.target_identifier))
                 self.respond(event)
 
-        else:
-            fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier[:2]))
+            return
 
-            if event.target_identifier[:2] not in surrounding_positions:
+        fabula.LOGGER.debug("target '{}' is not an entity identifier".format(event.target_identifier[:2]))
 
-                fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier[:2], surrounding_positions))
-                self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
+        if event.target_identifier[:2] not in surrounding_positions:
 
-            else:
-                # Still, the Entity to be dropped may originate either from Room
-                # or from Rack.
-                #
-                entity = None
+            fabula.LOGGER.info("AttemptFailed: drop of '{}' on {} not next to player: {}".format(event.item_identifier, event.target_identifier[:2], surrounding_positions))
+            self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
-                if event.item_identifier not in self.host.rack.entity_dict.keys():
+            return
 
-                    fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
+        # Still, the Entity to be dropped may originate either from Room or
+        # from Rack.
+        #
+        entity = None
 
-                    self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
-                                                                                event.item_identifier))
+        if event.item_identifier not in self.host.rack.entity_dict.keys():
 
-                    entity = room.entity_dict[event.item_identifier]
+            fabula.LOGGER.info("item still in Room, returning PicksUpEvent")
 
-                fabula.LOGGER.info("returning DropsEvent")
+            self.message_for_host.event_list.append(fabula.PicksUpEvent(event.identifier,
+                                                                        event.item_identifier))
 
-                self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                          event.item_identifier,
-                                                                          event.target_identifier[:2]))
+            entity = room.entity_dict[event.item_identifier]
 
-                if entity is None:
+        fabula.LOGGER.info("returning DropsEvent")
 
-                    entity = self.host.rack.entity_dict[event.item_identifier]
+        self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                  event.item_identifier,
+                                                                  event.target_identifier[:2]))
 
-                # Check if the dropped Entity is blocking, and if so, block
-                # the spot internally
-                #
-                if entity.blocking:
+        if entity is None:
 
-                    fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier[:2]))
+            entity = self.host.rack.entity_dict[event.item_identifier]
 
-                    self.taken_locations.append(event.target_identifier[:2])
+        # Check if the dropped Entity is blocking, and if so, block
+        # the spot internally
+        #
+        if entity.blocking:
+
+            fabula.LOGGER.debug("adding target '{}' to the list of taken locations".format(event.target_identifier[:2]))
+
+            self.taken_locations.append(event.target_identifier[:2])
 
         return
 

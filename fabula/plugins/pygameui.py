@@ -1804,10 +1804,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             plane.draggable = True
 
-            # Make insensitive to drops
-            #
-            plane.dropped_upon_callback = None
-
         else:
             fabula.LOGGER.debug("this does not affect the player entity, will delete item Plane from window.room")
 
@@ -2046,9 +2042,33 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
+        target_identifier = None
+
+        if plane.name in self.host.room.entity_dict.keys():
+
+            # Although we know the Entity, the server determines what if being
+            # looked at. So send target identifiers instead of Entity
+            # identifiers.
+            #
+            target_identifier = self.host.room.entity_locations[plane.name]
+
+        elif plane.name in self.host.rack.entity_dict.keys():
+
+            host_plane = self.inventory_plane
+
+            # Use the identifier, as the Rack has no location
+            #
+            target_identifier = plane.name
+
+        else:
+
+            fabula.LOGGER.error("Entity '{}' neither in rack nor room".format(plane.name))
+
+            raise RuntimeError("Entity '{}' neither in rack nor room".format(plane.name))
+
         event = fabula.TriesToDropEvent(self.host.client_id,
                                         dropped_plane.name,
-                                        self.host.room.entity_locations[plane.name])
+                                        target_identifier)
 
         self.message_for_host.event_list.append(event)
 
@@ -2060,64 +2080,78 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
-        if plane.name not in self.host.room.entity_dict.keys():
+        host_plane = None
 
-            fabula.LOGGER.debug("'{}' not in Room, ignoring right click".format(plane.name))
+        if plane.name in self.host.room.entity_dict.keys():
 
-        else:
-
-            # One
-            #
-            icon_plane = self.attempt_icon_planes[0]
-
-            icon_plane.rect.center = (plane.rect.center[0] - 35,
-                                      plane.rect.center[1])
-
-            # Sync position to Entity plane
-            #
-            icon_plane.sync(plane)
-
-            # This will remove and re-add the Plane to room.
-            # <3 planes :-)
-            #
-            self.window.room.sub(icon_plane)
-
-            # Two
-            #
-            icon_plane = self.attempt_icon_planes[1]
-
-            icon_plane.rect.center = (plane.rect.center[0] + 35,
-                                      plane.rect.center[1])
-
-            icon_plane.sync(plane)
-
-            self.window.room.sub(icon_plane)
-
-            # Three
-            #
-            icon_plane = self.attempt_icon_planes[2]
-
-            icon_plane.rect.center = (plane.rect.center[0],
-                                      plane.rect.center[1] - 35)
-
-            icon_plane.sync(plane)
-
-            self.window.room.sub(icon_plane)
-
-            # Four
-            #
-            icon_plane = self.attempt_icon_planes[3]
-
-            icon_plane.rect.center = (plane.rect.center[0],
-                                      plane.rect.center[1] + 35)
-
-            icon_plane.sync(plane)
-
-            self.window.room.sub(icon_plane)
+            host_plane = self.window.room
 
             # Save Entity
             #
             self.right_clicked_entity = self.host.room.entity_dict[plane.name]
+
+        elif plane.name in self.host.rack.entity_dict.keys():
+
+            host_plane = self.inventory_plane
+
+            # Save Entity
+            #
+            self.right_clicked_entity = self.host.rack.entity_dict[plane.name]
+
+        else:
+
+            fabula.LOGGER.error("No Entity named '{}' in rack or room".format(plane.name))
+
+            raise RuntimeError("No Entity named '{}' in rack or room".format(plane.name))
+
+        # One
+        #
+        icon_plane = self.attempt_icon_planes[0]
+
+        icon_plane.rect.center = (plane.rect.center[0] - 35,
+                                  plane.rect.center[1])
+
+        # Sync position to Entity plane
+        #
+        icon_plane.sync(plane)
+
+        # This will remove and re-add the Plane to room.
+        # <3 planes :-)
+        #
+        host_plane.sub(icon_plane)
+
+        # Two
+        #
+        icon_plane = self.attempt_icon_planes[1]
+
+        icon_plane.rect.center = (plane.rect.center[0] + 35,
+                                  plane.rect.center[1])
+
+        icon_plane.sync(plane)
+
+        host_plane.sub(icon_plane)
+
+        # Three
+        #
+        icon_plane = self.attempt_icon_planes[2]
+
+        icon_plane.rect.center = (plane.rect.center[0],
+                                  plane.rect.center[1] - 35)
+
+        icon_plane.sync(plane)
+
+        host_plane.sub(icon_plane)
+
+        # Four
+        #
+        icon_plane = self.attempt_icon_planes[3]
+
+        icon_plane.rect.center = (plane.rect.center[0],
+                                  plane.rect.center[1] + 35)
+
+        icon_plane.sync(plane)
+
+        host_plane.sub(icon_plane)
 
         return
 
@@ -2127,32 +2161,57 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         fabula.LOGGER.debug("called")
 
+        host_plane = None
+
         event = None
 
-        # Although we know the Entity, the server determines what if being
-        # looked at. So send target identifiers instead of Entity identifiers.
+        target_identifier = None
+
+        if self.right_clicked_entity.identifier in self.host.room.entity_dict.keys():
+
+            host_plane = self.window.room
+
+            # Although we know the Entity, the server determines what if being
+            # looked at. So send target identifiers instead of Entity
+            # identifiers.
+            #
+            target_identifier = self.host.room.entity_locations[self.right_clicked_entity.identifier]
+
+        elif self.right_clicked_entity.identifier in self.host.rack.entity_dict.keys():
+
+            host_plane = self.inventory_plane
+
+            # Use the identifier, as the Rack has no location
+            #
+            target_identifier = self.right_clicked_entity.identifier
+
+        else:
+
+            fabula.LOGGER.error("Cached right click Entity '{}' neither in rack nor room".format(self.right_clicked_entity.identifier))
+
+            raise RuntimeError("Cached right click Entity '{}' neither in rack nor room".format(self.right_clicked_entity.identifier))
 
         if plane.name == "attempt_manipulate":
 
             event = fabula.TriesToManipulateEvent(self.host.client_id,
-                                                  self.host.room.entity_locations[self.right_clicked_entity.identifier])
+                                                  target_identifier)
 
         elif plane.name == "attempt_talk_to":
 
             event = fabula.TriesToTalkToEvent(self.host.client_id,
-                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
+                                              target_identifier)
 
         elif plane.name == "attempt_look_at":
 
             event = fabula.TriesToLookAtEvent(self.host.client_id,
-                                              self.host.room.entity_locations[self.right_clicked_entity.identifier])
+                                              target_identifier)
 
         # Remove icons in any case. This also works if the "cancel" icon was
         # clicked.
         #
         for icon_plane in self.attempt_icon_planes:
 
-            self.window.room.remove(icon_plane)
+            host_plane.remove(icon_plane)
 
             # Don't forget to unsync position
             #

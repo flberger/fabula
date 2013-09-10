@@ -774,40 +774,52 @@ class Server(fabula.core.Engine):
 
         room = None
 
-        for current_room in self.room_by_id.values():
+        if (event.target_identifier in self.rack.entity_dict.keys()
+            and self.rack.owner_dict[event.target_identifier] == event.identifier):
 
-            if event.identifier in current_room.entity_dict.keys():
-
-                room = current_room
-
-        if room is not None and event.target_identifier in room.floor_plan:
-
-            new_events = [event]
-            entities = room.floor_plan[event.target_identifier].entities
-
-            for entity in entities:
-
-                event.target_identifier = entity.identifier
-
-                new_events = [event,
-                              fabula.LookedAtEvent(entity.identifier,
-                                                   event.identifier)]
-
-            fabula.LOGGER.info("forwarding event(s)")
-            kwargs["message"].event_list.extend(new_events)
+            # Pass to plugin unchanged
+            #
+            kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.info("AttemptFailed: {} not in floor_plan".format(event.target_identifier))
 
-            # Issue AttemptFailed to unblock client.
+            # Not in Rack - try to infer a Room.
             #
-            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+            for current_room in self.room_by_id.values():
+
+                if event.identifier in current_room.entity_dict.keys():
+
+                    room = current_room
+
+            if room is not None and event.target_identifier in room.floor_plan:
+
+                # Pick last Entity
+                #
+                event.target_identifier = room.floor_plan[event.target_identifier].entities[-1].identifier
+
+                fabula.LOGGER.info("forwarding event(s)")
+
+                kwargs["message"].event_list.append(event)
+
+                kwargs["message"].event_list.append(fabula.LookedAtEvent(event.target_identifier,
+                                                                         event.identifier))
+
+            else:
+                fabula.LOGGER.info("AttemptFailed: {} neither in Rack nor Room".format(event.target_identifier))
+
+                # Issue AttemptFailed to unblock client.
+                #
+                kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         return
 
     def process_TriesToTalkToEvent(self, event, **kwargs):
         """Check who is being talked to and forward the Event.
+
+           It is not supported to talk to Entites that are currently in the Rack.
         """
+
+        # NOTE: not checking for an attempt to talk to something in Rack.
 
         room = None
 
@@ -852,41 +864,48 @@ class Server(fabula.core.Engine):
 
         # TODO: duplicate from / similar to process_TriesToLookAtEvent
 
-        new_event = None
-
         room = None
 
-        for current_room in self.room_by_id.values():
+        if (event.target_identifier in self.rack.entity_dict.keys()
+            and self.rack.owner_dict[event.target_identifier] == event.identifier):
 
-            if event.identifier in current_room.entity_dict.keys():
-
-                room = current_room
-
-        # TODO: contracts...
-        #
-        if room is not None and event.target_identifier in room.floor_plan:
-
-            for entity in room.floor_plan[event.target_identifier].entities:
-
-                if entity.entity_type == fabula.ITEM:
-
-                    new_event = fabula.TriesToManipulateEvent(event.identifier,
-                                                              entity.identifier)
-                else:
-                    fabula.LOGGER.info("Entity type '{}' can not be manipulated".format(entity.entity_type))
-
-
-        if new_event == None:
-
-            fabula.LOGGER.info("AttemptFailed for {}".format(event))
-
-            # Issue AttemptFailed to unblock client.
+            # Pass to plugin unchanged
             #
-            kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+            kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.info("forwarding event")
-            kwargs["message"].event_list.append(new_event)
+
+            # Not in Rack - try to infer a Room.
+            #
+            for current_room in self.room_by_id.values():
+
+                if event.identifier in current_room.entity_dict.keys():
+
+                    room = current_room
+
+            # TODO: contracts...
+            #
+            if room is not None and event.target_identifier in room.floor_plan:
+
+                for entity in room.floor_plan[event.target_identifier].entities:
+
+                    if entity.entity_type == fabula.ITEM:
+
+                        event.target_identifier = entity.identifier
+
+                    else:
+                        fabula.LOGGER.debug("Entity type '{}' can not be manipulated".format(entity.entity_type))
+
+                fabula.LOGGER.info("forwarding event")
+
+                kwargs["message"].event_list.append(event)
+
+            else:
+                fabula.LOGGER.info("AttemptFailed for {}".format(event))
+
+                # Issue AttemptFailed to unblock client.
+                #
+                kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
         return
 
@@ -944,6 +963,8 @@ class Server(fabula.core.Engine):
            If the item is not in Rack (but in Room), the event is forwarded to the Plugin to decide what to do.
            If the Entity who tries to drop the item from Rack does not own it, the attempt fails.
            If there is another Entity on the tile, it is marked as the target.
+           If the target is in Rack and the Entity does not own it, the attempt fails.
+           If the target is in Rack and the Entity owns it, the event is forwarded to the Plugin to decide what to do.
            In any other case, the Event is forwarded to the Plugin.
         """
 
@@ -953,6 +974,25 @@ class Server(fabula.core.Engine):
 
         room = None
 
+        if event.target_identifier in self.rack.entity_dict.keys():
+
+            if self.rack.owner_dict[event.target_identifier] == event.identifier:
+
+                # Pass to plugin unchanged
+                #
+                kwargs["message"].event_list.append(event)
+
+                return
+
+            else:
+                fabula.LOGGER.warning("AttemptFailed: '{}' does not own '{}' in Rack".format(event.identifier, event.target_identifier))
+
+                kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
+
+                return
+
+        # Not in Rack - try to infer a Room.
+        #
         for current_room in self.room_by_id.values():
 
             if event.identifier in current_room.entity_dict.keys():
