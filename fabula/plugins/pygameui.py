@@ -169,7 +169,7 @@ class PygameEntity(fabula.Entity):
        The value of PygameEntity.property_dict["caption"] will be displayed above the
        PygameEntity.
 
-       PygameEntity.asset is supposed to be an instance of EntityPlane.
+       PygameEntity.assets["image/png"].data is supposed to be an instance of EntityPlane.
 
        Additional attributes:
 
@@ -205,19 +205,21 @@ class PygameEntity(fabula.Entity):
         """Instruct the EntityPlane with the movement.
         """
 
-        if self.asset.position_list:
+        # TODO: blindly assuming "image/png"
+        #
+        if self.assets["image/png"].data.position_list:
 
             # Take the last queued position as current
             #
-            current_x = self.asset.position_list[-1][0]
-            current_y = self.asset.position_list[-1][1]
+            current_x = self.assets["image/png"].data.position_list[-1][0]
+            current_y = self.assets["image/png"].data.position_list[-1][1]
 
         else:
             # Reference point is the bottom center of the image, which is
             # positioned at the bottom center of the tile
             #
-            current_x = self.asset.rect.centerx
-            current_y = self.asset.rect.bottom
+            current_x = self.assets["image/png"].data.rect.centerx
+            current_y = self.assets["image/png"].data.rect.bottom
 
         future_x = event.location[0] * self.spacing + int(self.spacing / 2)
         future_y = event.location[1] * self.spacing + self.spacing
@@ -243,11 +245,11 @@ class PygameEntity(fabula.Entity):
         #
         position_list.append((future_x, future_y))
 
-        self.asset.position_list.extend(position_list)
+        self.assets["image/png"].data.position_list.extend(position_list)
 
         # Animation
         #
-        if self.asset.spritesheet is not None:
+        if self.assets["image/png"].data.spritesheet is not None:
 
             # Compute direction from dx_per_frame and dy_per_frame.
             # See EntityPlane docstring for sprite sheet specifications.
@@ -278,9 +280,9 @@ class PygameEntity(fabula.Entity):
 
             # TODO: most of these need only be calculated once. This should be done once the asset is fetched. Given the asset doesn't change. Nah.
 
-            width = self.asset.spritesheet.get_width()
+            width = self.assets["image/png"].data.spritesheet.get_width()
 
-            offset = self.asset.rect.width
+            offset = self.assets["image/png"].data.rect.width
 
             repeat_frames = int(self.action_frames / int(width / offset))
 
@@ -303,7 +305,7 @@ class PygameEntity(fabula.Entity):
 
             repeat_count = 0
 
-            sprite_dimensions = self.asset.rect.size
+            sprite_dimensions = self.assets["image/png"].data.rect.size
 
             # Omit last step
             # TODO: copied from above, can this be moved into one single iteration?
@@ -321,7 +323,7 @@ class PygameEntity(fabula.Entity):
 
                     if offset > width - sprite_dimensions[0]:
 
-                        offset = self.asset.rect.width
+                        offset = self.assets["image/png"].data.rect.width
 
                     repeat_count = 0
 
@@ -330,7 +332,7 @@ class PygameEntity(fabula.Entity):
             subsurface_rect_list.append(pygame.Rect((0, row * sprite_dimensions[1]),
                                                     sprite_dimensions))
 
-            self.asset.subsurface_rect_list.extend(subsurface_rect_list)
+            self.assets["image/png"].data.subsurface_rect_list.extend(subsurface_rect_list)
 
         return
 
@@ -342,7 +344,11 @@ class PygameEntity(fabula.Entity):
         #
         fabula.Entity.process_ChangePropertyEvent(self, event)
 
-        if self.asset is not None and event.property_key == "caption":
+        # TODO: blindly assuming "image/png"
+        #
+        if ("image/png" in self.assets.keys()
+            and self.assets["image/png"].data is not None
+            and event.property_key == "caption"):
 
             # Do we already have a caption?
             #
@@ -371,21 +377,24 @@ class PygameEntity(fabula.Entity):
 
         if self.caption_plane is not None:
 
-            fabula.LOGGER.debug("aligning caption to midtop of Entity plane: {}".format(self.asset.rect.midtop))
+            # TODO: blindly assuming "image/png"
+            #
+            fabula.LOGGER.debug("aligning caption to midtop of Entity plane: {}".format(self.assets["image/png"].data.rect.midtop))
 
-            self.caption_plane.rect.center = self.asset.rect.midtop
+            self.caption_plane.rect.center = self.assets["image/png"].data.rect.midtop
 
             # Sync movements to asset Plane
             #
-            self.caption_plane.sync(self.asset)
+            self.caption_plane.sync(self.assets["image/png"].data)
 
-            # If we make the Label a subplane of the Entity.asset Plane,
-            # it will be cropped at the width of Entity.asset. This is not
-            # intended. So we make it a subplane of window.room, which is
-            # the parent of the asset.
+            # If we make the Label a subplane of the
+            # Entity.assets["image/png"].data Plane, it will be cropped at the
+            # width of Entity.assets["image/png"].data. This is not intended.
+            # So we make it a subplane of window.room, which is the parent of
+            # the asset.
             #
-            self.asset.parent.sub(self.caption_plane,
-                                  insert_after = self.asset.name)
+            self.assets["image/png"].data.parent.sub(self.caption_plane,
+                                                     insert_after = self.assets["image/png"].data.name)
 
         return
 
@@ -1296,7 +1305,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            The name of the subplane is the Entity identifier, so the subplane
            is accessible using window.room.<identifier>.
 
-           Entity.asset points to the Plane of the Entity.
+           Entity.assets["image/png"].data points to the Plane of the Entity.
 
            When a Plane has not yet been added, the Entity's class is changed
            to PygameEntity in addition.
@@ -1314,8 +1323,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # This is possibly a respawn from Rack, and the Entity already has
         # an asset.
+        # TODO: blindly assuming "image/png"
         #
-        if event.entity.asset is not None:
+        if ("image/png" in event.entity.assets.keys()
+            and event.entity.assets["image/png"].data is not None):
 
             msg = "Entity '{}' already has an asset, updating position to {}"
             fabula.LOGGER.info(msg.format(event.entity.identifier,
@@ -1324,12 +1335,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             x = event.location[0] * self.spacing + self.spacing / 2
             y = event.location[1] * self.spacing + self.spacing
 
-            event.entity.asset.rect.centerx = x
-            event.entity.asset.rect.bottom = y
+            event.entity.assets["image/png"].data.rect.centerx = x
+            event.entity.assets["image/png"].data.rect.bottom = y
 
             # Restore callback
             #
-            event.entity.asset.dropped_upon_callback = self.entity_dropped_callback
+            event.entity.assets["image/png"].data.dropped_upon_callback = self.entity_dropped_callback
 
         else:
             fabula.LOGGER.info("no asset for Entity '{}', attempting to fetch".format(event.entity.identifier))
@@ -1340,12 +1351,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             try:
                 # Get a file-like object from asset manager
                 #
-                file = self.assets.fetch(event.entity.asset_desc)
+                file = self.assets.fetch(event.entity.assets["image/png"].uri)
 
             except:
-                self.display_asset_exception(event.entity.asset_desc)
+                self.display_asset_exception(event.entity.assets["image/png"].uri)
 
-            self.display_loading_progress(event.entity.asset_desc)
+            self.display_loading_progress(event.entity.assets["image/png"].uri)
 
             # Replace with Surface from image file
             #
@@ -1365,12 +1376,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             spritesheet = None
 
-            if "fabulasheet" in event.entity.asset_desc:
+            if "fabulasheet" in event.entity.assets["image/png"].uri:
 
                 msg = "sprite sheet detected for Entity '{}', asset '{}'"
 
                 fabula.LOGGER.debug(msg.format(event.entity.identifier,
-                                               event.entity.asset_desc))
+                                               event.entity.assets["image/png"].uri))
 
                 # Save orignal surface containing the sheet
                 #
@@ -1401,7 +1412,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                     fabula.LOGGER.critical(msg)
 
-                    raise Exception(msg)
+                    raise RuntimeError(msg)
 
                 # Fix rect accordingly
                 #
@@ -1425,7 +1436,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Finally attach the Plane as the Entity's asset
             #
-            event.entity.asset = plane
+            event.entity.assets["image/png"].data = plane
 
             # The Entity must be able to react to Events. These reactions are
             # Pygame specific and are thus not covered in the basic fabula.Entity
@@ -1443,8 +1454,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # Oh well. Just swap.
                 #
                 fabula.LOGGER.debug("changing class of '{}' from {} to {}".format(event.entity.identifier,
-                                                                                event.entity.__class__,
-                                                                                PygameEntity))
+                                                                                  event.entity.__class__,
+                                                                                  PygameEntity))
 
                 event.entity.__class__ = PygameEntity
 
@@ -1457,8 +1468,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     pass
 
                 fabula.LOGGER.debug("changing class of '{}' from {} to bases {}".format(event.entity.identifier,
-                                                                                event.entity.__class__,
-                                                                                ExtendedEntity.__bases__))
+                                                                                        event.entity.__class__,
+                                                                                        ExtendedEntity.__bases__))
 
                 event.entity.__class__ = ExtendedEntity
 
@@ -1473,8 +1484,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Now there is a Plane for the Entity. Add to room.
         # This implicitly removes the Plane from the former parent plane.
         #
-        fabula.LOGGER.info("adding '{}' to window.room".format(event.entity.asset.name))
-        self.window.room.sub(event.entity.asset)
+        fabula.LOGGER.info("adding '{}' to window.room".format(event.entity.assets["image/png"].data.name))
+        self.window.room.sub(event.entity.assets["image/png"].data)
 
         # If the PygameEntity has a caption Plane, add it as well.
         #
@@ -1502,8 +1513,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def process_ChangeMapElementEvent(self, event):
         """Fetch asset and register/replace tile.
-           Tile.asset is the Pygame Surface since possibly multiple Planes must
-           be derived from a single Tile.
+           Tile.assets["image/png"].data is the Pygame Surface since possibly
+           multiple Planes must be derived from a single Tile.
         """
 
         fabula.LOGGER.debug("called")
@@ -1527,9 +1538,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if tile_from_list is None:
 
             fabula.LOGGER.error("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
-            raise Exception("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
+            raise RuntimeError("could not find tile {} in tile_list of room '{}'".format(event.tile, self.host.room.identifier))
 
-        if tile_from_list.asset is not None:
+        # TODO: blindly assuming "image/png"
+        #
+        if ("image/png" in tile_from_list.assets.keys()
+            and tile_from_list.assets["image/png"].data is not None):
 
             fabula.LOGGER.debug("tile already has an asset: {}".format(tile_from_list))
 
@@ -1542,12 +1556,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             try:
                 # Get a file-like object from asset manager
                 #
-                file = self.assets.fetch(tile_from_list.asset_desc)
+                file = self.assets.fetch(tile_from_list.assets["image/png"].uri)
 
             except:
-                self.display_asset_exception(tile_from_list.asset_desc)
+                self.display_asset_exception(tile_from_list.assets["image/png"].uri)
 
-            self.display_loading_progress(tile_from_list.asset_desc)
+            self.display_loading_progress(tile_from_list.assets["image/png"].uri)
 
             fabula.LOGGER.debug("loading Surface from {}".format(file))
 
@@ -1559,9 +1573,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             surface = surface.convert_alpha()
 
-            tile_from_list.asset = surface
+            tile_from_list.assets["image/png"].data = surface
 
-        # Now tile_from_list.asset is present
+        # Now tile_from_list.assets["image/png"].data is present
 
         # Do we already have a tile there?
         # Tiles are planes subplanes of self.window.room, indexed by their
@@ -1581,9 +1595,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Update image regardless whether the tile existed or not
         #
         fabula.LOGGER.debug("changing image for tile at {0} to {1}".format(str(event.location),
-                                                                           tile_from_list.asset))
+                                                                           tile_from_list.assets["image/png"].data))
 
-        self.window.room.tiles.subplanes[str(event.location)].image = tile_from_list.asset
+        self.window.room.tiles.subplanes[str(event.location)].image = tile_from_list.assets["image/png"].data
 
         return
 
@@ -1735,9 +1749,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         entity = self.host.room.entity_dict[event.identifier]
 
-        if entity.asset is not None \
-           and event.property_key == "caption" \
-           and not event.identifier + "_caption" in self.window.room.subplanes_list:
+        # TODO: blindly assuming "image/png"
+        #
+        if ("image/png" in entity.assets.keys()
+            and entity.assets["image/png"].data is not None
+            and event.property_key == "caption"
+            and not event.identifier + "_caption" in self.window.room.subplanes_list):
 
             fabula.LOGGER.debug("Entity '{}' has no caption yet, forwarding Event again".format(event.identifier))
 
@@ -1843,8 +1860,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                           background_color = (128, 128, 128, 0)))
 
             # Display above Entity
+            # TODO: blindly assuming "image/png"
             #
-            entity_rect = self.host.room.entity_dict[event.identifier].asset.rect
+            entity_rect = self.host.room.entity_dict[event.identifier].assets["image/png"].data.rect
 
             # Lower a bit, to make sure to touch the Entity.
             #
@@ -2263,8 +2281,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 # Catch a common error.
                 # TODO: Why does this happen?
+                # TODO: blindly assuming "image/png"
                 #
-                if entity.asset is None:
+                if ("image/png" in entity.assets.keys()
+                    and entity.assets["image/png"].data is None):
 
                     msg = "asset of Entity '{}' is None, cannot change draggable flag: {}"
 
@@ -2276,15 +2296,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                             if self.host.room.entity_locations[identifier] in surrounding_positions:
 
-                                entity.asset.draggable = True
+                                entity.assets["image/png"].data.draggable = True
 
                             else:
-                                entity.asset.draggable = False
+                                entity.assets["image/png"].data.draggable = False
 
                     else:
                         # Make sure it's not draggable
                         #
-                        entity.asset.draggable = False
+                        entity.assets["image/png"].data.draggable = False
 
         else:
             fabula.LOGGER.warning("'{}' not found in room, items are not made draggable".format(self.host.client_id))
@@ -2663,12 +2683,14 @@ class PygameEditor(PygameUserInterface):
                     # Cave: dummy asset description
                     #
                     tile = fabula.Tile(fabula.FLOOR,
-                                       "dummy asset for ({}, {})".format(x, y))
+                                       {"image/png": fabula.Asset("dummy asset for ({}, {})".format(x, y))})
 
                     rect = pygame.Rect((x * spacing, y * spacing),
                                        (spacing, spacing))
 
-                    tile.asset = fitted_surface.subsurface(rect)
+                    # TODO: blindly assuming "image/png"
+                    #
+                    tile.assets["image/png"].data = fitted_surface.subsurface(rect)
 
                     event = fabula.ChangeMapElementEvent(tile, (x, y))
 
@@ -2731,9 +2753,10 @@ class PygameEditor(PygameUserInterface):
                                       os.path.join(path, current_file))
 
                     # Send renamed Tile to Server
+                    # TODO: blindly assuming "image/png"
                     #
                     tile = fabula.Tile(self.host.room.floor_plan[(x, y)].tile.tile_type,
-                                       current_file)
+                                       {"image/png": fabula.Asset(current_file)})
 
                     event = fabula.ChangeMapElementEvent(tile, (x, y))
 
@@ -2746,18 +2769,19 @@ class PygameEditor(PygameUserInterface):
                     for entity in self.host.room.floor_plan[(x, y)].entities:
 
                         # TODO: make sure commas are not present in the other strings
+                        # TODO: blindly assuming "image/png"
                         #
                         argument_list = ",".join([entity.identifier,
                                                   entity.entity_type,
                                                   repr(entity.blocking),
                                                   repr(entity.mobile),
-                                                  entity.asset_desc])
+                                                  entity.assets["image/png"].uri])
 
                         entities_string = entities_string + "\t{}".format(argument_list)
 
                     roomfile.write("{}\t{}\t{}{}\n".format(repr((x, y)),
                                                            tile.tile_type,
-                                                           tile.asset_desc,
+                                                           tile.assets["image/png"].uri,
                                                            entities_string))
 
             roomfile.close()
@@ -2771,12 +2795,13 @@ class PygameEditor(PygameUserInterface):
 
                 # Create a new Entity which can be pickled by Event loggers
                 # TODO: still necessary?
+                # TODO: blindly assuming "image/png"
                 #
                 entity = fabula.Entity(identifier,
                                        self.host.room.entity_dict[identifier].entity_type,
                                        self.host.room.entity_dict[identifier].blocking,
                                        self.host.room.entity_dict[identifier].mobile,
-                                       self.host.room.entity_dict[identifier].asset_desc)
+                                       {"image/png": fabula.Asset(self.host.room.entity_dict[identifier].assets["image/png"].uri)})
 
                 event = fabula.SpawnEvent(entity,
                                          self.host.room.entity_locations[identifier])
@@ -2986,11 +3011,13 @@ class PygameEditor(PygameUserInterface):
 
             if image is not None:
 
+                # TODO: blindly assuming "image/png"
+                #
                 entity = fabula.Entity(identifier = entity_identifier,
                                        entity_type = {"ITEM": fabula.ITEM, "NPC": fabula.NPC}[entity_type],
                                        blocking = entity_blocking,
                                        mobile = entity_mobile,
-                                       asset_desc = filename)
+                                       assets = {"image/png": fabula.Asset(filename)})
 
                 fabula.LOGGER.info("adding Entity '{}'".format(entity_identifier))
 
@@ -3063,8 +3090,9 @@ class PygameEditor(PygameUserInterface):
             entity.mobile = entity_mobile
 
             # Update the properties Plane to show the changes
+            # TODO: blindly assuming "image/png"
             #
-            self.show_properties(entity.asset)
+            self.show_properties(entity.assets["image/png"].data)
 
         else:
             fabula.LOGGER.warning("Entity '{}' not found in entity_dict".format(entity_identifier))
@@ -3147,11 +3175,12 @@ class PygameEditor(PygameUserInterface):
 
         # The name of the clicked Plane is supposed to be a string representation
         # of a coordinate tuple.
+        # TODO: blindly assuming "image/png"
         #
         coordinates = eval(plane.name)
-        asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
+        uri = self.host.room.floor_plan[coordinates].tile.assets["image/png"].uri
 
-        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.OBSTACLE, asset_desc),
+        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.OBSTACLE, {"image/png": fabula.Asset(uri)}),
                                              coordinates)
 
         self.host.message_for_host.event_list.append(event)
@@ -3180,11 +3209,12 @@ class PygameEditor(PygameUserInterface):
 
         # The clicked Plane is the overlay. Its name is supposed to be a string
         # representation of a coordinate tuple plus "_overlay".
+        # TODO: blindly assuming "image/png"
         #
         coordinates = eval(plane.name.split("_overlay")[0])
-        asset_desc = self.host.room.floor_plan[coordinates].tile.asset_desc
+        uri = self.host.room.floor_plan[coordinates].tile.assets["image/png"].uri
 
-        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, asset_desc),
+        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, {"image/png": fabula.Asset(uri)}),
                                              coordinates)
 
         self.host.message_for_host.event_list.append(event)
@@ -3350,20 +3380,21 @@ class PygameEditor(PygameUserInterface):
                                                     background_color = (64, 64, 64),
                                                     text_color = (250, 250, 250)))
 
-        # Entity.asset
+        # Entity.assets
+        # TODO: blindly assuming "image/png"
         #
-        rect = pygame.Rect((0, 0), entity.asset.image.get_rect().size)
+        rect = pygame.Rect((0, 0), entity.assets["image/png"].data.image.get_rect().size)
 
         asset_plane = planes.Plane("asset", rect)
 
-        asset_plane.image = entity.asset.image
+        asset_plane.image = entity.assets["image/png"].data.image
 
         self.window.properties.sub(asset_plane)
 
         # Entity.asset_desc
         #
         self.window.properties.sub(planes.gui.Label("asset_desc",
-                                                    entity.asset_desc,
+                                                    entity.assets["image/png"].uri,
                                                     pygame.Rect((0, 0), (80, 25)),
                                                     background_color = (64, 64, 64),
                                                     text_color = (250, 250, 250)))
@@ -3422,10 +3453,13 @@ class PygameEditor(PygameUserInterface):
 
         for identifier in self.host.room.entity_locations.keys():
 
+            # TODO: blindly assuming "image/png"
+            #
             if (identifier != self.host.client_id
-                and self.host.room.entity_dict[identifier].asset is not None):
+                and "image/png" in self.host.room.entity_dict[identifier].assets.keys()
+                and self.host.room.entity_dict[identifier].assets["image/png"].data is not None):
 
-                self.host.room.entity_dict[identifier].asset.draggable = True
+                self.host.room.entity_dict[identifier].assets["image/png"].data.draggable = True
 
         return
 

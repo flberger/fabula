@@ -73,7 +73,7 @@ def load_room_from_file(filename, complete = True):
 
         coordiantes_string = splitted_line.pop(0)
         type = splitted_line.pop(0)
-        asset_desc = splitted_line.pop(0)
+        tile_uri = splitted_line.pop(0)
 
         location = None
 
@@ -81,7 +81,9 @@ def load_room_from_file(filename, complete = True):
         #
         if fabula.str_is_tuple(coordiantes_string):
 
-            tile = fabula.Tile(type, asset_desc)
+            # TODO: Blindly assuming content type "image/png"
+            #
+            tile = fabula.Tile(type, {"image/png": fabula.Asset(tile_uri)})
 
             location = eval(coordiantes_string) + (room_identifier, )
 
@@ -101,7 +103,7 @@ def load_room_from_file(filename, complete = True):
             #
             for comma_sep_entity in splitted_line:
 
-                identifier, entity_type, blocking, mobile, asset_desc = comma_sep_entity.split(",")
+                identifier, entity_type, blocking, mobile, entity_uri = comma_sep_entity.split(",")
 
                 if blocking in ("True", "False"):
 
@@ -117,11 +119,13 @@ def load_room_from_file(filename, complete = True):
                 else:
                     mobile = True
 
+                # TODO: Blindly assuming content type "image/png"
+                #
                 entity = fabula.Entity(identifier,
                                        entity_type,
                                        blocking,
                                        mobile,
-                                       asset_desc)
+                                       {"image/png": fabula.Asset(entity_uri)})
 
                 event_list.append(fabula.SpawnEvent(entity, location))
 

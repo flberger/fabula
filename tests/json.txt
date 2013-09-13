@@ -9,216 +9,234 @@ Excluding passive Events.
     >>> import fabula
     >>> print(fabula.Event("identifier").json())
     {
-        "class": "Event", 
+        "class": "Event",
         "identifier": "identifier"
     }
     >>> print(fabula.TriesToMoveEvent("identifier", (0, 1)).json())
     {
-        "class": "TriesToMoveEvent", 
-        "identifier": "identifier", 
+        "class": "TriesToMoveEvent",
+        "identifier": "identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.TriesToLookAtEvent("identifier", (0, 1)).json())
     {
-        "class": "TriesToLookAtEvent", 
-        "identifier": "identifier", 
+        "class": "TriesToLookAtEvent",
+        "identifier": "identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.TriesToPickUpEvent("identifier", (0, 1)).json())
     {
-        "class": "TriesToPickUpEvent", 
-        "identifier": "identifier", 
+        "class": "TriesToPickUpEvent",
+        "identifier": "identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.TriesToDropEvent("identifier", "item_identifier", (0, 1)).json())
     {
-        "class": "TriesToDropEvent", 
-        "identifier": "identifier", 
-        "item_identifier": "item_identifier", 
+        "class": "TriesToDropEvent",
+        "identifier": "identifier",
+        "item_identifier": "item_identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.TriesToManipulateEvent("identifier", (0, 1)).json())
     {
-        "class": "TriesToManipulateEvent", 
-        "identifier": "identifier", 
+        "class": "TriesToManipulateEvent",
+        "identifier": "identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.TriesToTalkToEvent("identifier", (0, 1)).json())
     {
-        "class": "TriesToTalkToEvent", 
-        "identifier": "identifier", 
+        "class": "TriesToTalkToEvent",
+        "identifier": "identifier",
         "target_identifier": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.MovesToEvent("identifier", (0, 1)).json())
     {
-        "class": "MovesToEvent", 
-        "identifier": "identifier", 
+        "class": "MovesToEvent",
+        "identifier": "identifier",
         "location": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.PicksUpEvent("identifier", "item_identifier").json())
     {
-        "class": "PicksUpEvent", 
-        "identifier": "identifier", 
+        "class": "PicksUpEvent",
+        "identifier": "identifier",
         "item_identifier": "item_identifier"
     }
     >>> print(fabula.DropsEvent("identifier", "item_identifier", (0, 1)).json())
     {
-        "class": "DropsEvent", 
-        "identifier": "identifier", 
-        "item_identifier": "item_identifier", 
+        "class": "DropsEvent",
+        "identifier": "identifier",
+        "item_identifier": "item_identifier",
         "location": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.CanSpeakEvent("identifier", ["sentences", "is", "a", "list", "of", "strings"]).json())
     {
-        "class": "CanSpeakEvent", 
-        "identifier": "identifier", 
+        "class": "CanSpeakEvent",
+        "identifier": "identifier",
         "sentences": [
-            "sentences", 
-            "is", 
-            "a", 
-            "list", 
-            "of", 
+            "sentences",
+            "is",
+            "a",
+            "list",
+            "of",
             "strings"
         ]
     }
     >>> print(fabula.AttemptFailedEvent("identifier").json())
     {
-        "class": "AttemptFailedEvent", 
+        "class": "AttemptFailedEvent",
         "identifier": "identifier"
     }
     >>> print(fabula.PerceptionEvent("identifier", "perception").json())
     {
-        "class": "PerceptionEvent", 
-        "identifier": "identifier", 
+        "class": "PerceptionEvent",
+        "identifier": "identifier",
         "perception": "perception"
     }
     >>> print(fabula.ManipulatesEvent("identifier", "item_identifier").json())
     {
-        "class": "ManipulatesEvent", 
-        "identifier": "identifier", 
+        "class": "ManipulatesEvent",
+        "identifier": "identifier",
         "item_identifier": "item_identifier"
     }
     >>> print(fabula.InitEvent("identifier").json())
     {
-        "class": "InitEvent", 
+        "class": "InitEvent",
         "identifier": "identifier"
     }
     >>> print(fabula.ExitEvent("identifier").json())
     {
-        "class": "ExitEvent", 
+        "class": "ExitEvent",
         "identifier": "identifier"
     }
     >>> print(fabula.SaysEvent("identifier", "text").json())
     {
-        "class": "SaysEvent", 
-        "identifier": "identifier", 
+        "class": "SaysEvent",
+        "identifier": "identifier",
         "text": "text"
     }
     >>> print(fabula.ChangePropertyEvent("identifier", "property_key", "property_value").json())
     {
-        "class": "ChangePropertyEvent", 
-        "identifier": "identifier", 
-        "property_key": "property_key", 
+        "class": "ChangePropertyEvent",
+        "identifier": "identifier",
+        "property_key": "property_key",
         "property_value": "property_value"
     }
-    >>> entity = fabula.Entity("identifier", fabula.ITEM, False, True, "entity.asset")
+    >>> entity = fabula.Entity("identifier", fabula.ITEM, False, True, {"text/plain": fabula.Asset("entity.txt")})
     >>> print(entity.json())
     {
-        "asset_desc": "entity.asset", 
-        "blocking": false, 
-        "class": "Entity", 
-        "entity_type": "ITEM", 
-        "identifier": "identifier", 
+        "assets": {
+            "text/plain": {
+                "data": null,
+                "uri": "entity.txt"
+            }
+        },
+        "blocking": false,
+        "class": "Entity",
+        "entity_type": "ITEM",
+        "identifier": "identifier",
         "mobile": true
     }
     >>> print(fabula.SpawnEvent(entity, (0, 1)).json())
     {
-        "class": "SpawnEvent", 
+        "class": "SpawnEvent",
         "entity": {
-            "asset_desc": "entity.asset", 
-            "blocking": false, 
-            "class": "Entity", 
-            "entity_type": "ITEM", 
-            "identifier": "identifier", 
+            "assets": {
+                "text/plain": {
+                    "data": null,
+                    "uri": "entity.txt"
+                }
+            },
+            "blocking": false,
+            "class": "Entity",
+            "entity_type": "ITEM",
+            "identifier": "identifier",
             "mobile": true
-        }, 
+        },
         "location": [
-            0, 
+            0,
             1
         ]
     }
     >>> print(fabula.DeleteEvent("identifier").json())
     {
-        "class": "DeleteEvent", 
+        "class": "DeleteEvent",
         "identifier": "identifier"
     }
     >>> print(fabula.EnterRoomEvent("client_identifier", "room_identifier").json())
     {
-        "class": "EnterRoomEvent", 
-        "client_identifier": "client_identifier", 
+        "class": "EnterRoomEvent",
+        "client_identifier": "client_identifier",
         "room_identifier": "room_identifier"
     }
     >>> print(fabula.RoomCompleteEvent().json())
     {
         "class": "RoomCompleteEvent"
     }
-    >>> tile = fabula.Tile(fabula.FLOOR, "tile.asset")
+    >>> tile = fabula.Tile(fabula.FLOOR, {"text/plain": fabula.Asset("tile.txt")})
     >>> print(tile.json())
     {
-        "asset": null, 
-        "asset_desc": "tile.asset", 
-        "class": "Tile", 
+        "assets": {
+            "text/plain": {
+                "data": null,
+                "uri": "tile.txt"
+            }
+        },
+        "class": "Tile",
         "tile_type": "FLOOR"
     }
     >>> print(fabula.ChangeMapElementEvent(tile, (0, 1)).json())
     {
-        "class": "ChangeMapElementEvent", 
+        "class": "ChangeMapElementEvent",
         "location": [
-            0, 
+            0,
             1
-        ], 
+        ],
         "tile": {
-            "asset": null, 
-            "asset_desc": "tile.asset", 
-            "class": "Tile", 
+            "assets": {
+                "text/plain": {
+                    "data": null,
+                    "uri": "tile.txt"
+                }
+            },
+            "class": "Tile",
             "tile_type": "FLOOR"
         }
     }
     >>> print(fabula.ServerParametersEvent("test_client", 0.5).json())
     {
-        "action_time": 0.5, 
-        "class": "ServerParametersEvent", 
+        "action_time": 0.5,
+        "class": "ServerParametersEvent",
         "client_identifier": "test_client"
     }
     >>> print(fabula.Message([fabula.Event("identifier")]).json())
     {
         "Message": [
             {
-                "class": "Event", 
+                "class": "Event",
                 "identifier": "identifier"
             }
         ]

@@ -7,9 +7,9 @@ Multiple Rooms
     >>> import fabula.plugins.serverside
     >>> import fabula.interfaces
     >>> import fabula.run
-    >>> tile = fabula.Tile(fabula.FLOOR, "dummy")
-    >>> player_entity = fabula.Entity("player", fabula.PLAYER, True, True, "dummy")
-    >>> npc_entity = fabula.Entity("npc", fabula.NPC, True, True, "dummy")
+    >>> tile = fabula.Tile(fabula.FLOOR, {"text/plain": fabula.Asset("dummy")})
+    >>> player_entity = fabula.Entity("player", fabula.PLAYER, True, True, {"text/plain": fabula.Asset("dummy")})
+    >>> npc_entity = fabula.Entity("npc", fabula.NPC, True, True, {"text/plain": fabula.Asset("dummy")})
     >>> class MultipleRoomsTest(fabula.plugins.serverside.DefaultGame):
     ...     def __init__(self, host):
     ...         fabula.plugins.serverside.DefaultGame.__init__(self, host)

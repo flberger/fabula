@@ -26,8 +26,8 @@ Serverside Event Queue
     ...     def process_InitEvent(self, event, **kwargs):
     ...         self.message_for_host.event_list.extend([fabula.EnterRoomEvent(client_identifier = event.identifier,
     ...                                                                       room_identifier = "test"),
-    ...                                                  fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, "dummy_asset"), (0, 0, "test")),
-    ...                                                  fabula.SpawnEvent(fabula.Entity("player_entity", fabula.PLAYER, True, True, "dummy_asset"), (0, 0, "test")),
+    ...                                                  fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, {"text/plain": fabula.Asset("dummy_asset")}), (0, 0, "test")),
+    ...                                                  fabula.SpawnEvent(fabula.Entity("player_entity", fabula.PLAYER, True, True, {"text/plain" : fabula.Asset("dummy.png")}), (0, 0, "test")),
     ...                                                  fabula.RoomCompleteEvent()])
     ...         return
     ...
@@ -40,7 +40,7 @@ Serverside Event Queue
     ------------------------------------------------------------
     <BLANKLINE>
     Press [Ctrl] + [C] to stop the server.
-    message_for_host == fabula.Message(event_list = [fabula.EnterRoomEvent(client_identifier = 'dummy_client', room_identifier = 'test'), fabula.ChangeMapElementEvent(location = (0, 0, 'test'), tile = fabula.Tile(tile_type = fabula.FLOOR, asset_desc = 'dummy_asset')), fabula.SpawnEvent(entity = fabula.Entity(identifier = 'player_entity', entity_type = fabula.PLAYER, blocking = True, mobile = True, asset_desc = 'dummy_asset'), location = (0, 0, 'test')), fabula.RoomCompleteEvent()])
+    message_for_host == fabula.Message(event_list = [fabula.EnterRoomEvent(client_identifier = 'dummy_client', room_identifier = 'test'), fabula.ChangeMapElementEvent(location = (0, 0, 'test'), tile = fabula.Tile(tile_type = fabula.FLOOR, assets = {'text/plain': fabula.Asset(uri = 'dummy_asset', data = None)})), fabula.SpawnEvent(entity = fabula.Entity(identifier = 'player_entity', entity_type = fabula.PLAYER, blocking = True, mobile = True, assets = {'text/plain': fabula.Asset(uri = 'dummy.png', data = None)}), location = (0, 0, 'test')), fabula.RoomCompleteEvent()])
     message_for_host == fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player_entity', perception = 'Test Queue 1')])
     message_for_host == fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player_entity', perception = 'Test Queue 2')])
     message_for_host == fabula.Message(event_list = [fabula.PerceptionEvent(identifier = 'player_entity', perception = 'Test Queue 3')])

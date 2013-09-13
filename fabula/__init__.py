@@ -728,11 +728,13 @@ class SpawnEvent(ServerEvent):
         #
         # TODO: Use compact JSON, and indentation only in doctest
         #
-        return json.dumps(json.loads(json_str.format(self.__class__.__name__,
-                                                     self.entity.json(),
-                                                     str(list(self.location)))),
-                          sort_keys = True,
-                          indent = 4)
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json.loads(json_str.format(self.__class__.__name__,
+                                                                                          self.entity.json(),
+                                                                                          str(list(self.location)))),
+                                                                           sort_keys = True,
+                                                                           indent = 4).splitlines()])
 
 class DeleteEvent(ServerEvent):
     """This event deletes an item or NPC from the map.
@@ -819,11 +821,13 @@ class ChangeMapElementEvent(ServerEvent):
         #
         # TODO: Use compact JSON, and indentation only in doctest
         #
-        return json.dumps(json.loads(json_str.format(self.__class__.__name__,
-                                                     self.tile.json(),
-                                                     str(list(self.location)))),
-                          sort_keys = True,
-                          indent = 4)
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json.loads(json_str.format(self.__class__.__name__,
+                                                                                          self.tile.json(),
+                                                                                          str(list(self.location)))),
+                                                                          sort_keys = True,
+                                                                          indent = 4).splitlines()])
 
 class ServerParametersEvent(ServerEvent):
     """This Event is sent by the Server when an InitEvent has been received.
@@ -904,7 +908,64 @@ class Message:
         #
         # Taken from pycms.CMS.json().
         #
-        return json.dumps(json.loads(json_str), sort_keys = True, indent = 4)
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json.loads(json_str), sort_keys = True, indent = 4).splitlines()])
+
+############################################################
+# Asset Entry
+
+# Using this explicit definition instead of a tuple for readability and
+# documentation.
+
+class Asset:
+    """A single asset entry.
+
+       Attributes:
+
+       Asset.uri
+           An URI string as per [RFC 2396](https://tools.ietf.org/html/rfc2396),
+           or a local filesystem path suitable to pass to open().
+
+       Asset.data
+           The asset's data. Initially None, replaced by implementation-dependet
+           data when the UserInterface retrieves the asset.
+    """
+
+    def __init__(self, uri, data = None):
+        """Initialise.
+        """
+
+        self.uri = uri
+
+        self.data = data
+
+        return
+
+    def __repr__(self):
+        """Official string representation.
+        """
+
+        return representation(self, ("uri", "data"))
+
+    def __str__(self):
+        """Informal string representation.
+        """
+
+        return "<Asset {} at {}>".format(self.__repr__(),
+                                         id(self))
+
+    def json(self):
+        """Return a JSON representation of the Asset.
+        """
+
+        return json_dump(self)
+
+    def serialisable(self):
+        """Return a serialisable representation for JSON encoding.
+        """
+
+        return {"uri": self.uri, "data": self.data}
 
 ############################################################
 # Entities
@@ -929,15 +990,9 @@ class Entity(fabula.eventprocessor.EventProcessor):
            Boolean flag. If True, the Entity can be picked up and dropped and
            will be able to move.
 
-       Entity.asset_desc
-           Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the Entity. Set upon
-           initialisation.
-
-       Entity.asset
-           The actual asset, application-dependent, initially None.
-           The UserInterface may fetch the asset using Entity.asset_desc and
-           attach it here.
+       Entity.assets
+           A dict, mapping strings denoting content types as per
+           [RFC 2045](https://tools.ietf.org/html/rfc2045) to Asset instances.
 
        Entity.property_dict
            A dict mapping strings to strings, holding the application-dependent
@@ -958,8 +1013,12 @@ class Entity(fabula.eventprocessor.EventProcessor):
        how it handles game objects.
     """
 
-    def __init__(self, identifier, entity_type, blocking, mobile, asset_desc):
+    def __init__(self, identifier, entity_type, blocking, mobile, assets):
         """Initialise.
+
+           assets is a dict to initialise Entity.asset with. It is advised
+           to supply a text/plain entry such as
+           {"text/plain" : Asset(None, "Entity description")}
         """
 
         fabula.eventprocessor.EventProcessor.__init__(self)
@@ -972,9 +1031,8 @@ class Entity(fabula.eventprocessor.EventProcessor):
         self.entity_type = entity_type
         self.blocking = blocking
         self.mobile = mobile
-        self.asset_desc = asset_desc
+        self.assets = dict(assets)
 
-        self.asset = None
         self.property_dict = {}
 
         # Will be filled by the UserInterface at runtime.
@@ -983,9 +1041,8 @@ class Entity(fabula.eventprocessor.EventProcessor):
 
     # EventProcessor overrides
     #
-    # These are called by the UserInterface,
-    # which also has added the Entity.framerate
-    # and Entity.action_frames attributes
+    # These are called by the UserInterface, which also has added the
+    # Entity.framerate and Entity.action_frames attributes
 
     def process_MovesToEvent(self, event):
         """This method is called by the UserInterface.
@@ -1045,7 +1102,7 @@ class Entity(fabula.eventprocessor.EventProcessor):
                       self.entity_type,
                       self.blocking,
                       self.mobile,
-                      self.asset_desc)
+                      self.assets)
 
     def __repr__(self):
         """Official string representation.
@@ -1055,14 +1112,13 @@ class Entity(fabula.eventprocessor.EventProcessor):
                                      "entity_type",
                                      "blocking",
                                      "mobile",
-                                     "asset_desc"))
+                                     "assets"))
 
     def __str__(self):
         """Informal string representation, including property_dict and asset.
         """
-        return "<{} property_dict = {} asset = {}>".format(self.__repr__(),
-                                                   self.property_dict,
-                                                   self.asset)
+        return "<{} property_dict = {}>".format(self.__repr__(),
+                                                self.property_dict)
 
     def json(self):
         """Return a JSON representation of the Entity.
@@ -1076,13 +1132,23 @@ class Entity(fabula.eventprocessor.EventProcessor):
                           "entity_type",
                           "blocking",
                           "mobile",
-                          "asset_desc"):
+                          "assets"):
 
             json_dict[attribute] = self.__dict__[attribute]
 
         # TODO: Use compact JSON, and indentation only in doctest
+
+        # From the Python documentation example "Extending JSONEncoder"
         #
-        return json.dumps(json_dict, sort_keys = True, indent = 4)
+        class AssetEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, fabula.Asset):
+                    return obj.serialisable()
+                return json.JSONEncoder.default(self, obj)
+
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json_dict, sort_keys = True, indent = 4, cls = AssetEncoder).splitlines()])
 
 ############################################################
 # Entity And Tile Types
@@ -1116,16 +1182,12 @@ class Tile:
        Tile.tile_type
            fabula.FLOOR or fabula.OBSTACLE
 
-       Tile.asset_desc
-           Preferably a string with a file name or an URI of a media file
-           containing the data for visualizing the Tile.
-
-       Tile.asset
-           The actual asset, application-dependent. The UserInterface may fetch
-           the asset using Entity.asset_desc and attach it here. Initially None.
+       Tile.assets
+           A dict, mapping strings denoting content types as per
+           [RFC 2045](https://tools.ietf.org/html/rfc2045) to Asset instances.
     """
 
-    def __init__(self, tile_type, asset_desc):
+    def __init__(self, tile_type, assets):
         """Tile initialisation.
            tile_type must be fabula.FLOOR or fabula.OBSTACLE, describing whether
            the player or NPCs can move across the tile.
@@ -1133,8 +1195,7 @@ class Tile:
            file containing the data for visualizing the tile.
         """
         self.tile_type = tile_type
-        self.asset_desc = asset_desc
-        self.asset = None
+        self.assets = dict(assets)
 
     def __eq__(self, other):
         """Allow the == operator to be used on Tiles.
@@ -1145,7 +1206,7 @@ class Tile:
         if other.__class__ == self.__class__:
 
             if (other.tile_type == self.tile_type
-                and other.asset_desc == self.asset_desc):
+                and other.assets == self.assets):
 
                 return True
 
@@ -1164,7 +1225,7 @@ class Tile:
         if other.__class__ == self.__class__:
 
             if (other.tile_type != self.tile_type
-                or other.asset_desc != self.asset_desc):
+                or other.assets != self.assets):
 
                 return True
 
@@ -1178,22 +1239,40 @@ class Tile:
         """Official string representation.
         """
 
-        return representation(self, ("tile_type", "asset_desc"))
+        return representation(self, ("tile_type", "assets"))
 
     def __str__(self):
         """Informal string representation, including the asset.
         """
 
-        # Taken from Entity.__str__()
-
-        return "<{} asset = {}>".format(self.__repr__(),
-                                        self.asset)
+        return "<{}>".format(self.__repr__())
 
     def json(self):
         """Return a JSON representation of the Tile.
         """
 
-        return json_dump(self)
+        # NOTE: Copied from Entity.json().
+
+        json_dict = {"class" : self.__class__.__name__}
+
+        for attribute in ("tile_type",
+                          "assets"):
+
+            json_dict[attribute] = self.__dict__[attribute]
+
+        # TODO: Use compact JSON, and indentation only in doctest
+
+        # From the Python documentation example "Extending JSONEncoder"
+        #
+        class AssetEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, fabula.Asset):
+                    return obj.serialisable()
+                return json.JSONEncoder.default(self, obj)
+
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json_dict, sort_keys = True, indent = 4, cls = AssetEncoder).splitlines()])
 
 ############################################################
 # Rooms
@@ -1603,8 +1682,9 @@ def json_dump(object):
     instance_dict["class"] = object.__class__.__name__
 
     # TODO: Use compact JSON, and indentation only in doctest
+    # Remove trailing whitespace
     #
-    return json.dumps(instance_dict, sort_keys = True, indent = 4)
+    return "\n".join([line.rstrip() for line in json.dumps(instance_dict, sort_keys = True, indent = 4).splitlines()])
 
 def surrounding_positions(position):
     """Return a list of tuples, representing the 8 surrounding positions around the tuple given.
