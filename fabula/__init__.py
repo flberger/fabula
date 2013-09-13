@@ -144,8 +144,6 @@
 #
 # TODO: Fabula needs a JSON-API for the server plugin. It also needs methods to access internal data structures like room, position etc.
 #
-# TODO: fabula.conf should be read / accessed where it is needed, not in run; no passing of options through init arguments
-# TODO: fabula.conf should maybe be read in the main package so that it can be accessed from everywhere Fabula is imported.
 # TODO: The asset manager should be used for finding the fabula.conf file.
 #
 # TODO: make the current game world abstraction an named application of a more generic Fabula. Get rid of specific handlers in EventProcessor. Instead, register callbacks for each "EVENTNAME" (see above).
@@ -214,6 +212,7 @@ import fabula.eventprocessor
 import re
 import logging
 import json
+import configparser
 
 ############################################################
 # Version Information
@@ -1712,3 +1711,14 @@ LOGGER = logging.getLogger("fabula")
 # All setup will be done in fabula.run.
 
 # Done with logging setup.
+
+############################################################
+# Config
+
+# Initialise parser and read config file
+#
+CONFIGPARSER = configparser.ConfigParser()
+
+if not len(CONFIGPARSER.read("fabula.conf")):
+
+    CONFIGPARSER = None

@@ -45,8 +45,10 @@ class UserInterface(fabula.plugins.Plugin):
 
        UserInterface.input_dict
            A dict mapping input methods to boolean flags, indicating which
-           input methods will be used by the client instance.
-           Initially {"mouse" : False, "keyboard" : False}
+           input methods will be used by the client instance. To change it,
+           alter keys and values at runtime, or create a subclass and
+           change it in __init__().
+           Initially {"mouse" : True, "keyboard" : False}
 
        UserInterface.action_frames
            The number of frames per action. This can only be set when a
@@ -71,20 +73,13 @@ class UserInterface(fabula.plugins.Plugin):
     ####################
     # Initialization
 
-    def __init__(self, assets, framerate, host, input = "mouse", fullscreen = False):
+    def __init__(self, assets, framerate, host):
         """This method initialises the UserInterface.
 
            assets must be an instance of fabula.Assets or a subclass.
 
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run in.
-
-           input must be a string which is a key in UserInterface.input_dict.
-           UserInterface.input_dict[input] will be set to True.
-
-           fullscreen is a Boolean flag that indicates whether the game should
-           run in a window or use the full screen. Its effect is implementation
-           dependent.
         """
 
         # First set up the plugin
@@ -98,8 +93,7 @@ class UserInterface(fabula.plugins.Plugin):
 
         # See docstring
         #
-        self.input_dict = {"mouse" : False, "keyboard" : False}
-        self.input_dict[input] = True
+        self.input_dict = {"mouse" : True, "keyboard" : False}
 
         # See docstring
         #

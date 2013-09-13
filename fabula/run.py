@@ -39,17 +39,12 @@ import logging
 from time import sleep
 import traceback
 import re
-import configparser
 import os
 
 class App:
     """An App instance represents a Fabula client or server application.
 
        Attributes:
-
-       App.parser
-           An instance of configparser.ConfigParser reading from fabula.conf, or
-           None if the file is not found.
 
        App.assets_class
            Class of the asset engine to be used.
@@ -87,14 +82,6 @@ class App:
            will run for an unlimited time.
         """
 
-        # Initialise parser and read config file
-        #
-        self.parser = configparser.ConfigParser()
-
-        if not len(self.parser.read("fabula.conf")):
-
-            self.parser = None
-
         # Base logger level is always logging.DEBUG
         #
         fabula.LOGGER.setLevel(logging.DEBUG)
@@ -112,7 +99,7 @@ class App:
 
         return
 
-    def run_client(self, framerate, interface, input = "mouse"):
+    def run_client(self, framerate, interface):
         """Run a Fabula client with the parameters given.
         """
 
@@ -130,21 +117,9 @@ class App:
 
         client = fabula.core.client.Client(interface)
 
-        fullscreen = False
-
-        if self.parser is not None and self.parser.has_option("fabula", "fullscreen"):
-
-            if self.parser.get("fabula", "fullscreen").lower() in ("true", "yes", "1"):
-
-                fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
-
-                fullscreen = True
-
         plugin = self.user_interface_class(assets,
                                            framerate,
-                                           client,
-                                           input = input,
-                                           fullscreen = fullscreen)
+                                           client)
 
         client.set_plugin(plugin)
 
@@ -259,7 +234,7 @@ class App:
 
         return
 
-    def run_standalone(self, framerate, action_time, input = "mouse"):
+    def run_standalone(self, framerate, action_time):
         """Run Fabula client and server on the local machine.
         """
 
@@ -287,23 +262,9 @@ class App:
 
         client = fabula.core.client.Client(client_interface)
 
-        # TODO: copied from above
-        #
-        fullscreen = False
-
-        if self.parser is not None and self.parser.has_option("fabula", "fullscreen"):
-
-            if self.parser.get("fabula", "fullscreen").lower() in ("true", "yes", "1"):
-
-                fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
-
-                fullscreen = True
-
         user_interface = self.user_interface_class(assets,
                                                    framerate,
-                                                   client,
-                                                   input = input,
-                                                   fullscreen = fullscreen)
+                                                   client)
 
         client.set_plugin(user_interface)
 
@@ -426,7 +387,7 @@ class App:
         return
 
     def _setup_file_logging(self, name):
-        """Aux method which checks App.parser for an option and conditionally adds a FileHandler to fabula.LOGGER that writes to fabula-<name>.log.
+        """Aux method which checks fabula.CONFIGPARSER for an option and conditionally adds a FileHandler to fabula.LOGGER that writes to fabula-<name>.log.
            It will return the file name, or None when logging is disabled.
         """
 
@@ -461,9 +422,9 @@ class App:
 
         file_name = None
 
-        if (self.parser is not None
-            and self.parser.has_option("fabula", "write_logfile")
-            and self.parser.get("fabula", "write_logfile").lower() in ("true", "yes", "1")):
+        if (fabula.CONFIGPARSER is not None
+            and fabula.CONFIGPARSER.has_option("fabula", "write_logfile")
+            and fabula.CONFIGPARSER.get("fabula", "write_logfile").lower() in ("true", "yes", "1")):
 
             file_name = "fabula-{}.log".format(name)
 

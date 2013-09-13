@@ -54,10 +54,6 @@ import tkinter._fix
 #
 PIX_PER_CHAR = 8
 
-# Hardwired screen size.
-#
-SCREENSIZE = (800, 600)
-
 def load_image(title):
     """Auxiliary function to make the user open an image file.
        Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
@@ -419,6 +415,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.inventory_plane
            Plane to display the inventory
 
+       PygameUserInterface.screensize
+           A tuple (width, height), holding the size of the screen.
+
        PygameUserInterface.spacing
            Spacing between tiles.
 
@@ -480,9 +479,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        The planes are attributes of PygameUserInterface:
 
        PygameUserInterface.window
-           An instance of planes.Display. Dimensions are given by SCREENSIZE.
-           By default opened in windowed mode, this can be changed by editing
-           the file fabula.conf.
+           An instance of planes.Display. Dimensions are given by
+           PygameUserInterface.screensize. By default opened in windowed mode,
+           this can be changed by editing   the file fabula.conf.
 
        PygameUserInterface.window.room
            planes Plane for the room. Initially it will have a size of 0x0 px.
@@ -496,7 +495,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            space for 8 100x100 px icons and located at the bottom of the window.
     """
 
-    def __init__(self, assets, framerate, host, input = "mouse", fullscreen = False, mousescroll = False):
+    def __init__(self, assets, framerate, host, mousescroll = False):
         """This method initialises the PygameUserInterface.
 
            assets must be an instance of fabula.Assets or a subclass.
@@ -504,23 +503,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            framerate must be an integer and sets the maximum (not minimum ;-))
            frames per second the client will run at.
 
-           input must be a string which is a key in UserInterface.input_dict.
-           PygameUserInterface.input_dict[input] will be set to True.
-
-           fullscreen is a Boolean flag.
-
            mousescroll is a Boolen flag, indicating whether to scroll the screen
            when the mouse reaches a screen border.
         """
+
+        # TODO: remove mousescroll from init arguments.
 
         # Call original __init__()
         #
         fabula.plugins.ui.UserInterface.__init__(self,
                                                  assets,
                                                  framerate,
-                                                 host,
-                                                 input = input,
-                                                 fullscreen = fullscreen)
+                                                 host)
 
         fabula.LOGGER.debug("called")
 
@@ -536,6 +530,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Initialise the frame timing clock.
         #
         self.clock = pygame.time.Clock()
+
+        # Hardwired screen size.
+        #
+        self.screensize = (800, 600)
+        #self.screensize = (1024, 768)
 
         # Spacing between tiles.
         #
@@ -556,9 +555,19 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         os.environ["SDL_VIDEO_CENTERED"] = "1"
 
+        fullscreen = False
+
+        if fabula.CONFIGPARSER is not None and fabula.CONFIGPARSER.has_option("fabula", "fullscreen"):
+
+            if fabula.CONFIGPARSER.get("fabula", "fullscreen").lower() in ("true", "yes", "1"):
+
+                fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
+
+                fullscreen = True
+
         # Open a planes window.
         #
-        self.window = planes.Display(SCREENSIZE, fullscreen)
+        self.window = planes.Display(self.screensize, fullscreen)
 
         # Create a black pygame surface for fade effects.
         #
@@ -928,8 +937,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 self.scroll = self.spacing
 
             elif (pygame.mouse.get_focused()
-                  and SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]
-                  and self.window.room.rect.right > SCREENSIZE[0]):
+                  and self.screensize[0] - 25 <= mouse_position[0] <= self.screensize[0]
+                  and self.window.room.rect.right > self.screensize[0]):
 
                 # Scroll to right
                 #
@@ -1195,8 +1204,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             player_position[0] = int((player_position[0] + 0.5) * self.spacing)
             player_position[1] = int((player_position[1] + 0.5) * self.spacing)
 
-            self.window.room.rect.left = 0 - player_position[0] + (SCREENSIZE[0] / 2)
-            self.window.room.rect.top =  0 - player_position[1] + (SCREENSIZE[1] / 2)
+            self.window.room.rect.left = 0 - player_position[0] + (self.screensize[0] / 2)
+            self.window.room.rect.top =  0 - player_position[1] + (self.screensize[1] / 2)
 
             self._snap_room_to_display()
 
@@ -1716,7 +1725,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 left_border_x = int((0 - self.window.room.rect.left) / self.spacing)
 
-                right_border_x = left_border_x + int(SCREENSIZE[0] / self.spacing) - 1
+                right_border_x = left_border_x + int(self.screensize[0] / self.spacing) - 1
 
                 if (event.location[0] <= left_border_x + 1
                     and self.window.room.rect.left < 0):
@@ -1726,7 +1735,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                     self.scroll = self.spacing
 
                 elif (event.location[0] >= right_border_x - 1
-                      and self.window.room.rect.right > SCREENSIZE[0]):
+                      and self.window.room.rect.right > self.screensize[0]):
 
                     # Scroll to the right
                     #
@@ -2327,20 +2336,20 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             self.window.room.rect.top = 0
 
-        if self.window.room.rect.right < SCREENSIZE[0]:
+        if self.window.room.rect.right < self.screensize[0]:
 
             fabula.LOGGER.debug("snapping window.room.rect.right from {} to {}".format(self.window.room.rect.right,
-                                                                                       SCREENSIZE[0]))
+                                                                                       self.screensize[0]))
 
-            self.window.room.rect.right = SCREENSIZE[0]
+            self.window.room.rect.right = self.screensize[0]
 
         # Mind the inventory
         #
-        if self.window.room.rect.bottom < SCREENSIZE[1] - self.window.inventory.rect.height:
+        if self.window.room.rect.bottom < self.screensize[1] - self.window.inventory.rect.height:
 
             fabula.LOGGER.debug("snapping window.room.rect.bottom")
 
-            self.window.room.rect.bottom = SCREENSIZE[1] - self.window.inventory.rect.height
+            self.window.room.rect.bottom = self.screensize[1] - self.window.inventory.rect.height
 
         return
 
@@ -3280,7 +3289,7 @@ class PygameEditor(PygameUserInterface):
                 #
                 self.scroll = self.spacing
 
-            elif SCREENSIZE[0] - 25 <= mouse_position[0] <= SCREENSIZE[0]:
+            elif self.screensize[0] - 25 <= mouse_position[0] <= self.screensize[0]:
 
                 # Scroll to right
                 #
@@ -3443,7 +3452,7 @@ class PygameEditor(PygameUserInterface):
 
         # Make it completely visible, no matter how large
         #
-        self.window.properties.rect.right = SCREENSIZE[0]
+        self.window.properties.rect.right = self.screensize[0]
 
         return
 
