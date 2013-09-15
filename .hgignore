@@ -1,15 +1,8 @@
 syntax: glob
 
 *.pyc
-.bzrignore
-examples/shard
 commit.txt
 *.log
-*.png
-*.jpg
-*.floorplan
-*.ttf
-*.logic
 dist/
 build
 MANIFEST
@@ -23,3 +16,6 @@ htmlcov
 print_log.sh
 ./fabula.conf
 surfacecatcher*
+*.png
+*.floorplan
+*.logic

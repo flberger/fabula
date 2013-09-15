@@ -2775,6 +2775,8 @@ class PygameEditor(PygameUserInterface):
 
                     entities_string = ""
 
+                    # NOTE: enclosing saved strings in quotes, to be compatible with spreadsheet applications.
+
                     for entity in self.host.room.floor_plan[(x, y)].entities:
 
                         # TODO: make sure commas are not present in the other strings
@@ -2786,12 +2788,12 @@ class PygameEditor(PygameUserInterface):
                                                   repr(entity.mobile),
                                                   entity.assets["image/png"].uri])
 
-                        entities_string = entities_string + "\t{}".format(argument_list)
+                        entities_string = entities_string + '\t"{}"'.format(argument_list)
 
-                    roomfile.write("{}\t{}\t{}{}\n".format(repr((x, y)),
-                                                           tile.tile_type,
-                                                           tile.assets["image/png"].uri,
-                                                           entities_string))
+                    roomfile.write('"{}"\t"{}"\t"{}"{}\n'.format(repr((x, y)),
+                                                                 tile.tile_type,
+                                                                 tile.assets["image/png"].uri,
+                                                                 entities_string))
 
             roomfile.close()
 

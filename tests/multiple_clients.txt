@@ -10,10 +10,10 @@ Multiple Clients
     >>> from time import sleep
     >>> f = open("default.floorplan", "wt")
     >>> # NOTE: Each PLAYER Entity name must correspond to a later client id
-    >>> f.write("(0, 0)\tFLOOR\tdummy_asset\tFirst_Client,PLAYER,True,True,dummy_asset\n")
-    67
-    >>> f.write("(1, 0)\tFLOOR\tdummy_asset\tSecond_Client,PLAYER,True,True,dummy_asset\n")
-    68
+    >>> f.write('"(0, 0)"\t"FLOOR, dummy_asset.txt"\t"First_Client,PLAYER,True,True,dummy_asset.txt"\n')
+    82
+    >>> f.write('"(1, 0)"\t"FLOOR, dummy_asset.txt"\t"Second_Client,PLAYER,True,True,dummy_asset.txt"\n')
+    83
     >>> f.close()
     >>> def run_server():
     ...     app = fabula.run.App(timeout = 20)

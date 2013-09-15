@@ -167,6 +167,7 @@
 # TODO: support zeroinstall - http://0install.net/
 #
 # TODO: The planes and surfacecatcher modules, required by pygameui, are bundled in distributions, but not part of the VCS repository. This leaves repository clones defunct, which should at least be documented.
+# TODO: offer a *distribution* (not repo) including all required packages; as separate installers, with a master installer script.
 #
 # TODO: Add a skeleton for new fabula games, including default graphics, fabula.conf, planes, attempt_*.png, cancel.png, default.floorplan etc.
 # TODO: automatically create file lists for inclusion from level files etc. for distribution
@@ -1633,6 +1634,8 @@ def str_is_tuple(str):
     """Return True if the string represents a (int, int[, str]) location tuple.
     """
 
+    # TODO: The dot is evil. Require alnum + "_"
+    #
     if re.match("^\(\d+\s*,\s*\d+(,\s*[\"'].+?[\"'])?\)$", str):
 
         return True
@@ -1700,6 +1703,49 @@ def surrounding_positions(position):
             (position[0], position[1] + 1),
             (position[0] - 1, position[1] + 1),
             (position[0] - 1, position[1])]
+
+# Taken from https://en.wikipedia.org/wiki/MIME-Type
+# These will be supplemented once need arises.
+# Candidates:
+# "zip": "application/zip",
+# "svg": "image/svg+xml",
+# "csv": "text/csv",
+# "xml": "text/xml",
+# "7z": "application/x-7z-compressed",
+# "tar": "application/x-tar",
+# "xcf": "image/x-xcf"
+#
+EXTENSION_MIME_TYPE_DICT = {"mp3": "audio/mpeg:",
+                            "ogg": "audio/ogg",
+                            "wav": "audio/vnd.wave",
+                            "gif": "image/gif",
+                            "jpg": "image/jpeg",
+                            "jpeg": "image/jpeg",
+                            "png": "image/png",
+                            "txt": "text/plain"}
+
+def infer_asset(uri):
+    """Infer a MIME type from an URI, and return a dict mapping the MIME type to an Asset with the given URI.
+
+       Raises RuntimeError on unhandled URIs or extensions.
+    """
+
+    if uri.find(".") == -1:
+        fabula.LOGGER.error("No dot in URI '{}', can not infer MIME type".format(uri))
+        raise RuntimeError("No dot in URI '{}', can not infer MIME type".format(uri))
+
+    extension = uri.split(".")[-1].lower()
+
+    if extension in EXTENSION_MIME_TYPE_DICT.keys():
+
+        return {EXTENSION_MIME_TYPE_DICT[extension]: Asset(uri)}
+
+    else:
+        # TODO: return "application/octet-stream" instead? See http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7 (which states that the client should assume it, but the server should not send it)
+        #
+        fabula.LOGGER.error("Extension '{}' is not registered in EXTENSION_MIME_TYPE_DICT".format(uri))
+        raise RuntimeError("Extension '{}' is not registered in EXTENSION_MIME_TYPE_DICT".format(uri))
+
 
 ############################################################
 # Logging

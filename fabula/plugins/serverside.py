@@ -40,11 +40,11 @@ def load_room_from_file(filename, complete = True):
        The ChangeMapElementEvents created by this function will use
        the filename minus extension as the room identifier.
 
-       The file must consist of lines of tab-separated elements:
+       The file must consist of lines of tab-separated strings:
 
-       (x, y)    tile_type    tile_asset_desc    identifier,entity_type,blocking,mobile,asset_desc
+       "(x, y)"\t"tile_type, tile_asset_uri[, tile_asset_uri, ...]"\t"identifier, entity_type, blocking, mobile, entity_asset_uri[, entity_asset_uri, ...]
 
-       Note that this example uses spaces in place of TABs.
+       The quotes enclosing the strings can also be left out.
     """
 
     # TODO: add parameter for Room identifier
@@ -71,9 +71,15 @@ def load_room_from_file(filename, complete = True):
         #
         splitted_line = line.split("\t")
 
+        # We support enclosing quotes, but they need not be there.
+        #
+        splitted_line = [element.strip("\"\'") for element in splitted_line]
+
         coordiantes_string = splitted_line.pop(0)
-        type = splitted_line.pop(0)
-        tile_uri = splitted_line.pop(0)
+
+        # TODO: Blindly assuming CSV. Check before.
+        #
+        tile_type_uris = splitted_line.pop(0).split(",")
 
         location = None
 
@@ -81,9 +87,15 @@ def load_room_from_file(filename, complete = True):
         #
         if fabula.str_is_tuple(coordiantes_string):
 
-            # TODO: Blindly assuming content type "image/png"
-            #
-            tile = fabula.Tile(type, {"image/png": fabula.Asset(tile_uri)})
+            tile_type = tile_type_uris.pop(0)
+
+            asset_dict = {}
+
+            for new_asset_dict in [fabula.infer_asset(uri.strip()) for uri in tile_type_uris]:
+
+                asset_dict.update(new_asset_dict)
+
+            tile = fabula.Tile(tile_type, asset_dict)
 
             location = eval(coordiantes_string) + (room_identifier, )
 
@@ -92,10 +104,8 @@ def load_room_from_file(filename, complete = True):
             event_list.append(event)
 
         else:
-
-            # TODO: warn here
-            #
-            pass
+            fabula.LOGGER.error("Line in '{}'does not start with a coordinate tuple: {}".format(filename, line))
+            raise RuntimeError("Line in '{}'does not start with a coordinate tuple: {}".format(filename, line))
 
         if len(splitted_line):
 
@@ -103,7 +113,14 @@ def load_room_from_file(filename, complete = True):
             #
             for comma_sep_entity in splitted_line:
 
-                identifier, entity_type, blocking, mobile, entity_uri = comma_sep_entity.split(",")
+                # TODO: Blindly assuming CSV. Check before.
+                #
+                comma_sep_entity = comma_sep_entity.split(",")
+
+                identifier = comma_sep_entity.pop(0).strip()
+                entity_type = comma_sep_entity.pop(0).strip()
+                blocking = comma_sep_entity.pop(0).strip()
+                mobile = comma_sep_entity.pop(0).strip()
 
                 if blocking in ("True", "False"):
 
@@ -119,13 +136,19 @@ def load_room_from_file(filename, complete = True):
                 else:
                     mobile = True
 
-                # TODO: Blindly assuming content type "image/png"
+                # The rest should be asset URIs
                 #
+                asset_dict = {}
+
+                for new_asset_dict in [fabula.infer_asset(uri.strip()) for uri in comma_sep_entity]:
+
+                    asset_dict.update(new_asset_dict)
+
                 entity = fabula.Entity(identifier,
                                        entity_type,
                                        blocking,
                                        mobile,
-                                       {"image/png": fabula.Asset(entity_uri)})
+                                       asset_dict)
 
                 event_list.append(fabula.SpawnEvent(entity, location))
 
@@ -434,8 +457,7 @@ class DefaultGame(fabula.plugins.Plugin):
         except:
 
             fabula.LOGGER.error("error opening file 'default.floorplan'")
-
-            return
+            raise
 
         if len(self.host.room_by_id):
 

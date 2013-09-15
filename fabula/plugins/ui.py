@@ -242,9 +242,9 @@ class UserInterface(fabula.plugins.Plugin):
            The default implementation logs the error and raises an Exception.
         """
 
-        fabula.LOGGER.critical("Asset could not be fetched: {}. Aborting.".format(asset))
+        fabula.LOGGER.critical("Asset could not be fetched: '{}', aborting".format(asset))
 
-        raise Exception("Asset could not be fetched: {}. Aborting.".format(asset))
+        raise RuntimeError("Asset could not be fetched: '{}', aborting".format(asset))
 
     def update_frame_timer(self):
         """You might have to notify a timer once per frame.
