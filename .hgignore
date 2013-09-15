@@ -16,6 +16,3 @@ htmlcov
 print_log.sh
 ./fabula.conf
 surfacecatcher*
-*.png
-*.floorplan
-*.logic

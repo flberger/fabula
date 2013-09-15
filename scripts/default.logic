@@ -1,0 +1,57 @@
+{"fabula.TriesToDropEvent(identifier = 'player', item_identifier = 'potion', target_identifier = 'tree_3')":
+    [fabula.SaysEvent(identifier = 'npc', text = 'Hey! Leave my tree alone!')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'apple')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'A fresh apple. Yummy!')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'axe')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'Ha! I can be an axe-wielding amazon!')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'npc')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'What is she doing here?')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'potion')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'I think I should not drink that.')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'tree_1')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'Looks like an apple tree.')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'key')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'Whose key is that?')
+    ],
+ "fabula.SaysEvent(identifier = 'player', text = 'I saw a key over there.')":
+    [fabula.SaysEvent(identifier = 'npc', text = 'Oh, thanks!'),
+     fabula.MovesToEvent(identifier = 'npc', location = (6, 2)),
+     fabula.MovesToEvent(identifier = 'npc', location = (6, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (5, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (4, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (3, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (2, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (1, 1)),
+     fabula.MovesToEvent(identifier = 'npc', location = (1, 0)),
+     fabula.MovesToEvent(identifier = 'npc', location = (1, 1))
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'tree_3')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'Dunno what tree this is...')
+    ],
+ "fabula.TriesToTalkToEvent(identifier = 'player', target_identifier = 'npc')":
+    [fabula.CanSpeakEvent(identifier = 'player', sentences = ['What are you doing here?', 'I saw a key over there.'
+    ])
+    ],
+ "fabula.SaysEvent(identifier = 'player', text = 'What are you doing here?')":
+    [fabula.SaysEvent(identifier = 'npc', text = 'I lost my key!')
+    ],
+ "fabula.TriesToDropEvent(identifier = 'player', item_identifier = 'axe', target_identifier = 'tree_1')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'That would make a lot of wood!')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'sword')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'That could come in handy.')
+    ],
+ "fabula.TriesToDropEvent(identifier = 'player', item_identifier = 'key', target_identifier = 'npc')":
+    [fabula.SaysEvent(identifier = 'npc', text = 'No, that is not my key.'),
+     fabula.SaysEvent(identifier = 'player', text = 'Pity.')
+    ],
+ "fabula.TriesToLookAtEvent(identifier = 'player', target_identifier = 'shield')":
+    [fabula.PerceptionEvent(identifier = 'player', perception = 'It is always good to have a shield.')
+    ]
+}
