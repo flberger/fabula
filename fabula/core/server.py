@@ -363,8 +363,10 @@ class Server(fabula.core.Engine):
         return
 
     def _call_plugin(self, connector):
-        """Auxiliary method. Call Plugin and process Plugin message.
+        """Auxiliary method, to be called from _main_loop(). Call Plugin and process Plugin message.
         """
+
+        # TODO: Check all code relying on connector being the origin of an Event - this might not be the case!!!
 
         # Put in a method to avoid duplication.
         # Must not take too long since the client is waiting.
@@ -504,6 +506,8 @@ class Server(fabula.core.Engine):
 
                             client_message_dict[single_client].event_list.append(event)
 
+                fabula.LOGGER.debug("client_message_dict == {}".format(client_message_dict))
+
                 # Now. Off with them!
                 #
                 for connector, client_identifier in self.room_by_id[room_identifier].active_clients.items():
@@ -512,8 +516,9 @@ class Server(fabula.core.Engine):
 
                     if len(message.event_list):
 
-                        fabula.LOGGER.debug("'{0}' outgoing: {1}".format(connector,
-                                                                         message))
+                        fabula.LOGGER.debug("'{}' ({}) outgoing: {}".format(connector,
+                                                                            client_identifier,
+                                                                            message))
 
                         try:
                             self.interface.connections[connector].send_message(message)
@@ -1064,6 +1069,8 @@ class Server(fabula.core.Engine):
            If the room does not exist, it will be created.
         """
 
+        connector = None
+
         if event.client_identifier in self.room_by_client.keys():
 
             fabula.LOGGER.info("removing client '{}' from room '{}'".format(event.client_identifier,
@@ -1076,11 +1083,28 @@ class Server(fabula.core.Engine):
             fabula.LOGGER.warning(msg.format(event.client_identifier,
                                              self.room_by_client[event.client_identifier]))
 
+            # NOTE: The Event may result from a player-initiated action, or from a queued Event. That means we can *not* rely on kwargs["connector"] being the actual trigger of the Event!
+
+            # Reverse dict trick from http://stackoverflow.com/a/14131104/1132250
+            #
+            connector = {value: key for key, value in self.room_by_client[event.client_identifier].active_clients.items()}[event.client_identifier]
+
+            fabula.LOGGER.debug("Using existing connector '{}' for client '{}'".format(connector,
+                                                                                       event.client_identifier))
+
             # TODO: Manage active clients rather in Room methods than here, from the outside? See also process_ExitEvent().
             #
-            del self.room_by_client[event.client_identifier].active_clients[kwargs["connector"]]
+            del self.room_by_client[event.client_identifier].active_clients[connector]
 
             del self.room_by_client[event.client_identifier]
+
+        else:
+            fabula.LOGGER.debug("Client '{}' is not yet in any room".format(event.client_identifier))
+
+            connector = kwargs["connector"]
+
+            fabula.LOGGER.info("Assuming connector '{}' for client '{}'".format(connector,
+                                                                                event.client_identifier))
 
         state = "new"
 
@@ -1091,11 +1115,11 @@ class Server(fabula.core.Engine):
         else:
             state = "existing"
 
-        fabula.LOGGER.info("registering client '{}' in {} room '{}'".format(str(kwargs["connector"]),
+        fabula.LOGGER.info("registering client '{}' in {} room '{}'".format(connector,
                                                                             state,
                                                                             event.room_identifier))
 
-        self.room_by_id[event.room_identifier].active_clients[kwargs["connector"]] = event.client_identifier
+        self.room_by_id[event.room_identifier].active_clients[connector] = event.client_identifier
 
         self.room_by_client[event.client_identifier] = self.room_by_id[event.room_identifier]
 

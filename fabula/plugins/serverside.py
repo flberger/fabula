@@ -40,9 +40,12 @@ def load_room_from_file(filename, complete = True):
        The ChangeMapElementEvents created by this function will use
        the filename minus extension as the room identifier.
 
+       An Assets() instance will be used to retrieve the file, and its search
+       strategies apply.
+
        The file must consist of lines of tab-separated strings:
 
-       "(x, y)"\t"tile_type, tile_asset_uri[, tile_asset_uri, ...]"\t"identifier, entity_type, blocking, mobile, entity_asset_uri[, entity_asset_uri, ...]
+       "(x, y)"TAB"tile_type, tile_asset_uri[, tile_asset_uri, ...]"TAB"identifier, entity_type, blocking, mobile, entity_asset_uri[, entity_asset_uri, ...]"[TAB"identifier, entity_type, blocking, mobile, entity_asset_uri[, entity_asset_uri, ...]"]
 
        The quotes enclosing the strings can also be left out.
     """
@@ -441,6 +444,8 @@ class DefaultGame(fabula.plugins.Plugin):
 
     def process_InitEvent(self, event):
         """Conditionally load default.floorplan and send it, or just spawn the player Entity.
+
+           Calls load_room_from_file() to retrieve the default.floorplan file.
 
            If a room is sent, all SpawnEvents with Entity type PLAYER whose
            identifier does not match event.identifier will be removed.

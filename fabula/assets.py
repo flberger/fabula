@@ -55,10 +55,13 @@ class Assets:
 
     def fetch(self, asset_desc, mode = "b"):
         """This method retrieves the file specified in asset_desc and returns a file-like object.
+
            mode is the mode used in open() and can be "b" for binary (default)
            or "t" for text mode.
+
            Since fetch() is a synchronous method, it will cancel after a timeout
            and raise a Exception if it failes to retrieve the data.
+
            This method actually is a dispatcher to more specialised methods.
         """
 
@@ -121,7 +124,11 @@ class Assets:
 
     def fetch_local_file(self, asset_desc, mode):
         """This method returns a a file-like object for the file specified.
+
            It will raise IOError if the file is not found.
+
+           The file will be searched in the local script directory first,
+           then in parent, sub and sibling directiries, then in site.PREFIXES.
         """
 
         # TODO: check the script base directory?
