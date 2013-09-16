@@ -17,7 +17,7 @@
       <a href="classIndex.html#fabula.core.Engine">View In Hierarchy</a>
     </p>
     <div>
-      <p>Known subclasses: <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></p>
+      <p>Known subclasses: <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></p>
     </div>
     <pre>Common base class for Fabula server and client engines.
 Most likely you will want to override all of the methods when subclassing
@@ -274,7 +274,7 @@ Engine.rack
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#__init__">fabula.eventprocessor.EventProcessor.__init__</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#__init__">fabula.eventprocessor.EventProcessor.__init__</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
     <pre>Set up Engine attributes.
 
 Arguments:
@@ -315,7 +315,7 @@ plugin_instance must be an instance of fabula.plugins.Plugin.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
     <pre>This is the main loop of an Engine. Put all the business logic here.
 
 This is a blocking method which should call all the process methods
@@ -340,7 +340,7 @@ The default implementation waits for self.plugin.exit_requested to be True.</pre
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToMoveEvent">fabula.eventprocessor.EventProcessor.process_TriesToMoveEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -358,7 +358,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">fabula.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToLookAtEvent">fabula.eventprocessor.EventProcessor.process_TriesToLookAtEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -376,7 +376,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">fabula.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToPickUpEvent">fabula.eventprocessor.EventProcessor.process_TriesToPickUpEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -394,7 +394,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">fabula.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToDropEvent">fabula.eventprocessor.EventProcessor.process_TriesToDropEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -412,7 +412,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">fabula.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToManipulateEvent">fabula.eventprocessor.EventProcessor.process_TriesToManipulateEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -430,7 +430,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">fabula.eventprocessor.EventProcessor.process_TriesToTalkToEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_TriesToTalkToEvent">fabula.eventprocessor.EventProcessor.process_TriesToTalkToEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -610,7 +610,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">fabula.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a>, <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_EnterRoomEvent">fabula.eventprocessor.EventProcessor.process_EnterRoomEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.client.Client.html">fabula.core.client.Client</a></div>
     <pre>The default implementation simply forwards the Event.
 On the client side, an EnterRoomEvent means that the server is about
 to send a new map, respawn the player and send items and NPCs.
@@ -652,7 +652,7 @@ The default implementation adds the event to the message.</pre>
     
   </div>
   <div class="functionBody">
-    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">fabula.eventprocessor.EventProcessor.process_InitEvent</a></div><div class="interfaceinfo">overridden in <a href="fabula.core.server.Server.html">fabula.core.server.Server</a></div>
+    <div class="interfaceinfo">overrides <a href="fabula.eventprocessor.EventProcessor.html#process_InitEvent">fabula.eventprocessor.EventProcessor.process_InitEvent</a></div>
     <pre>Process the Event.
 The default implementation adds the event to the message.</pre>
   </div>
@@ -676,7 +676,7 @@ The default implementation adds the event to the message.</pre>
   </div>
 </div>
     <address>
-      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-09-15 21:17:15.
+      <a href="index.html">API Documentation</a> for fabula, generated by <a href="http://codespeak.net/~mwh/pydoctor/">pydoctor</a> at 2013-09-16 23:38:31.
     </address>
   </body>
 </html>
