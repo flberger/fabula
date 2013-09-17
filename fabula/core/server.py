@@ -714,34 +714,9 @@ class Server(fabula.core.Engine):
 
             fabula.LOGGER.info("sending existing floor_plan and entities")
 
-            for tuple in room.floor_plan:
-
-                tile = room.floor_plan[tuple].tile
-
-                change_map_element_event = fabula.ChangeMapElementEvent(tile, tuple + (room.identifier, ))
-
-                # TODO: It's not very clean to write to self.message_for_remote directly since the procces_() methods are not supposed to do so.
-                #
-                self.message_for_remote.event_list.append(change_map_element_event)
-
-            for identifier in room.entity_locations:
-
-                entity = room.entity_dict[identifier]
-
-                spawn_event = fabula.SpawnEvent(entity,
-                                                room.entity_locations[identifier] + (room.identifier, ))
-
-                self.message_for_remote.event_list.append(spawn_event)
-
-                # Send properties of the Entity if there are any
-                #
-                for property in entity.property_dict.keys():
-
-                    change_property_event = fabula.ChangePropertyEvent(entity.identifier,
-                                                                       property,
-                                                                       entity.property_dict[property])
-
-                    self.message_for_remote.event_list.append(change_property_event)
+            # TODO: It's not very clean to write to self.message_for_remote directly since the procces_() methods are not supposed to do so.
+            #
+            self.message_for_remote.event_list.extend(self._generate_room_events(room.identifier))
 
             if len(self.rack.entity_dict):
 
@@ -770,6 +745,45 @@ class Server(fabula.core.Engine):
         kwargs["message"].event_list.append(event)
 
         return
+
+    def _generate_room_events(self, room_identifier):
+        """Generate and return a series of Events that establish an existing Room.
+
+           EnterRoomEvent and RoomCompleteEvent will not be included.
+        """
+
+        event_list = []
+
+        room = self.room_by_id[room_identifier]
+
+        for tuple in room.floor_plan:
+
+            tile = room.floor_plan[tuple].tile
+
+            change_map_element_event = fabula.ChangeMapElementEvent(tile, tuple + (room.identifier, ))
+
+            event_list.append(change_map_element_event)
+
+        for identifier in room.entity_locations:
+
+            entity = room.entity_dict[identifier]
+
+            spawn_event = fabula.SpawnEvent(entity,
+                                            room.entity_locations[identifier] + (room.identifier, ))
+
+            event_list.append(spawn_event)
+
+            # Set properties of the Entity if there are any
+            #
+            for property in entity.property_dict.keys():
+
+                change_property_event = fabula.ChangePropertyEvent(entity.identifier,
+                                                                   property,
+                                                                   entity.property_dict[property])
+
+                event_list.append(change_property_event)
+
+        return event_list
 
     def process_TriesToLookAtEvent(self, event, **kwargs):
         """Check what is being looked at, forward the Event and issue an according LookedAtEvent.

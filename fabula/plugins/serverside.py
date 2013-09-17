@@ -488,40 +488,49 @@ class DefaultGame(fabula.plugins.Plugin):
         else:
             fabula.LOGGER.info("Server has no room, sending Events from default.floorplan")
 
-            new_list = []
-            spawn_events = removed_events = 0
-
-            for returned_event in event_list:
-
-                if (isinstance(returned_event, fabula.SpawnEvent)
-                    and returned_event.entity.entity_type == fabula.PLAYER):
-
-                    spawn_events = spawn_events + 1
-
-                    if returned_event.entity.identifier == event.identifier:
-
-                        new_list.append(returned_event)
-
-                    else:
-                        msg = "discarding PLAYER SpawnEvent because identifier does not match: {}"
-
-                        fabula.LOGGER.info(msg.format(returned_event))
-
-                        removed_events = removed_events + 1
-
-                else:
-                    new_list.append(returned_event)
-
-            fabula.LOGGER.info("found {} SpawnEvents, removed {}".format(spawn_events,
-                                                                         removed_events))
-
-            if removed_events == spawn_events:
-
-                fabula.LOGGER.warning("all SpawnEvents removed! proceeding with undefined results")
-
-            self.message_for_host.event_list.extend(new_list)
+            self.message_for_host.event_list.extend(self._filter_spawn_events(event_list, event.identifier))
 
         return
+
+    def _filter_spawn_events(self, event_list, identifier):
+        """Remove all PLAYER SpawnEvents from event_list whose identifier does not match the given identifier.
+
+           Returns a new list of events.
+        """
+
+        new_list = []
+
+        spawn_events = removed_events = 0
+
+        for event in event_list:
+
+            if (isinstance(event, fabula.SpawnEvent)
+                and event.entity.entity_type == fabula.PLAYER):
+
+                spawn_events += 1
+
+                if event.entity.identifier == identifier:
+
+                    new_list.append(event)
+
+                else:
+                    msg = "Discarding PLAYER SpawnEvent because identifier does not match: {}"
+
+                    fabula.LOGGER.info(msg.format(event))
+
+                    removed_events += 1
+
+            else:
+                new_list.append(event)
+
+        fabula.LOGGER.info("Found {} SpawnEvents, removed {}".format(spawn_events,
+                                                                     removed_events))
+
+        if removed_events == spawn_events:
+
+            fabula.LOGGER.warning("All SpawnEvents removed! proceeding with undefined results")
+
+        return new_list
 
     def process_TriesToMoveEvent(self, event):
         """Queue the target to make the Entity move one step at a time.
