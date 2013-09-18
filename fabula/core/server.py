@@ -824,7 +824,9 @@ class Server(fabula.core.Engine):
                                                                          event.identifier))
 
             else:
-                fabula.LOGGER.info("AttemptFailed: {} neither in Rack nor Room".format(event.target_identifier))
+                msg = "AttemptFailed: '{}' not in Rack and not a valid location in any room's floor_plan"
+
+                fabula.LOGGER.info(msg.format(event.target_identifier))
 
                 # Issue AttemptFailed to unblock client.
                 #
@@ -852,7 +854,7 @@ class Server(fabula.core.Engine):
 
             if not room.floor_plan[event.target_identifier].entities:
 
-                fabula.LOGGER.info("AttemptFailed: no entity to talk to at {}".format(event.target_identifier))
+                fabula.LOGGER.info("AttemptFailed: no entity to talk to at location '{}'".format(event.target_identifier))
                 fabula.LOGGER.debug("room.entity_locations == {}".format(room.entity_locations))
 
                 kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
@@ -867,7 +869,7 @@ class Server(fabula.core.Engine):
                 kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.info("AttemptFailed: no key '{}' in floor_plan".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: '{}' is not a valid location in floor_plan".format(event.target_identifier))
 
             # Issue AttemptFailed to unblock client.
             #
@@ -1020,7 +1022,7 @@ class Server(fabula.core.Engine):
 
         if room is None:
 
-            fabula.LOGGER.warning("AttemptFailed: no room containing {}".format(event.identifier))
+            fabula.LOGGER.warning("AttemptFailed: no room containing '{}'".format(event.identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -1030,7 +1032,7 @@ class Server(fabula.core.Engine):
         #
         elif event.target_identifier[:2] not in room.floor_plan:
 
-            fabula.LOGGER.info("AttemptFailed: target {} not in Room.floor_plan".format(event.target_identifier[:2], event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: target '{}' is not a valid location in floor_plan".format(event.target_identifier[:2], event.item_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 
@@ -1038,7 +1040,7 @@ class Server(fabula.core.Engine):
 
         elif room.floor_plan[event.target_identifier[:2]].tile.tile_type != fabula.FLOOR:
 
-            fabula.LOGGER.info("AttemptFailed: tile at {} not FLOOR".format(event.target_identifier[:2], event.item_identifier))
+            fabula.LOGGER.info("AttemptFailed: tile at '{}' not FLOOR".format(event.target_identifier[:2], event.item_identifier))
 
             kwargs["message"].event_list.append(fabula.AttemptFailedEvent(event.identifier))
 

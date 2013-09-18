@@ -25,6 +25,7 @@ import fabula.core
 import time
 import datetime
 import traceback
+import os
 
 class Client(fabula.core.Engine):
     """An instance of this class is the main engine in every Fabula client.
@@ -87,8 +88,9 @@ class Client(fabula.core.Engine):
         self.room = None
 
         # Override logfile name
+        # Use PID for unique name. Two clients may run in the same directory.
         #
-        self.logfile_name = "messages-client-received.log"
+        self.logfile_name = "messages-client-{}-received.log".format(os.getpid())
 
         # Set up flags used by self.run()
         #

@@ -400,7 +400,10 @@ class App:
                 """
                 logging.Formatter.__init__(self, fmt, datefmt)
 
-                self.module_re = re.compile("^.*fabula/([^/]+/)*?([^/]+)(/__init__)*.py$")
+                # Using Unix "/" and MS Windows "\" path seperators.
+                # Which of course should be handled by os.path.
+                #
+                self.module_re = re.compile(r"^.*[/\\]([^/\\]+[/\\])*?([^/\\]+)([/\\]__init__)*.py$")
 
             def format(self, record):
                 """Override logging.Formatter.format()
