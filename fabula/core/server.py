@@ -448,6 +448,8 @@ class Server(fabula.core.Engine):
             #
             for room_identifier, room_message in self.message_by_room_id.items():
 
+                fabula.LOGGER.debug("Processing message for Room '{}'".format(room_identifier))
+
                 # Find active clients and build a message for each client
                 #
                 client_message_dict = {}
@@ -516,7 +518,7 @@ class Server(fabula.core.Engine):
 
                     if len(message.event_list):
 
-                        fabula.LOGGER.debug("'{}' ({}) outgoing: {}".format(connector,
+                        fabula.LOGGER.debug("'{}' ('{}') outgoing: {}".format(connector,
                                                                             client_identifier,
                                                                             message))
 
@@ -1094,7 +1096,7 @@ class Server(fabula.core.Engine):
 
             # TODO: remove player Entity here?
             #
-            msg = "NOT removing possible player Entity for '{}' from room '{}'"
+            msg = "NOT removing possible player Entity for '{}' from room {}"
 
             fabula.LOGGER.warning(msg.format(event.client_identifier,
                                              self.room_by_client[event.client_identifier]))

@@ -2684,12 +2684,16 @@ class PygameEditor(PygameUserInterface):
             fabula.LOGGER.debug("dimensions of fitted image: {}x{}".format(fitted_width,
                                                                            fitted_height))
 
+            #!!!
+            #self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
+            #                                                                   self.host.room.identifier))
+
             for x in range(int(fitted_width / spacing)):
 
                 for y in range(int(fitted_height / spacing)):
 
-                    # Create new Tile and sent it to Server
                     # Cave: dummy asset description
+                    # Create new Tile and sent it to Server
                     #
                     tile = fabula.Tile(fabula.FLOOR,
                                        {"image/png": fabula.Asset("dummy asset for ({}, {})".format(x, y))})
@@ -2701,11 +2705,11 @@ class PygameEditor(PygameUserInterface):
                     #
                     tile.assets["image/png"].data = fitted_surface.subsurface(rect)
 
-                    event = fabula.ChangeMapElementEvent(tile, (x, y))
+                    event = fabula.ChangeMapElementEvent(tile, (x, y, self.host.room.identifier))
 
                     self.host.message_for_host.event_list.append(event)
 
-            self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
+            #self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
         else:
             fabula.LOGGER.error("could not load image '{}'".format(filename))
@@ -3169,7 +3173,7 @@ class PygameEditor(PygameUserInterface):
             if self.host.room.floor_plan[coordinates].tile.tile_type == fabula.OBSTACLE:
 
                 overlay_plane = planes.Plane(str(coordinates) + "_overlay",
-                                                 pygame.Rect(self.window.room.tiles.subplanes[str(coordinates)].rect),
+                                                 pygame.Rect(self.window.room.tiles.subplanes[str(coordinates + (self.host.room.identifier, ))].rect),
                                                  left_click_callback = self.make_tile_floor)
 
                 overlay_plane.image = self.overlay_surface
@@ -3189,9 +3193,13 @@ class PygameEditor(PygameUserInterface):
         # TODO: blindly assuming "image/png"
         #
         coordinates = eval(plane.name)
-        uri = self.host.room.floor_plan[coordinates].tile.assets["image/png"].uri
 
-        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.OBSTACLE, {"image/png": fabula.Asset(uri)}),
+        # NOTE: floor_plan uses (x, y) tuples
+        #
+        uri = self.host.room.floor_plan[coordinates[:2]].tile.assets["image/png"].uri
+        data = self.host.room.floor_plan[coordinates[:2]].tile.assets["image/png"].data
+
+        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.OBSTACLE, {"image/png": fabula.Asset(uri, data = data)}),
                                              coordinates)
 
         self.host.message_for_host.event_list.append(event)
@@ -3224,9 +3232,10 @@ class PygameEditor(PygameUserInterface):
         #
         coordinates = eval(plane.name.split("_overlay")[0])
         uri = self.host.room.floor_plan[coordinates].tile.assets["image/png"].uri
+        data = self.host.room.floor_plan[coordinates].tile.assets["image/png"].data
 
-        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, {"image/png": fabula.Asset(uri)}),
-                                             coordinates)
+        event = fabula.ChangeMapElementEvent(fabula.Tile(fabula.FLOOR, {"image/png": fabula.Asset(uri, data = data)}),
+                                             coordinates + (self.host.room.identifier, ))
 
         self.host.message_for_host.event_list.append(event)
 

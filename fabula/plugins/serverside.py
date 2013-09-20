@@ -987,10 +987,17 @@ class Editor(DefaultGame):
 
         # Upon first call we have a host and thus a decent room and rack
         # TODO: of course it is a waste to set that on every call
-        # NOTE: using first room in host
+        # HACK: using last room in host TODO: fix
         #
-        self.room = list(self.host.room_by_id.values())[0]
+        if len(self.host.room_by_id):
+            self.room = list(self.host.room_by_id.values())[-1]
+        else:
+            # Dummy room for the meantime
+            #
+            self.room = fabula.Room("dummy")
+
         self.rack = self.host.rack
+
 
         self.message_for_host = DefaultGame.process_message(self, message)
 
@@ -1035,9 +1042,9 @@ class Editor(DefaultGame):
             self.message_for_host.event_list.append(fabula.EnterRoomEvent(self.client_id,
                                                                           "edit_this"))
 
-            tile = fabula.Tile(fabula.FLOOR, "100x100-gray.png")
+            tile = fabula.Tile(fabula.FLOOR, {"image/png": fabula.Asset("100x100-gray.png")})
 
-            event = fabula.ChangeMapElementEvent(tile, (0, 0))
+            event = fabula.ChangeMapElementEvent(tile, (0, 0, "edit_this"))
 
             self.message_for_host.event_list.append(event)
 
@@ -1047,10 +1054,10 @@ class Editor(DefaultGame):
                                    entity_type = fabula.PLAYER,
                                    blocking = False,
                                    mobile = True,
-                                   asset_desc = "player-fabulasheet.png")
+                                   assets = {"image/png": fabula.Asset("player-fabulasheet.png")})
 
             self.message_for_host.event_list.append(fabula.SpawnEvent(entity,
-                                                                     (0, 0)))
+                                                                     (0, 0, "edit_this")))
 
             # Force recreation of the tiles plane
             #
