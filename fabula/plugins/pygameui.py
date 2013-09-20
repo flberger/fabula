@@ -418,6 +418,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        PygameUserInterface.screensize
            A tuple (width, height), holding the size of the screen.
 
+       PygameUserInterface.fullscreen
+           A boolean flag whether to run in fullscreen or not.
+
        PygameUserInterface.spacing
            Spacing between tiles.
 
@@ -479,9 +482,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        The planes are attributes of PygameUserInterface:
 
        PygameUserInterface.window
-           An instance of planes.Display. Dimensions are given by
+           An instance of planes.Display. Initially None, will be created by
+           PygameUserInterface._setup_display(). Dimensions are given by
            PygameUserInterface.screensize. By default opened in windowed mode,
-           this can be changed by editing   the file fabula.conf.
+           this can be changed by editing the file fabula.conf.
 
        PygameUserInterface.window.room
            planes Plane for the room. Initially it will have a size of 0x0 px.
@@ -532,13 +536,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.clock = pygame.time.Clock()
 
         # Hardwired screen size.
+        # Jakob Nielsen's [2012 recommendation](http://www.nngroup.com/articles/computer-screens-getting-bigger/)
+        # is optimizing for 1440x768, but we leave some space by default.
         #
-        self.screensize = (800, 600)
-        #self.screensize = (1024, 768)
+        self.screensize = (1024, 768)
 
         # Spacing between tiles.
         #
-        self.spacing = 100
+        self.spacing = 128
 
         # Counter for scrolling left-right
         #
@@ -555,7 +560,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         os.environ["SDL_VIDEO_CENTERED"] = "1"
 
-        fullscreen = False
+        self.fullscreen = False
 
         if fabula.CONFIGPARSER is not None and fabula.CONFIGPARSER.has_option("fabula", "fullscreen"):
 
@@ -563,51 +568,25 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 fabula.LOGGER.info("found fullscreen option in fabula.conf, going fullscreen")
 
-                fullscreen = True
+                self.fullscreen = True
 
-        # Open a planes window.
+        # Will be created by _setup_display() called later
         #
-        self.window = planes.Display(self.screensize, fullscreen)
+        self.window = None
 
-        # Create a black pygame surface for fade effects.
+        # Will be created by _setup_display() called later
         #
-        self.fade_surface = self.window.image.copy()
+        self.fade_surface = None
 
         # Create loading text surface to be used in process_EnterRoomEvent
         #
         self.loading_surface = planes.gui.FONTS.big_font.render("Loading, please wait...",
-                                                              True,
-                                                              (255, 255, 255))
+                                                                True,
+                                                                (255, 255, 255))
 
-        # Create inventory plane.
+        # Will be created by _setup_display() called later
         #
-        self.inventory_plane = planes.Plane("inventory",
-                                            pygame.Rect((0, 500), (800, 100)),
-                                            dropped_upon_callback = self.inventory_callback)
-
-        self.inventory_plane.image.fill((64, 64, 64))
-
-        # Copied from get_connection_details().
-        # TODO: Again a reason for an image loading routine.
-        #
-        try:
-            file = self.assets.fetch("inventory.png")
-
-            surface = pygame.image.load(file)
-
-            file.close()
-
-            # Convert to internal format suitable for blitting.
-            # Not using convert_alpha(), no RGBA support fo inventory.
-            #
-            surface = surface.convert()
-
-            fabula.LOGGER.debug("using inventory.png")
-
-            self.inventory_plane.image = surface
-
-        except:
-            fabula.LOGGER.warning("inventory.png not found, no inventory background")
+        self.inventory_plane = None
 
         # Load the standard attempt icons
         #
@@ -630,10 +609,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             file.close()
 
-            # Convert to internal format suitable for blitting
-            #
-            surface = surface.convert_alpha()
-
             # Create Rect - taken from above
             #
             rect = pygame.Rect((0, 0), surface.get_rect().size)
@@ -641,8 +616,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             # Create Plane
             #
             plane = planes.Plane(name,
-                                     rect,
-                                     left_click_callback = self.attempt_icon_callback)
+                                 rect,
+                                 left_click_callback = self.attempt_icon_callback)
 
             plane.image = surface
 
@@ -654,21 +629,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         self.right_clicked_entity = None
 
-        # Create plane for the room.
-        # This Plane is only there to collect subplanes and hence is initialised
-        # with 0x0 pixels. The final Plane will be created by process_RoomCompleteEvent().
+        # Will be created by _setup_display() called later
         #
-        self.window.sub(planes.Plane("room",
-                                     pygame.Rect((0, 0), (0, 0))))
-
-        # Create a subplane as a sort-of buffer for Tiles.
-        #
-        self.window.room.sub(planes.Plane("tiles",
-                                          pygame.Rect((0, 0), (0, 0))))
-
-        # Initialise on screen display.
-        #
-        self.osd = PygameOSD(self.window)
+        self.osd = None
 
         # Stub for the screen recording directory
         #
@@ -679,6 +642,76 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.mousescroll = mousescroll
 
         fabula.LOGGER.debug("complete")
+
+        return
+
+    def _setup_display(self):
+        """Set up the planes Display, utilising PygameUserInterface.screensize and PygameUserInterface.fullscreen.
+        """
+
+        if self.window is None:
+
+            fabula.LOGGER.info("No main window yet, creating")
+
+            # Open a planes window.
+            #
+            self.window = planes.Display(self.screensize, self.fullscreen)
+
+            # Create a black pygame surface for fade effects.
+            #
+            self.fade_surface = self.window.image.copy()
+
+            # Create inventory plane.
+            # TODO: Hardcoded dimensions
+            #
+            self.inventory_plane = planes.Plane("inventory",
+                                                pygame.Rect((0, self.spacing * 5),
+                                                            (self.screensize[0], self.spacing)),
+                                                dropped_upon_callback = self.inventory_callback)
+
+            self.inventory_plane.image.fill((64, 64, 64))
+
+            # Copied from get_connection_details().
+            # TODO: Again a reason for an image loading routine.
+            #
+            try:
+                file = self.assets.fetch("inventory.png")
+
+                surface = pygame.image.load(file)
+
+                file.close()
+
+                fabula.LOGGER.debug("using inventory.png")
+
+                # Not using convert_alpha(), no RGBA support fo inventory.
+                #
+                self.inventory_plane.image = surface.convert()
+
+            except:
+                fabula.LOGGER.warning("inventory.png not found, no inventory background")
+
+            # Convert already establishes planes to internal format suitable for
+            # blitting.
+
+            for plane in self.attempt_icon_planes:
+
+                plane.image = plane.image.convert_alpha()
+
+            # Create plane for the room.
+            # This Plane is only there to collect subplanes and hence is initialised
+            # with 0x0 pixels. The final Plane will be created by process_RoomCompleteEvent().
+            #
+            self.window.sub(planes.Plane("room",
+                                         pygame.Rect((0, 0), (0, 0))))
+
+            # Create a subplane as a sort-of buffer for Tiles.
+            #
+            self.window.room.sub(planes.Plane("tiles",
+                                              pygame.Rect((0, 0), (0, 0))))
+
+            # Initialise on screen display.
+            #
+            self.osd = PygameOSD(self.window)
 
         return
 
@@ -700,7 +733,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         fabula.LOGGER.debug("called")
 
         # Display the splash screen
+
+        # TODO: Replace by Tkinter dialog box?
         #
+        self._setup_display()
+
         # TODO: copied from above. Maybe an image loading routine would be good.
 
         try:
@@ -1055,6 +1092,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         """
 
         fabula.LOGGER.info("entering room: {}".format(event.room_identifier))
+
+        self._setup_display()
 
         fabula.LOGGER.debug("fading out")
 

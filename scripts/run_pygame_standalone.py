@@ -34,9 +34,23 @@ import fabula.plugins.pygameui
 import fabula.plugins.serverside
 import fabula.run
 
+class SmallPygameUI(fabula.plugins.pygameui.PygameUserInterface):
+    """A 800x600 PygameUI.
+    """
+
+    def __init__(self, assets, framerate, host, mousescroll = False):
+
+        fabula.plugins.pygameui.PygameUserInterface.__init__(self, assets, framerate, host, mousescroll)
+
+        self.screensize = (800, 600)
+        self.spacing = 100
+
+        return
+
+
 def main():
     app = fabula.run.App(timeout = 0)
-    app.user_interface_class = fabula.plugins.pygameui.PygameUserInterface
+    app.user_interface_class = SmallPygameUI
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
     app.run_standalone(30, 0.8)
 
