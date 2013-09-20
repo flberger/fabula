@@ -2555,11 +2555,15 @@ class PygameEditor(PygameUserInterface):
 
         # Spacing is a little larger here to show grid lines.
         #
-        self.spacing = 101
+        self.spacing += 1
 
         # Setup a cache for planes
         #
         self.plane_cache = []
+
+        # Create planes Display
+        #
+        self._setup_display()
 
         # Set window name
         #
@@ -2568,7 +2572,7 @@ class PygameEditor(PygameUserInterface):
         # Create a semi-transparent red Surface to be used as an OBSTACLE
         # indicator overlay
         #
-        self.overlay_surface = pygame.Surface((100, 100))
+        self.overlay_surface = pygame.Surface((self.spacing, self.spacing))
         self.overlay_surface.fill((255, 0, 0))
         self.overlay_surface.set_alpha(127)
 
@@ -2681,10 +2685,9 @@ class PygameEditor(PygameUserInterface):
 
         if new_image is not None:
 
-            # TODO: hardcoded spacing
-            # Cannot use self.spacing since it is deliberately larger than PygameUserInterface.spacing
+            # TODO: hardcoded spacing, assuming 1 was added
             #
-            spacing = 100
+            spacing = self.spacing - 1
 
             image_width, image_height = new_image.get_size()
 
@@ -2723,9 +2726,10 @@ class PygameEditor(PygameUserInterface):
             fabula.LOGGER.debug("dimensions of fitted image: {}x{}".format(fitted_width,
                                                                            fitted_height))
 
-            #!!!
-            #self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
-            #                                                                   self.host.room.identifier))
+            # We have to re-enter the current room for the UI to display the
+            # Tiles properly.
+            self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
+                                                                               self.host.room.identifier))
 
             for x in range(int(fitted_width / spacing)):
 
@@ -2748,7 +2752,12 @@ class PygameEditor(PygameUserInterface):
 
                     self.host.message_for_host.event_list.append(event)
 
-            #self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
+            # Respawn current Entities. To achieve that, we recreate the room
+            # and filter out all ChangeMapElementEvents.
+            #
+            self.host.message_for_host.event_list.extend([event for event in self.host.host._generate_room_events(self.host.room.identifier) if not isinstance(event, fabula.ChangeMapElementEvent)])
+
+            self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
         else:
             fabula.LOGGER.error("could not load image '{}'".format(filename))
@@ -2786,8 +2795,10 @@ class PygameEditor(PygameUserInterface):
             fabula.LOGGER.warning("no filename selected")
 
         else:
-            fabula.LOGGER.info("save to: {}".format(filename))
+            fabula.LOGGER.info("save to: '{}'".format(filename))
 
+            # NOTE: Using filename as new room identifier
+            #
             self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
                                                                                filename))
 
@@ -2801,7 +2812,7 @@ class PygameEditor(PygameUserInterface):
                     #
                     current_file = filename + "-{0}_{1}.png".format(x, y)
                     fabula.LOGGER.debug(current_file)
-                    pygame.image.save(self.window.room.tiles.subplanes[str((x, y))].image,
+                    pygame.image.save(self.window.room.tiles.subplanes[str((x, y, self.host.room.identifier))].image,
                                       os.path.join(path, current_file))
 
                     # Send renamed Tile to Server
@@ -2810,7 +2821,9 @@ class PygameEditor(PygameUserInterface):
                     tile = fabula.Tile(self.host.room.floor_plan[(x, y)].tile.tile_type,
                                        {"image/png": fabula.Asset(current_file)})
 
-                    event = fabula.ChangeMapElementEvent(tile, (x, y))
+                    # NOTE: Using filename as new room identifier
+                    #
+                    event = fabula.ChangeMapElementEvent(tile, (x, y, filename))
 
                     self.host.message_for_host.event_list.append(event)
 
@@ -2833,34 +2846,30 @@ class PygameEditor(PygameUserInterface):
 
                         entities_string = entities_string + '\t"{}"'.format(argument_list)
 
-                    roomfile.write('"{}"\t"{}"\t"{}"{}\n'.format(repr((x, y)),
+                    roomfile.write('"{}"\t"{}, {}"{}\n'.format(repr((x, y)),
                                                                  tile.tile_type,
                                                                  tile.assets["image/png"].uri,
                                                                  entities_string))
 
             roomfile.close()
 
-            fabula.LOGGER.info("wrote {}".format(filename + ".floorplan"))
+            fabula.LOGGER.info("wrote '{}'".format(filename + ".floorplan"))
 
             # Then respawn all current Entities in the Server since
             # EnterRoomEvent will set up a new room
             #
-            for identifier in self.host.room.entity_dict.keys():
+            for event in self.host.host._generate_room_events(self.host.room.identifier):
 
-                # Create a new Entity which can be pickled by Event loggers
-                # TODO: still necessary?
-                # TODO: blindly assuming "image/png"
-                #
-                entity = fabula.Entity(identifier,
-                                       self.host.room.entity_dict[identifier].entity_type,
-                                       self.host.room.entity_dict[identifier].blocking,
-                                       self.host.room.entity_dict[identifier].mobile,
-                                       {"image/png": fabula.Asset(self.host.room.entity_dict[identifier].assets["image/png"].uri)})
+                if not isinstance(event, fabula.ChangeMapElementEvent):
 
-                event = fabula.SpawnEvent(entity,
-                                         self.host.room.entity_locations[identifier])
+                    if ("location" in event.__dict__.keys()
+                        and len(event.location) == 3):
 
-                self.host.message_for_host.event_list.append(event)
+                        event.location = (event.location[0],
+                                          event.location[1],
+                                          filename)
+
+                    self.host.message_for_host.event_list.append(event)
 
             self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
@@ -3396,7 +3405,7 @@ class PygameEditor(PygameUserInterface):
 
         # Shift room to have space for the GUI
         #
-        self.window.room.rect.left = 100
+        self.window.room.rect.left = self.spacing
 
         return
 
