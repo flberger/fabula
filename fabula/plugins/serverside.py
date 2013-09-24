@@ -317,6 +317,17 @@ class DefaultGame(fabula.plugins.Plugin):
 
         event_list = []
 
+        # Process Message queue
+        # NOTE: Doing this first, it might establish a Room for a client to handle MovesToEvents.
+        #
+        if len(self.message_queue):
+
+            fabula.LOGGER.info("adding events from message_queue")
+
+            for message in self.message_queue.pop(0):
+
+                event_list.extend(message.event_list)
+
         # Create a new list to be able to change the dict during iteration.
         #
         for identifier in list(self.tries_to_move_dict.keys()):
@@ -383,16 +394,6 @@ class DefaultGame(fabula.plugins.Plugin):
 
                         del self.tries_to_move_dict[identifier]
                         del self.path_dict[identifier]
-
-        # Process Message queue
-        #
-        if len(self.message_queue):
-
-            fabula.LOGGER.info("adding events from message_queue")
-
-            for message in self.message_queue.pop(0):
-
-                event_list.extend(message.event_list)
 
         return event_list
 
