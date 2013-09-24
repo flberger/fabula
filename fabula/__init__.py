@@ -1612,6 +1612,14 @@ class Rack:
         """Return and remove the Entity identified by identifier.
         """
 
+        # TODO: contracts...
+
+        if identifier not in self.entity_dict.keys():
+
+            fabula.LOGGER.critical("Can not retrieve '{}': not in Rack".format(identifier))
+
+            raise KeyError("Can not retrieve '{}': not in Rack".format(identifier))
+
         entity = self.entity_dict[identifier]
 
         del self.entity_dict[identifier]
