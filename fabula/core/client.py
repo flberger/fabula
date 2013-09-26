@@ -815,7 +815,7 @@ class Client(fabula.core.Engine):
             kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.warning("Entity to delete does not exist.")
+            fabula.LOGGER.warning("Entity '{}' to delete does not exist".format(event.identifier))
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """This method empties all data structures and passes the event on
@@ -827,6 +827,18 @@ class Client(fabula.core.Engine):
         # Delete old room and create new
         #
         self.room = fabula.Room(event.room_identifier)
+
+        # Clear Rack from items we don't own
+        #
+        for item_identifier in list(self.rack.owner_dict.keys()):
+
+            if self.rack.owner_dict[item_identifier] != self.client_id:
+
+                del self.rack.owner_dict[item_identifier]
+
+                del self.rack.entity_dict[item_identifier]
+
+        fabula.LOGGER.debug("Rack after cleanup: {}".format(self.rack))
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them

@@ -767,19 +767,24 @@ class Server(fabula.core.Engine):
 
             for identifier in self.rack.entity_dict:
 
-                # We must spawn at a valid location. Spawning at the first
-                # coordinate tuple in the room. Doesn't matter, it will be
-                # picked up in an instant anyway.
+                # Only send items that are owned by Entities currently in this
+                # room.
                 #
-                spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                                list(room.floor_plan.keys())[0] + (room.identifier, ))
+                if self.rack.owner_dict[identifier] in self.room_by_id[room.identifier].entity_dict.keys():
 
-                event_list.append(spawn_event)
+                    # We must spawn at a valid location. Spawning at the first
+                    # coordinate tuple in the room. Doesn't matter, it will be
+                    # picked up in an instant anyway.
+                    #
+                    spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
+                                                    list(room.floor_plan.keys())[0] + (room.identifier, ))
 
-                picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
-                                                     identifier)
+                    event_list.append(spawn_event)
 
-                event_list.append(picks_up_event)
+                    picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
+                                                         identifier)
+
+                    event_list.append(picks_up_event)
 
         return event_list
 

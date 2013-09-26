@@ -1618,7 +1618,7 @@ class Rack:
 
             fabula.LOGGER.critical("Can not retrieve '{}': not in Rack".format(identifier))
 
-            raise KeyError("Can not retrieve '{}': not in Rack".format(identifier))
+            raise KeyError("Can not retrieve '{}': not in Rack {}".format(identifier, str(self)))
 
         entity = self.entity_dict[identifier]
 
@@ -1627,6 +1627,20 @@ class Rack:
         del self.owner_dict[identifier]
 
         return entity
+
+    def __repr__(self):
+        """Official string representation.
+        """
+
+        return representation(self, [])
+
+    def __str__(self):
+        """Inofficial, informative string representation.
+        """
+
+        msg = "<Rack entity_dict.keys == {} owner_dict == {}>"
+
+        return(msg.format(list(self.entity_dict.keys()), self.owner_dict))
 
 ############################################################
 # Utilities
