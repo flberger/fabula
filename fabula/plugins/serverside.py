@@ -723,15 +723,15 @@ class DefaultGame(fabula.plugins.Plugin):
 
             entity = room.entity_dict[event.item_identifier]
 
-        fabula.LOGGER.info("returning DropsEvent")
-
-        self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                  event.item_identifier,
-                                                                  event.target_identifier[:2]))
-
         if entity is None:
 
             entity = self.host.rack.entity_dict[event.item_identifier]
+
+        fabula.LOGGER.info("returning DropsEvent")
+
+        self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                  entity,
+                                                                  event.target_identifier[:2]))
 
         # Check if the dropped Entity is blocking, and if so, block
         # the spot internally
@@ -1089,15 +1089,15 @@ class Editor(DefaultGame):
 
                 entity = self.room.entity_dict[event.item_identifier]
 
-            fabula.LOGGER.info("returning DropsEvent")
-
-            self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                     event.item_identifier,
-                                                                     event.target_identifier))
-
             if entity is None:
 
                 entity = self.host.rack.entity_dict[event.item_identifier]
+
+            fabula.LOGGER.info("returning DropsEvent")
+
+            self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                      entity,
+                                                                      event.target_identifier))
 
             # Check if the dropped Entity is blocking, and if so, block
             # the spot internally
@@ -1355,7 +1355,7 @@ class CommandLine(DefaultGame):
         elif token_list[0] == "drop" and len(token_list) == 5:
 
             event = fabula.DropsEvent(token_list[1],
-                                      token_list[2],
+                                      self.host.rack.entity_dict(token_list[2]),
                                       (int(token_list[3]), int(token_list[4])))
 
             return_string = "<- {}".format(event)

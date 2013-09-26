@@ -583,14 +583,25 @@ class Client(fabula.core.Engine):
         #
         fabula.LOGGER.debug("called")
 
-        # Respawn the Entity to be dropped in Engine.room
-        # Delete it from Engine.rack
-        #
-        # TODO: Fails when Entity not in rack. Contracts.
-        #
-        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+        # Maybe someone drops something which is not in our rack, for example
+        # if the dropping Entity brings the item from a different room.
 
-        dropped_entity = self.rack.retrieve(event.item_identifier)
+        dropped_entity = None
+
+        if event.entity.identifier in self.rack.entity_dict.keys():
+
+            # Respawn the Entity to be dropped in Engine.room
+            # Delete it from Engine.rack
+            #
+            fabula.LOGGER.info("removing '{}' from Rack".format(event.entity.identifier))
+
+            dropped_entity = self.rack.retrieve(event.entity.identifier)
+
+        else:
+
+            dropped_entity = event.entity
+
+        fabula.LOGGER.info("Spawning '{}' in Room".format(dropped_entity.identifier))
 
         spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
 

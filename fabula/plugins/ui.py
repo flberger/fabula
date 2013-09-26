@@ -450,9 +450,9 @@ class UserInterface(fabula.plugins.Plugin):
 
         # Spawn the dropped Entity
         #
-        fabula.LOGGER.info("spawning '{}' in room".format(event.item_identifier))
+        fabula.LOGGER.info("spawning '{}' in room".format(event.entity.identifier))
 
-        entity = self.host.room.entity_dict[event.item_identifier]
+        entity = self.host.room.entity_dict[event.entity.identifier]
 
         self.process_SpawnEvent(fabula.SpawnEvent(entity, event.location))
 

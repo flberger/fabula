@@ -1225,9 +1225,9 @@ class Server(fabula.core.Engine):
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
-        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.entity.identifier))
 
-        dropped_entity = self.rack.retrieve(event.item_identifier)
+        dropped_entity = self.rack.retrieve(event.entity.identifier)
 
         spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
 

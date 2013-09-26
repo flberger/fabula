@@ -453,23 +453,50 @@ class DropsEvent(ConfirmEvent):
        DropsEvent.identifier
            identifier of the Entity to drop the item
 
-       DropsEvent.item_identifier
-           The item to be dropped on the map
+       DropsEvent.entity
+           The Entity to be dropped on the map
 
        DropsEvent.location
            A description as in the TriesToMoveEvent
     """
 
-    def __init__(self, identifier, item_identifier, location):
+    def __init__(self, identifier, entity, location):
         """Event initialisation.
-           item_identifier identifies the item to be dropped on the map.
+           entity is the Entity to be dropped on the map.
            location is a description as in the TriesToMoveEvent.
         """
         self.identifier = identifier
 
-        self.item_identifier = item_identifier
+        self.entity = entity
 
         self.location = location
+
+    def json(self):
+        """Return a JSON representation of the DropsEvent.
+        """
+
+        # This Event need special care because it carries an Entity that must be
+        # JSON-serialized.
+
+        json_str = '{{"class" : "{}", "identifier" : "{}", "entity" : {}, "location" : {}}}'
+
+        # We pipe the whole thing back and forth through json, to get both
+        # validation and pretty-printing.
+        #
+        # See Message.json().
+        #
+        # Use list() to get JSON-style square brackets for tuples.
+        #
+        # TODO: Use compact JSON, and indentation only in doctest
+        #
+        # Remove trailing whitespace
+        #
+        return "\n".join([line.rstrip() for line in json.dumps(json.loads(json_str.format(self.__class__.__name__,
+                                                                                          self.identifier,
+                                                                                          self.entity.json(),
+                                                                                          str(list(self.location)))),
+                                                                           sort_keys = True,
+                                                                           indent = 4).splitlines()])
 
 class CanSpeakEvent(ConfirmEvent):
     """This is a server invitation for the player or an NPC to speak.

@@ -82,16 +82,6 @@ Excluding passive Events.
         "identifier": "identifier",
         "item_identifier": "item_identifier"
     }
-    >>> print(fabula.DropsEvent("identifier", "item_identifier", (0, 1)).json())
-    {
-        "class": "DropsEvent",
-        "identifier": "identifier",
-        "item_identifier": "item_identifier",
-        "location": [
-            0,
-            1
-        ]
-    }
     >>> print(fabula.CanSpeakEvent("identifier", ["sentences", "is", "a", "list", "of", "strings"]).json())
     {
         "class": "CanSpeakEvent",
@@ -176,6 +166,28 @@ Excluding passive Events.
             "identifier": "identifier",
             "mobile": true
         },
+        "location": [
+            0,
+            1
+        ]
+    }
+    >>> print(fabula.DropsEvent("identifier", entity, (0, 1)).json())
+    {
+        "class": "DropsEvent",
+        "entity": {
+            "assets": {
+                "text/plain": {
+                    "data": null,
+                    "uri": "entity.txt"
+                }
+            },
+            "blocking": false,
+            "class": "Entity",
+            "entity_type": "ITEM",
+            "identifier": "identifier",
+            "mobile": true
+        },
+        "identifier": "identifier",
         "location": [
             0,
             1
