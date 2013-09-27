@@ -317,6 +317,17 @@ class DefaultGame(fabula.plugins.Plugin):
 
         event_list = []
 
+        # Process Message queue
+        # NOTE: Doing this first, it might establish a Room for a client to handle MovesToEvents.
+        #
+        if len(self.message_queue):
+
+            fabula.LOGGER.info("adding events from message_queue")
+
+            for message in self.message_queue.pop(0):
+
+                event_list.extend(message.event_list)
+
         # Create a new list to be able to change the dict during iteration.
         #
         for identifier in list(self.tries_to_move_dict.keys()):
@@ -383,16 +394,6 @@ class DefaultGame(fabula.plugins.Plugin):
 
                         del self.tries_to_move_dict[identifier]
                         del self.path_dict[identifier]
-
-        # Process Message queue
-        #
-        if len(self.message_queue):
-
-            fabula.LOGGER.info("adding events from message_queue")
-
-            for message in self.message_queue.pop(0):
-
-                event_list.extend(message.event_list)
 
         return event_list
 
@@ -722,15 +723,15 @@ class DefaultGame(fabula.plugins.Plugin):
 
             entity = room.entity_dict[event.item_identifier]
 
-        fabula.LOGGER.info("returning DropsEvent")
-
-        self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                  event.item_identifier,
-                                                                  event.target_identifier[:2]))
-
         if entity is None:
 
             entity = self.host.rack.entity_dict[event.item_identifier]
+
+        fabula.LOGGER.info("returning DropsEvent")
+
+        self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                  entity,
+                                                                  event.target_identifier[:2]))
 
         # Check if the dropped Entity is blocking, and if so, block
         # the spot internally
@@ -1095,15 +1096,15 @@ class Editor(DefaultGame):
 
                 entity = self.room.entity_dict[event.item_identifier]
 
-            fabula.LOGGER.info("returning DropsEvent")
-
-            self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
-                                                                     event.item_identifier,
-                                                                     event.target_identifier))
-
             if entity is None:
 
                 entity = self.host.rack.entity_dict[event.item_identifier]
+
+            fabula.LOGGER.info("returning DropsEvent")
+
+            self.message_for_host.event_list.append(fabula.DropsEvent(event.identifier,
+                                                                      entity,
+                                                                      event.target_identifier))
 
             # Check if the dropped Entity is blocking, and if so, block
             # the spot internally
@@ -1361,7 +1362,7 @@ class CommandLine(DefaultGame):
         elif token_list[0] == "drop" and len(token_list) == 5:
 
             event = fabula.DropsEvent(token_list[1],
-                                      token_list[2],
+                                      self.host.rack.entity_dict(token_list[2]),
                                       (int(token_list[3]), int(token_list[4])))
 
             return_string = "<- {}".format(event)

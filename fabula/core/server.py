@@ -714,31 +714,11 @@ class Server(fabula.core.Engine):
                                         connector = kwargs["connector"],
                                         message = self.message_for_remote)
 
-            fabula.LOGGER.info("sending existing floor_plan and entities")
+            fabula.LOGGER.info("Sending existing floor_plan, entities and Rack")
 
             # TODO: It's not very clean to write to self.message_for_remote directly since the procces_() methods are not supposed to do so.
             #
-            self.message_for_remote.event_list.extend(self._generate_room_events(room.identifier))
-
-            if len(self.rack.entity_dict):
-
-                fabula.LOGGER.info("sending Spawn and PickUpEvents from existing rack")
-
-                for identifier in self.rack.entity_dict:
-
-                    # We must spawn at a valid location. Spawning at the first
-                    # coordinate tuple in the room. Doesn't matter, it will be
-                    # picked up in an instant anyway.
-                    #
-                    spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
-                                                    list(room.floor_plan.keys())[0] + (room.identifier, ))
-
-                    self.message_for_remote.event_list.append(spawn_event)
-
-                    picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
-                                                         identifier)
-
-                    self.message_for_remote.event_list.append(picks_up_event)
+            self.message_for_remote.event_list.extend(self._generate_room_rack_events(room.identifier))
 
         # If a room has already been sent, the plugin should only spawn a new
         # player entity.
@@ -748,8 +728,8 @@ class Server(fabula.core.Engine):
 
         return
 
-    def _generate_room_events(self, room_identifier):
-        """Generate and return a series of Events that establish an existing Room.
+    def _generate_room_rack_events(self, room_identifier):
+        """Generate and return a series of Events that establish an existing Room and the Rack.
 
            EnterRoomEvent and RoomCompleteEvent will not be included.
         """
@@ -784,6 +764,29 @@ class Server(fabula.core.Engine):
                                                                    entity.property_dict[property])
 
                 event_list.append(change_property_event)
+
+        if len(self.rack.entity_dict):
+
+            for identifier in self.rack.entity_dict:
+
+                # Only send items that are owned by Entities currently in this
+                # room.
+                #
+                if self.rack.owner_dict[identifier] in self.room_by_id[room.identifier].entity_dict.keys():
+
+                    # We must spawn at a valid location. Spawning at the first
+                    # coordinate tuple in the room. Doesn't matter, it will be
+                    # picked up in an instant anyway.
+                    #
+                    spawn_event = fabula.SpawnEvent(self.rack.entity_dict[identifier],
+                                                    list(room.floor_plan.keys())[0] + (room.identifier, ))
+
+                    event_list.append(spawn_event)
+
+                    picks_up_event = fabula.PicksUpEvent(self.rack.owner_dict[identifier],
+                                                         identifier)
+
+                    event_list.append(picks_up_event)
 
         return event_list
 
@@ -1224,9 +1227,9 @@ class Server(fabula.core.Engine):
         #
         # TODO: Fails when Entity not in rack. Contracts.
         #
-        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.entity.identifier))
 
-        dropped_entity = self.rack.retrieve(event.item_identifier)
+        dropped_entity = self.rack.retrieve(event.entity.identifier)
 
         spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
 

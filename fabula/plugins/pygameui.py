@@ -1539,6 +1539,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         #
         event.entity.display_caption()
 
+        # Finally - this may be a draggable item.
+        # Check only when we are not in the middle of establishing a Room.
+        #
+        if self.freeze == False:
+
+            self.make_items_draggable()
+
         return
 
     def process_DeleteEvent(self, event):

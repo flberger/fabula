@@ -583,14 +583,25 @@ class Client(fabula.core.Engine):
         #
         fabula.LOGGER.debug("called")
 
-        # Respawn the Entity to be dropped in Engine.room
-        # Delete it from Engine.rack
-        #
-        # TODO: Fails when Entity not in rack. Contracts.
-        #
-        fabula.LOGGER.info("removing '{}' from Rack and respawning in Room".format(event.item_identifier))
+        # Maybe someone drops something which is not in our rack, for example
+        # if the dropping Entity brings the item from a different room.
 
-        dropped_entity = self.rack.retrieve(event.item_identifier)
+        dropped_entity = None
+
+        if event.entity.identifier in self.rack.entity_dict.keys():
+
+            # Respawn the Entity to be dropped in Engine.room
+            # Delete it from Engine.rack
+            #
+            fabula.LOGGER.info("removing '{}' from Rack".format(event.entity.identifier))
+
+            dropped_entity = self.rack.retrieve(event.entity.identifier)
+
+        else:
+
+            dropped_entity = event.entity
+
+        fabula.LOGGER.info("Spawning '{}' in Room".format(dropped_entity.identifier))
 
         spawn_event = fabula.SpawnEvent(dropped_entity, event.location)
 
@@ -815,7 +826,7 @@ class Client(fabula.core.Engine):
             kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.warning("Entity to delete does not exist.")
+            fabula.LOGGER.warning("Entity '{}' to delete does not exist".format(event.identifier))
 
     def process_EnterRoomEvent(self, event, **kwargs):
         """This method empties all data structures and passes the event on
@@ -827,6 +838,18 @@ class Client(fabula.core.Engine):
         # Delete old room and create new
         #
         self.room = fabula.Room(event.room_identifier)
+
+        # Clear Rack from items we don't own
+        #
+        for item_identifier in list(self.rack.owner_dict.keys()):
+
+            if self.rack.owner_dict[item_identifier] != self.client_id:
+
+                del self.rack.owner_dict[item_identifier]
+
+                del self.rack.entity_dict[item_identifier]
+
+        fabula.LOGGER.debug("Rack after cleanup: {}".format(self.rack))
 
         # There possibly will be no more confirmation
         # for past attempts, so do not wait for them
