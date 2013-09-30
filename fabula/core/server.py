@@ -813,7 +813,11 @@ class Server(fabula.core.Engine):
 
                     room = current_room
 
-            if room is not None and event.target_identifier in room.floor_plan:
+            # TODO: Contracts. We sort of already have them here.
+            #
+            if (room is not None
+                and event.target_identifier in room.floor_plan
+                and len(room.floor_plan[event.target_identifier].entities)):
 
                 # Pick last Entity
                 #
@@ -827,7 +831,7 @@ class Server(fabula.core.Engine):
                                                                          event.identifier))
 
             else:
-                msg = "AttemptFailed: '{}' not in Rack and not a valid location in any room's floor_plan"
+                msg = "AttemptFailed: '{}' not in Rack and either not a valid location in any room's floor_plan, or no entities at that location"
 
                 fabula.LOGGER.info(msg.format(event.target_identifier))
 
@@ -853,7 +857,9 @@ class Server(fabula.core.Engine):
 
                 room = current_room
 
-        if room is not None and event.target_identifier in room.floor_plan:
+        if (room is not None
+            and event.target_identifier in room.floor_plan
+            and len(room.floor_plan[event.target_identifier].entities)):
 
             if not room.floor_plan[event.target_identifier].entities:
 
@@ -872,7 +878,7 @@ class Server(fabula.core.Engine):
                 kwargs["message"].event_list.append(event)
 
         else:
-            fabula.LOGGER.info("AttemptFailed: '{}' is not a valid location in floor_plan".format(event.target_identifier))
+            fabula.LOGGER.info("AttemptFailed: '{}' is not a valid location in floor_plan, or no entity there".format(event.target_identifier))
 
             # Issue AttemptFailed to unblock client.
             #
@@ -909,7 +915,9 @@ class Server(fabula.core.Engine):
 
             # TODO: contracts...
             #
-            if room is not None and event.target_identifier in room.floor_plan:
+            if (room is not None
+                and event.target_identifier in room.floor_plan
+                and len(room.floor_plan[event.target_identifier].entities)):
 
                 for entity in room.floor_plan[event.target_identifier].entities:
 
@@ -951,7 +959,9 @@ class Server(fabula.core.Engine):
 
         # TODO: contracts...
         #
-        if room is not None and event.target_identifier in room.floor_plan:
+        if (room is not None
+            and event.target_identifier in room.floor_plan
+            and len(room.floor_plan[event.target_identifier].entities)):
 
             # TODO: This only tries to pick up the very last Entity encountered.
             #
