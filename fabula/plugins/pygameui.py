@@ -460,6 +460,11 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            Boolen flag, indicating whether to scroll the screen when the mouse
            reaches a screen border.
 
+       PygameUserInterface.keybindings
+           A dict mapping instances of Pygame key constants to functions.
+           Will be handled by
+           PygameUserInterface.keybindings.collect_player_input().
+
        PygameUserInterface utilises the planes module for 2D bitmap rendering.
        The planes hierarchy is organised as follows:
 
@@ -640,6 +645,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         self.surfacecatcher = None
 
         self.mousescroll = mousescroll
+
+        self.keybindings = {}
 
         fabula.LOGGER.debug("complete")
 
@@ -953,6 +960,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
     def collect_player_input(self):
         """Gather Pygame events, scan for QUIT or special keys and let the planes Display evaluate the events.
+
+           This method will evaluate key bindings defined in the
+           PygameUserInterface.keybindings dict which maps Pygame key constants
+           to functions to be called when a key is pressed.
         """
 
         # TODO: The UserInterface should only ever collect and send one single client event to prevent cheating and blocking other clients in the server. (hint by Alexander Marbach)
@@ -1079,6 +1090,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 # TODO: Adding Events to self.message_for_host is weird. This should be returned instead in some way, shouldn't it?
                 #
                 self.message_for_host.event_list.append(event)
+
+            elif (self.keybindings
+                  and event.type == pygame.KEYDOWN
+                  and event.key in self.keybindings.keys()):
+
+                fabula.LOGGER.debug("Key '{}' pressed, calling function from keybindings".format(event.key))
+
+                self.keybindings[event.key]()
 
         self.window.process(events)
 

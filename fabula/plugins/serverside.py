@@ -526,7 +526,7 @@ class DefaultGame(fabula.plugins.Plugin):
             else:
                 new_list.append(event)
 
-        fabula.LOGGER.info("Found {} SpawnEvents, removed {}".format(spawn_events,
+        fabula.LOGGER.info("Found {} SpawnEvents, {} removed".format(spawn_events,
                                                                      removed_events))
 
         if removed_events == spawn_events:
