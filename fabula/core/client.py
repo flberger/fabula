@@ -420,7 +420,7 @@ class Client(fabula.core.Engine):
                                 try:
                                     if self.room.tile_is_walkable(event.target_identifier[:2]):
 
-                                        self.movement_cache[0] = self.host.room.entity_locations[event.identifier]
+                                        self.movement_cache[0] = self.room.entity_locations[event.identifier]
 
                                         moves_to_event = fabula.MovesToEvent(event.identifier,
                                                                              event.target_identifier[:2])
