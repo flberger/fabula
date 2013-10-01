@@ -212,7 +212,7 @@ class DefaultGame(fabula.plugins.Plugin):
            by DefaultGame.process_message().
    """
 
-    # TODO: Add a method change_room() or the like, which makes a player change from one room to another. Basically Server._generate_room_events() + Delete and Spawn.
+    # TODO: Add a method change_room() or the like, which makes a player change from one room to another. Basically Server._generate_room_rack_events() + Delete and Spawn.
 
     def __init__(self, host):
         """Initialise.

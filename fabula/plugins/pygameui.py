@@ -2781,7 +2781,7 @@ class PygameEditor(PygameUserInterface):
             # Respawn current Entities. To achieve that, we recreate the room
             # and filter out all ChangeMapElementEvents.
             #
-            self.host.message_for_host.event_list.extend([event for event in self.host.host._generate_room_events(self.host.room.identifier) if not isinstance(event, fabula.ChangeMapElementEvent)])
+            self.host.message_for_host.event_list.extend([event for event in self.host.host._generate_room_rack_events(self.host.room.identifier) if not isinstance(event, fabula.ChangeMapElementEvent)])
 
             self.host.message_for_host.event_list.append(fabula.RoomCompleteEvent())
 
@@ -2884,7 +2884,7 @@ class PygameEditor(PygameUserInterface):
             # Then respawn all current Entities in the Server since
             # EnterRoomEvent will set up a new room
             #
-            for event in self.host.host._generate_room_events(self.host.room.identifier):
+            for event in self.host.host._generate_room_rack_events(self.host.room.identifier):
 
                 if not isinstance(event, fabula.ChangeMapElementEvent):
 
