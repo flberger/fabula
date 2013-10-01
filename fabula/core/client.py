@@ -48,8 +48,9 @@ class Client(fabula.core.Engine):
        Client.timestamp
            Timestamp to detect server dropouts
 
-       Client.local_moves_to_event
-           Cache for the latest local MovesToEvent
+       Client.movement_cache
+           A list [location, MovesToEvent] which saves the latest Entity
+           position before the movement and the locally applied MovesToEvent.
 
        Client.room
            An instance of fabula.Room, initialy None.
@@ -108,7 +109,7 @@ class Client(fabula.core.Engine):
 
         # Remember the latest local MovesToEvent
         #
-        self.local_moves_to_event = fabula.MovesToEvent(None, None)
+        self.movement_cache = [None, fabula.MovesToEvent(None, None)]
 
         fabula.LOGGER.debug("complete")
 
@@ -419,6 +420,8 @@ class Client(fabula.core.Engine):
                                 try:
                                     if self.room.tile_is_walkable(event.target_identifier[:2]):
 
+                                        self.movement_cache[0] = self.room.entity_locations[event.identifier]
+
                                         moves_to_event = fabula.MovesToEvent(event.identifier,
                                                                              event.target_identifier[:2])
 
@@ -430,7 +433,7 @@ class Client(fabula.core.Engine):
                                         # Remember event for crosscheck with
                                         # event from Server
                                         #
-                                        self.local_moves_to_event = moves_to_event
+                                        self.movement_cache[1] = moves_to_event
 
                                     else:
                                         # Instead of
@@ -518,7 +521,7 @@ class Client(fabula.core.Engine):
 
         # Did this fail for the Entity we just moved locally?
         #
-        if event.identifier == self.local_moves_to_event.identifier:
+        if event.identifier == self.movement_cache[1].identifier:
 
             entity = self.room.entity_dict[event.identifier]
             location = self.room.entity_locations[event.identifier]
@@ -526,24 +529,17 @@ class Client(fabula.core.Engine):
             fabula.LOGGER.warning("attempt failed for '{}', now at {}".format(event.identifier,
                                                                               location))
 
-            # !!! TODO: This still relies on direction information which has been removed from Fabula core. Replace by a custom record of the old position.
-            #
-            vector = self.plugin.direction_vector_dict[entity.direction]
-
-            restored_x = location[0] - vector[0]
-            restored_y = location[1] - vector[1]
-
             self.room.process_MovesToEvent(fabula.MovesToEvent(event.identifier,
-                                                              (restored_x, restored_y)))
+                                                               self.movement_cache[0]))
 
             fabula.LOGGER.info("'{}' now reverted to {}".format(event.identifier,
-                                                                (restored_x, restored_y)))
+                                                                self.movement_cache[0]))
 
         # Call default to forward to the Plugin.
         #
         fabula.core.Engine.process_AttemptFailedEvent(self,
-                                                     event,
-                                                     message = kwargs["message"])
+                                                      event,
+                                                      message = kwargs["message"])
 
         if event.identifier == self.client_id:
 
@@ -676,34 +672,32 @@ class Client(fabula.core.Engine):
         """Notify the Room and add the event to the message.
         """
 
-        # Is this the very same as the latest
-        # local MovesToEvent?
+        # Is this the very same as the latest local MovesToEvent?
         #
-        if event.identifier == self.local_moves_to_event.identifier:
+        if event == self.movement_cache[1]:
 
-            if event.location == self.local_moves_to_event.location:
+            # Fine, we already had that.
+            #
+            msg = "server issued MovesToEvent already applied: {}"
+            fabula.LOGGER.info(msg.format(event))
 
-                # Fine, we already had that.
-                #
-                msg = "server issued MovesToEvent already applied: ('{}', {})"
-                fabula.LOGGER.info(msg.format(event.identifier, event.location))
+            # Reset copy of local event
+            #
+            self.movement_cache[0] = None
+            self.movement_cache[1] = fabula.MovesToEvent(None, None)
 
-                # Reset copy of local event
-                #
-                self.local_moves_to_event = fabula.MovesToEvent(None, None)
+            if event.identifier == self.client_id:
 
-                if event.identifier == self.client_id:
+                self.await_confirmation = False
 
-                    self.await_confirmation = False
+            return
 
-                return
+        else:
+            msg = "Recorded target location {} for Entity '{}' does not match incoming location {}"
 
-            else:
-                msg = "Recorded location {} for Entity '{}' does not match incoming location {}"
-
-                fabula.LOGGER.debug(msg.format(self.local_moves_to_event.location,
-                                               event.identifier,
-                                               event.location))
+            fabula.LOGGER.debug(msg.format(self.movement_cache[1].location,
+                                           event.identifier,
+                                           event.location))
 
         # Former default implementation
         #
@@ -720,7 +714,7 @@ class Client(fabula.core.Engine):
         # Only allow new input if the last
         # MovesToEvent has been confirmed.
         #
-        if self.local_moves_to_event.identifier == None:
+        if self.movement_cache[1].identifier == None:
 
             # TODO: check location == None as well?
             #

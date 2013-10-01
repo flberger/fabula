@@ -423,7 +423,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                     # TODO: exit properly
                     #
-                    raise SystemExit
+                    raise RuntimeError("cannot queue {}: not a Message instance".format(message))
 
             # Make a list to be able to extract elements
             #
@@ -431,11 +431,24 @@ class DefaultGame(fabula.plugins.Plugin):
 
             fabula.LOGGER.debug("got {}".format(messages))
 
-            # First append to existing Message lists
+            # First append to existing Message lists.
+            # Observe that each of self.message_queue or messages may be
+            # exhausted first.
             #
-            for message_list in self.message_queue:
+            i = len(self.message_queue)
 
-                message_list.append(messages.pop(0))
+            if len(messages) < i:
+
+                i = len(messages)
+
+            j = 0
+
+            while i:
+
+                self.message_queue[j].append(messages.pop(0))
+
+                j += 1
+                i -= 1
 
             # Queue the rest as lists
             #
