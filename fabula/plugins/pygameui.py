@@ -1983,9 +1983,30 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             #
             self.window.sub(says_box)
 
-        for frame in range(self._chars_to_frames(event.text)):
+        first_part = int(self._chars_to_frames(event.text) * 0.95)
+        second_part = self._chars_to_frames(event.text) - first_part
+
+        # The first can be closed on ESC
+        #
+        while first_part:
 
             self.display_single_frame()
+
+            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+
+                first_part = 0
+
+            else:
+
+                first_part -= 1
+
+        # The second half can not be canceled
+        #
+        while second_part:
+
+            self.display_single_frame()
+
+            second_part -= 1
 
         says_box.destroy()
 
