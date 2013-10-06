@@ -96,13 +96,19 @@ class EntityPlane(planes.Plane):
            A list of movement steps as position tuples
 
        EntityPlane.spritesheet
-           If not None, a Pygame Surface that contains a sprite sheet. The sheet
-           is assumed to consist of 4 rows. The first column contains the
-           static view of the Entity in front, left, back and right view (from
-           the first row down). Rows are supposed to contain movement animation
-           frames: the first row a downward movement in front view, the second
-           row a movement to the left in left view etc. Frames are assumed to be
-           of equal width and height.
+           If not None, a Pygame Surface that contains a sprite sheet.
+
+           The sheet is assumed to consist of 4 rows. The first column contains
+           the static view of the Entity in front, left, back and right view
+           (from the first row down). Rows are supposed to contain movement
+           animation frames: the first row a downward movement in front view,
+           the second row a movement to the left in left view etc.
+
+           A row of movement animations will be played distributed over the
+           course of UserInterface.action_time, which in turn is derived from
+           a ServerParametersEvent.
+
+           Frames are assumed to be of equal width and height.
 
        EntityPlane.subsurface_rect_list
            A list of Pygame Rects to create subsurfaces of the sprite sheet.
