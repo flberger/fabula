@@ -85,7 +85,7 @@ INCLUDE_FILES.extend([os.path.join("scripts", "default.floorplan"),
                       os.path.join("scripts", "tree_large.png"),
                       os.path.join("scripts", "tree_small.png")])
 
-INCLUDE_FILES.extend(glob.glob(os.path.join("scripts", "default-*.png")))
+INCLUDE_FILES.extend(glob.glob(os.path.join("scripts", "demo_background*.png")))
 
 if sys.platform == "win32":
     INCLUDE_FILES.append(os.path.join(sys.prefix, "tcl", "tcl8.5"))
