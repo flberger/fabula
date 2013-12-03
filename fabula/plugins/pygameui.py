@@ -1767,10 +1767,6 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                 self.display_single_frame()
                 frames = frames - 1
 
-            # Mark Entity Plane as changed to trigger redraw of the room
-            #
-            #self.window.room.subplanes[event.identifier].last_rect = None
-
             self.window.remove(flash_plane)
             
             self.display_single_frame()
