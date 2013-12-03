@@ -24,6 +24,7 @@
 # October-December 2009, which in turn borrowed a lot from the PyGame-based
 # CharanisMLClient developed in May 2008.
 
+# TODO: Make blocking nature of SaysEvent more apparent, e.g. dimmed screen.
 # TODO: Make screen resolution and tile size configurable
 # TODO: always display and log full paths of saved or loaded files
 # TODO: in PygameEditor, display all assets from local folder for visual editing
@@ -824,18 +825,18 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         if prompt_connector:
 
             container.sub(planes.gui.Label("connector_caption",
-                                               "Server IP",
-                                               pygame.Rect((0, 0),
-                                                           (200, 30)),
-                                               background_color = (128, 128, 128, 0)))
+                                           "Server IP",
+                                           pygame.Rect((0, 0),
+                                                       (200, 30)),
+                                           background_color = (128, 128, 128, 0)))
 
             container.sub(planes.gui.TextBox("connector",
-                                                 pygame.Rect((0, 0),
-                                                             (200, 30)),
-                                                 return_callback = None))
+                                             pygame.Rect((0, 0),
+                                                         (200, 30)),
+                                             return_callback = None))
 
             # Provide a default
-            # !!! TODO: remember older IPs somehow. Config file?
+            # TODO: remember older IPs somehow. Config file?
             #
             container.connector.text = "127.0.0.1"
 
@@ -1221,6 +1222,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                     pygame.Rect((0, 0),
                                                 room_plane.rect.size)))
 
+        # As these have no background, delete their implicitly
+        # created image to save blitting time.
+        #
+        room_plane.del_image()
+
+        room_plane.tiles.del_image()
+        
         # Transfer all Tile Planes to the new 'tiles' Plane
         #
         for plane in list(self.window.room.tiles.subplanes.values()):
@@ -1747,8 +1755,13 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             if frames < 1:
                 frames = 1
 
-            self.window.room.rendersurface.fill((250, 250, 250))
-            self.window.room.last_rect = None
+            flash_plane = planes.Plane("flash",
+                                       pygame.Rect((0, 0),
+                                                   self.window.rect.size))
+
+            flash_plane.image.fill((250, 250, 250))
+
+            self.window.sub(flash_plane)
 
             while frames:
                 self.display_single_frame()
@@ -1756,8 +1769,10 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             # Mark Entity Plane as changed to trigger redraw of the room
             #
-            self.window.room.subplanes[event.identifier].last_rect = None
+            #self.window.room.subplanes[event.identifier].last_rect = None
 
+            self.window.remove(flash_plane)
+            
             self.display_single_frame()
 
         return

@@ -52,7 +52,7 @@ def main():
     app = fabula.run.App(timeout = 0)
     app.user_interface_class = SmallPygameUI
     app.server_plugin_class = fabula.plugins.serverside.DefaultGame
-    app.run_standalone(30, 0.8)
+    app.run_standalone(60, 0.8)
 
 if __name__ == "__main__":
 
