@@ -1755,6 +1755,8 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
             if frames < 1:
                 frames = 1
 
+            # TODO: Don't re-create this plane every time - cache it
+            #
             flash_plane = planes.Plane("flash",
                                        pygame.Rect((0, 0),
                                                    self.window.rect.size))
@@ -1934,71 +1936,45 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         says_box = None
 
-        # Choose mode of presentation by text length
-        # TODO: threshold should be configurable somewhere
+        # Use large container
         #
-        if len(event.text) <= 10:
+        says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
+                                               planes.gui.tmb.C_512_STYLE)
 
-            # Small container
-            #
-            says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
-                                                   planes.gui.tmb.C_256_STYLE)
+        # Additional speaker string
+        #
+        speaker_str = "{}:".format(event.identifier)
 
-            says_box.sub(planes.gui.Label("text",
-                                          event.text,
-                                          pygame.Rect((0, 0),
-                                                      (len(event.text) * PIX_PER_CHAR, 30)),
-                                          background_color = (128, 128, 128, 0)))
+        says_box.sub(planes.gui.Label("speaker",
+                                      speaker_str,
+                                      pygame.Rect((0, 0),
+                                                  (len(speaker_str) * PIX_PER_CHAR, 30)),
+                                      background_color = (128, 128, 128, 0)))
 
-            # Display above Entity
-            # TODO: blindly assuming "image/png"
-            #
-            entity_rect = self.host.room.entity_dict[event.identifier].assets["image/png"].data.rect
+        says_box.sub(planes.gui.Label("text",
+                                      event.text,
+                                      pygame.Rect((0, 0),
+                                                  (len(event.text) * PIX_PER_CHAR, 30)),
+                                      background_color = (128, 128, 128, 0)))
 
-            # Lower a bit, to make sure to touch the Entity.
-            #
-            says_box.rect.midbottom = (entity_rect.centerx,
-                                       entity_rect.top + 10)
+        # Display at the bottom of the screen
+        #
+        says_box.rect.midbottom = (self.window.rect.centerx,
+                                   self.window.rect.bottom - self.inventory_plane.rect.height)
 
-            # Make sure it's completely visible
-            #
-            says_box.rect.clamp_ip(pygame.Rect((0, 0), self.window.rect.size))
+        # Dim the screen to underline the game is blocked
+        # TODO: Don't re-create this plane every time - cache it
+        #
+        dim_plane = planes.Plane("dim",
+                                 pygame.Rect((0, 0), self.window.rect.size))
 
-            # To actually align with the Entity coordinates, this must be a
-            # subplane of the room.
-            #
-            self.window.room.sub(says_box)
+        dim_plane.image.set_alpha(128)
 
-        else:
-            # Large container
-            #
-            says_box = planes.gui.tmb.TMBContainer("{}_says".format(event.identifier),
-                                                   planes.gui.tmb.C_512_STYLE)
-
-            # Additional speaker string
-            #
-            speaker_str = "{}:".format(event.identifier)
-
-            says_box.sub(planes.gui.Label("speaker",
-                                          speaker_str,
-                                          pygame.Rect((0, 0),
-                                                      (len(speaker_str) * PIX_PER_CHAR, 30)),
-                                          background_color = (128, 128, 128, 0)))
-
-            says_box.sub(planes.gui.Label("text",
-                                          event.text,
-                                          pygame.Rect((0, 0),
-                                                      (len(event.text) * PIX_PER_CHAR, 30)),
-                                          background_color = (128, 128, 128, 0)))
-
-            # Display at the bottom of the screen
-            #
-            says_box.rect.midbottom = (self.window.rect.centerx,
-                                       self.window.rect.bottom - self.inventory_plane.rect.height)
-
-            # This is just being put in the window, on top.
-            #
-            self.window.sub(says_box)
+        self.window.sub(dim_plane)
+        
+        # This is just being put in the window, on top.
+        #
+        self.window.sub(says_box)
 
         first_part = int(self._chars_to_frames(event.text) * 0.95)
         second_part = self._chars_to_frames(event.text) - first_part
@@ -2017,13 +1993,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                 first_part -= 1
 
-        # The second half can not be canceled
+        # The second half can not be cancelled
         #
         while second_part:
 
             self.display_single_frame()
 
             second_part -= 1
+
+        dim_plane.destroy()
 
         says_box.destroy()
 
