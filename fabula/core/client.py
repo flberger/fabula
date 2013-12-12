@@ -233,7 +233,9 @@ class Client(fabula.core.Engine):
 
                     fabula.LOGGER.debug("Clearing log file")
 
-                    message_log_file = open(self.logfile_name, "wt")
+                    # Always supply explicit encoding
+                    #
+                    message_log_file = open(self.logfile_name, "wt", encoding = "utf8")
                     message_log_file.write("")
                     message_log_file.close()
 
@@ -241,7 +243,9 @@ class Client(fabula.core.Engine):
 
                     message_timestamp = datetime.datetime.today()
 
-                message_log_file = open(self.logfile_name, "at")
+                # Always supply explicit encoding
+                #
+                message_log_file = open(self.logfile_name, "at", encoding = "utf8")
 
                 timedifference = datetime.datetime.today() - message_timestamp
 

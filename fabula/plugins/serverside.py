@@ -911,7 +911,9 @@ class DefaultGame(fabula.plugins.Plugin):
         if filename:
 
             try:
-                file = open(filename, "rt")
+                # Always supply explicit encoding
+                #
+                file = open(filename, "rt", encoding = "utf8")
 
                 logic_textdump = file.read()
 
@@ -1223,7 +1225,9 @@ class Editor(DefaultGame):
             logic_textdump = logic_textdump.replace('],', '],\n')
             logic_textdump = logic_textdump.replace('}', '\n}\n')
 
-            file = open(filename, "wt")
+            # Always supply explicit encoding
+            #
+            file = open(filename, "wt", encoding = "utf8")
 
             file.write(logic_textdump)
 

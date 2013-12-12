@@ -66,7 +66,9 @@ class PythonReplayInterface(fabula.interfaces.Interface):
 
             raise RuntimeError("Can not read from '{}', it might be overwritten during replay. Please rename the file and try again.".format(self.filename))
 
-        message_log_file = open(self.filename, "rt")
+        # Always supply explicit encoding
+        #
+        message_log_file = open(self.filename, "rt", encoding = "utf8")
 
         fabula.LOGGER.debug("reading data")
 

@@ -494,10 +494,12 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
        The planes are attributes of PygameUserInterface:
 
        PygameUserInterface.window
-           An instance of planes.Display. Initially None, will be created by
-           PygameUserInterface._setup_display(). Dimensions are given by
-           PygameUserInterface.screensize. By default opened in windowed mode,
-           this can be changed by editing the file fabula.conf.
+           An instance of planes.Display. Initially None, will be created
+           by PygameUserInterface._setup_display(), which in turn is
+           called by PygameUserInterface.get_connection_details().
+           Dimensions are given by PygameUserInterface.screensize. By
+           default opened in windowed mode, this can be changed by
+           editing the file fabula.conf.
 
        PygameUserInterface.window.room
            planes Plane for the room. Initially it will have a size of 0x0 px.
@@ -2844,7 +2846,9 @@ class PygameEditor(PygameUserInterface):
             self.host.message_for_host.event_list.append(fabula.EnterRoomEvent(self.host.client_id,
                                                                                filename))
 
-            roomfile = open(filename + ".floorplan", "wt")
+            # Always supply explicit encoding
+            #
+            roomfile = open(filename + ".floorplan", "wt", encoding = "utf8")
 
             # TODO: only save PNGs if they have actually changed
             #

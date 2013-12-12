@@ -34,6 +34,7 @@ Tile Fetching and Display in PygameUserInterface
     ...
     >>> class QuittingInterface(fabula.plugins.pygameui.PygameUserInterface):
     ...     def get_connection_details(self):
+    ...         self._setup_display()
     ...         return fabula.plugins.ui.UserInterface.get_connection_details(self)
     ...     def process_RoomCompleteEvent(self, event):
     ...         fabula.plugins.pygameui.PygameUserInterface.process_RoomCompleteEvent(self, event)

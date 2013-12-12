@@ -201,10 +201,25 @@ class Assets:
 
         msg = "attempting to retrieve '{}' from local file in {} mode"
 
-        fabula.LOGGER.debug(msg.format(asset_desc,
-                                       {"t" : "text", "b" : "binary"}[mode]))
+        file = None
 
-        file = open(asset_desc, mode = "r" + mode)
+        if mode == "t":
+
+            fabula.LOGGER.debug(msg.format(asset_desc, "text"))
+
+            # Always supply explicit encoding
+            #
+            file = open(asset_desc, mode = "rt", encoding = "utf8")
+
+        elif mode == "b":
+
+            fabula.LOGGER.debug(msg.format(asset_desc, "binary"))
+
+            file = open(asset_desc, mode = "rb")
+            
+        else:
+        
+            raise RuntimeError("Unsupported mode: '{}'".format(mode))
 
         fabula.LOGGER.debug("returning {}".format(file))
 
