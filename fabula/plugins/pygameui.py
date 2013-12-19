@@ -1972,13 +1972,41 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         dim_plane = planes.Plane("dim",
                                  pygame.Rect((0, 0), self.window.rect.size))
 
-        dim_plane.image.set_alpha(128)
+        # Start fully transparent
+        #
+        dim_plane.image.set_alpha(0)
 
         self.window.sub(dim_plane)
         
         # This is just being put in the window, on top.
         #
         self.window.sub(says_box)
+
+        # Fade in quickly
+        #
+        steps = int(self.action_frames / 5)
+
+        if steps < 1:
+
+            steps = 1
+
+        # Fade to half-opaque
+        #
+        fadestep = int(128 / steps)
+
+        while steps:
+            
+            dim_plane.image.set_alpha(dim_plane.image.get_alpha() + fadestep)
+
+            self.display_single_frame()
+
+            steps -= 1
+
+        # Make sure target value is reached
+        #
+        dim_plane.image.set_alpha(128)
+        
+        self.display_single_frame()
 
         first_part = int(self._chars_to_frames(event.text) * 0.95)
         second_part = self._chars_to_frames(event.text) - first_part
@@ -2005,9 +2033,35 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
             second_part -= 1
 
-        dim_plane.destroy()
-
         says_box.destroy()
+
+        # Fade out quickly
+        #
+        steps = int(self.action_frames / 5)
+
+        if steps < 1:
+
+            steps = 1
+
+        # Fade from half-opaque
+        #
+        fadestep = int(128 / steps)
+
+        while steps:
+            
+            dim_plane.image.set_alpha(dim_plane.image.get_alpha() - fadestep)
+
+            self.display_single_frame()
+
+            steps -= 1
+
+        # Make sure target value is reached
+        #
+        dim_plane.image.set_alpha(0)
+        
+        self.display_single_frame()
+
+        dim_plane.destroy()
 
         return
 
