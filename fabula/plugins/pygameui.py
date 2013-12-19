@@ -1053,7 +1053,9 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
                                          "state")
 
             elif (event.type == pygame.KEYDOWN
-                  and event.key == pygame.K_F2):
+                  and event.key == pygame.K_F2
+                  and (event.mod == pygame.KMOD_LSHIFT
+                       or event.mod == pygame.KMOD_RSHIFT)):
 
                 if self.screen_dump_folder:
 

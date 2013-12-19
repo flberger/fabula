@@ -164,7 +164,7 @@ clean:
 	rm -vf `find . -iname '*.pyc'`
 
 commit.txt:
-	hg diff > commit.txt ; nano commit.txt
+	hg diff > commit.txt
 
 # First taken from the StepSim Makefile
 #
