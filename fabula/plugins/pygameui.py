@@ -1984,7 +1984,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Fade in quickly
         #
-        steps = int(self.action_frames / 5)
+        steps = int(self.action_frames / 4)
 
         if steps < 1:
 
@@ -2037,7 +2037,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
         # Fade out quickly
         #
-        steps = int(self.action_frames / 5)
+        steps = int(self.action_frames / 4)
 
         if steps < 1:
 
