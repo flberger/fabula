@@ -29,6 +29,7 @@ import traceback
 import datetime
 import collections
 import itertools
+import logging
 
 # TODO: Add a decent default server CLI.
 
@@ -77,12 +78,13 @@ class Server(fabula.core.Engine):
         # Setup base class
         # Engine.__init__() calls EventProcessor.__init__()
         #
-        fabula.core.Engine.__init__(self,
-                                   interface_instance)
+        fabula.core.Engine.__init__(self, interface_instance, "server")
 
-        # Override logfile name
+        # Always supply explicit encoding.
         #
-        self.logfile_name = "messages-server-received.log"
+        self.message_logger.addHandler(logging.FileHandler("messages-server-received.log",
+                                                           mode = "w",
+                                                           encoding = "utf8"))
 
         # Timestamp for messages
         #
@@ -221,7 +223,27 @@ class Server(fabula.core.Engine):
 
                 fabula.LOGGER.debug("'{0}' incoming: {1}".format(connector, message))
 
-                self._write_logfile(message)
+                # Start Message log timer with first incoming
+                # message
+                #
+                if self.message_timestamp is None:
+
+                    fabula.LOGGER.debug("Starting message log timer")
+
+                    self.message_timestamp = datetime.datetime.today()
+
+                timedifference = datetime.datetime.today() - self.message_timestamp
+
+                # Logging time difference in seconds and message, tab-separated,
+                # terminated with double-newline.
+                # timedifference as seconds + tenth of a second
+                #
+                self.message_logger.debug("{}\t{}\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
+                                                            repr(message)))
+
+                # Renew timestamp
+                #
+                self.message_timestamp = datetime.datetime.today()
 
                 for event in message.event_list:
 
@@ -321,48 +343,6 @@ class Server(fabula.core.Engine):
                     self.message_for_remote = fabula.Message([])
 
                     self._add_event_to_room_message(fabula.DeleteEvent(client_id), room)
-
-        return
-
-    def _write_logfile(self, message):
-        """Auxiliary method. Log to logfile.
-        """
-
-        # Clear file and start Message log timer with first incoming
-        # message
-        #
-        if self.message_timestamp is None:
-
-            fabula.LOGGER.debug("Clearing log file")
-
-            # Always supply explicit encoding
-            #
-            message_log_file = open(self.logfile_name, "wt", encoding = "utf8")
-            message_log_file.write("")
-            message_log_file.close()
-
-            fabula.LOGGER.debug("Starting message log timer")
-
-            self.message_timestamp = datetime.datetime.today()
-
-        # Always supply explicit encoding
-        #
-        message_log_file = open(self.logfile_name, "at", encoding = "utf8")
-
-        timedifference = datetime.datetime.today() - self.message_timestamp
-
-        # Logging time difference in seconds and message, tab-separated,
-        # terminated with double-newline.
-        # timedifference as seconds + tenth of a second
-        #
-        message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
-                                                   repr(message)))
-
-        message_log_file.close()
-
-        # Renew timestamp
-        #
-        self.message_timestamp = datetime.datetime.today()
 
         return
 

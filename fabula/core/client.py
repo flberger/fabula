@@ -26,6 +26,7 @@ import time
 import datetime
 import traceback
 import os
+import logging
 
 class Client(fabula.core.Engine):
     """An instance of this class is the main engine in every Fabula client.
@@ -73,7 +74,7 @@ class Client(fabula.core.Engine):
         # Setup Engine internals
         # Engine.__init__() calls EventProcessor.__init__()
         #
-        fabula.core.Engine.__init__(self, interface_instance)
+        fabula.core.Engine.__init__(self, interface_instance, "client")
 
         # Now we have:
         #
@@ -88,10 +89,12 @@ class Client(fabula.core.Engine):
         #
         self.room = None
 
-        # Override logfile name
         # Use PID for unique name. Two clients may run in the same directory.
+        # Always supply explicit encoding.
         #
-        self.logfile_name = "messages-client-{}-received.log".format(os.getpid())
+        self.message_logger.addHandler(logging.FileHandler("messages-client-{}-received.log".format(os.getpid()),
+                                                           mode = "w",
+                                                           encoding = "utf8"))
 
         # Set up flags used by self.run()
         #
@@ -224,28 +227,14 @@ class Client(fabula.core.Engine):
                 fabula.LOGGER.debug("server incoming: {}".format(server_message))
 
                 # Log to logfile
-                # TODO: this could be a method. But the we would have to maintain the message_timestamp in the instance.
 
-                # Clear file and start Message log timer with first incoming
-                # message
+                # Start Message log timer with first incoming message
                 #
                 if message_timestamp is None:
-
-                    fabula.LOGGER.debug("Clearing log file")
-
-                    # Always supply explicit encoding
-                    #
-                    message_log_file = open(self.logfile_name, "wt", encoding = "utf8")
-                    message_log_file.write("")
-                    message_log_file.close()
 
                     fabula.LOGGER.debug("Starting message log timer")
 
                     message_timestamp = datetime.datetime.today()
-
-                # Always supply explicit encoding
-                #
-                message_log_file = open(self.logfile_name, "at", encoding = "utf8")
 
                 timedifference = datetime.datetime.today() - message_timestamp
 
@@ -253,10 +242,8 @@ class Client(fabula.core.Engine):
                 # terminated with double-newline.
                 # timedifference as seconds + tenth of a second
                 #
-                message_log_file.write("{}\t{}\n\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
-                                                           repr(server_message)))
-
-                message_log_file.close()
+                self.message_logger.debug("{}\t{}\n".format(timedifference.seconds + timedifference.microseconds / 1000000.0,
+                                                            repr(server_message)))
 
                 # Renew timestamp
                 #

@@ -24,6 +24,7 @@
 
 import fabula
 import fabula.eventprocessor
+import logging
 from time import sleep
 
 class Engine(fabula.eventprocessor.EventProcessor):
@@ -35,9 +36,9 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
        Engine.interface
 
-       Engine.logfile_name
-           The name of a logfile that Engine.run() will log incoming
-           messages to. Initially "messages.log".
+       Engine.message_logger
+           An instance of logging.Logger that Engine.run() should log
+           incoming messages to.
 
        Engine.plugin
            This is None upon initialisation and must be set to an instance of
@@ -51,7 +52,7 @@ class Engine(fabula.eventprocessor.EventProcessor):
            An instance of fabula.Rack.
     """
 
-    def __init__(self, interface_instance):
+    def __init__(self, interface_instance, sublogger_name):
         """Set up Engine attributes.
 
            Arguments:
@@ -59,6 +60,10 @@ class Engine(fabula.eventprocessor.EventProcessor):
            interface_instance
                An instance of a subclass of fabula.interfaces.Interface to
                communicate with the remote host.
+
+           sublogger_name
+               A string. Engine.message_logger will be created by
+               calling logging.getLogger("fabula." + sublogger_name)
         """
 
         # First setup base class
@@ -67,7 +72,15 @@ class Engine(fabula.eventprocessor.EventProcessor):
 
         self.interface = interface_instance
 
-        self.logfile_name = "messages.log"
+        # The logging module uses a funny dotted naming hierarchy
+        # for subloggers.
+        #
+        self.message_logger = logging.getLogger("fabula." + sublogger_name)
+
+        # Raw message logs are not supposed to clutter the fabula
+        # main logger.
+        #
+        self.message_logger.propagate = False
 
         self.plugin = None
 
@@ -111,8 +124,8 @@ class Engine(fabula.eventprocessor.EventProcessor):
            This is a blocking method which should call all the process methods
            to process events, and then call the plugin.
 
-           This method should log incoming messages to a file
-           named Engine.logfile_name.
+           This method should log incoming messages to the logger
+           instance Engine.message_logger.
 
            The default implementation waits for self.plugin.exit_requested to be True.
         """

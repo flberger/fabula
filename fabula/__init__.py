@@ -105,6 +105,7 @@
 # TODO: Entity.entity_type -> Entity.type? Tile.tile_type -> Tile.type?
 # TODO: nicer logging. Use the NullLogger and leave logging to the Fabula host. Use named calls to getLogger("somename") and repeat these calls whenever a Fabula logger is needed instead of passing them around.
 # TODO: Remove "This method..." from docstrings, and just explain what it does.
+# TODO: Class attributes should be needed in several methods, or be accessed from the outside. Make sure everything else is local to methods.
 #
 #
 # OPTIMISATION
