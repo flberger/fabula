@@ -2,7 +2,7 @@
 
    Based on former implementations of the ClientControlEngine
 
-   Copyright 2010 Florian Berger <fberger@florian-berger.de>
+   Copyright 2010 Florian Berger <mail@florian-berger.de>
 """
 
 # This file is part of Fabula.

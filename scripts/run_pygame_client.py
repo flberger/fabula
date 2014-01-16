@@ -2,7 +2,7 @@
 
 """Pygame Client for Fabula start script
 
-   Copyright 2012 Florian Berger <fberger@florian-berger.de>
+   Copyright 2012 Florian Berger <mail@florian-berger.de>
 """
 
 # This file is part of Fabula.

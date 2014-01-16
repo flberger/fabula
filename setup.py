@@ -1,6 +1,6 @@
 """Fabula Setup Script
 
-   Copyright 2010 Florian Berger <fberger@florian-berger.de>
+   Copyright 2010 Florian Berger <mail@florian-berger.de>
 """
 
 # This file is part of Fabula.
@@ -97,7 +97,7 @@ if sys.platform == "win32":
 setup(name = PACKAGE,
       version = fabula.VERSION,
       author = "Florian Berger",
-      author_email = "fberger@florian-berger.de",
+      author_email = "mail@florian-berger.de",
       url = "http://fabula-engine.org/",
       description = "An Open Source Python Game Engine suitable for adventure, role-playing and strategy games and digital interactive storytelling.",
       license = "GPL",

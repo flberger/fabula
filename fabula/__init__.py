@@ -1,6 +1,6 @@
 """Fabula  - An Open Source Python Game Engine
 
-   Copyright 2010 Florian Berger <fberger@florian-berger.de>
+   Copyright 2010 Florian Berger <mail@florian-berger.de>
 
 
    Overview
