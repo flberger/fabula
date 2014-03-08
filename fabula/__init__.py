@@ -204,6 +204,8 @@
 # TODO: client and server logfile gets mixed up when running in threads in one process, as in 'multiple_clients.txt' doctest. Investigage and separate by using different loggers. Fix multiple clients doctest to use threads and print to STDOUT after that.
 #
 # TODO: Use 'with' and Python context managers for client, interfaces etc. to ensure proper startup and shutdown?
+#
+# TODO: Use standard asynchat for TCP networking?
 
 # Fabula will not work with Python versions prior to 3.x.
 #
