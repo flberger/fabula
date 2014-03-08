@@ -362,7 +362,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
                 if location is None:
 
-                    fabula.LOGGER.debug("no possible move for '{}', removing from tries_to_move_dict and returning AttemptFailedEvent".format(identifier))
+                    fabula.LOGGER.info("no possible move for '{}', removing from tries_to_move_dict and returning AttemptFailedEvent".format(identifier))
 
                     del self.tries_to_move_dict[identifier]
                     del self.path_dict[identifier]
@@ -579,7 +579,7 @@ class DefaultGame(fabula.plugins.Plugin):
 
         if location is None:
 
-            fabula.LOGGER.warning("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
+            fabula.LOGGER.info("no possible move for '{}', not recording in tries_to_move_dict".format(event.identifier))
 
             fabula.LOGGER.info("AttemptFailed for '{}'".format(event.identifier))
             self.message_for_host.event_list.append(fabula.AttemptFailedEvent(event.identifier))
