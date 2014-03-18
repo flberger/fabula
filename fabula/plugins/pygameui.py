@@ -948,8 +948,15 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
                     self._snap_room_to_display()
 
-            self.window.update()
-            self.window.render()
+            try:
+                self.window.update()
+                self.window.render()
+
+            except AttributeError:
+
+                fabula.LOGGER.critical("AttributeError calling PygameUserInterface.window methods! Did you set up window by calling _setup_display() in get_connection_details()?")
+
+                raise
 
             # TODO: replace with update(dirty_rect_list)
             #
