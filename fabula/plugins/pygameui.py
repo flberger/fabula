@@ -55,6 +55,11 @@ import tkinter._fix
 #
 PIX_PER_CHAR = 8
 
+# Multipliers for text display time
+#
+TEXT_DISPLAY_DIVIDER = 7
+TEXT_DISPLAY_MIN_FACTOR = 2.5
+
 def load_image(title):
     """Auxiliary function to make the user open an image file.
        Returns a tuple (Surface, filename) upon success, (None, None) otherwise.
@@ -1955,7 +1960,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
         # Additional speaker string
         #
         speaker_str = "{}:".format(event.identifier)
-
+        
         says_box.sub(planes.gui.Label("speaker",
                                       speaker_str,
                                       pygame.Rect((0, 0),
@@ -2504,14 +2509,14 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
            characters is the string to display.
         """
 
-        # Display for (action_time / 7) per character, but at least for
-        # 2.5 * action_time
-        #
-        frames = int(self.action_frames / 7 * len(characters))
+        # Display for (action_time / TEXT_DISPLAY_DIVIDER) per character, but at least for
+        # TEXT_DISPLAY_MIN_FACTOR * action_time
+        # 
+        frames = int(self.action_frames / TEXT_DISPLAY_DIVIDER * len(characters))
 
-        if frames < 2.5 * self.action_frames:
+        if frames < TEXT_DISPLAY_MIN_FACTOR * self.action_frames:
 
-            frames = int(2.5 * self.action_frames)
+            frames = int(TEXT_DISPLAY_MIN_FACTOR * self.action_frames)
 
         return frames
 
