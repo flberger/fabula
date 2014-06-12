@@ -48,11 +48,16 @@ appropriate *.exe file.
 
 ### I want code my own games using Fabula, customising server logic or the client.
 
-You will need Python >= 3.1 from http://python.org/ and Pygame >= 1.9.1 from 
-http://pygame.org/.
+Fabula will run in the following software environment:
 
-Then get the *source release*. Fabula uses the Python distutils module. To 
-install, unzip the archive and run
+- Python 3.3.3, available at [https://www.python.org/download/releases/3.3.3/](https://www.python.org/download/releases/3.3.3/)
+
+- pygame 1.9.2.a0, available at [https://bitbucket.org/pygame/pygame/downloads](https://bitbucket.org/pygame/pygame/downloads)
+
+- To build standalone executables: cx_Freeze 4.3.1, available at [http://sourceforge.net/projects/cx-freeze/files/4.3.1/](http://sourceforge.net/projects/cx-freeze/files/4.3.1/)
+
+Then get the *source release*. Fabula uses the Python distutils module.
+To install, unzip the archive and run
 
     python setup.py install
 
@@ -77,4 +82,4 @@ History
 Author & Copyright
 ------------------
 
-Copyright 2010-2012 Florian Berger <fberger@florian-berger.de>
+Copyright 2010-2014 Florian Berger <fberger@florian-berger.de>
