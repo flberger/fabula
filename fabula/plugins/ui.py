@@ -62,10 +62,6 @@ class UserInterface(fabula.plugins.Plugin):
            Flag whether to stop displaying the game and collect input.
            False upon initialisation.
 
-       UserInterface.room
-           Variables to be filled by the Client before each call to
-           process_message()
-
        UserInterface.direction_vector_dict
            Convenience dict converting symbolic directions to a vector
     """

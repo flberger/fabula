@@ -474,8 +474,7 @@ class PygameUserInterface(fabula.plugins.ui.UserInterface):
 
        PygameUserInterface.keybindings
            A dict mapping instances of Pygame key constants to functions.
-           Will be handled by
-           PygameUserInterface.keybindings.collect_player_input().
+           Will be handled by PygameUserInterface.collect_player_input().
 
        PygameUserInterface utilises the planes module for 2D bitmap rendering.
        The planes hierarchy is organised as follows:
